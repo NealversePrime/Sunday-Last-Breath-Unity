@@ -26,7 +26,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v3_auto.flag";
+                string flagPath = "Temp/scene_v4_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -633,20 +633,20 @@ namespace SundayLastBreath.Editor
             cRect.anchorMin = new Vector2(0f, 1f);
             cRect.anchorMax = new Vector2(1f, 1f);
             cRect.pivot = new Vector2(0.5f, 1f);
-            cRect.sizeDelta = new Vector2(0, 120);
-            cRect.anchoredPosition = new Vector2(0, -30);
+            cRect.sizeDelta = new Vector2(0, 95);
+            cRect.anchoredPosition = new Vector2(0, -42);
 
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(container.transform, false);
             RectTransform tRect = titleObj.AddComponent<RectTransform>();
             tRect.anchorMin = new Vector2(0f, 1f);
             tRect.anchorMax = new Vector2(1f, 1f);
-            tRect.sizeDelta = new Vector2(0, 50);
+            tRect.sizeDelta = new Vector2(0, 42);
             tRect.anchoredPosition = new Vector2(0, 0);
 
             TextMeshProUGUI titleTmp = titleObj.AddComponent<TextMeshProUGUI>();
             titleTmp.text = title;
-            titleTmp.fontSize = 32;
+            titleTmp.fontSize = 28;
             titleTmp.fontStyle = FontStyles.Bold;
             titleTmp.alignment = TextAlignmentOptions.Center;
             titleTmp.color = new Color(0.83f, 0.33f, 0f);
@@ -657,12 +657,12 @@ namespace SundayLastBreath.Editor
             RectTransform sRect = subObj.AddComponent<RectTransform>();
             sRect.anchorMin = new Vector2(0f, 1f);
             sRect.anchorMax = new Vector2(1f, 1f);
-            sRect.sizeDelta = new Vector2(0, 40);
-            sRect.anchoredPosition = new Vector2(0, -50);
+            sRect.sizeDelta = new Vector2(0, 32);
+            sRect.anchoredPosition = new Vector2(0, -44);
 
             TextMeshProUGUI subTmp = subObj.AddComponent<TextMeshProUGUI>();
             subTmp.text = subtitle;
-            subTmp.fontSize = 18;
+            subTmp.fontSize = 16;
             subTmp.fontStyle = FontStyles.Italic;
             subTmp.alignment = TextAlignmentOptions.Center;
             subTmp.color = new Color(0.6f, 0.6f, 0.6f);
@@ -747,17 +747,20 @@ namespace SundayLastBreath.Editor
             CreateHeader(panel.transform, "SURVIVOR IDENTITY", "\"What was your life before the screaming started?\"");
 
             // Vertical ScrollView with 3-column Grid (matching Twine layout)
-            GameObject scrollObj = CreateScrollView(panel.transform, "JobScrollView", new Vector2(1540, 830), true, out Transform content);
+            GameObject scrollObj = CreateScrollView(panel.transform, "JobScrollView", new Vector2(1540, 890), true, out Transform content);
             RectTransform sRect = scrollObj.GetComponent<RectTransform>();
-            sRect.anchoredPosition = new Vector2(0, -40);
+            sRect.anchoredPosition = new Vector2(0, -56);
 
             GridLayoutGroup glg = content.gameObject.AddComponent<GridLayoutGroup>();
-            glg.cellSize = new Vector2(470, 500);
-            glg.spacing = new Vector2(24, 24);
+            glg.cellSize = new Vector2(470, 420);
+            glg.spacing = new Vector2(24, 16);
             glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             glg.constraintCount = 3;
-            glg.padding = new RectOffset(10, 10, 10, 30);
+            glg.padding = new RectOffset(15, 15, 10, 10);
             glg.childAlignment = TextAnchor.UpperCenter;
+
+            // Auto-detect screen & fit all 6 jobs without scroll if requirements met
+            scrollObj.AddComponent<JobSelectionScreenAdapter>();
 
             foreach (var job in CharacterCreationDefinitions.Jobs)
             {
@@ -770,39 +773,158 @@ namespace SundayLastBreath.Editor
         private static GameObject BuildStudentTrainingPanel(Transform parent, CharacterCreationScreen screen, SerializedObject so)
         {
             GameObject panel = CreatePanelContainer(parent, "StudentTrainingPanel");
-            CreateHeader(panel.transform, "PRE-APOCALYPSE TRAINING", "\"While others worked, you were preparing. How did you spend your free time?\"");
+            CreateHeader(panel.transform, "PRE-APOCALYPSE TRAINING", "\"While others worked, you were preparing. Where did your natural talents lie?\"");
 
-            GameObject pointsObj = new GameObject("PointsText");
-            pointsObj.transform.SetParent(panel.transform, false);
-            RectTransform ptRect = pointsObj.AddComponent<RectTransform>();
-            ptRect.anchorMin = new Vector2(0.5f, 0.5f);
-            ptRect.anchorMax = new Vector2(0.5f, 0.5f);
-            ptRect.sizeDelta = new Vector2(600, 40);
-            ptRect.anchoredPosition = new Vector2(0, 140);
-            TextMeshProUGUI pointsTmp = pointsObj.AddComponent<TextMeshProUGUI>();
-            pointsTmp.fontSize = 24;
+            // Main Dossier Box (1160 x 580)
+            GameObject dossierBox = new GameObject("DossierBox");
+            dossierBox.transform.SetParent(panel.transform, false);
+            RectTransform dbRect = dossierBox.AddComponent<RectTransform>();
+            dbRect.anchorMin = new Vector2(0.5f, 0.5f);
+            dbRect.anchorMax = new Vector2(0.5f, 0.5f);
+            dbRect.sizeDelta = new Vector2(1160, 580);
+            dbRect.anchoredPosition = new Vector2(0, -35);
+
+            // Outer border
+            Image dbBorder = dossierBox.AddComponent<Image>();
+            dbBorder.color = new Color(0.18f, 0.18f, 0.18f, 1f);
+
+            // Inner dark panel
+            GameObject innerBox = new GameObject("Inner");
+            innerBox.transform.SetParent(dossierBox.transform, false);
+            RectTransform inRect = innerBox.AddComponent<RectTransform>();
+            StretchFull(inRect);
+            inRect.offsetMin = new Vector2(1, 1);
+            inRect.offsetMax = new Vector2(-1, -1);
+            Image inBg = innerBox.AddComponent<Image>();
+            inBg.color = new Color(0.035f, 0.035f, 0.035f, 0.98f);
+
+            // Top accent stripe (3px orange across the entire top)
+            GameObject topStripe = new GameObject("TopStripe");
+            topStripe.transform.SetParent(innerBox.transform, false);
+            RectTransform tsRect = topStripe.AddComponent<RectTransform>();
+            tsRect.anchorMin = new Vector2(0f, 1f);
+            tsRect.anchorMax = new Vector2(1f, 1f);
+            tsRect.pivot = new Vector2(0.5f, 1f);
+            tsRect.sizeDelta = new Vector2(0, 3);
+            tsRect.anchoredPosition = Vector2.zero;
+            topStripe.AddComponent<Image>().color = new Color(0.83f, 0.33f, 0f);
+
+            // ==========================================
+            // LEFT COLUMN: ATTRIBUTE ALLOCATOR CARD (535 x 542)
+            // ==========================================
+            GameObject leftCol = new GameObject("LeftColumn");
+            leftCol.transform.SetParent(innerBox.transform, false);
+            RectTransform lcRect = leftCol.AddComponent<RectTransform>();
+            lcRect.anchorMin = new Vector2(0f, 0f);
+            lcRect.anchorMax = new Vector2(0f, 1f);
+            lcRect.pivot = new Vector2(0f, 0.5f);
+            lcRect.sizeDelta = new Vector2(535, 0);
+            lcRect.anchoredPosition = new Vector2(25, 0);
+
+            // Left Card panel container
+            GameObject allocBox = new GameObject("AllocatorPanel");
+            allocBox.transform.SetParent(leftCol.transform, false);
+            RectTransform apRect = allocBox.AddComponent<RectTransform>();
+            StretchFull(apRect);
+            apRect.offsetMin = new Vector2(0, 18);
+            apRect.offsetMax = new Vector2(0, -18);
+            Image apBg = allocBox.AddComponent<Image>();
+            apBg.color = new Color(0.022f, 0.022f, 0.022f, 0.95f);
+
+            // Card Title (Aptitude Allocation)
+            GameObject allocTitleObj = new GameObject("AllocTitle");
+            allocTitleObj.transform.SetParent(allocBox.transform, false);
+            RectTransform atRect = allocTitleObj.AddComponent<RectTransform>();
+            atRect.anchorMin = new Vector2(0f, 1f);
+            atRect.anchorMax = new Vector2(1f, 1f);
+            atRect.pivot = new Vector2(0.5f, 1f);
+            atRect.sizeDelta = new Vector2(-30, 26);
+            atRect.anchoredPosition = new Vector2(0, -16);
+            TextMeshProUGUI atTmp = allocTitleObj.AddComponent<TextMeshProUGUI>();
+            atTmp.text = "APTITUDE ALLOCATION";
+            atTmp.fontSize = 18;
+            atTmp.fontStyle = FontStyles.Bold;
+            atTmp.characterSpacing = 2f;
+            atTmp.alignment = TextAlignmentOptions.Center;
+            atTmp.color = new Color(0.90f, 0.49f, 0.13f);
+
+            // Card Subtitle
+            GameObject allocSubObj = new GameObject("AllocSubtitle");
+            allocSubObj.transform.SetParent(allocBox.transform, false);
+            RectTransform asRect = allocSubObj.AddComponent<RectTransform>();
+            asRect.anchorMin = new Vector2(0f, 1f);
+            asRect.anchorMax = new Vector2(1f, 1f);
+            asRect.pivot = new Vector2(0.5f, 1f);
+            asRect.sizeDelta = new Vector2(-30, 20);
+            asRect.anchoredPosition = new Vector2(0, -44);
+            TextMeshProUGUI asTmp = allocSubObj.AddComponent<TextMeshProUGUI>();
+            asTmp.text = "\"Distribute 5 AP points to define your pre-disaster foundations.\"";
+            asTmp.fontSize = 12.5f;
+            asTmp.fontStyle = FontStyles.Italic;
+            asTmp.alignment = TextAlignmentOptions.Center;
+            asTmp.color = new Color(0.60f, 0.60f, 0.60f);
+
+            // Divider Line
+            GameObject leftDivObj = new GameObject("LeftDivider");
+            leftDivObj.transform.SetParent(allocBox.transform, false);
+            RectTransform ldRect = leftDivObj.AddComponent<RectTransform>();
+            ldRect.anchorMin = new Vector2(0f, 1f);
+            ldRect.anchorMax = new Vector2(1f, 1f);
+            ldRect.pivot = new Vector2(0.5f, 1f);
+            ldRect.sizeDelta = new Vector2(-30, 1);
+            ldRect.anchoredPosition = new Vector2(0, -68);
+            leftDivObj.AddComponent<Image>().color = new Color(0.18f, 0.18f, 0.18f, 1f);
+
+            // Points Remaining Pill Badge
+            GameObject pointsBadge = new GameObject("PointsBadge");
+            pointsBadge.transform.SetParent(allocBox.transform, false);
+            RectTransform pbRect = pointsBadge.AddComponent<RectTransform>();
+            pbRect.anchorMin = new Vector2(0.5f, 1f);
+            pbRect.anchorMax = new Vector2(0.5f, 1f);
+            pbRect.pivot = new Vector2(0.5f, 1f);
+            pbRect.sizeDelta = new Vector2(495, 36);
+            pbRect.anchoredPosition = new Vector2(0, -78);
+            Image pbBg = pointsBadge.AddComponent<Image>();
+            pbBg.color = new Color(0.08f, 0.08f, 0.08f, 0.95f);
+
+            GameObject ptTextObj = new GameObject("Text");
+            ptTextObj.transform.SetParent(pointsBadge.transform, false);
+            RectTransform pttRect = ptTextObj.AddComponent<RectTransform>();
+            StretchFull(pttRect);
+            TextMeshProUGUI pointsTmp = ptTextObj.AddComponent<TextMeshProUGUI>();
+            pointsTmp.fontSize = 14;
             pointsTmp.fontStyle = FontStyles.Bold;
             pointsTmp.alignment = TextAlignmentOptions.Center;
-            pointsTmp.color = new Color(0.83f, 0.33f, 0f);
+            pointsTmp.color = new Color(0.90f, 0.49f, 0.13f);
+            pointsTmp.text = "[ 5 AP AVAILABLE FOR ALLOCATION ]";
             so.FindProperty("studentPointsText").objectReferenceValue = pointsTmp;
 
+            // Attributes Rows Container (5 rows x 46px + 6px spacing = 254px)
             GameObject rowsBox = new GameObject("AttributesRows");
-            rowsBox.transform.SetParent(panel.transform, false);
+            rowsBox.transform.SetParent(allocBox.transform, false);
             RectTransform rRect = rowsBox.AddComponent<RectTransform>();
-            rRect.anchorMin = new Vector2(0.5f, 0.5f);
-            rRect.anchorMax = new Vector2(0.5f, 0.5f);
-            rRect.sizeDelta = new Vector2(500, 240);
-            rRect.anchoredPosition = new Vector2(0, -10);
+            rRect.anchorMin = new Vector2(0.5f, 1f);
+            rRect.anchorMax = new Vector2(0.5f, 1f);
+            rRect.pivot = new Vector2(0.5f, 1f);
+            rRect.sizeDelta = new Vector2(495, 260);
+            rRect.anchoredPosition = new Vector2(0, -124);
             VerticalLayoutGroup vlg = rowsBox.AddComponent<VerticalLayoutGroup>();
-            vlg.spacing = 8;
+            vlg.spacing = 6;
             vlg.childControlWidth = true;
             vlg.childForceExpandWidth = true;
+            vlg.childControlHeight = false;
+            vlg.childForceExpandHeight = false;
 
-            TextMeshProUGUI strTmp = CreateTrainingRow(rowsBox.transform, "STRENGTH", () => screen.AddStudentPoint("str"));
-            TextMeshProUGUI intTmp = CreateTrainingRow(rowsBox.transform, "INTELLIGENCE", () => screen.AddStudentPoint("int"));
-            TextMeshProUGUI agiTmp = CreateTrainingRow(rowsBox.transform, "AGILITY", () => screen.AddStudentPoint("agi"));
-            TextMeshProUGUI chaTmp = CreateTrainingRow(rowsBox.transform, "CHARISMA", () => screen.AddStudentPoint("cha"));
-            TextMeshProUGUI perTmp = CreateTrainingRow(rowsBox.transform, "PERCEPTION", () => screen.AddStudentPoint("per"));
+            TextMeshProUGUI strTmp = CreateTrainingRow(rowsBox.transform, "STRENGTH", new Color(0.91f, 0.30f, 0.24f), 
+                () => screen.AddStudentPoint("str"), () => screen.RemoveStudentPoint("str"), () => screen.InspectStudentStat("str", true));
+            TextMeshProUGUI intTmp = CreateTrainingRow(rowsBox.transform, "INTELLIGENCE", new Color(0.20f, 0.60f, 0.86f), 
+                () => screen.AddStudentPoint("int"), () => screen.RemoveStudentPoint("int"), () => screen.InspectStudentStat("int", true));
+            TextMeshProUGUI agiTmp = CreateTrainingRow(rowsBox.transform, "AGILITY", new Color(0.18f, 0.80f, 0.44f), 
+                () => screen.AddStudentPoint("agi"), () => screen.RemoveStudentPoint("agi"), () => screen.InspectStudentStat("agi", true));
+            TextMeshProUGUI chaTmp = CreateTrainingRow(rowsBox.transform, "CHARISMA", new Color(0.61f, 0.35f, 0.71f), 
+                () => screen.AddStudentPoint("cha"), () => screen.RemoveStudentPoint("cha"), () => screen.InspectStudentStat("cha", true));
+            TextMeshProUGUI perTmp = CreateTrainingRow(rowsBox.transform, "PERCEPTION", new Color(0.95f, 0.77f, 0.06f), 
+                () => screen.AddStudentPoint("per"), () => screen.RemoveStudentPoint("per"), () => screen.InspectStudentStat("per", true));
 
             so.FindProperty("studentStrText").objectReferenceValue = strTmp;
             so.FindProperty("studentIntText").objectReferenceValue = intTmp;
@@ -810,30 +932,509 @@ namespace SundayLastBreath.Editor
             so.FindProperty("studentChaText").objectReferenceValue = chaTmp;
             so.FindProperty("studentPerText").objectReferenceValue = perTmp;
 
+            // Warning Text
             GameObject warnObj = new GameObject("WarningText");
-            warnObj.transform.SetParent(panel.transform, false);
+            warnObj.transform.SetParent(allocBox.transform, false);
             RectTransform wRect = warnObj.AddComponent<RectTransform>();
-            wRect.anchorMin = new Vector2(0.5f, 0.5f);
-            wRect.anchorMax = new Vector2(0.5f, 0.5f);
-            wRect.sizeDelta = new Vector2(500, 30);
-            wRect.anchoredPosition = new Vector2(0, -145);
+            wRect.anchorMin = new Vector2(0.5f, 0f);
+            wRect.anchorMax = new Vector2(0.5f, 0f);
+            wRect.pivot = new Vector2(0.5f, 0f);
+            wRect.sizeDelta = new Vector2(495, 36);
+            wRect.anchoredPosition = new Vector2(0, 18);
             TextMeshProUGUI warnTmp = warnObj.AddComponent<TextMeshProUGUI>();
-            warnTmp.text = "[!] SPEND ALL POINTS TO CONTINUE";
-            warnTmp.fontSize = 18;
+            warnTmp.text = "[!] ALLOCATE ALL 5 POINTS TO FINALIZE RECORD";
+            warnTmp.fontSize = 13f;
             warnTmp.fontStyle = FontStyles.Bold;
             warnTmp.alignment = TextAlignmentOptions.Center;
-            warnTmp.color = new Color(0.8f, 0.2f, 0.2f);
+            warnTmp.color = new Color(0.92f, 0.30f, 0.30f);
             warnTmp.raycastTarget = false;
             so.FindProperty("studentWarningText").objectReferenceValue = warnTmp;
 
-            Button continueBtn = CreateStandardButton(panel.transform, "CONTINUE TO UNIVERSITY MAJOR", () => screen.ConfirmStudentTraining(), new Vector2(380, 50));
+            // Continue Button (Placed in exact same bottom slot)
+            Button continueBtn = CreateStandardButton(allocBox.transform, "CONFIRM APTITUDE & PROCEED ->", () => screen.ConfirmStudentTraining(), new Vector2(495, 44));
             RectTransform cRect = continueBtn.GetComponent<RectTransform>();
-            cRect.anchorMin = new Vector2(0.5f, 0.5f);
-            cRect.anchorMax = new Vector2(0.5f, 0.5f);
-            cRect.anchoredPosition = new Vector2(0, -200);
+            cRect.anchorMin = new Vector2(0.5f, 0f);
+            cRect.anchorMax = new Vector2(0.5f, 0f);
+            cRect.pivot = new Vector2(0.5f, 0f);
+            cRect.anchoredPosition = new Vector2(0, 18);
             so.FindProperty("studentContinueButton").objectReferenceValue = continueBtn;
 
+            // ==========================================
+            // RIGHT COLUMN: STAT INSPECTOR CARD (535 x 542)
+            // ==========================================
+            GameObject rightCol = new GameObject("RightColumn");
+            rightCol.transform.SetParent(innerBox.transform, false);
+            RectTransform rcRect = rightCol.AddComponent<RectTransform>();
+            rcRect.anchorMin = new Vector2(1f, 0f);
+            rcRect.anchorMax = new Vector2(1f, 1f);
+            rcRect.pivot = new Vector2(1f, 0.5f);
+            rcRect.sizeDelta = new Vector2(535, 0);
+            rcRect.anchoredPosition = new Vector2(-25, 0);
+
+            // Card panel container
+            GameObject inspBox = new GameObject("InspectorPanel");
+            inspBox.transform.SetParent(rightCol.transform, false);
+            RectTransform ipRect = inspBox.AddComponent<RectTransform>();
+            StretchFull(ipRect);
+            ipRect.offsetMin = new Vector2(0, 18);
+            ipRect.offsetMax = new Vector2(0, -18);
+            Image ipBg = inspBox.AddComponent<Image>();
+            ipBg.color = new Color(0.022f, 0.022f, 0.022f, 0.95f);
+
+            // Inspector Title
+            GameObject inspTitleObj = new GameObject("InspTitle");
+            inspTitleObj.transform.SetParent(inspBox.transform, false);
+            RectTransform itRect = inspTitleObj.AddComponent<RectTransform>();
+            itRect.anchorMin = new Vector2(0f, 1f);
+            itRect.anchorMax = new Vector2(1f, 1f);
+            itRect.pivot = new Vector2(0.5f, 1f);
+            itRect.sizeDelta = new Vector2(-30, 26);
+            itRect.anchoredPosition = new Vector2(0, -16);
+            TextMeshProUGUI itTmp = inspTitleObj.AddComponent<TextMeshProUGUI>();
+            itTmp.text = "STRENGTH (PHYSICAL POWER)";
+            itTmp.fontSize = 18;
+            itTmp.fontStyle = FontStyles.Bold;
+            itTmp.characterSpacing = 2f;
+            itTmp.alignment = TextAlignmentOptions.Center;
+            itTmp.color = new Color(0.91f, 0.30f, 0.24f);
+            so.FindProperty("inspectorStatTitle").objectReferenceValue = itTmp;
+
+            // Inspector Quote
+            GameObject inspQuoteObj = new GameObject("InspQuote");
+            inspQuoteObj.transform.SetParent(inspBox.transform, false);
+            RectTransform iqRect = inspQuoteObj.AddComponent<RectTransform>();
+            iqRect.anchorMin = new Vector2(0f, 1f);
+            iqRect.anchorMax = new Vector2(1f, 1f);
+            iqRect.pivot = new Vector2(0.5f, 1f);
+            iqRect.sizeDelta = new Vector2(-30, 20);
+            iqRect.anchoredPosition = new Vector2(0, -44);
+            TextMeshProUGUI iqTmp = inspQuoteObj.AddComponent<TextMeshProUGUI>();
+            iqTmp.text = "\"Muscles conditioned from athletics, manual labor, and gym drills.\"";
+            iqTmp.fontSize = 12.5f;
+            iqTmp.fontStyle = FontStyles.Italic;
+            iqTmp.alignment = TextAlignmentOptions.Center;
+            iqTmp.color = new Color(0.60f, 0.60f, 0.60f);
+            so.FindProperty("inspectorStatQuote").objectReferenceValue = iqTmp;
+
+            // Divider Line
+            GameObject divObj = new GameObject("Divider");
+            divObj.transform.SetParent(inspBox.transform, false);
+            RectTransform dRect = divObj.AddComponent<RectTransform>();
+            dRect.anchorMin = new Vector2(0f, 1f);
+            dRect.anchorMax = new Vector2(1f, 1f);
+            dRect.pivot = new Vector2(0.5f, 1f);
+            dRect.sizeDelta = new Vector2(-30, 1);
+            dRect.anchoredPosition = new Vector2(0, -68);
+            divObj.AddComponent<Image>().color = new Color(0.18f, 0.18f, 0.18f, 1f);
+
+            // Banner illustration
+            GameObject iBannerObj = new GameObject("VignetteBanner");
+            iBannerObj.transform.SetParent(inspBox.transform, false);
+            RectTransform ibRect = iBannerObj.AddComponent<RectTransform>();
+            ibRect.anchorMin = new Vector2(0f, 1f);
+            ibRect.anchorMax = new Vector2(1f, 1f);
+            ibRect.pivot = new Vector2(0.5f, 1f);
+            ibRect.sizeDelta = new Vector2(-30, 135);
+            ibRect.anchoredPosition = new Vector2(0, -78);
+            iBannerObj.AddComponent<RectMask2D>();
+            Image ibBg = iBannerObj.AddComponent<Image>();
+            ibBg.color = new Color(0.06f, 0.06f, 0.06f, 0.8f);
+
+            GameObject iImgObj = new GameObject("Image");
+            iImgObj.transform.SetParent(iBannerObj.transform, false);
+            RectTransform iiRect = iImgObj.AddComponent<RectTransform>();
+            StretchFull(iiRect);
+            Image iiImg = iImgObj.AddComponent<Image>();
+            iiImg.raycastTarget = false;
+            Sprite studSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Jobs/job_student.png");
+            if (studSprite != null)
+            {
+                iiImg.sprite = studSprite;
+                iiImg.color = new Color(0.85f, 0.85f, 0.85f, 1f);
+                AspectRatioFitter arf = iImgObj.AddComponent<AspectRatioFitter>();
+                arf.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                arf.aspectRatio = studSprite.rect.width / studSprite.rect.height;
+            }
+
+            // Dark bottom fade on vignette
+            GameObject iGradObj = new GameObject("FadeOverlay");
+            iGradObj.transform.SetParent(iBannerObj.transform, false);
+            RectTransform igRect = iGradObj.AddComponent<RectTransform>();
+            igRect.anchorMin = new Vector2(0f, 0f);
+            igRect.anchorMax = new Vector2(1f, 0f);
+            igRect.pivot = new Vector2(0.5f, 0f);
+            igRect.sizeDelta = new Vector2(0, 50);
+            igRect.anchoredPosition = Vector2.zero;
+            Image igImg = iGradObj.AddComponent<Image>();
+            igImg.sprite = GetBottomFadeGradient();
+            igImg.raycastTarget = false;
+
+            // Inspector Description (Explicit Word Wrapping Enabled!)
+            GameObject inspDescObj = new GameObject("InspDesc");
+            inspDescObj.transform.SetParent(inspBox.transform, false);
+            RectTransform idRect = inspDescObj.AddComponent<RectTransform>();
+            idRect.anchorMin = new Vector2(0f, 1f);
+            idRect.anchorMax = new Vector2(1f, 1f);
+            idRect.pivot = new Vector2(0.5f, 1f);
+            idRect.sizeDelta = new Vector2(-36, 48);
+            idRect.anchoredPosition = new Vector2(0, -222);
+            TextMeshProUGUI idTmp = inspDescObj.AddComponent<TextMeshProUGUI>();
+            idTmp.text = "Determines raw physical power, encumbrance limit, and brute force survival actions in combat and exploration.";
+            idTmp.fontSize = 12.5f;
+            idTmp.lineSpacing = 3f;
+            idTmp.alignment = TextAlignmentOptions.TopLeft;
+            idTmp.color = new Color(0.75f, 0.75f, 0.75f);
+            idTmp.textWrappingMode = TextWrappingModes.Normal;
+            idTmp.overflowMode = TextOverflowModes.Truncate;
+            so.FindProperty("inspectorStatDesc").objectReferenceValue = idTmp;
+
+            // Inspector Impact Card Box (Framed Survival Impact)
+            GameObject impactCard = new GameObject("ImpactCard");
+            impactCard.transform.SetParent(inspBox.transform, false);
+            RectTransform icRect = impactCard.AddComponent<RectTransform>();
+            icRect.anchorMin = new Vector2(0f, 1f);
+            icRect.anchorMax = new Vector2(1f, 1f);
+            icRect.pivot = new Vector2(0.5f, 1f);
+            icRect.sizeDelta = new Vector2(-30, 245);
+            icRect.anchoredPosition = new Vector2(0, -278);
+            Image icBg = impactCard.AddComponent<Image>();
+            icBg.color = new Color(0.04f, 0.04f, 0.04f, 0.95f);
+
+            // Subtle top line on ImpactCard
+            GameObject icTopLine = new GameObject("TopLine");
+            icTopLine.transform.SetParent(impactCard.transform, false);
+            RectTransform ictlRect = icTopLine.AddComponent<RectTransform>();
+            ictlRect.anchorMin = new Vector2(0f, 1f);
+            ictlRect.anchorMax = new Vector2(1f, 1f);
+            ictlRect.pivot = new Vector2(0.5f, 1f);
+            ictlRect.sizeDelta = new Vector2(0, 2);
+            ictlRect.anchoredPosition = Vector2.zero;
+            icTopLine.AddComponent<Image>().color = new Color(0.83f, 0.33f, 0f, 0.7f);
+
+            GameObject inspImpactObj = new GameObject("InspImpact");
+            inspImpactObj.transform.SetParent(impactCard.transform, false);
+            RectTransform imRect = inspImpactObj.AddComponent<RectTransform>();
+            StretchFull(imRect);
+            imRect.offsetMin = new Vector2(14, 10);
+            imRect.offsetMax = new Vector2(-14, -10);
+            TextMeshProUGUI imTmp = inspImpactObj.AddComponent<TextMeshProUGUI>();
+            imTmp.text = "<color=#E67E22><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                "• <color=#FFFFFF><b>Melee Combat:</b></color> +15% damage with blunt and edged weapons\n" +
+                "• <color=#FFFFFF><b>Carrying Capacity:</b></color> +8 kg maximum inventory encumbrance\n" +
+                "• <color=#FFFFFF><b>Breaching:</b></color> Force open jammed doors and barricades without tools";
+            imTmp.fontSize = 12.5f;
+            imTmp.lineSpacing = 5f;
+            imTmp.alignment = TextAlignmentOptions.TopLeft;
+            imTmp.color = new Color(0.85f, 0.85f, 0.85f);
+            imTmp.textWrappingMode = TextWrappingModes.Normal;
+            imTmp.overflowMode = TextOverflowModes.Truncate;
+            so.FindProperty("inspectorStatImpact").objectReferenceValue = imTmp;
+
             return panel;
+        }
+
+        private struct AcademicCardDef
+        {
+            public string id;
+            public string majorTitle;
+            public string minorTitle;
+            public string majorDesc;
+            public string minorDesc;
+            public string majorStat;
+            public string minorStat;
+            public Color accentColor;
+            public string spriteName;
+        }
+
+        private static readonly AcademicCardDef[] AcademicOptions = new AcademicCardDef[]
+        {
+            new AcademicCardDef
+            {
+                id = "shooting",
+                majorTitle = "ROTC",
+                minorTitle = "SHOOTING",
+                majorDesc = "Military science. You spent weekends at the range.",
+                minorDesc = "Target practice and firearms handling.",
+                majorStat = "+3 SHOOTING",
+                minorStat = "+2 SHOOTING",
+                accentColor = new Color(0.91f, 0.30f, 0.24f), // #E74C3C Red
+                spriteName = "shooting"
+            },
+            new AcademicCardDef
+            {
+                id = "melee",
+                majorTitle = "SPORTS",
+                minorTitle = "MELEE",
+                majorDesc = "Varsity combat sports. How to use your body as a weapon.",
+                minorDesc = "Self-defense combat and hand-to-hand martial arts.",
+                majorStat = "+3 MELEE",
+                minorStat = "+2 MELEE",
+                accentColor = new Color(0.90f, 0.49f, 0.13f), // #E67E22 Orange/Gold
+                spriteName = "melee"
+            },
+            new AcademicCardDef
+            {
+                id = "stealth",
+                majorTitle = "TRACK",
+                minorTitle = "STEALTH",
+                majorDesc = "Outdoor survival. Move through terrain without being noticed.",
+                minorDesc = "Moving unseen and field evasion techniques.",
+                majorStat = "+3 STEALTH",
+                minorStat = "+2 STEALTH",
+                accentColor = new Color(0.18f, 0.80f, 0.44f), // #2ECC71 Green
+                spriteName = "stealth"
+            },
+            new AcademicCardDef
+            {
+                id = "tech",
+                majorTitle = "CS & IT",
+                minorTitle = "TECH",
+                majorDesc = "Hardware engineering. Manipulate electronics and security.",
+                minorDesc = "Hardware repair and electronics fundamentals.",
+                majorStat = "+3 TECH",
+                minorStat = "+2 TECH",
+                accentColor = new Color(0.20f, 0.60f, 0.86f), // #3498DB Blue
+                spriteName = "tech"
+            },
+            new AcademicCardDef
+            {
+                id = "medicine",
+                majorTitle = "BIOLOGY",
+                minorTitle = "MEDICINE",
+                majorDesc = "Pre-med sciences. You understand anatomy and how to patch wounds.",
+                minorDesc = "First aid protocols and emergency response.",
+                majorStat = "+3 MEDICINE",
+                minorStat = "+2 MEDICINE",
+                accentColor = new Color(0.61f, 0.35f, 0.71f), // #9B59B6 Purple
+                spriteName = "medicine"
+            }
+        };
+
+        private static GameObject CreateAcademicCard(Transform parent, AcademicCardDef opt, bool isMajor, UnityEngine.Events.UnityAction onSelect)
+        {
+            GameObject cardObj = new GameObject($"AcademicCard_{opt.id}");
+            cardObj.transform.SetParent(parent, false);
+            RectTransform rect = cardObj.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(300, 580);
+
+            // Card border outline (1px dark border)
+            Image cardBorder = cardObj.AddComponent<Image>();
+            cardBorder.color = new Color(0.18f, 0.18f, 0.18f, 1f);
+
+            // Inner dark panel (#080808)
+            GameObject innerCard = new GameObject("InnerCard");
+            innerCard.transform.SetParent(cardObj.transform, false);
+            RectTransform innerRect = innerCard.AddComponent<RectTransform>();
+            StretchFull(innerRect);
+            innerRect.offsetMin = new Vector2(1, 1);
+            innerRect.offsetMax = new Vector2(-1, -1);
+            Image innerBg = innerCard.AddComponent<Image>();
+            innerBg.color = new Color(0.031f, 0.031f, 0.031f, 1f);
+            Button cardBtn = innerCard.AddComponent<Button>();
+            cardBtn.targetGraphic = innerBg;
+            ColorBlock ccb = cardBtn.colors;
+            ccb.normalColor = new Color(0.031f, 0.031f, 0.031f, 1f);
+            ccb.highlightedColor = new Color(0.08f, 0.08f, 0.08f, 1f);
+            ccb.pressedColor = new Color(0.12f, 0.12f, 0.12f, 1f);
+            ccb.selectedColor = ccb.normalColor;
+            cardBtn.colors = ccb;
+            if (onSelect != null) cardBtn.onClick.AddListener(onSelect);
+
+            // Top accent bar (3px line with opt.accentColor)
+            GameObject topBar = new GameObject("TopBorder");
+            topBar.transform.SetParent(innerCard.transform, false);
+            RectTransform tbRect = topBar.AddComponent<RectTransform>();
+            tbRect.anchorMin = new Vector2(0f, 1f);
+            tbRect.anchorMax = new Vector2(1f, 1f);
+            tbRect.pivot = new Vector2(0.5f, 1f);
+            tbRect.sizeDelta = new Vector2(0, 3);
+            tbRect.anchoredPosition = Vector2.zero;
+            topBar.AddComponent<Image>().color = opt.accentColor;
+
+            // Banner Image Container (Masked)
+            GameObject bannerObj = new GameObject("Banner");
+            bannerObj.transform.SetParent(innerCard.transform, false);
+            RectTransform bRect = bannerObj.AddComponent<RectTransform>();
+            bRect.anchorMin = new Vector2(0f, 1f);
+            bRect.anchorMax = new Vector2(1f, 1f);
+            bRect.pivot = new Vector2(0.5f, 1f);
+            bRect.sizeDelta = new Vector2(0, 240);
+            bRect.anchoredPosition = new Vector2(0, -3);
+            bannerObj.AddComponent<RectMask2D>();
+            Image bBg = bannerObj.AddComponent<Image>();
+            bBg.color = new Color(0.06f, 0.06f, 0.06f, 0.8f);
+
+            // Illustration image
+            GameObject imgObj = new GameObject("Icon");
+            imgObj.transform.SetParent(bannerObj.transform, false);
+            RectTransform imgRect = imgObj.AddComponent<RectTransform>();
+            Image pImg = imgObj.AddComponent<Image>();
+            pImg.raycastTarget = false;
+
+            Sprite hobbySprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/Hobbies/{opt.spriteName}.png");
+            if (hobbySprite != null)
+            {
+                pImg.sprite = hobbySprite;
+                pImg.color = new Color(0.92f, 0.92f, 0.92f, 1f);
+            }
+
+            float spriteRatio = (hobbySprite != null && hobbySprite.rect.height > 0)
+                ? (hobbySprite.rect.width / hobbySprite.rect.height)
+                : 1.0f;
+
+            if (spriteRatio > 1.2f)
+            {
+                // Cover banner mode (for 3:2 landscape illustrations)
+                StretchFull(imgRect);
+                AspectRatioFitter arf = imgObj.AddComponent<AspectRatioFitter>();
+                arf.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                arf.aspectRatio = spriteRatio;
+                pImg.preserveAspect = false;
+
+                // Pre-calculate exact sizeDelta for instant editor layout without waiting for layout pass
+                float containerW = 298f;
+                float containerH = 240f;
+                float neededW = containerH * spriteRatio;
+                if (neededW > containerW)
+                {
+                    imgRect.sizeDelta = new Vector2(neededW - containerW, 0f);
+                }
+                else
+                {
+                    float neededH = containerW / spriteRatio;
+                    imgRect.sizeDelta = new Vector2(0f, Mathf.Max(0f, neededH - containerH));
+                }
+                imgRect.anchoredPosition = Vector2.zero;
+            }
+            else
+            {
+                // Centered icon mode (for square clipart icons)
+                imgRect.anchorMin = new Vector2(0.5f, 0.5f);
+                imgRect.anchorMax = new Vector2(0.5f, 0.5f);
+                imgRect.pivot = new Vector2(0.5f, 0.5f);
+                imgRect.sizeDelta = new Vector2(170, 170);
+                imgRect.anchoredPosition = new Vector2(0, -5);
+                pImg.preserveAspect = true;
+            }
+
+            // Dark bottom gradient overlay
+            GameObject gradObj = new GameObject("FadeOverlay");
+            gradObj.transform.SetParent(bannerObj.transform, false);
+            RectTransform gRect = gradObj.AddComponent<RectTransform>();
+            gRect.anchorMin = new Vector2(0f, 0f);
+            gRect.anchorMax = new Vector2(1f, 0f);
+            gRect.pivot = new Vector2(0.5f, 0f);
+            gRect.sizeDelta = new Vector2(0, 65);
+            gRect.anchoredPosition = Vector2.zero;
+            Image gradImg = gradObj.AddComponent<Image>();
+            gradImg.sprite = GetBottomFadeGradient();
+            gradImg.raycastTarget = false;
+
+            // Title
+            string displayTitle = isMajor ? opt.majorTitle : opt.minorTitle;
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(innerCard.transform, false);
+            RectTransform tRect = titleObj.AddComponent<RectTransform>();
+            tRect.anchorMin = new Vector2(0f, 1f);
+            tRect.anchorMax = new Vector2(1f, 1f);
+            tRect.pivot = new Vector2(0.5f, 1f);
+            tRect.sizeDelta = new Vector2(-20, 32);
+            tRect.anchoredPosition = new Vector2(0, -258);
+            TextMeshProUGUI tTmp = titleObj.AddComponent<TextMeshProUGUI>();
+            tTmp.text = displayTitle;
+            tTmp.fontSize = 22;
+            tTmp.fontStyle = FontStyles.Bold;
+            tTmp.characterSpacing = 2f;
+            tTmp.alignment = TextAlignmentOptions.Center;
+            tTmp.color = opt.accentColor;
+            tTmp.raycastTarget = false;
+
+            // Stat Badge Pill
+            string displayStat = isMajor ? opt.majorStat : opt.minorStat;
+            GameObject statObj = new GameObject("StatBadge");
+            statObj.transform.SetParent(innerCard.transform, false);
+            RectTransform stRect = statObj.AddComponent<RectTransform>();
+            stRect.anchorMin = new Vector2(0f, 1f);
+            stRect.anchorMax = new Vector2(1f, 1f);
+            stRect.pivot = new Vector2(0.5f, 1f);
+            stRect.sizeDelta = new Vector2(-40, 28);
+            stRect.anchoredPosition = new Vector2(0, -298);
+            Image stBg = statObj.AddComponent<Image>();
+            stBg.color = new Color(0f, 0f, 0f, 0.55f);
+
+            GameObject stTextObj = new GameObject("Text");
+            stTextObj.transform.SetParent(statObj.transform, false);
+            RectTransform sttRect = stTextObj.AddComponent<RectTransform>();
+            StretchFull(sttRect);
+            TextMeshProUGUI stTmp = stTextObj.AddComponent<TextMeshProUGUI>();
+            stTmp.text = displayStat;
+            stTmp.fontSize = 13;
+            stTmp.fontStyle = FontStyles.Bold;
+            stTmp.alignment = TextAlignmentOptions.Center;
+            stTmp.color = opt.accentColor;
+            stTmp.raycastTarget = false;
+
+            // Description
+            string displayDesc = isMajor ? opt.majorDesc : opt.minorDesc;
+            GameObject descObj = new GameObject("Description");
+            descObj.transform.SetParent(innerCard.transform, false);
+            RectTransform dRect = descObj.AddComponent<RectTransform>();
+            dRect.anchorMin = new Vector2(0f, 1f);
+            dRect.anchorMax = new Vector2(1f, 1f);
+            dRect.pivot = new Vector2(0.5f, 1f);
+            dRect.sizeDelta = new Vector2(-24, 80);
+            dRect.anchoredPosition = new Vector2(0, -338);
+            TextMeshProUGUI dTmp = descObj.AddComponent<TextMeshProUGUI>();
+            dTmp.text = displayDesc;
+            dTmp.fontSize = 12.5f;
+            dTmp.lineSpacing = 2.5f;
+            dTmp.alignment = TextAlignmentOptions.Center;
+            dTmp.color = new Color(0.72f, 0.72f, 0.72f);
+            dTmp.textWrappingMode = TextWrappingModes.Normal;
+            dTmp.overflowMode = TextOverflowModes.Ellipsis;
+            dTmp.raycastTarget = false;
+
+            // Action Button
+            GameObject btnObj = new GameObject("SelectBtn");
+            btnObj.transform.SetParent(innerCard.transform, false);
+            RectTransform btnRect = btnObj.AddComponent<RectTransform>();
+            btnRect.anchorMin = new Vector2(0.5f, 0f);
+            btnRect.anchorMax = new Vector2(0.5f, 0f);
+            btnRect.pivot = new Vector2(0.5f, 0f);
+            btnRect.sizeDelta = new Vector2(250, 48);
+            btnRect.anchoredPosition = new Vector2(0, 20);
+
+            Image btnBg = btnObj.AddComponent<Image>();
+            btnBg.color = new Color(0.09f, 0.09f, 0.09f, 0.98f);
+            Button bBtn = btnObj.AddComponent<Button>();
+            bBtn.targetGraphic = btnBg;
+
+            ColorBlock cb = bBtn.colors;
+            cb.normalColor = new Color(0.09f, 0.09f, 0.09f, 0.98f);
+            cb.highlightedColor = Color.Lerp(new Color(0.18f, 0.18f, 0.18f, 1f), opt.accentColor, 0.45f);
+            cb.pressedColor = opt.accentColor * 0.75f;
+            cb.selectedColor = cb.normalColor;
+            bBtn.colors = cb;
+
+            if (onSelect != null) bBtn.onClick.AddListener(onSelect);
+
+            GameObject btObj = new GameObject("Text");
+            btObj.transform.SetParent(btnObj.transform, false);
+            RectTransform btRect = btObj.AddComponent<RectTransform>();
+            StretchFull(btRect);
+            TextMeshProUGUI btTmp = btObj.AddComponent<TextMeshProUGUI>();
+            btTmp.text = isMajor ? "SELECT MAJOR" : "SELECT MINOR";
+            btTmp.fontSize = 13.5f;
+            btTmp.fontStyle = FontStyles.Bold;
+            btTmp.characterSpacing = 2f;
+            btTmp.alignment = TextAlignmentOptions.Center;
+            btTmp.color = Color.white;
+            btTmp.raycastTarget = false;
+
+            AcademicCardView cardView = cardObj.AddComponent<AcademicCardView>();
+            cardView.skillId = opt.id;
+
+            return cardObj;
         }
 
         private static GameObject BuildStudentMajorPanel(Transform parent, CharacterCreationScreen screen)
@@ -841,12 +1442,26 @@ namespace SundayLastBreath.Editor
             GameObject panel = CreatePanelContainer(parent, "StudentMajorPanel");
             CreateHeader(panel.transform, "UNIVERSITY TRANSCRIPT: MAJOR", "\"Before the sirens, you were preparing for a career. What was your focus?\"");
 
-            GameObject grid = CreateButtonsGrid(panel.transform, "MajorGrid", 3);
-            CreateStandardButton(grid.transform, "ROTC\n<size=14><color=#aaa>Military Science (+3 Shoot)</color></size>", () => screen.SelectStudentMajor("shooting"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "SPORTS\n<size=14><color=#aaa>Combat Sports (+3 Melee)</color></size>", () => screen.SelectStudentMajor("melee"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "TRACK\n<size=14><color=#aaa>Outdoor Survival (+3 Stealth)</color></size>", () => screen.SelectStudentMajor("stealth"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "CS & IT\n<size=14><color=#aaa>Hardware Engineering (+3 Tech)</color></size>", () => screen.SelectStudentMajor("tech"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "BIOLOGY\n<size=14><color=#aaa>Pre-med Sciences (+3 Medicine)</color></size>", () => screen.SelectStudentMajor("medicine"), new Vector2(240, 70));
+            GameObject container = new GameObject("AcademicContainer");
+            container.transform.SetParent(panel.transform, false);
+            RectTransform cRect = container.AddComponent<RectTransform>();
+            cRect.anchorMin = new Vector2(0.5f, 0.5f);
+            cRect.anchorMax = new Vector2(0.5f, 0.5f);
+            cRect.sizeDelta = new Vector2(1650, 600);
+            cRect.anchoredPosition = new Vector2(0, -35);
+
+            HorizontalLayoutGroup hlg = container.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 28;
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+
+            foreach (var opt in AcademicOptions)
+            {
+                CreateAcademicCard(container.transform, opt, isMajor: true, () => screen.SelectStudentMajor(opt.id));
+            }
 
             return panel;
         }
@@ -856,12 +1471,26 @@ namespace SundayLastBreath.Editor
             GameObject panel = CreatePanelContainer(parent, "StudentMinorPanel");
             CreateHeader(panel.transform, "UNIVERSITY TRANSCRIPT: MINOR", "\"And what did you study on the side?\"");
 
-            GameObject grid = CreateButtonsGrid(panel.transform, "MinorGrid", 3);
-            CreateStandardButton(grid.transform, "SHOOTING\n<size=14><color=#aaa>Target Practice (+2 Shoot)</color></size>", () => screen.SelectStudentMinor("shooting"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "MELEE\n<size=14><color=#aaa>Self-defense Combat (+2 Melee)</color></size>", () => screen.SelectStudentMinor("melee"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "STEALTH\n<size=14><color=#aaa>Moving Unseen (+2 Stealth)</color></size>", () => screen.SelectStudentMinor("stealth"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "TECH\n<size=14><color=#aaa>Hardware Repair (+2 Tech)</color></size>", () => screen.SelectStudentMinor("tech"), new Vector2(240, 70));
-            CreateStandardButton(grid.transform, "MEDICINE\n<size=14><color=#aaa>First Aid Protocols (+2 Medicine)</color></size>", () => screen.SelectStudentMinor("medicine"), new Vector2(240, 70));
+            GameObject container = new GameObject("AcademicContainer");
+            container.transform.SetParent(panel.transform, false);
+            RectTransform cRect = container.AddComponent<RectTransform>();
+            cRect.anchorMin = new Vector2(0.5f, 0.5f);
+            cRect.anchorMax = new Vector2(0.5f, 0.5f);
+            cRect.sizeDelta = new Vector2(1650, 600);
+            cRect.anchoredPosition = new Vector2(0, -35);
+
+            HorizontalLayoutGroup hlg = container.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 28;
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+
+            foreach (var opt in AcademicOptions)
+            {
+                CreateAcademicCard(container.transform, opt, isMajor: false, () => screen.SelectStudentMinor(opt.id));
+            }
 
             return panel;
         }
@@ -870,33 +1499,143 @@ namespace SundayLastBreath.Editor
         {
             GameObject panel = CreatePanelContainer(parent, "HobbySelectionPanel");
             
+            // Header with atmospheric title & subtitle
             GameObject headerObj = new GameObject("Header");
             headerObj.transform.SetParent(panel.transform, false);
             RectTransform hRect = headerObj.AddComponent<RectTransform>();
             hRect.anchorMin = new Vector2(0f, 1f);
             hRect.anchorMax = new Vector2(1f, 1f);
             hRect.pivot = new Vector2(0.5f, 1f);
-            hRect.sizeDelta = new Vector2(0, 90);
-            hRect.anchoredPosition = new Vector2(0, -20);
+            hRect.sizeDelta = new Vector2(0, 95);
+            hRect.anchoredPosition = new Vector2(0, -42);
 
-            TextMeshProUGUI hTmp = headerObj.AddComponent<TextMeshProUGUI>();
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(headerObj.transform, false);
+            RectTransform tRect = titleObj.AddComponent<RectTransform>();
+            tRect.anchorMin = new Vector2(0f, 1f);
+            tRect.anchorMax = new Vector2(1f, 1f);
+            tRect.sizeDelta = new Vector2(0, 42);
+            tRect.anchoredPosition = new Vector2(0, 0);
+
+            TextMeshProUGUI hTmp = titleObj.AddComponent<TextMeshProUGUI>();
             hTmp.text = "PRIMARY HOBBY";
             hTmp.fontSize = 28;
             hTmp.fontStyle = FontStyles.Bold;
             hTmp.alignment = TextAlignmentOptions.Center;
-            hTmp.color = Color.white;
-            hTmp.characterSpacing = 6;
+            hTmp.color = new Color(0.83f, 0.33f, 0f);
+            hTmp.characterSpacing = 8;
             so.FindProperty("hobbyHeaderTitle").objectReferenceValue = hTmp;
 
-            // Scroll View with Grid
-            GameObject scrollObj = CreateScrollView(panel.transform, "HobbyScrollView", new Vector2(1200, 600), true, out Transform content);
+            GameObject subObj = new GameObject("Subtitle");
+            subObj.transform.SetParent(headerObj.transform, false);
+            RectTransform sRect = subObj.AddComponent<RectTransform>();
+            sRect.anchorMin = new Vector2(0f, 1f);
+            sRect.anchorMax = new Vector2(1f, 1f);
+            sRect.sizeDelta = new Vector2(0, 32);
+            sRect.anchoredPosition = new Vector2(0, -44);
+
+            TextMeshProUGUI subTmp = subObj.AddComponent<TextMeshProUGUI>();
+            subTmp.text = "\"How did you spend your weekends before everything fell apart?\"";
+            subTmp.fontSize = 16;
+            subTmp.fontStyle = FontStyles.Italic;
+            subTmp.alignment = TextAlignmentOptions.Center;
+            subTmp.color = new Color(0.6f, 0.6f, 0.6f);
+            so.FindProperty("hobbyHeaderSubtitle").objectReferenceValue = subTmp;
+
+            // Weakness Thematic Tab Bar (Physical Flaws vs Mental Flaws)
+            GameObject tabBarObj = new GameObject("WeaknessTabBar");
+            tabBarObj.transform.SetParent(panel.transform, false);
+            RectTransform tbRect = tabBarObj.AddComponent<RectTransform>();
+            tbRect.anchorMin = new Vector2(0.5f, 1f);
+            tbRect.anchorMax = new Vector2(0.5f, 1f);
+            tbRect.pivot = new Vector2(0.5f, 1f);
+            tbRect.sizeDelta = new Vector2(740, 38);
+            tbRect.anchoredPosition = new Vector2(0, -122);
+
+            HorizontalLayoutGroup hlg = tabBarObj.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 20;
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+            hlg.childControlWidth = true;
+            hlg.childControlHeight = true;
+            hlg.childForceExpandWidth = true;
+            hlg.childForceExpandHeight = true;
+
+            // Physical Tab Button
+            GameObject physTabObj = new GameObject("Btn_PhysicalTab");
+            physTabObj.transform.SetParent(tabBarObj.transform, false);
+            Image physBg = physTabObj.AddComponent<Image>();
+            physBg.color = new Color(0.65f, 0.15f, 0.12f, 0.95f);
+            Button physBtn = physTabObj.AddComponent<Button>();
+            physBtn.targetGraphic = physBg;
+            Outline physOutline = physTabObj.AddComponent<Outline>();
+            physOutline.effectColor = new Color(0.91f, 0.30f, 0.24f, 0.85f);
+            physOutline.effectDistance = new Vector2(1, -1);
+
+            GameObject physTxtObj = new GameObject("Text");
+            physTxtObj.transform.SetParent(physTabObj.transform, false);
+            RectTransform pttRect = physTxtObj.AddComponent<RectTransform>();
+            StretchFull(pttRect);
+            TextMeshProUGUI physTmp = physTxtObj.AddComponent<TextMeshProUGUI>();
+            physTmp.text = "<b>● PHYSICAL FLAWS (10)</b>";
+            physTmp.fontSize = 13f;
+            physTmp.fontStyle = FontStyles.Bold;
+            physTmp.characterSpacing = 2f;
+            physTmp.alignment = TextAlignmentOptions.Center;
+            physTmp.color = Color.white;
+            physTmp.raycastTarget = false;
+
+            // Mental Tab Button
+            GameObject mentalTabObj = new GameObject("Btn_MentalTab");
+            mentalTabObj.transform.SetParent(tabBarObj.transform, false);
+            Image mentalBg = mentalTabObj.AddComponent<Image>();
+            mentalBg.color = new Color(0.08f, 0.08f, 0.08f, 0.85f);
+            Button mentalBtn = mentalTabObj.AddComponent<Button>();
+            mentalBtn.targetGraphic = mentalBg;
+            Outline mentalOutline = mentalTabObj.AddComponent<Outline>();
+            mentalOutline.effectColor = new Color(0.20f, 0.20f, 0.20f, 0.5f);
+            mentalOutline.effectDistance = new Vector2(1, -1);
+
+            GameObject mentalTxtObj = new GameObject("Text");
+            mentalTxtObj.transform.SetParent(mentalTabObj.transform, false);
+            RectTransform mttRect = mentalTxtObj.AddComponent<RectTransform>();
+            StretchFull(mttRect);
+            TextMeshProUGUI mentalTmp = mentalTxtObj.AddComponent<TextMeshProUGUI>();
+            mentalTmp.text = "<b>○ MENTAL & SOCIAL (10)</b>";
+            mentalTmp.fontSize = 13f;
+            mentalTmp.fontStyle = FontStyles.Bold;
+            mentalTmp.characterSpacing = 2f;
+            mentalTmp.alignment = TextAlignmentOptions.Center;
+            mentalTmp.color = new Color(0.6f, 0.6f, 0.6f);
+            mentalTmp.raycastTarget = false;
+
+            tabBarObj.SetActive(false);
+
+            so.FindProperty("weaknessTabBar").objectReferenceValue = tabBarObj;
+            so.FindProperty("physicalTabButton").objectReferenceValue = physBtn;
+            so.FindProperty("mentalTabButton").objectReferenceValue = mentalBtn;
+            so.FindProperty("physicalTabBg").objectReferenceValue = physBg;
+            so.FindProperty("mentalTabBg").objectReferenceValue = mentalBg;
+            so.FindProperty("physicalTabText").objectReferenceValue = physTmp;
+            so.FindProperty("mentalTabText").objectReferenceValue = mentalTmp;
+            so.FindProperty("physicalTabOutline").objectReferenceValue = physOutline;
+            so.FindProperty("mentalTabOutline").objectReferenceValue = mentalOutline;
+
+            // Responsive ScrollView with 5-column Grid
+            GameObject scrollObj = CreateScrollView(panel.transform, "HobbyScrollView", new Vector2(1540, 890), true, out Transform content);
+            RectTransform scrollRectTransform = scrollObj.GetComponent<RectTransform>();
+            scrollRectTransform.anchoredPosition = new Vector2(0, -58);
+
             GridLayoutGroup glg = content.gameObject.AddComponent<GridLayoutGroup>();
-            glg.cellSize = new Vector2(260, 240);
-            glg.spacing = new Vector2(20, 20);
+            glg.cellSize = new Vector2(280, 280);
+            glg.spacing = new Vector2(18, 16);
             glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            glg.constraintCount = 4;
-            glg.padding = new RectOffset(20, 20, 20, 20);
+            glg.constraintCount = 5;
+            glg.padding = new RectOffset(20, 20, 10, 15);
+            glg.childAlignment = TextAnchor.UpperCenter;
             so.FindProperty("hobbyCardsContainer").objectReferenceValue = content;
+
+            // Auto-detect screen & fit all 15 positive hobbies without scroll if requirements met
+            scrollObj.AddComponent<HobbySelectionScreenAdapter>();
 
             // Card Template (Prefab)
             GameObject template = BuildHobbyCardTemplate(panel.transform);
@@ -909,38 +1648,376 @@ namespace SundayLastBreath.Editor
         private static GameObject BuildSummaryDossierPanel(Transform parent, CharacterCreationScreen screen, SerializedObject so)
         {
             GameObject panel = CreatePanelContainer(parent, "SummaryDossierPanel");
-            CreateHeader(panel.transform, "SURVIVOR DOSSIER: DAY ZERO", "\"The choices you made have defined you. The nightmare begins tomorrow.\"");
 
-            GameObject box = new GameObject("DossierBox");
-            box.transform.SetParent(panel.transform, false);
-            RectTransform bRect = box.AddComponent<RectTransform>();
-            bRect.anchorMin = new Vector2(0.5f, 0.5f);
-            bRect.anchorMax = new Vector2(0.5f, 0.5f);
-            bRect.sizeDelta = new Vector2(900, 480);
-            bRect.anchoredPosition = new Vector2(0, 20);
+            // Main Dossier Frame
+            GameObject frame = new GameObject("FederalDossierFrame");
+            frame.transform.SetParent(panel.transform, false);
+            RectTransform frameRect = frame.AddComponent<RectTransform>();
+            frameRect.anchorMin = new Vector2(0.5f, 0.5f);
+            frameRect.anchorMax = new Vector2(0.5f, 0.5f);
+            frameRect.sizeDelta = new Vector2(1420, 760);
+            frameRect.anchoredPosition = new Vector2(0, 0);
 
-            Image bBg = box.AddComponent<Image>();
-            bBg.color = new Color(0.07f, 0.07f, 0.07f, 0.95f);
+            Image frameBg = frame.AddComponent<Image>();
+            frameBg.color = new Color(0.05f, 0.07f, 0.10f, 0.98f); // Deep federal navy/black
 
-            VerticalLayoutGroup vlg = box.AddComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(30, 30, 25, 25);
-            vlg.spacing = 10;
-            vlg.childControlWidth = true;
-            vlg.childForceExpandWidth = true;
+            Outline outline = frame.AddComponent<Outline>();
+            outline.effectColor = new Color(0.18f, 0.28f, 0.40f, 0.85f);
+            outline.effectDistance = new Vector2(2, -2);
 
-            so.FindProperty("summaryNameText").objectReferenceValue = CreateDossierRow(box.transform, 30, FontStyles.Bold, new Color(0.83f, 0.33f, 0f));
-            so.FindProperty("summaryIdentityText").objectReferenceValue = CreateDossierRow(box.transform, 18, FontStyles.Normal, Color.white);
-            so.FindProperty("summaryVitalsText").objectReferenceValue = CreateDossierRow(box.transform, 18, FontStyles.Normal, new Color(0.36f, 0.55f, 0.71f));
-            so.FindProperty("summaryAttributesText").objectReferenceValue = CreateDossierRow(box.transform, 18, FontStyles.Normal, new Color(0.8f, 0.8f, 0.8f));
-            so.FindProperty("summarySkillsText").objectReferenceValue = CreateDossierRow(box.transform, 16, FontStyles.Normal, new Color(0.7f, 0.7f, 0.7f));
-            so.FindProperty("summaryTraitsText").objectReferenceValue = CreateDossierRow(box.transform, 15, FontStyles.Normal, new Color(0.85f, 0.85f, 0.85f));
-            so.FindProperty("summaryInventoryText").objectReferenceValue = CreateDossierRow(box.transform, 15, FontStyles.Normal, new Color(0.6f, 0.6f, 0.6f));
+            frame.AddComponent<RectMask2D>();
 
-            Button beginBtn = CreateStandardButton(panel.transform, "BEGIN SURVIVAL >>", () => screen.SendMessage("OnBeginSurvivalClicked", UnityEngine.SendMessageOptions.DontRequireReceiver), new Vector2(350, 55));
+            // ==========================================
+            // 1. TOP HEADER BAR (Height: 88px)
+            // ==========================================
+            GameObject headerBar = new GameObject("HeaderBar");
+            headerBar.transform.SetParent(frame.transform, false);
+            RectTransform hRect = headerBar.AddComponent<RectTransform>();
+            hRect.anchorMin = new Vector2(0, 1);
+            hRect.anchorMax = new Vector2(1, 1);
+            hRect.pivot = new Vector2(0.5f, 1);
+            hRect.sizeDelta = new Vector2(0, 88);
+            hRect.anchoredPosition = Vector2.zero;
+
+            Image hBg = headerBar.AddComponent<Image>();
+            hBg.color = new Color(0.08f, 0.12f, 0.18f, 1f); // Official navy
+
+            // Gold underline
+            GameObject goldLine = new GameObject("GoldDivider");
+            goldLine.transform.SetParent(headerBar.transform, false);
+            RectTransform glRect = goldLine.AddComponent<RectTransform>();
+            glRect.anchorMin = new Vector2(0, 0);
+            glRect.anchorMax = new Vector2(1, 0);
+            glRect.pivot = new Vector2(0.5f, 0);
+            glRect.sizeDelta = new Vector2(0, 2);
+            glRect.anchoredPosition = Vector2.zero;
+            Image glImg = goldLine.AddComponent<Image>();
+            glImg.color = new Color(0.85f, 0.68f, 0.25f, 1f); // Metallic Gold
+
+            // Left: Official Federal Seal
+            GameObject sealObj = new GameObject("FederalSeal");
+            sealObj.transform.SetParent(headerBar.transform, false);
+            RectTransform sRect = sealObj.AddComponent<RectTransform>();
+            sRect.anchorMin = new Vector2(0, 0.5f);
+            sRect.anchorMax = new Vector2(0, 0.5f);
+            sRect.pivot = new Vector2(0, 0.5f);
+            sRect.sizeDelta = new Vector2(68, 68);
+            sRect.anchoredPosition = new Vector2(20, 0);
+
+            Image sealImg = sealObj.AddComponent<Image>();
+            Sprite sealSprite = LoadSpriteSafe("Assets/Sprites/FederalBioEmergencySeal.png");
+            if (sealSprite != null)
+            {
+                sealImg.sprite = sealSprite;
+                sealImg.preserveAspect = true;
+            }
+
+            // Middle: Title Block
+            GameObject titleBlock = new GameObject("TitleBlock");
+            titleBlock.transform.SetParent(headerBar.transform, false);
+            RectTransform tbRect = titleBlock.AddComponent<RectTransform>();
+            tbRect.anchorMin = new Vector2(0, 0.5f);
+            tbRect.anchorMax = new Vector2(0, 0.5f);
+            tbRect.pivot = new Vector2(0, 0.5f);
+            tbRect.sizeDelta = new Vector2(750, 56);
+            tbRect.anchoredPosition = new Vector2(104, 0);
+
+            VerticalLayoutGroup tbVlg = titleBlock.AddComponent<VerticalLayoutGroup>();
+            tbVlg.childAlignment = TextAnchor.MiddleLeft;
+            tbVlg.spacing = 2;
+            tbVlg.childControlWidth = true;
+            tbVlg.childForceExpandWidth = true;
+            tbVlg.childControlHeight = true;
+            tbVlg.childForceExpandHeight = false;
+
+            GameObject t1Obj = new GameObject("Title");
+            t1Obj.transform.SetParent(titleBlock.transform, false);
+            LayoutElement t1Le = t1Obj.AddComponent<LayoutElement>();
+            t1Le.preferredHeight = 28;
+            TextMeshProUGUI t1 = t1Obj.AddComponent<TextMeshProUGUI>();
+            t1.text = "<cspace=0.15em>FEDERAL BIO-EMERGENCY AGENCY</cspace>";
+            t1.fontSize = 20;
+            t1.fontStyle = FontStyles.Bold;
+            t1.color = new Color(0.96f, 0.75f, 0.26f); // Warm Gold
+
+            GameObject t2Obj = new GameObject("Subtitle");
+            t2Obj.transform.SetParent(titleBlock.transform, false);
+            LayoutElement t2Le = t2Obj.AddComponent<LayoutElement>();
+            t2Le.preferredHeight = 18;
+            TextMeshProUGUI t2 = t2Obj.AddComponent<TextMeshProUGUI>();
+            t2.text = "CDC • FEMA JOINT OUTBREAK RESPONSE TASKFORCE   |   EMERGENCY REGISTER PROTOCOL 2026";
+            t2.fontSize = 11.5f;
+            t2.color = new Color(0.55f, 0.68f, 0.82f); // Slate cyan
+
+            // Right: Case Metadata
+            GameObject metaBlock = new GameObject("MetaBlock");
+            metaBlock.transform.SetParent(headerBar.transform, false);
+            RectTransform mbRect = metaBlock.AddComponent<RectTransform>();
+            mbRect.anchorMin = new Vector2(1, 0.5f);
+            mbRect.anchorMax = new Vector2(1, 0.5f);
+            mbRect.pivot = new Vector2(1, 0.5f);
+            mbRect.sizeDelta = new Vector2(440, 56);
+            mbRect.anchoredPosition = new Vector2(-22, 0);
+
+            VerticalLayoutGroup mbVlg = metaBlock.AddComponent<VerticalLayoutGroup>();
+            mbVlg.childAlignment = TextAnchor.MiddleRight;
+            mbVlg.spacing = 2;
+            mbVlg.childControlWidth = true;
+            mbVlg.childForceExpandWidth = true;
+            mbVlg.childControlHeight = true;
+            mbVlg.childForceExpandHeight = false;
+
+            GameObject m1Obj = new GameObject("CaseId");
+            m1Obj.transform.SetParent(metaBlock.transform, false);
+            LayoutElement m1Le = m1Obj.AddComponent<LayoutElement>();
+            m1Le.preferredHeight = 22;
+            TextMeshProUGUI m1 = m1Obj.AddComponent<TextMeshProUGUI>();
+            m1.text = "<mspace=0.6em>CASE FILE: #US-88204-EAS</mspace>   |   DATE: DAY ZERO 23:45";
+            m1.fontSize = 12;
+            m1.alignment = TextAlignmentOptions.Right;
+            m1.color = new Color(0.68f, 0.78f, 0.88f);
+
+            GameObject m2Obj = new GameObject("ThreatLevel");
+            m2Obj.transform.SetParent(metaBlock.transform, false);
+            LayoutElement m2Le = m2Obj.AddComponent<LayoutElement>();
+            m2Le.preferredHeight = 22;
+            TextMeshProUGUI m2 = m2Obj.AddComponent<TextMeshProUGUI>();
+            m2.text = "<color=#EF5350><b>[ STATUS: CIVIL DANGER WARNING // LEVEL 4 ]</b></color>";
+            m2.fontSize = 12.5f;
+            m2.alignment = TextAlignmentOptions.Right;
+
+            // ==========================================
+            // 2. COLUMNS CONTAINER (Height: 588px)
+            // ==========================================
+            GameObject colsObj = new GameObject("ColumnsContainer");
+            colsObj.transform.SetParent(frame.transform, false);
+            RectTransform cRect = colsObj.AddComponent<RectTransform>();
+            cRect.anchorMin = new Vector2(0, 0);
+            cRect.anchorMax = new Vector2(1, 1);
+            cRect.offsetMin = new Vector2(18, 76);
+            cRect.offsetMax = new Vector2(-18, -96);
+            colsObj.AddComponent<RectMask2D>();
+
+            HorizontalLayoutGroup hlg = colsObj.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 16;
+            hlg.childControlWidth = true;
+            hlg.childForceExpandWidth = true;
+            hlg.childControlHeight = true;
+            hlg.childForceExpandHeight = true;
+
+            // --- COLUMN 1: CITIZEN IDENTITY & VITALS ---
+            GameObject col1 = CreateDossierCard(colsObj.transform, "Col1_Identity", 420);
+            CreateSectionHeader(col1.transform, "01 // CITIZEN IDENTITY & VITALS");
+            CreateSubLabel(col1.transform, "REGISTRANT LEGAL IDENTITY:");
+            so.FindProperty("summaryNameText").objectReferenceValue = CreateDossierRow(col1.transform, 22, FontStyles.Bold, new Color(1f, 0.78f, 0.25f));
+            so.FindProperty("summaryIdentityText").objectReferenceValue = CreateDossierRow(col1.transform, 12.5f, FontStyles.Normal, Color.white);
+            CreateDivider(col1.transform);
+            CreateSubLabel(col1.transform, "PHYSIOLOGICAL VITALS & CONDITION:");
+            so.FindProperty("summaryVitalsText").objectReferenceValue = CreateDossierRow(col1.transform, 12.5f, FontStyles.Normal, new Color(0.40f, 0.75f, 0.95f));
+            CreateDivider(col1.transform);
+            CreateSubLabel(col1.transform, "BIOMETRIC & INFECTION SCREENING PROTOCOL:");
+            TextMeshProUGUI screeningText = CreateDossierRow(col1.transform, 11f, FontStyles.Normal, new Color(0.70f, 0.78f, 0.85f));
+            screeningText.lineSpacing = 2f;
+            screeningText.text = 
+                "• CHECKPOINT: <color=#FFE082>SECTOR-04 // METRO DECONTAM GATE</color>\n" +
+                "• BODY TEMP: <color=#66BB6A>36.8°C [NORMAL / AFEBRILE]</color>\n" +
+                "• VIRAL ANTIGEN SWAB: <color=#66BB6A>NEGATIVE (NON-REACTIVE)</color>\n" +
+                "• RETINAL OCULAR SCAN: <color=#66BB6A>NORMAL (NO CAPILLARY RUPTURE)</color>\n" +
+                "• EPIDERMAL CHECK: <color=#66BB6A>NO INFECTED LACERATIONS / BITES</color>\n" +
+                "• STATUS: <color=#29B6F6><b>TIER-1 CONDITIONAL CLEARANCE</b></color>\n\n" +
+                "<mspace=0.45em><color=#556677>||| | |||| | ||| |||| | | |||| |||</color></mspace>  <color=#8899AA>#EAS-2026-US88204</color>";
+
+            // Rubber stamp in Column 1 (Overlay inside Card 1)
+            GameObject stampHolder = new GameObject("StampHolder");
+            stampHolder.transform.SetParent(col1.transform, false);
+
+            LayoutElement stLe = stampHolder.AddComponent<LayoutElement>();
+            stLe.ignoreLayout = true; // Sits as an overlay, does not push content down!
+
+            RectTransform stRect = stampHolder.GetComponent<RectTransform>();
+            stRect.anchorMin = new Vector2(0.5f, 0f);
+            stRect.anchorMax = new Vector2(0.5f, 0f);
+            stRect.pivot = new Vector2(0.5f, 0f);
+            stRect.sizeDelta = new Vector2(185, 185);
+            stRect.anchoredPosition = new Vector2(25, 25); // Neatly anchored within Card 1 bottom area
+
+            Image stampImg = stampHolder.AddComponent<Image>();
+            Sprite stampSprite = LoadSpriteSafe("Assets/Sprites/BiohazardApprovedStampAngled.png");
+            if (stampSprite == null) stampSprite = LoadSpriteSafe("Assets/Sprites/BiohazardApprovedStamp.png");
+            if (stampSprite != null)
+            {
+                stampImg.sprite = stampSprite;
+                stampImg.preserveAspect = true;
+                stampImg.color = new Color(1f, 1f, 1f, 0.95f);
+            }
+
+            // --- COLUMN 2: ATTRIBUTES & PROFICIENCIES ---
+            GameObject col2 = CreateDossierCard(colsObj.transform, "Col2_Aptitudes", 440);
+            CreateSectionHeader(col2.transform, "02 // ATTRIBUTES & PROFICIENCIES");
+            CreateSubLabel(col2.transform, "CORE BIOLOGICAL ATTRIBUTES:");
+            so.FindProperty("summaryAttributesText").objectReferenceValue = CreateDossierRow(col2.transform, 13.5f, FontStyles.Normal, Color.white);
+            CreateDivider(col2.transform);
+            CreateSubLabel(col2.transform, "SURVIVAL & WEAPON PROFICIENCIES:");
+            so.FindProperty("summarySkillsText").objectReferenceValue = CreateDossierRow(col2.transform, 12.5f, FontStyles.Normal, Color.white);
+            CreateDivider(col2.transform);
+            CreateSubLabel(col2.transform, "CDC OUTBREAK RESPONSE ADVISORY // PROTOCOL 104:");
+
+            // Framed Tactical Advisory Box (Tightened to 115px)
+            GameObject advBox = new GameObject("AdvisoryBox");
+            advBox.transform.SetParent(col2.transform, false);
+            RectTransform abRect = advBox.AddComponent<RectTransform>();
+            abRect.sizeDelta = new Vector2(0, 115);
+
+            Image abBg = advBox.AddComponent<Image>();
+            abBg.color = new Color(0.04f, 0.06f, 0.09f, 0.85f);
+
+            Outline abOutline = advBox.AddComponent<Outline>();
+            abOutline.effectColor = new Color(0.18f, 0.26f, 0.38f, 0.6f);
+            abOutline.effectDistance = new Vector2(1, -1);
+
+            GameObject abTextObj = new GameObject("Text");
+            abTextObj.transform.SetParent(advBox.transform, false);
+            RectTransform abtRect = abTextObj.AddComponent<RectTransform>();
+            StretchFull(abtRect);
+            abtRect.offsetMin = new Vector2(10, 8);
+            abtRect.offsetMax = new Vector2(-10, -8);
+
+            TextMeshProUGUI abTmp = abTextObj.AddComponent<TextMeshProUGUI>();
+            abTmp.fontSize = 10f;
+            abTmp.lineSpacing = 1.5f;
+            abTmp.alignment = TextAlignmentOptions.TopLeft;
+            abTmp.color = new Color(0.72f, 0.78f, 0.84f);
+            abTmp.textWrappingMode = TextWrappingModes.Normal;
+            abTmp.text = 
+                "<color=#FFA726><b>\"Infected display hyper-kinesis, sensory frenzy, and loss of pain response due to rapid frontal necrosis.\"</b></color>\n" +
+                "<color=#45B7FF><b>• COMBAT DIRECTIVE:</b></color> <color=#CFD8DC>Cranial destruction is sole neutralization vector. Prioritize retreat.</color>\n" +
+                "<color=#45B7FF><b>• HYDRATION SAFETY:</b></color> <color=#CFD8DC>Boil tap water min. 10 minutes. Dehydration accelerates susceptibility.</color>";
+
+            // --- COLUMN 3: TRAITS & FIELD MANIFEST ---
+            GameObject col3 = CreateDossierCard(colsObj.transform, "Col3_Manifest", 460);
+            CreateSectionHeader(col3.transform, "03 // TRAITS & FIELD MANIFEST");
+            CreateSubLabel(col3.transform, "RECORDED TRAITS & CONDITIONAL FLAWS:");
+            so.FindProperty("summaryTraitsText").objectReferenceValue = CreateDossierRow(col3.transform, 11.5f, FontStyles.Normal, Color.white);
+            CreateDivider(col3.transform);
+            CreateSubLabel(col3.transform, "DECLARED SURVIVAL SUPPLIES:");
+            so.FindProperty("summaryInventoryText").objectReferenceValue = CreateDossierRow(col3.transform, 11.5f, FontStyles.Normal, Color.white);
+            CreateDivider(col3.transform);
+            CreateSubLabel(col3.transform, "FEMA CIVIL DEFENSE EDICT // SEC-44B COMPLIANCE:");
+
+            // Framed Edict Box (Tightened to 105px)
+            GameObject edictBox = new GameObject("EdictBox");
+            edictBox.transform.SetParent(col3.transform, false);
+            RectTransform ebRect = edictBox.AddComponent<RectTransform>();
+            ebRect.sizeDelta = new Vector2(0, 105);
+
+            Image ebBg = edictBox.AddComponent<Image>();
+            ebBg.color = new Color(0.04f, 0.06f, 0.09f, 0.85f);
+
+            Outline ebOutline = edictBox.AddComponent<Outline>();
+            ebOutline.effectColor = new Color(0.18f, 0.26f, 0.38f, 0.6f);
+            ebOutline.effectDistance = new Vector2(1, -1);
+
+            GameObject ebTextObj = new GameObject("Text");
+            ebTextObj.transform.SetParent(edictBox.transform, false);
+            RectTransform ebtRect = ebTextObj.AddComponent<RectTransform>();
+            StretchFull(ebtRect);
+            ebtRect.offsetMin = new Vector2(10, 8);
+            ebtRect.offsetMax = new Vector2(-10, -8);
+
+            TextMeshProUGUI ebTmp = ebTextObj.AddComponent<TextMeshProUGUI>();
+            ebTmp.fontSize = 10f;
+            ebTmp.lineSpacing = 1.5f;
+            ebTmp.alignment = TextAlignmentOptions.TopLeft;
+            ebTmp.color = new Color(0.72f, 0.78f, 0.84f);
+            ebTmp.textWrappingMode = TextWrappingModes.Normal;
+            ebTmp.text = 
+                "<color=#EF5350><b>• DISARMAMENT EXEMPTION:</b></color> <color=#CFD8DC>Declared defensive sidearms licensed under Martial Edict 2026-09.</color>\n" +
+                "<color=#EF5350><b>• EVACUATION CORRIDOR:</b></color> <color=#CFD8DC>Proceed along I-80 North checkpoints. Mandatory curfew 19:00 - 06:00.</color>\n" +
+                "<color=#EF5350><b>• CONCEALMENT PENALTY:</b></color> <color=#CFD8DC>Concealing bite wounds is high treason punishable by internment.</color>\n" +
+                "<color=#78909C>FIELD EXAMINER: [Agent M. Vance // #8841-B]</color>    <color=#66BB6A><b>STAMP: VERIFIED</b></color>";
+
+            // ==========================================
+            // 3. BOTTOM FOOTER DOCK (Height: 72px)
+            // ==========================================
+            GameObject footerBar = new GameObject("FooterBar");
+            footerBar.transform.SetParent(frame.transform, false);
+            RectTransform footRect = footerBar.AddComponent<RectTransform>();
+            footRect.anchorMin = new Vector2(0, 0);
+            footRect.anchorMax = new Vector2(1, 0);
+            footRect.pivot = new Vector2(0.5f, 0);
+            footRect.sizeDelta = new Vector2(0, 72);
+            footRect.anchoredPosition = Vector2.zero;
+
+            Image footBg = footerBar.AddComponent<Image>();
+            footBg.color = new Color(0.06f, 0.08f, 0.12f, 1f);
+
+            GameObject footLine = new GameObject("TopDivider");
+            footLine.transform.SetParent(footerBar.transform, false);
+            RectTransform flRect = footLine.AddComponent<RectTransform>();
+            flRect.anchorMin = new Vector2(0, 1);
+            flRect.anchorMax = new Vector2(1, 1);
+            flRect.pivot = new Vector2(0.5f, 1);
+            flRect.sizeDelta = new Vector2(0, 1.5f);
+            flRect.anchoredPosition = Vector2.zero;
+            Image flImg = footLine.AddComponent<Image>();
+            flImg.color = new Color(0.18f, 0.28f, 0.40f, 0.8f);
+
+            // Warning Notice Left
+            GameObject warnObj = new GameObject("WarningNotice");
+            warnObj.transform.SetParent(footerBar.transform, false);
+            RectTransform wRect = warnObj.AddComponent<RectTransform>();
+            wRect.anchorMin = new Vector2(0, 0.5f);
+            wRect.anchorMax = new Vector2(0, 0.5f);
+            wRect.pivot = new Vector2(0, 0.5f);
+            wRect.sizeDelta = new Vector2(740, 50);
+            wRect.anchoredPosition = new Vector2(24, 0);
+
+            TextMeshProUGUI wTmp = warnObj.AddComponent<TextMeshProUGUI>();
+            wTmp.text = "<color=#EF5350><b>[!] OFFICIAL NOTICE:</b></color> <color=#90A4AE>FALSE DECLARATIONS PUNISHABLE UNDER FEMA DIRECTIVE 44-B. PROCEED TO DESIGNATED EVACUATION SECTOR IMMEDIATELY.</color>";
+            wTmp.fontSize = 11.5f;
+            wTmp.alignment = TextAlignmentOptions.MidlineLeft;
+
+            // Start Over Button
+            Button restartBtn = CreateStandardButton(footerBar.transform, "↺ START OVER", () => screen.SendMessage("RestartCharacterCreation", UnityEngine.SendMessageOptions.DontRequireReceiver), new Vector2(210, 46), new Color(0.85f, 0.90f, 0.95f));
+            restartBtn.gameObject.name = "Btn_StartOver";
+            RectTransform rRect = restartBtn.GetComponent<RectTransform>();
+            rRect.anchorMin = new Vector2(1, 0.5f);
+            rRect.anchorMax = new Vector2(1, 0.5f);
+            rRect.pivot = new Vector2(1, 0.5f);
+            rRect.anchoredPosition = new Vector2(-386, 0);
+
+            Image rBg = restartBtn.GetComponent<Image>();
+            rBg.color = new Color(0.12f, 0.16f, 0.22f, 0.95f);
+
+            Outline rOutline = restartBtn.gameObject.AddComponent<Outline>();
+            rOutline.effectColor = new Color(0.35f, 0.45f, 0.58f, 0.75f);
+            rOutline.effectDistance = new Vector2(1, -1);
+
+            TextMeshProUGUI rTmp = restartBtn.GetComponentInChildren<TextMeshProUGUI>();
+            if (rTmp != null)
+            {
+                rTmp.fontSize = 13.5f;
+            }
+
+            so.FindProperty("restartCreationButton").objectReferenceValue = restartBtn;
+
+            // Action Button Right
+            Button beginBtn = CreateStandardButton(footerBar.transform, "CONFIRM & COMMENCE SURVIVAL >>", () => screen.SendMessage("OnBeginSurvivalClicked", UnityEngine.SendMessageOptions.DontRequireReceiver), new Vector2(350, 46));
             RectTransform btnRect = beginBtn.GetComponent<RectTransform>();
-            btnRect.anchorMin = new Vector2(0.5f, 0.5f);
-            btnRect.anchorMax = new Vector2(0.5f, 0.5f);
-            btnRect.anchoredPosition = new Vector2(0, -260);
+            btnRect.anchorMin = new Vector2(1, 0.5f);
+            btnRect.anchorMax = new Vector2(1, 0.5f);
+            btnRect.pivot = new Vector2(1, 0.5f);
+            btnRect.anchoredPosition = new Vector2(-24, 0);
+
+            Image btnImg = beginBtn.GetComponent<Image>();
+            btnImg.color = new Color(0.78f, 0.16f, 0.16f, 1f); // Emergency Hazard Red
+
+            TextMeshProUGUI btnText = beginBtn.GetComponentInChildren<TextMeshProUGUI>();
+            if (btnText != null)
+            {
+                btnText.fontSize = 15f;
+            }
+
             so.FindProperty("beginSurvivalButton").objectReferenceValue = beginBtn;
 
             return panel;
@@ -1217,7 +2294,7 @@ namespace SundayLastBreath.Editor
             GameObject cardObj = new GameObject("JobCard_" + job.id);
             cardObj.transform.SetParent(parent, false);
             RectTransform rect = cardObj.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(470, 500);
+            rect.sizeDelta = new Vector2(470, 440);
 
             // Card border outline (1px dark border)
             Image cardBorder = cardObj.AddComponent<Image>();
@@ -1251,11 +2328,11 @@ namespace SundayLastBreath.Editor
             bRect.anchorMin = new Vector2(0f, 1f);
             bRect.anchorMax = new Vector2(1f, 1f);
             bRect.pivot = new Vector2(0.5f, 1f);
-            bRect.sizeDelta = new Vector2(0, 225);
+            bRect.sizeDelta = new Vector2(0, 180);
             bRect.anchoredPosition = new Vector2(0, -3);
             bannerObj.AddComponent<RectMask2D>();
 
-            // Illustration image
+            // Illustration image (Cover fit with AspectRatioFitter - never stretch)
             GameObject imgObj = new GameObject("JobImage");
             imgObj.transform.SetParent(bannerObj.transform, false);
             RectTransform imgRect = imgObj.AddComponent<RectTransform>();
@@ -1278,6 +2355,19 @@ namespace SundayLastBreath.Editor
                 pImg.color = Color.clear;
             }
 
+            AspectRatioFitter arf = imgObj.AddComponent<AspectRatioFitter>();
+            arf.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            float spriteRatio = (jobSprite != null && jobSprite.rect.height > 0)
+                ? (jobSprite.rect.width / jobSprite.rect.height)
+                : 1.5f;
+            arf.aspectRatio = spriteRatio;
+
+            // Pre-calculate exact sizeDelta for instant editor layout without waiting for layout pass
+            float containerW = 468f;
+            float neededH = containerW / spriteRatio;
+            imgRect.sizeDelta = new Vector2(0f, Mathf.Max(0f, neededH - 180f));
+            imgRect.anchoredPosition = Vector2.zero;
+
             // Dark bottom gradient overlay
             GameObject gradObj = new GameObject("FadeOverlay");
             gradObj.transform.SetParent(bannerObj.transform, false);
@@ -1285,7 +2375,7 @@ namespace SundayLastBreath.Editor
             gRect.anchorMin = new Vector2(0f, 0f);
             gRect.anchorMax = new Vector2(1f, 0f);
             gRect.pivot = new Vector2(0.5f, 0f);
-            gRect.sizeDelta = new Vector2(0, 110);
+            gRect.sizeDelta = new Vector2(0, 75);
             gRect.anchoredPosition = Vector2.zero;
             Image gradImg = gradObj.AddComponent<Image>();
             gradImg.sprite = GetBottomFadeGradient();
@@ -1299,11 +2389,11 @@ namespace SundayLastBreath.Editor
             tRect.anchorMin = new Vector2(0f, 1f);
             tRect.anchorMax = new Vector2(1f, 1f);
             tRect.pivot = new Vector2(0.5f, 1f);
-            tRect.sizeDelta = new Vector2(430, 36);
-            tRect.anchoredPosition = new Vector2(0, -235);
+            tRect.sizeDelta = new Vector2(-40, 32);
+            tRect.anchoredPosition = new Vector2(0, -190);
             TextMeshProUGUI tTmp = titleObj.AddComponent<TextMeshProUGUI>();
             tTmp.text = displayTitle;
-            tTmp.fontSize = 24;
+            tTmp.fontSize = 22;
             tTmp.fontStyle = FontStyles.Bold;
             tTmp.characterSpacing = 2.5f;
             tTmp.alignment = TextAlignmentOptions.Left;
@@ -1318,12 +2408,12 @@ namespace SundayLastBreath.Editor
             dRect.anchorMin = new Vector2(0f, 1f);
             dRect.anchorMax = new Vector2(1f, 1f);
             dRect.pivot = new Vector2(0.5f, 1f);
-            dRect.sizeDelta = new Vector2(430, 68);
-            dRect.anchoredPosition = new Vector2(0, -274);
+            dRect.sizeDelta = new Vector2(-40, 54);
+            dRect.anchoredPosition = new Vector2(0, -226);
             TextMeshProUGUI dTmp = descObj.AddComponent<TextMeshProUGUI>();
             dTmp.text = $"{job.description}\n<color=#888888><i>\"{cleanQuote}\"</i></color>";
-            dTmp.fontSize = 12.5f;
-            dTmp.lineSpacing = 2.5f;
+            dTmp.fontSize = 11.5f;
+            dTmp.lineSpacing = 2f;
             dTmp.alignment = TextAlignmentOptions.Left;
             dTmp.color = new Color(0.75f, 0.73f, 0.73f);
             dTmp.textWrappingMode = TextWrappingModes.Normal;
@@ -1337,8 +2427,8 @@ namespace SundayLastBreath.Editor
             stRect.anchorMin = new Vector2(0f, 1f);
             stRect.anchorMax = new Vector2(1f, 1f);
             stRect.pivot = new Vector2(0.5f, 1f);
-            stRect.sizeDelta = new Vector2(430, 60);
-            stRect.anchoredPosition = new Vector2(0, -352);
+            stRect.sizeDelta = new Vector2(-40, 52);
+            stRect.anchoredPosition = new Vector2(0, -286);
 
             Image stBg = statsObj.AddComponent<Image>();
             stBg.color = new Color(0f, 0f, 0f, 0.45f);
@@ -1360,11 +2450,11 @@ namespace SundayLastBreath.Editor
             RectTransform stTextRect = sTextObj.AddComponent<RectTransform>();
             StretchFull(stTextRect);
             stTextRect.offsetMin = new Vector2(14, 4);
-            stTextRect.offsetMax = new Vector2(-10, -4);
+            stTextRect.offsetMax = new Vector2(-8, -4);
             TextMeshProUGUI stTmp = sTextObj.AddComponent<TextMeshProUGUI>();
             stTmp.text = $"<color=#FFFFFF><b>PERKS:</b></color> {GetJobPerkSummary(job)}\n<color=#FFFFFF><b>START:</b></color> {GetJobStartSummary(job)}";
-            stTmp.fontSize = 12.5f;
-            stTmp.lineSpacing = 3f;
+            stTmp.fontSize = 11.5f;
+            stTmp.lineSpacing = 2.5f;
             stTmp.alignment = TextAlignmentOptions.Left;
             stTmp.color = new Color(0.68f, 0.68f, 0.68f);
             stTmp.raycastTarget = false;
@@ -1373,11 +2463,11 @@ namespace SundayLastBreath.Editor
             GameObject btnObj = new GameObject("SelectBtn");
             btnObj.transform.SetParent(innerCard.transform, false);
             RectTransform btnRect = btnObj.AddComponent<RectTransform>();
-            btnRect.anchorMin = new Vector2(0.5f, 0f);
-            btnRect.anchorMax = new Vector2(0.5f, 0f);
+            btnRect.anchorMin = new Vector2(0f, 0f);
+            btnRect.anchorMax = new Vector2(1f, 0f);
             btnRect.pivot = new Vector2(0.5f, 0f);
-            btnRect.sizeDelta = new Vector2(430, 46);
-            btnRect.anchoredPosition = new Vector2(0, 16);
+            btnRect.sizeDelta = new Vector2(-40, 42);
+            btnRect.anchoredPosition = new Vector2(0, 14);
 
             Image bBg = btnObj.AddComponent<Image>();
             bBg.color = new Color(0.09f, 0.09f, 0.09f, 0.98f);
@@ -1399,9 +2489,9 @@ namespace SundayLastBreath.Editor
             StretchFull(btRect);
             TextMeshProUGUI btTmp = btObj.AddComponent<TextMeshProUGUI>();
             btTmp.text = GetSelectButtonText(job);
-            btTmp.fontSize = 14f;
+            btTmp.fontSize = 13.5f;
             btTmp.fontStyle = FontStyles.Bold;
-            btTmp.characterSpacing = 2.5f;
+            btTmp.characterSpacing = 2f;
             btTmp.alignment = TextAlignmentOptions.Center;
             btTmp.color = Color.white;
             btTmp.raycastTarget = false;
@@ -1412,80 +2502,152 @@ namespace SundayLastBreath.Editor
             GameObject cardObj = new GameObject("HobbyCardTemplate");
             cardObj.transform.SetParent(parent, false);
             RectTransform rect = cardObj.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(260, 240);
+            rect.sizeDelta = new Vector2(280, 280);
 
+            // Card border outline (1px dark border)
             Image borderImg = cardObj.AddComponent<Image>();
-            borderImg.color = new Color(0.83f, 0.33f, 0f);
+            borderImg.color = new Color(0.18f, 0.18f, 0.18f, 1f);
 
+            // Inner dark panel (#080808)
             GameObject innerObj = new GameObject("Inner");
             innerObj.transform.SetParent(cardObj.transform, false);
             RectTransform inRect = innerObj.AddComponent<RectTransform>();
             StretchFull(inRect);
-            inRect.offsetMin = new Vector2(2, 2);
-            inRect.offsetMax = new Vector2(-2, -2);
-            innerObj.AddComponent<Image>().color = new Color(0.08f, 0.08f, 0.08f, 0.98f);
+            inRect.offsetMin = new Vector2(1, 1);
+            inRect.offsetMax = new Vector2(-1, -1);
+            Image innerBg = innerObj.AddComponent<Image>();
+            innerBg.color = new Color(0.031f, 0.031f, 0.031f, 1f);
 
+            // Top accent bar (3px line)
+            GameObject topBar = new GameObject("TopBorder");
+            topBar.transform.SetParent(innerObj.transform, false);
+            RectTransform tbRect = topBar.AddComponent<RectTransform>();
+            tbRect.anchorMin = new Vector2(0f, 1f);
+            tbRect.anchorMax = new Vector2(1f, 1f);
+            tbRect.pivot = new Vector2(0.5f, 1f);
+            tbRect.sizeDelta = new Vector2(0, 3);
+            tbRect.anchoredPosition = Vector2.zero;
+            Image topBarImg = topBar.AddComponent<Image>();
+            topBarImg.color = new Color(0.83f, 0.33f, 0f);
+
+            // Banner Container (Masked)
+            GameObject bannerObj = new GameObject("Banner");
+            bannerObj.transform.SetParent(innerObj.transform, false);
+            RectTransform bRect = bannerObj.AddComponent<RectTransform>();
+            bRect.anchorMin = new Vector2(0f, 1f);
+            bRect.anchorMax = new Vector2(1f, 1f);
+            bRect.pivot = new Vector2(0.5f, 1f);
+            bRect.sizeDelta = new Vector2(0, 105);
+            bRect.anchoredPosition = new Vector2(0, -3);
+            bannerObj.AddComponent<RectMask2D>();
+            Image bBg = bannerObj.AddComponent<Image>();
+            bBg.color = new Color(0.06f, 0.06f, 0.06f, 0.6f);
+
+            // Trait Illustration Icon
             GameObject iconObj = new GameObject("Icon");
-            iconObj.transform.SetParent(innerObj.transform, false);
+            iconObj.transform.SetParent(bannerObj.transform, false);
             RectTransform icRect = iconObj.AddComponent<RectTransform>();
-            icRect.anchorMin = new Vector2(0.5f, 1f);
-            icRect.anchorMax = new Vector2(0.5f, 1f);
-            icRect.pivot = new Vector2(0.5f, 1f);
-            icRect.sizeDelta = new Vector2(50, 50);
-            icRect.anchoredPosition = new Vector2(0, -10);
+            icRect.anchorMin = new Vector2(0.5f, 0.5f);
+            icRect.anchorMax = new Vector2(0.5f, 0.5f);
+            icRect.pivot = new Vector2(0.5f, 0.5f);
+            icRect.sizeDelta = new Vector2(88, 88);
+            icRect.anchoredPosition = new Vector2(0, -2);
             Image icImg = iconObj.AddComponent<Image>();
             icImg.preserveAspect = true;
+            icImg.raycastTarget = false;
 
+            // Subtle dark bottom fade overlay
+            GameObject gradObj = new GameObject("FadeOverlay");
+            gradObj.transform.SetParent(bannerObj.transform, false);
+            RectTransform gRect = gradObj.AddComponent<RectTransform>();
+            gRect.anchorMin = new Vector2(0f, 0f);
+            gRect.anchorMax = new Vector2(1f, 0f);
+            gRect.pivot = new Vector2(0.5f, 0f);
+            gRect.sizeDelta = new Vector2(0, 35);
+            gRect.anchoredPosition = Vector2.zero;
+            Image gradImg = gradObj.AddComponent<Image>();
+            gradImg.sprite = GetBottomFadeGradient();
+            gradImg.raycastTarget = false;
+
+            // Title
             GameObject titleObj = new GameObject("Title");
             titleObj.transform.SetParent(innerObj.transform, false);
             RectTransform tRect = titleObj.AddComponent<RectTransform>();
             tRect.anchorMin = new Vector2(0f, 1f);
             tRect.anchorMax = new Vector2(1f, 1f);
-            tRect.sizeDelta = new Vector2(0, 26);
-            tRect.anchoredPosition = new Vector2(0, -65);
+            tRect.pivot = new Vector2(0.5f, 1f);
+            tRect.sizeDelta = new Vector2(-20, 24);
+            tRect.anchoredPosition = new Vector2(0, -114);
             TextMeshProUGUI tTmp = titleObj.AddComponent<TextMeshProUGUI>();
-            tTmp.fontSize = 16;
+            tTmp.fontSize = 15;
             tTmp.fontStyle = FontStyles.Bold;
+            tTmp.characterSpacing = 1.5f;
             tTmp.alignment = TextAlignmentOptions.Center;
+            tTmp.color = Color.white;
             tTmp.raycastTarget = false;
 
+            // Description
             GameObject descObj = new GameObject("Description");
             descObj.transform.SetParent(innerObj.transform, false);
             RectTransform dRect = descObj.AddComponent<RectTransform>();
             dRect.anchorMin = new Vector2(0f, 1f);
             dRect.anchorMax = new Vector2(1f, 1f);
-            dRect.sizeDelta = new Vector2(230, 50);
-            dRect.anchoredPosition = new Vector2(0, -95);
+            dRect.pivot = new Vector2(0.5f, 1f);
+            dRect.sizeDelta = new Vector2(-24, 38);
+            dRect.anchoredPosition = new Vector2(0, -140);
             TextMeshProUGUI dTmp = descObj.AddComponent<TextMeshProUGUI>();
-            dTmp.fontSize = 12;
+            dTmp.fontSize = 11f;
+            dTmp.lineSpacing = 1.5f;
             dTmp.alignment = TextAlignmentOptions.Center;
-            dTmp.color = new Color(0.7f, 0.7f, 0.7f);
+            dTmp.color = new Color(0.72f, 0.72f, 0.72f);
+            dTmp.textWrappingMode = TextWrappingModes.Normal;
+            dTmp.overflowMode = TextOverflowModes.Ellipsis;
             dTmp.raycastTarget = false;
 
-            GameObject stObj = new GameObject("StatsPreview");
-            stObj.transform.SetParent(innerObj.transform, false);
-            RectTransform stRect = stObj.AddComponent<RectTransform>();
+            // Stats Preview Box (Dark pill background)
+            GameObject statsObj = new GameObject("StatsBox");
+            statsObj.transform.SetParent(innerObj.transform, false);
+            RectTransform stRect = statsObj.AddComponent<RectTransform>();
             stRect.anchorMin = new Vector2(0f, 1f);
             stRect.anchorMax = new Vector2(1f, 1f);
-            stRect.sizeDelta = new Vector2(0, 24);
-            stRect.anchoredPosition = new Vector2(0, -145);
-            TextMeshProUGUI stTmp = stObj.AddComponent<TextMeshProUGUI>();
-            stTmp.fontSize = 13;
+            stRect.pivot = new Vector2(0.5f, 1f);
+            stRect.sizeDelta = new Vector2(-30, 26);
+            stRect.anchoredPosition = new Vector2(0, -182);
+            Image statsBgImg = statsObj.AddComponent<Image>();
+            statsBgImg.color = new Color(0.04f, 0.08f, 0.14f, 0.6f);
+
+            GameObject stTextObj = new GameObject("Text");
+            stTextObj.transform.SetParent(statsObj.transform, false);
+            RectTransform sttRect = stTextObj.AddComponent<RectTransform>();
+            StretchFull(sttRect);
+            TextMeshProUGUI stTmp = stTextObj.AddComponent<TextMeshProUGUI>();
+            stTmp.fontSize = 11f;
             stTmp.fontStyle = FontStyles.Bold;
             stTmp.alignment = TextAlignmentOptions.Center;
+            stTmp.color = new Color(0.36f, 0.70f, 1.0f);
             stTmp.raycastTarget = false;
 
+            // Select Button
             GameObject btnObj = new GameObject("SelectBtn");
             btnObj.transform.SetParent(innerObj.transform, false);
-            RectTransform bRect = btnObj.AddComponent<RectTransform>();
-            bRect.anchorMin = new Vector2(0.5f, 0f);
-            bRect.anchorMax = new Vector2(0.5f, 0f);
-            bRect.sizeDelta = new Vector2(180, 36);
-            bRect.anchoredPosition = new Vector2(0, 15);
-            Image bBg = btnObj.AddComponent<Image>();
-            bBg.color = new Color(0.18f, 0.18f, 0.18f);
+            RectTransform bBtnRect = btnObj.AddComponent<RectTransform>();
+            bBtnRect.anchorMin = new Vector2(0.5f, 0f);
+            bBtnRect.anchorMax = new Vector2(0.5f, 0f);
+            bBtnRect.pivot = new Vector2(0.5f, 0f);
+            bBtnRect.sizeDelta = new Vector2(240, 36);
+            bBtnRect.anchoredPosition = new Vector2(0, 14);
+
+            Image btnBg = btnObj.AddComponent<Image>();
+            btnBg.color = new Color(0.09f, 0.09f, 0.09f, 0.98f);
             Button bBtn = btnObj.AddComponent<Button>();
-            bBtn.targetGraphic = bBg;
+            bBtn.targetGraphic = btnBg;
+
+            ColorBlock cb = bBtn.colors;
+            cb.normalColor = new Color(0.09f, 0.09f, 0.09f, 0.98f);
+            cb.highlightedColor = new Color(0.70f, 0.30f, 0.05f, 1f);
+            cb.pressedColor = new Color(0.50f, 0.20f, 0.02f, 1f);
+            cb.selectedColor = cb.normalColor;
+            bBtn.colors = cb;
 
             GameObject btObj = new GameObject("Text");
             btObj.transform.SetParent(btnObj.transform, false);
@@ -1493,8 +2655,9 @@ namespace SundayLastBreath.Editor
             StretchFull(btRect);
             TextMeshProUGUI btTmp = btObj.AddComponent<TextMeshProUGUI>();
             btTmp.text = "SELECT";
-            btTmp.fontSize = 16;
+            btTmp.fontSize = 12.5f;
             btTmp.fontStyle = FontStyles.Bold;
+            btTmp.characterSpacing = 2f;
             btTmp.alignment = TextAlignmentOptions.Center;
             btTmp.color = Color.white;
             btTmp.raycastTarget = false;
@@ -1502,63 +2665,152 @@ namespace SundayLastBreath.Editor
             HobbyCardView cardView = cardObj.AddComponent<HobbyCardView>();
             SerializedObject cso = new SerializedObject(cardView);
             cso.FindProperty("cardBorder").objectReferenceValue = borderImg;
+            cso.FindProperty("topAccentBar").objectReferenceValue = topBarImg;
             cso.FindProperty("iconImage").objectReferenceValue = icImg;
             cso.FindProperty("titleText").objectReferenceValue = tTmp;
             cso.FindProperty("descriptionText").objectReferenceValue = dTmp;
             cso.FindProperty("statsPreviewText").objectReferenceValue = stTmp;
+            cso.FindProperty("statsBg").objectReferenceValue = statsBgImg;
             cso.FindProperty("selectButton").objectReferenceValue = bBtn;
+            cso.FindProperty("buttonText").objectReferenceValue = btTmp;
             cso.ApplyModifiedProperties();
 
             return cardObj;
         }
 
-        private static TextMeshProUGUI CreateTrainingRow(Transform parent, string label, UnityEngine.Events.UnityAction onAdd)
+        private static TextMeshProUGUI CreateTrainingRow(Transform parent, string label, Color statColor, UnityEngine.Events.UnityAction onAdd, UnityEngine.Events.UnityAction onSub, UnityEngine.Events.UnityAction onInspect)
         {
             GameObject row = new GameObject("Row_" + label);
             row.transform.SetParent(parent, false);
             RectTransform rect = row.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(480, 40);
+            rect.sizeDelta = new Vector2(495, 46);
 
-            GameObject textObj = new GameObject("Label");
+            // Row background (interactive button to inspect stat)
+            Image rowBg = row.AddComponent<Image>();
+            rowBg.color = new Color(0.06f, 0.06f, 0.06f, 0.85f);
+            Button rowBtn = row.AddComponent<Button>();
+            rowBtn.targetGraphic = rowBg;
+            ColorBlock rcb = rowBtn.colors;
+            rcb.normalColor = new Color(0.06f, 0.06f, 0.06f, 0.85f);
+            rcb.highlightedColor = new Color(0.12f, 0.12f, 0.12f, 0.98f);
+            rcb.pressedColor = new Color(0.16f, 0.16f, 0.16f, 1f);
+            rcb.selectedColor = rcb.normalColor;
+            rowBtn.colors = rcb;
+            if (onInspect != null) rowBtn.onClick.AddListener(onInspect);
+            row.AddComponent<EventTrigger>();
+
+            // Left colored accent indicator (3px vertical stripe)
+            GameObject indObj = new GameObject("StatPip");
+            indObj.transform.SetParent(row.transform, false);
+            RectTransform indRect = indObj.AddComponent<RectTransform>();
+            indRect.anchorMin = new Vector2(0f, 0f);
+            indRect.anchorMax = new Vector2(0f, 1f);
+            indRect.pivot = new Vector2(0f, 0.5f);
+            indRect.sizeDelta = new Vector2(3, 0);
+            indRect.anchoredPosition = Vector2.zero;
+            indObj.AddComponent<Image>().color = statColor;
+
+            // Stat Label (Left side)
+            GameObject lblObj = new GameObject("NameLabel");
+            lblObj.transform.SetParent(row.transform, false);
+            RectTransform lblRect = lblObj.AddComponent<RectTransform>();
+            lblRect.anchorMin = new Vector2(0f, 0f);
+            lblRect.anchorMax = new Vector2(0f, 1f);
+            lblRect.pivot = new Vector2(0f, 0.5f);
+            lblRect.sizeDelta = new Vector2(125, 0);
+            lblRect.anchoredPosition = new Vector2(14, 0);
+            TextMeshProUGUI lblTmp = lblObj.AddComponent<TextMeshProUGUI>();
+            lblTmp.text = label;
+            lblTmp.fontSize = 14;
+            lblTmp.fontStyle = FontStyles.Bold;
+            lblTmp.color = statColor;
+            lblTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            lblTmp.raycastTarget = false;
+
+            // Btn_Minus [-]
+            GameObject mBtnObj = new GameObject("Btn_Minus");
+            mBtnObj.transform.SetParent(row.transform, false);
+            RectTransform mbRect = mBtnObj.AddComponent<RectTransform>();
+            mbRect.anchorMin = new Vector2(0f, 0.5f);
+            mbRect.anchorMax = new Vector2(0f, 0.5f);
+            mbRect.pivot = new Vector2(0.5f, 0.5f);
+            mbRect.sizeDelta = new Vector2(34, 32);
+            mbRect.anchoredPosition = new Vector2(158, 0);
+            Image mbBg = mBtnObj.AddComponent<Image>();
+            mbBg.color = new Color(0.16f, 0.16f, 0.16f, 1f);
+            Button mBtn = mBtnObj.AddComponent<Button>();
+            mBtn.targetGraphic = mbBg;
+            ColorBlock mcb = mBtn.colors;
+            mcb.normalColor = new Color(0.16f, 0.16f, 0.16f, 1f);
+            mcb.highlightedColor = new Color(0.70f, 0.25f, 0.15f, 1f);
+            mcb.pressedColor = new Color(0.50f, 0.15f, 0.10f, 1f);
+            mBtn.colors = mcb;
+            if (onSub != null) mBtn.onClick.AddListener(onSub);
+
+            GameObject mTextObj = new GameObject("Text");
+            mTextObj.transform.SetParent(mBtnObj.transform, false);
+            RectTransform mtRect = mTextObj.AddComponent<RectTransform>();
+            StretchFull(mtRect);
+            TextMeshProUGUI mtTmp = mTextObj.AddComponent<TextMeshProUGUI>();
+            mtTmp.text = "-";
+            mtTmp.fontSize = 20;
+            mtTmp.fontStyle = FontStyles.Bold;
+            mtTmp.alignment = TextAlignmentOptions.Center;
+            mtTmp.color = Color.white;
+            mtTmp.raycastTarget = false;
+
+            // Pip & Value Text (Center area)
+            GameObject textObj = new GameObject("ValueDisplay");
             textObj.transform.SetParent(row.transform, false);
             RectTransform tRect = textObj.AddComponent<RectTransform>();
-            tRect.anchorMin = new Vector2(0f, 0.5f);
-            tRect.anchorMax = new Vector2(0.7f, 0.5f);
-            tRect.anchoredPosition = Vector2.zero;
+            tRect.anchorMin = new Vector2(0f, 0f);
+            tRect.anchorMax = new Vector2(1f, 1f);
+            tRect.offsetMin = new Vector2(180, 0);
+            tRect.offsetMax = new Vector2(-48, 0);
             TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
-            tmp.text = $"{label}: 2";
-            tmp.fontSize = 18;
-            tmp.fontStyle = FontStyles.Bold;
-            tmp.color = new Color(0.36f, 0.55f, 0.71f);
+            tmp.text = "<color=#2A2A2A>■ ■ ■ ■ ■ ■ ■ ■ ■ ■</color>   <b>2</b>";
+            tmp.fontSize = 14;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = Color.white;
+            tmp.textWrappingMode = TextWrappingModes.NoWrap;
+            tmp.raycastTarget = false;
 
-            GameObject btnObj = new GameObject("Btn_Plus");
-            btnObj.transform.SetParent(row.transform, false);
-            RectTransform bRect = btnObj.AddComponent<RectTransform>();
-            bRect.anchorMin = new Vector2(0.85f, 0.5f);
-            bRect.anchorMax = new Vector2(1f, 0.5f);
-            bRect.sizeDelta = new Vector2(60, 32);
-            bRect.anchoredPosition = Vector2.zero;
-            Image bBg = btnObj.AddComponent<Image>();
-            bBg.color = new Color(0.18f, 0.18f, 0.18f);
-            Button btn = btnObj.AddComponent<Button>();
-            btn.targetGraphic = bBg;
-            if (onAdd != null) btn.onClick.AddListener(onAdd);
+            // Btn_Plus [+]
+            GameObject pBtnObj = new GameObject("Btn_Plus");
+            pBtnObj.transform.SetParent(row.transform, false);
+            RectTransform pbRect = pBtnObj.AddComponent<RectTransform>();
+            pbRect.anchorMin = new Vector2(1f, 0.5f);
+            pbRect.anchorMax = new Vector2(1f, 0.5f);
+            pbRect.pivot = new Vector2(0.5f, 0.5f);
+            pbRect.sizeDelta = new Vector2(34, 32);
+            pbRect.anchoredPosition = new Vector2(-22, 0);
+            Image pbBg = pBtnObj.AddComponent<Image>();
+            pbBg.color = new Color(0.16f, 0.16f, 0.16f, 1f);
+            Button pBtn = pBtnObj.AddComponent<Button>();
+            pBtn.targetGraphic = pbBg;
+            ColorBlock pcb = pBtn.colors;
+            pcb.normalColor = new Color(0.16f, 0.16f, 0.16f, 1f);
+            pcb.highlightedColor = Color.Lerp(new Color(0.22f, 0.22f, 0.22f, 1f), statColor, 0.65f);
+            pcb.pressedColor = statColor * 0.85f;
+            pBtn.colors = pcb;
+            if (onAdd != null) pBtn.onClick.AddListener(onAdd);
 
-            GameObject btObj = new GameObject("Text");
-            btObj.transform.SetParent(btnObj.transform, false);
-            RectTransform btRect = btObj.AddComponent<RectTransform>();
-            StretchFull(btRect);
-            TextMeshProUGUI btTmp = btObj.AddComponent<TextMeshProUGUI>();
-            btTmp.text = "+1";
-            btTmp.fontSize = 16;
-            btTmp.fontStyle = FontStyles.Bold;
-            btTmp.alignment = TextAlignmentOptions.Center;
-            btTmp.color = Color.white;
+            GameObject ptObj = new GameObject("Text");
+            ptObj.transform.SetParent(pBtnObj.transform, false);
+            RectTransform ptRect = ptObj.AddComponent<RectTransform>();
+            StretchFull(ptRect);
+            TextMeshProUGUI ptTmp = ptObj.AddComponent<TextMeshProUGUI>();
+            ptTmp.text = "+";
+            ptTmp.fontSize = 20;
+            ptTmp.fontStyle = FontStyles.Bold;
+            ptTmp.alignment = TextAlignmentOptions.Center;
+            ptTmp.color = Color.white;
+            ptTmp.raycastTarget = false;
 
             return tmp;
         }
 
-        private static TextMeshProUGUI CreateDossierRow(Transform parent, int fontSize, FontStyles style, Color color)
+        private static TextMeshProUGUI CreateDossierRow(Transform parent, float fontSize, FontStyles style, Color color)
         {
             GameObject obj = new GameObject("Row");
             obj.transform.SetParent(parent, false);
@@ -1567,7 +2819,105 @@ namespace SundayLastBreath.Editor
             tmp.fontStyle = style;
             tmp.color = color;
             tmp.alignment = TextAlignmentOptions.TopLeft;
+
+            ContentSizeFitter csf = obj.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+
             return tmp;
+        }
+
+        private static GameObject CreateDossierCard(Transform parent, string name, float preferredWidth)
+        {
+            GameObject card = new GameObject(name);
+            card.transform.SetParent(parent, false);
+
+            LayoutElement le = card.AddComponent<LayoutElement>();
+            le.preferredWidth = preferredWidth;
+            le.flexibleWidth = 1;
+            le.preferredHeight = 580;
+            le.flexibleHeight = 0;
+
+            Image bg = card.AddComponent<Image>();
+            bg.color = new Color(0.07f, 0.10f, 0.15f, 0.95f); // Deep tactical slate card
+
+            Outline outline = card.AddComponent<Outline>();
+            outline.effectColor = new Color(0.16f, 0.24f, 0.35f, 0.8f);
+            outline.effectDistance = new Vector2(1, -1);
+
+            card.AddComponent<RectMask2D>();
+
+            VerticalLayoutGroup vlg = card.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(16, 16, 12, 12);
+            vlg.spacing = 5;
+            vlg.childControlWidth = true;
+            vlg.childForceExpandWidth = true;
+            vlg.childControlHeight = false;
+            vlg.childForceExpandHeight = false;
+
+            return card;
+        }
+
+        private static void CreateSectionHeader(Transform parent, string title)
+        {
+            GameObject barObj = new GameObject("SectionHeader");
+            barObj.transform.SetParent(parent, false);
+            RectTransform rect = barObj.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 28);
+
+            Image bg = barObj.AddComponent<Image>();
+            bg.color = new Color(0.10f, 0.16f, 0.25f, 0.95f); // Deep navy badge
+
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(barObj.transform, false);
+            RectTransform tRect = textObj.AddComponent<RectTransform>();
+            StretchFull(tRect);
+            tRect.offsetMin = new Vector2(10, 0);
+            tRect.offsetMax = new Vector2(-10, 0);
+
+            TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
+            tmp.text = title;
+            tmp.fontSize = 12.5f;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.alignment = TextAlignmentOptions.MidlineLeft;
+            tmp.color = new Color(0.45f, 0.72f, 0.98f); // Light cyan blue
+        }
+
+        private static void CreateSubLabel(Transform parent, string text)
+        {
+            GameObject obj = new GameObject("SubLabel");
+            obj.transform.SetParent(parent, false);
+            TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
+            tmp.text = text;
+            tmp.fontSize = 10.5f;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.color = new Color(0.48f, 0.58f, 0.68f); // Muted slate
+
+            ContentSizeFitter csf = obj.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        }
+
+        private static void CreateDivider(Transform parent)
+        {
+            GameObject line = new GameObject("Divider");
+            line.transform.SetParent(parent, false);
+            RectTransform rect = line.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 1);
+            Image img = line.AddComponent<Image>();
+            img.color = new Color(0.14f, 0.20f, 0.28f, 0.8f);
+        }
+
+        private static Sprite LoadSpriteSafe(string path)
+        {
+            TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (ti != null && (ti.textureType != TextureImporterType.Sprite || !ti.alphaIsTransparency))
+            {
+                ti.textureType = TextureImporterType.Sprite;
+                ti.alphaIsTransparency = true;
+                ti.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
         private static void StretchFull(RectTransform rect)

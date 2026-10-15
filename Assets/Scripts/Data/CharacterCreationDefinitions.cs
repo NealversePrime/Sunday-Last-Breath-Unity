@@ -14,9 +14,30 @@ namespace SundayLastBreath.Data
         public Color accentColor;
         public int str, intl, agi, cha, per;
         public int hpBonus, staminaBonus, humanityBonus;
-        public int shooting, melee, stealth, tech, medicine, scavenging;
+        public int shooting, melee, stealth, tech, medicine, scavenging, survival, resolve;
         [NonSerialized] public (string name, string desc)[] perks;
         [NonSerialized] public (string item, int qty)[] startingItems;
+    }
+
+    [Serializable]
+    public class PerkData
+    {
+        public string id;
+        public string title;
+        public string description;
+        public string iconName;
+        public string requiredSkill;
+        public int requiredSkillLevel;
+
+        public PerkData(string id, string title, string desc, string icon, string skill = null, int level = 0)
+        {
+            this.id = id;
+            this.title = title;
+            this.description = desc;
+            this.iconName = icon;
+            this.requiredSkill = skill;
+            this.requiredSkillLevel = level;
+        }
     }
 
     [Serializable]
@@ -32,6 +53,20 @@ namespace SundayLastBreath.Data
 
     public static class CharacterCreationDefinitions
     {
+        public static readonly PerkData[] AllPerks = new PerkData[]
+        {
+            new PerkData("gunslinger", "GUNSLINGER", "+25% reload speed & +15% critical hit chance with pistols.", "gunslinger", "shooting", 2),
+            new PerkData("shotgunner", "SHOTGUNNER", "High-impact knockdown and tighter pellet spread with shotguns.", "shotgunner", "shooting", 3),
+            new PerkData("blunt_bruiser", "BLUNT BRUISER", "Stun enemies with blunt weapons and smash barricaded doors.", "blunt_bruiser", "melee", 2),
+            new PerkData("bladesmith", "BLADESMITH", "Attacks with blades cause severe Bleed and silent criticals.", "bladesmith", "melee", 2),
+            new PerkData("iron_stomach", "IRON STOMACH", "Immunity to food poisoning from stale rations and unboiled water.", "iron_stomach", "survival", 2),
+            new PerkData("field_forager", "FIELD FORAGER", "Harvest 50% more wild herbs, clean water, and campcraft scrap.", "field_forager", "survival", 2),
+            new PerkData("second_wind", "SECOND WIND", "Instant stamina recovery and sprint boost when Health drops below 25%.", "second_wind", "survival", 3),
+            new PerkData("iron_will", "IRON WILL", "Immunity to panic and 40% reduced Humanity loss during trauma.", "iron_will", "resolve", 2),
+            new PerkData("crisis_negotiator", "CRISIS NEGOTIATOR", "De-escalate armed encounters peacefully and get 20% barter discounts.", "crisis_negotiator", "resolve", 2),
+            new PerkData("commanding_presence", "COMMANDING PRESENCE", "Allied survivors gain +15% Accuracy and will not flee from terror.", "commanding_presence", "resolve", 3),
+        };
+
         public static readonly JobData[] Jobs = new JobData[]
         {
             new JobData
@@ -42,11 +77,11 @@ namespace SundayLastBreath.Data
                 quote = "\"Protect and Serve\" is just a memory. Now, it's \"Aim and Fire.\"",
                 accentColor = new Color(0.36f, 0.55f, 0.71f), // #5D8DB5
                 str = 5, intl = 4, agi = 6, cha = 3, per = 7,
-                shooting = 3, melee = 2,
+                shooting = 3, melee = 2, resolve = 1,
                 perks = new[]
                 {
-                    ("STEADY HANDS", "+15 Accuracy bonus."),
-                    ("AUTHORITY", "Command NPCs in crisis.")
+                    ("GUNSLINGER", "+25% reload speed & +15% pistol accuracy."),
+                    ("COMMANDING PRESENCE", "Allies gain +15% accuracy and resist panic.")
                 },
                 startingItems = new[]
                 {
@@ -63,11 +98,11 @@ namespace SundayLastBreath.Data
                 accentColor = new Color(0.62f, 0.11f, 0.11f), // #9E1B1B
                 str = 8, intl = 3, agi = 4, cha = 4, per = 3,
                 hpBonus = 40,
-                melee = 3, tech = 2,
+                melee = 3, tech = 2, survival = 2,
                 perks = new[]
                 {
-                    ("BREACHER", "Smash locked doors with force."),
-                    ("IRON GRIP", "Knockback enemies on miss.")
+                    ("BLUNT BRUISER", "Smash barricades & heavy melee stun."),
+                    ("SECOND WIND", "Instant stamina surge when HP drops below 25%.")
                 },
                 startingItems = new[]
                 {
@@ -84,11 +119,11 @@ namespace SundayLastBreath.Data
                 accentColor = new Color(0.18f, 0.80f, 0.44f), // #2ECC71
                 str = 3, intl = 5, agi = 8, cha = 2, per = 6,
                 staminaBonus = 40,
-                stealth = 3, scavenging = 2,
+                stealth = 3, scavenging = 2, survival = 1,
                 perks = new[]
                 {
-                    ("LOCKSMITH", "Open locks silently."),
-                    ("GHOST", "Harder for enemies to hit you.")
+                    ("BLADESMITH", "Attacks cause Bleed. Critical sneak attacks."),
+                    ("FIELD FORAGER", "Scavenge +50% extra food, water & supplies.")
                 },
                 startingItems = new[]
                 {
@@ -106,11 +141,11 @@ namespace SundayLastBreath.Data
                 accentColor = new Color(0.20f, 0.60f, 0.86f), // #3498DB
                 str = 2, intl = 8, agi = 4, cha = 5, per = 5,
                 humanityBonus = 20,
-                medicine = 3, tech = 2,
+                medicine = 3, tech = 2, resolve = 1,
                 perks = new[]
                 {
                     ("FIELD MEDIC", "Healing items restore 2x HP."),
-                    ("ANATOMIST", "High critical hit chance.")
+                    ("IRON WILL", "Immunity to panic in high-stress crisis encounters.")
                 },
                 startingItems = new[]
                 {
@@ -128,11 +163,11 @@ namespace SundayLastBreath.Data
                 accentColor = new Color(0.61f, 0.35f, 0.71f), // #9B59B6
                 str = 3, intl = 5, agi = 3, cha = 9, per = 4,
                 humanityBonus = 30,
-                scavenging = 2, medicine = 1,
+                scavenging = 2, medicine = 1, resolve = 3,
                 perks = new[]
                 {
-                    ("SILVER TONGUE", "Better trade prices with NPCs."),
-                    ("INSPIRATION", "Companions gain +10 Accuracy.")
+                    ("CRISIS NEGOTIATOR", "20% barter discount & peaceful de-escalation."),
+                    ("COMMANDING PRESENCE", "Allies gain +15% accuracy and resist panic.")
                 },
                 startingItems = new[]
                 {
@@ -202,7 +237,7 @@ namespace SundayLastBreath.Data
                 applyEffect = (c, step) =>
                 {
                     c.per += (step == 1 ? 2 : 1);
-                    if (step == 1) c.shooting += 1;
+                    if (step == 1) { c.shooting += 1; c.survival += 1; }
                     c.AddTrait("HUNTER", "Spot ambushes early.");
                     c.AddItem("Binoculars", 1);
                     c.AddItem("Combat Knife", 1);
@@ -245,7 +280,8 @@ namespace SundayLastBreath.Data
                 {
                     c.staminaMax += 10;
                     c.stamina = c.staminaMax;
-                    if (step == 1) { c.str += 1; c.scavenging += 1; }
+                    if (step == 1) { c.str += 1; c.scavenging += 1; c.survival += 2; }
+                    else { c.survival += 1; }
                     c.bagLimit += 2;
                     c.AddTrait("HIKER", "+2 Inventory Slots.");
                     c.AddItem("Hiking Boots", 1);
@@ -275,7 +311,7 @@ namespace SundayLastBreath.Data
                 applyEffect = (c, step) =>
                 {
                     c.intl += 1;
-                    if (step == 1) { c.per += 1; c.hpMax += 5; c.hp = c.hpMax; }
+                    if (step == 1) { c.per += 1; c.hpMax += 5; c.hp = c.hpMax; c.survival += 1; }
                     c.AddTrait("GARDENER", "Water and Food heal extra.");
                 }
             },
@@ -330,6 +366,8 @@ namespace SundayLastBreath.Data
                 applyEffect = (c, step) =>
                 {
                     c.cha += (step == 1 ? 2 : 1);
+                    if (step == 1) c.resolve += 2;
+                    else c.resolve += 1;
                     c.AddTrait("DEBATER", "Detect deceit.");
                 }
             },
@@ -369,7 +407,7 @@ namespace SundayLastBreath.Data
                 applyEffect = (c, step) =>
                 {
                     c.humanity += (step == 1 ? 10 : 5);
-                    if (step == 1) c.medicine += 1;
+                    if (step == 1) { c.medicine += 1; c.resolve += 1; }
                     c.AddTrait("VOLUNTEER", "Heal morale faster.");
                     c.AddItem("First Aid Kit", 1);
                 }

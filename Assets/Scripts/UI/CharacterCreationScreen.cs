@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using SundayLastBreath.Core;
 using SundayLastBreath.Data;
 
@@ -51,10 +52,36 @@ namespace SundayLastBreath.UI
         [SerializeField] private Button studentContinueButton;
         [SerializeField] private TextMeshProUGUI studentWarningText;
 
+        [Header("Student Training Inspector")]
+        [SerializeField] private TextMeshProUGUI inspectorStatTitle;
+        [SerializeField] private TextMeshProUGUI inspectorStatQuote;
+        [SerializeField] private TextMeshProUGUI inspectorStatDesc;
+        [SerializeField] private TextMeshProUGUI inspectorStatImpact;
+
         [Header("Hobby UI")]
         [SerializeField] private TextMeshProUGUI hobbyHeaderTitle;
+        [SerializeField] private TextMeshProUGUI hobbyHeaderSubtitle;
         [SerializeField] private Transform hobbyCardsContainer;
         [SerializeField] private GameObject hobbyCardPrefab;
+
+        [Header("Weakness Thematic Tabs")]
+        [SerializeField] private GameObject weaknessTabBar;
+        [SerializeField] private Button physicalTabButton;
+        [SerializeField] private Button mentalTabButton;
+        [SerializeField] private Image physicalTabBg;
+        [SerializeField] private Image mentalTabBg;
+        [SerializeField] private TextMeshProUGUI physicalTabText;
+        [SerializeField] private TextMeshProUGUI mentalTabText;
+        [SerializeField] private Outline physicalTabOutline;
+        [SerializeField] private Outline mentalTabOutline;
+
+        private int activeWeaknessTab = 0; // 0 = Physical, 1 = Mental
+
+        private static readonly HashSet<string> PhysicalWeaknessIds = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
+        {
+            "smoker", "alcoholic", "asthmatic", "blind", "badknee", 
+            "glutton", "fragile", "insomniac", "clumsy", "germophobe"
+        };
 
         [Header("Summary Dossier UI")]
         [SerializeField] private TextMeshProUGUI summaryNameText;
@@ -65,12 +92,14 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI summaryTraitsText;
         [SerializeField] private TextMeshProUGUI summaryInventoryText;
         [SerializeField] private Button beginSurvivalButton;
+        [SerializeField] private Button restartCreationButton;
 
         // Runtime creation data
         private CharacterData character = new CharacterData();
         private int hobbyStep = 1; // 1 = Primary, 2 = Secondary, 3 = Weakness
         private List<string> pickedHobbyIds = new List<string>();
         private int studentPointsRemaining = 5;
+        private bool dossierLayoutEnforced = false;
 
         public CharacterData CreatedCharacter => character;
 
@@ -209,14 +238,20 @@ namespace SundayLastBreath.UI
             // 5. Student Training Buttons
             if (studentTrainingPanel != null)
             {
-                Transform rows = studentTrainingPanel.transform.Find("AttributesRows");
+                Transform rows = null;
+                var allChildren = studentTrainingPanel.GetComponentsInChildren<Transform>(true);
+                foreach (var t in allChildren)
+                {
+                    if (t.name == "AttributesRows") { rows = t; break; }
+                }
+
                 if (rows != null)
                 {
-                    WireTrainingPlus(rows, "Row_STRENGTH", "str");
-                    WireTrainingPlus(rows, "Row_INTELLIGENCE", "int");
-                    WireTrainingPlus(rows, "Row_AGILITY", "agi");
-                    WireTrainingPlus(rows, "Row_CHARISMA", "cha");
-                    WireTrainingPlus(rows, "Row_PERCEPTION", "per");
+                    WireTrainingRow(rows, "Row_STRENGTH", "str");
+                    WireTrainingRow(rows, "Row_INTELLIGENCE", "int");
+                    WireTrainingRow(rows, "Row_AGILITY", "agi");
+                    WireTrainingRow(rows, "Row_CHARISMA", "cha");
+                    WireTrainingRow(rows, "Row_PERCEPTION", "per");
                 }
 
                 if (studentContinueButton != null)
@@ -227,58 +262,34 @@ namespace SundayLastBreath.UI
             }
 
             // 6. Student Major Buttons
-            if (studentMajorPanel != null)
-            {
-                Transform grid = studentMajorPanel.transform.Find("MajorGrid");
-                if (grid != null)
-                {
-                    var buttons = grid.GetComponentsInChildren<Button>(true);
-                    foreach (var btn in buttons)
-                    {
-                        var tmp = btn.GetComponentInChildren<TextMeshProUGUI>();
-                        if (tmp != null)
-                        {
-                            string txt = tmp.text.ToUpper();
-                            btn.onClick.RemoveAllListeners();
-                            if (txt.Contains("ROTC")) btn.onClick.AddListener(() => SelectStudentMajor("shooting"));
-                            else if (txt.Contains("SPORTS")) btn.onClick.AddListener(() => SelectStudentMajor("melee"));
-                            else if (txt.Contains("TRACK")) btn.onClick.AddListener(() => SelectStudentMajor("stealth"));
-                            else if (txt.Contains("CS")) btn.onClick.AddListener(() => SelectStudentMajor("tech"));
-                            else if (txt.Contains("BIOLOGY")) btn.onClick.AddListener(() => SelectStudentMajor("medicine"));
-                        }
-                    }
-                }
-            }
+            WireAcademicCards(studentMajorPanel, isMajor: true);
 
             // 7. Student Minor Buttons
-            if (studentMinorPanel != null)
-            {
-                Transform grid = studentMinorPanel.transform.Find("MinorGrid");
-                if (grid != null)
-                {
-                    var buttons = grid.GetComponentsInChildren<Button>(true);
-                    foreach (var btn in buttons)
-                    {
-                        var tmp = btn.GetComponentInChildren<TextMeshProUGUI>();
-                        if (tmp != null)
-                        {
-                            string txt = tmp.text.ToUpper();
-                            btn.onClick.RemoveAllListeners();
-                            if (txt.Contains("SHOOTING")) btn.onClick.AddListener(() => SelectStudentMinor("shooting"));
-                            else if (txt.Contains("MELEE")) btn.onClick.AddListener(() => SelectStudentMinor("melee"));
-                            else if (txt.Contains("STEALTH")) btn.onClick.AddListener(() => SelectStudentMinor("stealth"));
-                            else if (txt.Contains("TECH")) btn.onClick.AddListener(() => SelectStudentMinor("tech"));
-                            else if (txt.Contains("MEDICINE")) btn.onClick.AddListener(() => SelectStudentMinor("medicine"));
-                        }
-                    }
-                }
-            }
+            WireAcademicCards(studentMinorPanel, isMajor: false);
 
             // 8. Begin Survival Button
             if (beginSurvivalButton != null)
             {
                 beginSurvivalButton.onClick.RemoveAllListeners();
                 beginSurvivalButton.onClick.AddListener(OnBeginSurvivalClicked);
+            }
+
+            if (restartCreationButton != null)
+            {
+                restartCreationButton.onClick.RemoveAllListeners();
+                restartCreationButton.onClick.AddListener(RestartCharacterCreation);
+            }
+
+            // 9. Weakness Thematic Tab Buttons
+            if (physicalTabButton != null)
+            {
+                physicalTabButton.onClick.RemoveAllListeners();
+                physicalTabButton.onClick.AddListener(() => SwitchWeaknessTab(0));
+            }
+            if (mentalTabButton != null)
+            {
+                mentalTabButton.onClick.RemoveAllListeners();
+                mentalTabButton.onClick.AddListener(() => SwitchWeaknessTab(1));
             }
         }
 
@@ -298,7 +309,7 @@ namespace SundayLastBreath.UI
             }
         }
 
-        private void WireTrainingPlus(Transform rows, string rowName, string stat)
+        private void WireTrainingRow(Transform rows, string rowName, string stat)
         {
             Transform row = rows.Find(rowName);
             if (row != null)
@@ -309,6 +320,83 @@ namespace SundayLastBreath.UI
                     plusBtn.onClick.RemoveAllListeners();
                     plusBtn.onClick.AddListener(() => AddStudentPoint(stat));
                 }
+
+                Button minusBtn = row.Find("Btn_Minus")?.GetComponent<Button>();
+                if (minusBtn != null)
+                {
+                    minusBtn.onClick.RemoveAllListeners();
+                    minusBtn.onClick.AddListener(() => RemoveStudentPoint(stat));
+                }
+
+                Button rowBtn = row.GetComponent<Button>();
+                if (rowBtn != null)
+                {
+                    rowBtn.onClick.RemoveAllListeners();
+                    rowBtn.onClick.AddListener(() =>
+                    {
+                        InspectStudentStat(stat, lockSelection: true);
+                        PlayClick();
+                    });
+                }
+
+                // Add PointerEnter & PointerExit triggers for instant hover preview and lock mechanics
+                EventTrigger rowTrigger = row.gameObject.GetComponent<EventTrigger>();
+                if (rowTrigger == null) rowTrigger = row.gameObject.AddComponent<EventTrigger>();
+                rowTrigger.triggers.Clear();
+
+                EventTrigger.Entry enterEntry = new EventTrigger.Entry();
+                enterEntry.eventID = EventTriggerType.PointerEnter;
+                enterEntry.callback.AddListener((data) => { OnRowPointerEnter(stat); });
+                rowTrigger.triggers.Add(enterEntry);
+
+                EventTrigger.Entry exitEntry = new EventTrigger.Entry();
+                exitEntry.eventID = EventTriggerType.PointerExit;
+                exitEntry.callback.AddListener((data) => { OnRowPointerExit(stat); });
+                rowTrigger.triggers.Add(exitEntry);
+
+                if (plusBtn != null)
+                {
+                    EventTrigger plusTrigger = plusBtn.gameObject.GetComponent<EventTrigger>();
+                    if (plusTrigger == null) plusTrigger = plusBtn.gameObject.AddComponent<EventTrigger>();
+                    plusTrigger.triggers.Clear();
+                    plusTrigger.triggers.Add(enterEntry);
+                }
+
+                if (minusBtn != null)
+                {
+                    EventTrigger minusTrigger = minusBtn.gameObject.GetComponent<EventTrigger>();
+                    if (minusTrigger == null) minusTrigger = minusBtn.gameObject.AddComponent<EventTrigger>();
+                    minusTrigger.triggers.Clear();
+                    minusTrigger.triggers.Add(enterEntry);
+                }
+            }
+        }
+
+        private void Update()
+        {
+            if (studentTrainingPanel != null && studentTrainingPanel.activeInHierarchy && inspectLockTimer > 0f)
+            {
+                inspectLockTimer -= Time.deltaTime;
+                if (inspectLockTimer <= 0f)
+                {
+                    inspectLockTimer = 0f;
+                    // Lock window expired: seamlessly switch to currently hovered stat if mouse is over one
+                    if (!string.IsNullOrEmpty(currentlyHoveredStat) &&
+                        !string.Equals(currentInspectedStat, currentlyHoveredStat, System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        InspectStudentStat(currentlyHoveredStat, lockSelection: false);
+                        if (AudioManager.Instance != null)
+                        {
+                            AudioManager.Instance.PlayButtonHover();
+                        }
+                    }
+                }
+            }
+
+            if (summaryDossierPanel != null && summaryDossierPanel.activeInHierarchy && !dossierLayoutEnforced)
+            {
+                EnforceDossierLayout();
+                dossierLayoutEnforced = true;
             }
         }
 
@@ -318,6 +406,9 @@ namespace SundayLastBreath.UI
             hobbyStep = 1;
             pickedHobbyIds.Clear();
             studentPointsRemaining = 5;
+            inspectLockTimer = 0f;
+            currentlyHoveredStat = null;
+            activeWeaknessTab = 0;
 
             // Start creation music & clock tick
             if (AudioManager.Instance != null && creationMusicClip != null)
@@ -348,6 +439,7 @@ namespace SundayLastBreath.UI
             if (studentMinorPanel != null) studentMinorPanel.SetActive(false);
             if (hobbySelectionPanel != null) hobbySelectionPanel.SetActive(false);
             if (summaryDossierPanel != null) summaryDossierPanel.SetActive(false);
+            dossierLayoutEnforced = false;
         }
 
         #region Step 1: Gender Selection
@@ -472,12 +564,19 @@ namespace SundayLastBreath.UI
             character.tech = job.tech;
             character.medicine = job.medicine;
             character.scavenging = job.scavenging;
+            character.survival = job.survival;
+            character.resolve = job.resolve;
 
             if (job.perks != null)
             {
                 foreach (var perk in job.perks)
                 {
-                    character.AddTrait(perk.name, perk.desc);
+                    Sprite icon = null;
+#if UNITY_EDITOR
+                    string iconKey = perk.name.ToLower().Replace(" ", "_");
+                    icon = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/Perks/{iconKey}.png");
+#endif
+                    character.AddTrait(perk.name, perk.desc, icon);
                 }
             }
 
@@ -504,11 +603,58 @@ namespace SundayLastBreath.UI
         #endregion
 
         #region Step 4b: Student Exclusive Training & Majors
+        private string currentInspectedStat = "str";
+        private string currentlyHoveredStat = null;
+        private float inspectLockTimer = 0f;
+        private const float CLICK_LOCK_DURATION = 3.5f;
+
         public void ShowStudentTrainingPanel()
         {
             HideAllPanels();
             if (studentTrainingPanel != null) studentTrainingPanel.SetActive(true);
+            inspectLockTimer = 0f;
+            currentlyHoveredStat = null;
+            InspectStudentStat("str", lockSelection: false);
             UpdateStudentTrainingUI();
+        }
+
+        public void OnRowPointerEnter(string stat)
+        {
+            currentlyHoveredStat = stat;
+            if (inspectLockTimer <= 0f)
+            {
+                if (!string.Equals(currentInspectedStat, stat, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    InspectStudentStat(stat, lockSelection: false);
+                    if (AudioManager.Instance != null)
+                    {
+                        AudioManager.Instance.PlayButtonHover();
+                    }
+                }
+            }
+        }
+
+        public void OnRowPointerExit(string stat)
+        {
+            if (string.Equals(currentlyHoveredStat, stat, System.StringComparison.OrdinalIgnoreCase))
+            {
+                currentlyHoveredStat = null;
+            }
+        }
+
+        public void HoverStudentStat(string stat)
+        {
+            OnRowPointerEnter(stat);
+        }
+
+        public void InspectStudentStat(string stat, bool lockSelection = false)
+        {
+            currentInspectedStat = stat;
+            if (lockSelection)
+            {
+                inspectLockTimer = CLICK_LOCK_DURATION;
+            }
+            UpdateStudentInspectorUI();
         }
 
         public void AddStudentPoint(string stat)
@@ -524,22 +670,134 @@ namespace SundayLastBreath.UI
                 case "per": if (character.per < 10) { character.per++; studentPointsRemaining--; } break;
             }
 
+            InspectStudentStat(stat, lockSelection: true);
             PlayClick();
             UpdateStudentTrainingUI();
         }
 
+        public void RemoveStudentPoint(string stat)
+        {
+            if (studentPointsRemaining >= 5) return;
+
+            switch (stat.ToLower())
+            {
+                case "str": if (character.str > 2) { character.str--; studentPointsRemaining++; } break;
+                case "int": if (character.intl > 2) { character.intl--; studentPointsRemaining++; } break;
+                case "agi": if (character.agi > 2) { character.agi--; studentPointsRemaining++; } break;
+                case "cha": if (character.cha > 2) { character.cha--; studentPointsRemaining++; } break;
+                case "per": if (character.per > 2) { character.per--; studentPointsRemaining++; } break;
+            }
+
+            InspectStudentStat(stat, lockSelection: true);
+            PlayClick();
+            UpdateStudentTrainingUI();
+        }
+
+        private string FormatPips(int value)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int i = 1; i <= 10; i++)
+            {
+                if (i <= value)
+                    sb.Append("<color=#E67E22>■ </color>");
+                else
+                    sb.Append("<color=#2A2A2A>■ </color>");
+            }
+            return sb.ToString().TrimEnd();
+        }
+
         private void UpdateStudentTrainingUI()
         {
-            if (studentPointsText != null) studentPointsText.text = $"POINTS REMAINING: {studentPointsRemaining}";
-            if (studentStrText != null) studentStrText.text = $"STRENGTH: {character.str}";
-            if (studentIntText != null) studentIntText.text = $"INTELLIGENCE: {character.intl}";
-            if (studentAgiText != null) studentAgiText.text = $"AGILITY: {character.agi}";
-            if (studentChaText != null) studentChaText.text = $"CHARISMA: {character.cha}";
-            if (studentPerText != null) studentPerText.text = $"PERCEPTION: {character.per}";
+            if (studentPointsText != null)
+            {
+                studentPointsText.text = studentPointsRemaining > 0
+                    ? $"<color=#E67E22><b>[ {studentPointsRemaining} AP AVAILABLE FOR ALLOCATION ]</b></color>"
+                    : "<color=#2ECC71><b>[ ALL 5 AP POINTS ALLOCATED ]</b></color>";
+            }
+
+            if (studentStrText != null) studentStrText.text = $"{FormatPips(character.str)}   <color=#FFFFFF><b>{character.str}</b></color>";
+            if (studentIntText != null) studentIntText.text = $"{FormatPips(character.intl)}   <color=#FFFFFF><b>{character.intl}</b></color>";
+            if (studentAgiText != null) studentAgiText.text = $"{FormatPips(character.agi)}   <color=#FFFFFF><b>{character.agi}</b></color>";
+            if (studentChaText != null) studentChaText.text = $"{FormatPips(character.cha)}   <color=#FFFFFF><b>{character.cha}</b></color>";
+            if (studentPerText != null) studentPerText.text = $"{FormatPips(character.per)}   <color=#FFFFFF><b>{character.per}</b></color>";
 
             bool finished = studentPointsRemaining == 0;
             if (studentContinueButton != null) studentContinueButton.gameObject.SetActive(finished);
-            if (studentWarningText != null) studentWarningText.gameObject.SetActive(!finished);
+            if (studentWarningText != null)
+            {
+                studentWarningText.gameObject.SetActive(!finished);
+                studentWarningText.text = $"[!] ALLOCATE ALL 5 POINTS TO FINALIZE RECORD ({studentPointsRemaining} REMAINING)";
+            }
+
+            UpdateStudentInspectorUI();
+        }
+
+        private void UpdateStudentInspectorUI()
+        {
+            if (inspectorStatTitle == null) return;
+
+            switch (currentInspectedStat.ToLower())
+            {
+                case "str":
+                    inspectorStatTitle.text = "STRENGTH (PHYSICAL POWER)";
+                    inspectorStatTitle.color = new Color(0.91f, 0.30f, 0.24f);
+                    if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Muscles conditioned from athletics, manual labor, and gym drills.\"";
+                    if (inspectorStatDesc != null) inspectorStatDesc.text = "Determines raw physical power, encumbrance limit, and brute force survival actions in combat and exploration.";
+                    if (inspectorStatImpact != null) inspectorStatImpact.text = 
+                        "<color=#E74C3C><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "• <color=#FFFFFF><b>Melee Combat:</b></color> +15% damage with blunt and edged weapons\n" +
+                        "• <color=#FFFFFF><b>Carrying Capacity:</b></color> +8 kg maximum inventory encumbrance\n" +
+                        "• <color=#FFFFFF><b>Breaching:</b></color> Force open jammed doors and barricades without tools";
+                    break;
+
+                case "int":
+                    inspectorStatTitle.text = "INTELLIGENCE (ANALYTICAL MIND)";
+                    inspectorStatTitle.color = new Color(0.20f, 0.60f, 0.86f);
+                    if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Late-night academic research, problem solving, and technical curiosity.\"";
+                    if (inspectorStatDesc != null) inspectorStatDesc.text = "Governs scientific knowledge, electronic engineering, and the efficiency of medical supplies under pressure.";
+                    if (inspectorStatImpact != null) inspectorStatImpact.text = 
+                        "<color=#3498DB><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "• <color=#FFFFFF><b>Electronics & Tech:</b></color> +20% success when bypassing security and hotwiring\n" +
+                        "• <color=#FFFFFF><b>Field Medicine:</b></color> Bandages, antibiotics & medkits restore +25% extra HP\n" +
+                        "• <color=#FFFFFF><b>Crafting Efficiency:</b></color> Unlock advanced survival blueprints with less scrap";
+                    break;
+
+                case "agi":
+                    inspectorStatTitle.text = "AGILITY (REFLEXES & MOBILITY)";
+                    inspectorStatTitle.color = new Color(0.18f, 0.80f, 0.44f);
+                    if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Quick reflexes, track sprinting, and agile body coordination.\"";
+                    if (inspectorStatDesc != null) inspectorStatDesc.text = "Determines movement swiftness, noise generation while sneaking, and reactive evasion when ambushed.";
+                    if (inspectorStatImpact != null) inspectorStatImpact.text = 
+                        "<color=#2ECC71><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "• <color=#FFFFFF><b>Sprint Stamina:</b></color> -10% stamina drain while sprinting away from hazards\n" +
+                        "• <color=#FFFFFF><b>Stealth Evasion:</b></color> Sound footprint reduced by 15% across all surfaces\n" +
+                        "• <color=#FFFFFF><b>Dodge Chance:</b></color> +12% chance to evade enemy lunges and grab attacks";
+                    break;
+
+                case "cha":
+                    inspectorStatTitle.text = "CHARISMA (FORCE OF PERSONALITY)";
+                    inspectorStatTitle.color = new Color(0.61f, 0.35f, 0.71f);
+                    if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Campus diplomacy, debate leadership, and unwavering social poise.\"";
+                    if (inspectorStatDesc != null) inspectorStatDesc.text = "Governs interpersonal influence, trade negotiations with survivors, and psychological resilience.";
+                    if (inspectorStatImpact != null) inspectorStatImpact.text = 
+                        "<color=#9B59B6><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "• <color=#FFFFFF><b>Dialogue Checks:</b></color> Significant persuasion and de-escalation advantages\n" +
+                        "• <color=#FFFFFF><b>Barter Economy:</b></color> 10% discount when trading goods with neutral survivors\n" +
+                        "• <color=#FFFFFF><b>Morale & Composure:</b></color> High resistance to psychological panic checks";
+                    break;
+
+                case "per":
+                    inspectorStatTitle.text = "PERCEPTION (SITUATIONAL ALERTNESS)";
+                    inspectorStatTitle.color = new Color(0.95f, 0.77f, 0.06f);
+                    if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Keen senses—noticing subtle sounds, shadows, and concealed hazards.\"";
+                    if (inspectorStatDesc != null) inspectorStatDesc.text = "Governs sensory alertness, firearm accuracy at range, and the ability to scavenge hidden supplies.";
+                    if (inspectorStatImpact != null) inspectorStatImpact.text = 
+                        "<color=#F1C40F><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "• <color=#FFFFFF><b>Firearms & Aiming:</b></color> +10% ranged critical hit chance and recoil control\n" +
+                        "• <color=#FFFFFF><b>Loot Detection:</b></color> Spot hidden supplies and secret caches from +3m distance\n" +
+                        "• <color=#FFFFFF><b>Ambush Warning:</b></color> Early audio-visual cues before walking into dangerous traps";
+                    break;
+            }
         }
 
         public void ConfirmStudentTraining()
@@ -552,19 +810,94 @@ namespace SundayLastBreath.UI
         public void ShowStudentMajorPanel()
         {
             HideAllPanels();
-            if (studentMajorPanel != null) studentMajorPanel.SetActive(true);
+            if (studentMajorPanel != null)
+            {
+                studentMajorPanel.SetActive(true);
+                WireAcademicCards(studentMajorPanel, isMajor: true);
+            }
         }
+
+        private void WireAcademicCards(GameObject panel, bool isMajor)
+        {
+            if (panel == null) return;
+            AcademicCardView[] cards = panel.GetComponentsInChildren<AcademicCardView>(true);
+            foreach (var card in cards)
+            {
+                string sId = card.skillId;
+                Button[] buttons = card.GetComponentsInChildren<Button>(true);
+                foreach (var btn in buttons)
+                {
+                    btn.onClick.RemoveAllListeners();
+                    if (isMajor)
+                    {
+                        btn.onClick.AddListener(() => SelectStudentMajor(sId));
+                    }
+                    else
+                    {
+                        btn.onClick.AddListener(() => SelectStudentMinor(sId));
+                    }
+                }
+            }
+        }
+
+        private string chosenMajorSkill = "";
 
         public void SelectStudentMajor(string skill)
         {
-            switch (skill.ToLower())
+            chosenMajorSkill = skill.ToLower();
+            string perkName = null;
+            string perkDesc = null;
+            string perkIcon = null;
+
+            switch (chosenMajorSkill)
             {
-                case "shooting": character.shooting = 3; break;
-                case "melee": character.melee = 3; break;
-                case "stealth": character.stealth = 3; break;
-                case "tech": character.tech = 3; break;
-                case "medicine": character.medicine = 3; break;
+                case "shooting":
+                    character.shooting = 3;
+                    perkName = "GUNSLINGER";
+                    perkDesc = "+25% reload speed & +15% pistol accuracy.";
+                    perkIcon = "gunslinger";
+                    break;
+                case "melee":
+                    character.melee = 3;
+                    perkName = "BLADESMITH";
+                    perkDesc = "Attacks cause Bleed. Critical sneak attacks.";
+                    perkIcon = "bladesmith";
+                    break;
+                case "stealth":
+                    character.stealth = 3;
+                    break;
+                case "tech":
+                    character.tech = 3;
+                    break;
+                case "medicine":
+                    character.medicine = 3;
+                    perkName = "FIELD MEDIC";
+                    perkDesc = "Healing items restore 2x HP.";
+                    break;
+                case "survival":
+                    character.survival = 3;
+                    perkName = "FIELD FORAGER";
+                    perkDesc = "Harvest +50% extra food, water & campcraft scrap.";
+                    perkIcon = "field_forager";
+                    break;
+                case "resolve":
+                    character.resolve = 3;
+                    perkName = "IRON WILL";
+                    perkDesc = "Immunity to panic in high-stress crisis encounters.";
+                    perkIcon = "iron_will";
+                    break;
             }
+
+            if (!string.IsNullOrEmpty(perkName))
+            {
+                Sprite icon = null;
+#if UNITY_EDITOR
+                if (!string.IsNullOrEmpty(perkIcon))
+                    icon = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/Perks/{perkIcon}.png");
+#endif
+                character.AddTrait(perkName, perkDesc, icon);
+            }
+
             PlayClick();
             ShowStudentMinorPanel();
         }
@@ -572,7 +905,19 @@ namespace SundayLastBreath.UI
         public void ShowStudentMinorPanel()
         {
             HideAllPanels();
-            if (studentMinorPanel != null) studentMinorPanel.SetActive(true);
+            if (studentMinorPanel != null)
+            {
+                studentMinorPanel.SetActive(true);
+                WireAcademicCards(studentMinorPanel, isMajor: false);
+
+                // Filter out the skill already chosen as Major (matches Twine behavior)
+                AcademicCardView[] minorCards = studentMinorPanel.GetComponentsInChildren<AcademicCardView>(true);
+                foreach (var card in minorCards)
+                {
+                    bool isMajor = !string.IsNullOrEmpty(chosenMajorSkill) && card.skillId.Equals(chosenMajorSkill, System.StringComparison.OrdinalIgnoreCase);
+                    card.gameObject.SetActive(!isMajor);
+                }
+            }
         }
 
         public void SelectStudentMinor(string skill)
@@ -584,6 +929,8 @@ namespace SundayLastBreath.UI
                 case "stealth": if (character.stealth < 3) character.stealth = 2; break;
                 case "tech": if (character.tech < 3) character.tech = 2; break;
                 case "medicine": if (character.medicine < 3) character.medicine = 2; break;
+                case "survival": if (character.survival < 3) character.survival = 2; break;
+                case "resolve": if (character.resolve < 3) character.resolve = 2; break;
             }
             PlayClick();
             hobbyStep = 1;
@@ -600,14 +947,76 @@ namespace SundayLastBreath.UI
             if (hobbyHeaderTitle != null)
             {
                 if (hobbyStep == 1)
+                {
                     hobbyHeaderTitle.text = "PRIMARY HOBBY <color=#888888>(+1-2 Stats / Items)</color>";
+                    if (hobbyHeaderSubtitle != null)
+                        hobbyHeaderSubtitle.text = "\"How did you spend your weekends before everything fell apart?\"";
+                }
                 else if (hobbyStep == 2)
+                {
                     hobbyHeaderTitle.text = "SECONDARY HOBBY <color=#888888>(+1 Stat / Items)</color>";
+                    if (hobbyHeaderSubtitle != null)
+                        hobbyHeaderSubtitle.text = "\"A secondary pursuit that kept your instincts sharp.\"";
+                }
                 else
-                    hobbyHeaderTitle.text = "SURVIVOR WEAKNESS <color=#B32D2E>(Critical Drawback)</color>";
+                {
+                    hobbyHeaderTitle.text = "SURVIVOR WEAKNESS <color=#E74C3C>(Critical Drawback)</color>";
+                    if (hobbyHeaderSubtitle != null)
+                        hobbyHeaderSubtitle.text = "\"Nobody survives untouched. What was your fatal flaw?\"";
+                }
+            }
+
+            if (weaknessTabBar != null)
+            {
+                weaknessTabBar.SetActive(hobbyStep == 3);
+            }
+
+            if (hobbyStep == 3)
+            {
+                UpdateWeaknessTabVisuals();
+            }
+
+            // Reset scroll position to top
+            ScrollRect sr = hobbyCardsContainer != null ? hobbyCardsContainer.GetComponentInParent<ScrollRect>() : null;
+            if (sr != null)
+            {
+                sr.verticalNormalizedPosition = 1f;
             }
 
             PopulateHobbyCards();
+        }
+
+        public void SwitchWeaknessTab(int tabIndex)
+        {
+            if (activeWeaknessTab == tabIndex) return;
+            activeWeaknessTab = tabIndex;
+            PlayClick();
+            UpdateWeaknessTabVisuals();
+            PopulateHobbyCards();
+        }
+
+        private void UpdateWeaknessTabVisuals()
+        {
+            bool isPhysical = activeWeaknessTab == 0;
+
+            if (physicalTabBg != null)
+                physicalTabBg.color = isPhysical ? new Color(0.65f, 0.15f, 0.12f, 0.95f) : new Color(0.08f, 0.08f, 0.08f, 0.85f);
+            if (mentalTabBg != null)
+                mentalTabBg.color = !isPhysical ? new Color(0.65f, 0.15f, 0.12f, 0.95f) : new Color(0.08f, 0.08f, 0.08f, 0.85f);
+
+            if (physicalTabText != null)
+            {
+                physicalTabText.text = isPhysical ? "<b><color=#FFFFFF>● PHYSICAL FLAWS (10)</color></b>" : "<b><color=#777777>○ PHYSICAL FLAWS (10)</color></b>";
+            }
+            if (mentalTabText != null)
+            {
+                mentalTabText.text = !isPhysical ? "<b><color=#FFFFFF>● MENTAL & SOCIAL (10)</color></b>" : "<b><color=#777777>○ MENTAL & SOCIAL (10)</color></b>";
+            }
+
+            if (physicalTabOutline != null)
+                physicalTabOutline.effectColor = isPhysical ? new Color(0.91f, 0.30f, 0.24f, 0.85f) : new Color(0.20f, 0.20f, 0.20f, 0.5f);
+            if (mentalTabOutline != null)
+                mentalTabOutline.effectColor = !isPhysical ? new Color(0.91f, 0.30f, 0.24f, 0.85f) : new Color(0.20f, 0.20f, 0.20f, 0.5f);
         }
 
         private void PopulateHobbyCards()
@@ -620,20 +1029,47 @@ namespace SundayLastBreath.UI
                 Destroy(child.gameObject);
             }
 
-            HobbyData[] sourceList = (hobbyStep < 3)
-                ? CharacterCreationDefinitions.PositiveHobbies
-                : CharacterCreationDefinitions.DestructiveWeaknesses;
-
-            foreach (var hobby in sourceList)
+            if (hobbyStep < 3)
             {
-                if (pickedHobbyIds.Contains(hobby.id)) continue;
-
-                GameObject cardObj = Instantiate(hobbyCardPrefab, hobbyCardsContainer);
-                HobbyCardView cardView = cardObj.GetComponent<HobbyCardView>();
-                if (cardView != null)
+                foreach (var hobby in CharacterCreationDefinitions.PositiveHobbies)
                 {
-                    cardView.Setup(hobby, () => OnHobbySelected(hobby));
+                    if (pickedHobbyIds.Contains(hobby.id)) continue;
+
+                    GameObject cardObj = Instantiate(hobbyCardPrefab, hobbyCardsContainer);
+                    cardObj.SetActive(true);
+                    HobbyCardView cardView = cardObj.GetComponent<HobbyCardView>();
+                    if (cardView != null)
+                    {
+                        cardView.Setup(hobby, () => OnHobbySelected(hobby));
+                    }
                 }
+            }
+            else
+            {
+                // Weakness step: filtered by active tab (10 cards each in a 5x2 grid, 0 scrolling!)
+                foreach (var hobby in CharacterCreationDefinitions.DestructiveWeaknesses)
+                {
+                    if (pickedHobbyIds.Contains(hobby.id)) continue;
+
+                    bool isPhys = PhysicalWeaknessIds.Contains(hobby.id);
+                    if (activeWeaknessTab == 0 && !isPhys) continue;
+                    if (activeWeaknessTab == 1 && isPhys) continue;
+
+                    GameObject cardObj = Instantiate(hobbyCardPrefab, hobbyCardsContainer);
+                    cardObj.SetActive(true);
+                    HobbyCardView cardView = cardObj.GetComponent<HobbyCardView>();
+                    if (cardView != null)
+                    {
+                        cardView.Setup(hobby, () => OnHobbySelected(hobby));
+                    }
+                }
+            }
+
+            // Notify responsive adapter to fit or enable scroll
+            HobbySelectionScreenAdapter adapter = hobbyCardsContainer.GetComponentInParent<HobbySelectionScreenAdapter>();
+            if (adapter != null)
+            {
+                adapter.UpdateLayout();
             }
         }
 
@@ -665,42 +1101,329 @@ namespace SundayLastBreath.UI
         {
             HideAllPanels();
             if (summaryDossierPanel != null) summaryDossierPanel.SetActive(true);
+            EnforceDossierLayout();
+            dossierLayoutEnforced = true;
 
             if (summaryNameText != null)
                 summaryNameText.text = character.FullName.ToUpper();
 
             if (summaryIdentityText != null)
-                summaryIdentityText.text = $"GENDER: {character.gender.ToUpper()}   |   BACKGROUND: {character.job.ToUpper()}";
+                summaryIdentityText.text = $"GENDER: <color=#FFE082><b>{character.gender.ToUpper()}</b></color>   |   VOCATION: <color=#FFE082><b>{character.job.ToUpper()}</b></color>";
 
             if (summaryVitalsText != null)
-                summaryVitalsText.text = $"HP: {character.hp}/{character.hpMax}   |   STAMINA: {character.stamina}/{character.staminaMax}   |   HUMANITY: {character.humanity}/100";
+                summaryVitalsText.text = $"<color=#EF5350><b>HP:</b> {character.hp}/{character.hpMax}</color>   |   <color=#FFA726><b>STAMINA:</b> {character.stamina}/{character.staminaMax}</color>   |   <color=#29B6F6><b>HUMANITY:</b> {character.humanity}/100</color>";
 
             if (summaryAttributesText != null)
-                summaryAttributesText.text = $"STR: {character.str}   INT: {character.intl}   AGI: {character.agi}   CHA: {character.cha}   PER: {character.per}";
+            {
+                summaryAttributesText.text = 
+                    $"<color=#90A4AE>STR:</color> <mspace=0.6em><color=#FFFFFF><b>{character.str:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.str, 10)}</color>\n" +
+                    $"<color=#90A4AE>INT:</color> <mspace=0.6em><color=#FFFFFF><b>{character.intl:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.intl, 10)}</color>\n" +
+                    $"<color=#90A4AE>AGI:</color> <mspace=0.6em><color=#FFFFFF><b>{character.agi:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.agi, 10)}</color>\n" +
+                    $"<color=#90A4AE>CHA:</color> <mspace=0.6em><color=#FFFFFF><b>{character.cha:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.cha, 10)}</color>\n" +
+                    $"<color=#90A4AE>PER:</color> <mspace=0.6em><color=#FFFFFF><b>{character.per:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.per, 10)}</color>";
+            }
 
             if (summarySkillsText != null)
-                summarySkillsText.text = $"SHOOTING: {character.shooting}   MELEE: {character.melee}   STEALTH: {character.stealth}\nTECH: {character.tech}   MEDICINE: {character.medicine}   SCAVENGING: {character.scavenging}";
+            {
+                summarySkillsText.text = 
+                    $"<color=#90A4AE>SHOOTING:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.shooting:00}</b></color></mspace><pos=50%><color=#90A4AE>MELEE:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.melee:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>STEALTH:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.stealth:00}</b></color></mspace><pos=50%><color=#90A4AE>TECH:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.tech:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>MEDICINE:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.medicine:00}</b></color></mspace><pos=50%><color=#90A4AE>SCAVENGING:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.scavenging:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>SURVIVAL:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.survival:00}</b></color></mspace><pos=50%><color=#90A4AE>RESOLVE:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.resolve:00}</b></color></mspace>";
+            }
 
             if (summaryTraitsText != null)
             {
                 string traitsList = "";
                 foreach (var t in character.traits)
                 {
-                    string color = t.isWeakness ? "#B32D2E" : "#D35400";
-                    traitsList += $"<color={color}><b>[{t.name}]</b></color> {t.description}\n";
+                    string color = t.isWeakness ? "#EF5350" : "#66BB6A";
+                    string icon = t.isWeakness ? "[-]" : "[+]";
+                    traitsList += $"<color={color}><b>{icon} {t.name.ToUpper()}:</b></color> <color=#CFD8DC>{t.description}</color>\n";
                 }
                 summaryTraitsText.text = string.IsNullOrEmpty(traitsList) ? "None" : traitsList.TrimEnd();
             }
 
             if (summaryInventoryText != null)
             {
-                string itemsList = "";
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                int idx = 0;
                 foreach (var item in character.inventory)
                 {
-                    itemsList += $"• {item.itemId} (x{item.quantity})\n";
+                    if (idx % 2 == 0)
+                    {
+                        if (idx > 0) sb.Append("\n");
+                        sb.Append($"<color=#80CBC4>•</color> <color=#FFFFFF><b>{item.itemId}</b></color> <color=#FFE082>(x{item.quantity})</color>");
+                    }
+                    else
+                    {
+                        sb.Append($"<pos=50%><color=#80CBC4>•</color> <color=#FFFFFF><b>{item.itemId}</b></color> <color=#FFE082>(x{item.quantity})</color>");
+                    }
+                    idx++;
                 }
-                summaryInventoryText.text = string.IsNullOrEmpty(itemsList) ? "Empty" : itemsList.TrimEnd();
+                summaryInventoryText.text = sb.Length == 0 ? "Empty" : sb.ToString().TrimEnd();
             }
+        }
+
+        private static string FormatStatPips(int val, int max = 10)
+        {
+            int filled = Mathf.Clamp(val, 0, max);
+            int empty = Mathf.Max(0, max - filled);
+            return $"{new string('■', filled)}{new string('□', empty)}";
+        }
+
+        private void EnforceDossierLayout()
+        {
+            if (summaryDossierPanel == null) return;
+
+            Transform frame = summaryDossierPanel.transform.Find("FederalDossierFrame");
+            if (frame == null) return;
+
+            RectTransform frameRect = frame.GetComponent<RectTransform>();
+            if (frameRect != null)
+            {
+                frameRect.sizeDelta = new Vector2(1420, 760);
+                frameRect.anchoredPosition = Vector2.zero;
+            }
+            if (frame.GetComponent<RectMask2D>() == null)
+            {
+                frame.gameObject.AddComponent<RectMask2D>();
+            }
+
+            Transform cols = frame.Find("ColumnsContainer");
+            if (cols != null)
+            {
+                if (cols.GetComponent<RectMask2D>() == null)
+                {
+                    cols.gameObject.AddComponent<RectMask2D>();
+                }
+
+                RectTransform cRect = cols.GetComponent<RectTransform>();
+                if (cRect != null)
+                {
+                    cRect.anchorMin = new Vector2(0, 0);
+                    cRect.anchorMax = new Vector2(1, 1);
+                    cRect.offsetMin = new Vector2(18, 76);
+                    cRect.offsetMax = new Vector2(-18, -96);
+                }
+
+                HorizontalLayoutGroup hlg = cols.GetComponent<HorizontalLayoutGroup>();
+                if (hlg != null)
+                {
+                    hlg.childControlHeight = true;
+                    hlg.childForceExpandHeight = true;
+                    hlg.spacing = 16;
+                }
+
+                for (int i = 0; i < cols.childCount; i++)
+                {
+                    Transform card = cols.GetChild(i);
+                    if (card.GetComponent<RectMask2D>() == null)
+                    {
+                        card.gameObject.AddComponent<RectMask2D>();
+                    }
+                    LayoutElement le = card.GetComponent<LayoutElement>();
+                    if (le != null)
+                    {
+                        le.preferredHeight = 580;
+                        le.flexibleHeight = 0;
+                    }
+                    RectTransform crt = card.GetComponent<RectTransform>();
+                    if (crt != null)
+                    {
+                        crt.sizeDelta = new Vector2(crt.sizeDelta.x, 580);
+                    }
+
+                    VerticalLayoutGroup vlg = card.GetComponent<VerticalLayoutGroup>();
+                    if (vlg != null)
+                    {
+                        vlg.padding = new RectOffset(16, 16, 12, 12);
+                        vlg.spacing = 5;
+                        vlg.childControlWidth = true;
+                        vlg.childForceExpandWidth = true;
+                        vlg.childControlHeight = false;
+                        vlg.childForceExpandHeight = false;
+                    }
+                }
+
+                Transform col1 = cols.Find("Col1_Identity");
+                if (col1 != null)
+                {
+                    Transform stamp = col1.Find("StampHolder");
+                    if (stamp != null)
+                    {
+                        LayoutElement stLe = stamp.GetComponent<LayoutElement>();
+                        if (stLe != null) stLe.ignoreLayout = true;
+
+                        RectTransform sRect = stamp.GetComponent<RectTransform>();
+                        if (sRect != null)
+                        {
+                            sRect.anchorMin = new Vector2(0.5f, 0f);
+                            sRect.anchorMax = new Vector2(0.5f, 0f);
+                            sRect.pivot = new Vector2(0.5f, 0f);
+                            sRect.sizeDelta = new Vector2(185, 185);
+                            sRect.anchoredPosition = new Vector2(25, 25);
+                        }
+                    }
+                }
+
+                Transform col2 = cols.Find("Col2_Aptitudes");
+                if (col2 != null)
+                {
+                    Transform advBox = col2.Find("AdvisoryBox");
+                    if (advBox != null)
+                    {
+                        RectTransform abRect = advBox.GetComponent<RectTransform>();
+                        if (abRect != null)
+                        {
+                            abRect.sizeDelta = new Vector2(0, 115);
+                        }
+                    }
+                }
+
+                Transform col3 = cols.Find("Col3_Manifest");
+                if (col3 != null)
+                {
+                    Transform edictBox = col3.Find("EdictBox");
+                    if (edictBox != null)
+                    {
+                        RectTransform ebRect = edictBox.GetComponent<RectTransform>();
+                        if (ebRect != null)
+                        {
+                            ebRect.sizeDelta = new Vector2(0, 105);
+                        }
+                    }
+                }
+
+                if (cRect != null)
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(cRect);
+                }
+            }
+
+            Transform footer = frame.Find("FooterBar");
+            if (footer != null)
+            {
+                RectTransform footRect = footer.GetComponent<RectTransform>();
+                if (footRect != null)
+                {
+                    footRect.anchorMin = new Vector2(0, 0);
+                    footRect.anchorMax = new Vector2(1, 0);
+                    footRect.pivot = new Vector2(0.5f, 0);
+                    footRect.sizeDelta = new Vector2(0, 72);
+                    footRect.anchoredPosition = Vector2.zero;
+                }
+
+                Transform notice = footer.Find("WarningNotice");
+                if (notice != null)
+                {
+                    RectTransform nr = notice.GetComponent<RectTransform>();
+                    if (nr != null)
+                    {
+                        nr.sizeDelta = new Vector2(740, 50);
+                        nr.anchoredPosition = new Vector2(24, 0);
+                    }
+                }
+
+                // Confirm button right
+                Transform begin = footer.Find("Btn_CONFIRM&COMMENCESURVIVAL>>");
+                if (begin != null)
+                {
+                    RectTransform br = begin.GetComponent<RectTransform>();
+                    if (br != null)
+                    {
+                        br.anchorMin = new Vector2(1, 0.5f);
+                        br.anchorMax = new Vector2(1, 0.5f);
+                        br.pivot = new Vector2(1, 0.5f);
+                        br.sizeDelta = new Vector2(350, 46);
+                        br.anchoredPosition = new Vector2(-24, 0);
+                    }
+                }
+
+                // Reset / Start Over button
+                Transform resetObj = footer.Find("Btn_StartOver");
+                if (resetObj == null)
+                {
+                    GameObject rBtnObj = new GameObject("Btn_StartOver");
+                    rBtnObj.transform.SetParent(footer, false);
+                    RectTransform rRect = rBtnObj.AddComponent<RectTransform>();
+                    rRect.anchorMin = new Vector2(1, 0.5f);
+                    rRect.anchorMax = new Vector2(1, 0.5f);
+                    rRect.pivot = new Vector2(1, 0.5f);
+                    rRect.sizeDelta = new Vector2(210, 46);
+                    rRect.anchoredPosition = new Vector2(-386, 0);
+
+                    Image rBg = rBtnObj.AddComponent<Image>();
+                    rBg.color = new Color(0.12f, 0.16f, 0.22f, 0.95f);
+
+                    Outline rOutline = rBtnObj.AddComponent<Outline>();
+                    rOutline.effectColor = new Color(0.35f, 0.45f, 0.58f, 0.75f);
+                    rOutline.effectDistance = new Vector2(1, -1);
+
+                    Button rBtn = rBtnObj.AddComponent<Button>();
+                    rBtn.targetGraphic = rBg;
+                    ColorBlock cb = rBtn.colors;
+                    cb.normalColor = new Color(0.12f, 0.16f, 0.22f, 0.95f);
+                    cb.highlightedColor = new Color(0.65f, 0.20f, 0.18f, 1f);
+                    cb.pressedColor = new Color(0.45f, 0.12f, 0.10f, 1f);
+                    rBtn.colors = cb;
+                    rBtn.onClick.AddListener(RestartCharacterCreation);
+
+                    GameObject textObj = new GameObject("Text");
+                    textObj.transform.SetParent(rBtnObj.transform, false);
+                    RectTransform tr = textObj.AddComponent<RectTransform>();
+                    tr.anchorMin = Vector2.zero;
+                    tr.anchorMax = Vector2.one;
+                    tr.offsetMin = Vector2.zero;
+                    tr.offsetMax = Vector2.zero;
+
+                    TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
+                    tmp.text = "<b><color=#CFD8DC>↺ START OVER</color></b>";
+                    tmp.fontSize = 13.5f;
+                    tmp.alignment = TextAlignmentOptions.Center;
+                    tmp.raycastTarget = false;
+
+                    restartCreationButton = rBtn;
+                }
+                else
+                {
+                    RectTransform rRect = resetObj.GetComponent<RectTransform>();
+                    if (rRect != null)
+                    {
+                        rRect.anchorMin = new Vector2(1, 0.5f);
+                        rRect.anchorMax = new Vector2(1, 0.5f);
+                        rRect.pivot = new Vector2(1, 0.5f);
+                        rRect.sizeDelta = new Vector2(210, 46);
+                        rRect.anchoredPosition = new Vector2(-386, 0);
+                    }
+                    Button rBtn = resetObj.GetComponent<Button>();
+                    if (rBtn != null)
+                    {
+                        rBtn.onClick.RemoveAllListeners();
+                        rBtn.onClick.AddListener(RestartCharacterCreation);
+                        restartCreationButton = rBtn;
+                    }
+                }
+            }
+        }
+
+        public void RestartCharacterCreation()
+        {
+            PlayClick();
+            character = new CharacterData();
+            hobbyStep = 1;
+            pickedHobbyIds.Clear();
+            studentPointsRemaining = 5;
+            inspectLockTimer = 0f;
+            currentlyHoveredStat = null;
+            activeWeaknessTab = 0;
+            dossierLayoutEnforced = false;
+
+            if (customFirstNameInput != null) customFirstNameInput.text = "";
+            if (customLastNameInput != null) customLastNameInput.text = "";
+            if (customGenderInput != null) customGenderInput.text = "";
+
+            ShowGenderPanel();
         }
 
         private void OnBeginSurvivalClicked()

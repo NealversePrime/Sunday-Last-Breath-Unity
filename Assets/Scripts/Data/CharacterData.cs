@@ -73,6 +73,8 @@ namespace SundayLastBreath.Data
         public int tech = 0;
         public int medicine = 0;
         public int scavenging = 0;
+        public int survival = 0;
+        public int resolve = 0;
 
         [Header("Perks & Inventory")]
         public int bagLimit = 12;
