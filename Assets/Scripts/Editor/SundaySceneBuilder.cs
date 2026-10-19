@@ -26,7 +26,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v4_auto.flag";
+                string flagPath = "Temp/scene_v8_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -102,6 +102,7 @@ namespace SundayLastBreath.Editor
             DisclaimerScreen disclaimerScreen = BuildDisclaimerScreen(screensObj.transform);
             TitleScreen titleScreen = BuildTitleScreen(screensObj.transform);
             CharacterCreationScreen creationScreen = BuildCharacterCreationScreen(screensObj.transform);
+            SundayTypography.ApplyHierarchy(screensObj.transform);
 
             // 7. GameManager
             GameObject gameMgrObj = new GameObject("GameManager");
@@ -610,6 +611,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("summaryDossierPanel").objectReferenceValue = summaryPanel;
 
             so.ApplyModifiedProperties();
+            screen.EnsureIdentityConsoleBuilt();
 
             obj.SetActive(false);
             return screen;
@@ -841,7 +843,7 @@ namespace SundayLastBreath.Editor
             atRect.sizeDelta = new Vector2(-30, 26);
             atRect.anchoredPosition = new Vector2(0, -16);
             TextMeshProUGUI atTmp = allocTitleObj.AddComponent<TextMeshProUGUI>();
-            atTmp.text = "APTITUDE ALLOCATION";
+            atTmp.text = "S.P.A.I.C. APTITUDE ALLOCATION";
             atTmp.fontSize = 18;
             atTmp.fontStyle = FontStyles.Bold;
             atTmp.characterSpacing = 2f;
@@ -858,7 +860,7 @@ namespace SundayLastBreath.Editor
             asRect.sizeDelta = new Vector2(-30, 20);
             asRect.anchoredPosition = new Vector2(0, -44);
             TextMeshProUGUI asTmp = allocSubObj.AddComponent<TextMeshProUGUI>();
-            asTmp.text = "\"Distribute 5 AP points to define your pre-disaster foundations.\"";
+            asTmp.text = "\"Distribute 5 AP points across your S.P.A.I.C. profile.\"";
             asTmp.fontSize = 12.5f;
             asTmp.fontStyle = FontStyles.Italic;
             asTmp.alignment = TextAlignmentOptions.Center;
@@ -917,20 +919,20 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI strTmp = CreateTrainingRow(rowsBox.transform, "STRENGTH", new Color(0.91f, 0.30f, 0.24f), 
                 () => screen.AddStudentPoint("str"), () => screen.RemoveStudentPoint("str"), () => screen.InspectStudentStat("str", true));
-            TextMeshProUGUI intTmp = CreateTrainingRow(rowsBox.transform, "INTELLIGENCE", new Color(0.20f, 0.60f, 0.86f), 
-                () => screen.AddStudentPoint("int"), () => screen.RemoveStudentPoint("int"), () => screen.InspectStudentStat("int", true));
-            TextMeshProUGUI agiTmp = CreateTrainingRow(rowsBox.transform, "AGILITY", new Color(0.18f, 0.80f, 0.44f), 
-                () => screen.AddStudentPoint("agi"), () => screen.RemoveStudentPoint("agi"), () => screen.InspectStudentStat("agi", true));
-            TextMeshProUGUI chaTmp = CreateTrainingRow(rowsBox.transform, "CHARISMA", new Color(0.61f, 0.35f, 0.71f), 
-                () => screen.AddStudentPoint("cha"), () => screen.RemoveStudentPoint("cha"), () => screen.InspectStudentStat("cha", true));
             TextMeshProUGUI perTmp = CreateTrainingRow(rowsBox.transform, "PERCEPTION", new Color(0.95f, 0.77f, 0.06f), 
                 () => screen.AddStudentPoint("per"), () => screen.RemoveStudentPoint("per"), () => screen.InspectStudentStat("per", true));
+            TextMeshProUGUI agiTmp = CreateTrainingRow(rowsBox.transform, "AGILITY", new Color(0.18f, 0.80f, 0.44f), 
+                () => screen.AddStudentPoint("agi"), () => screen.RemoveStudentPoint("agi"), () => screen.InspectStudentStat("agi", true));
+            TextMeshProUGUI intTmp = CreateTrainingRow(rowsBox.transform, "INTELLIGENCE", new Color(0.20f, 0.60f, 0.86f), 
+                () => screen.AddStudentPoint("int"), () => screen.RemoveStudentPoint("int"), () => screen.InspectStudentStat("int", true));
+            TextMeshProUGUI chaTmp = CreateTrainingRow(rowsBox.transform, "CHARISMA", new Color(0.61f, 0.35f, 0.71f), 
+                () => screen.AddStudentPoint("cha"), () => screen.RemoveStudentPoint("cha"), () => screen.InspectStudentStat("cha", true));
 
             so.FindProperty("studentStrText").objectReferenceValue = strTmp;
-            so.FindProperty("studentIntText").objectReferenceValue = intTmp;
-            so.FindProperty("studentAgiText").objectReferenceValue = agiTmp;
-            so.FindProperty("studentChaText").objectReferenceValue = chaTmp;
             so.FindProperty("studentPerText").objectReferenceValue = perTmp;
+            so.FindProperty("studentAgiText").objectReferenceValue = agiTmp;
+            so.FindProperty("studentIntText").objectReferenceValue = intTmp;
+            so.FindProperty("studentChaText").objectReferenceValue = chaTmp;
 
             // Warning Text
             GameObject warnObj = new GameObject("WarningText");
@@ -1542,14 +1544,14 @@ namespace SundayLastBreath.Editor
             subTmp.color = new Color(0.6f, 0.6f, 0.6f);
             so.FindProperty("hobbyHeaderSubtitle").objectReferenceValue = subTmp;
 
-            // Weakness Thematic Tab Bar (Physical Flaws vs Mental Flaws)
+            // Thematic Tab Bar (Combat/Field vs Mind/Tech for Positive Hobbies, Physical vs Mental for Weaknesses)
             GameObject tabBarObj = new GameObject("WeaknessTabBar");
             tabBarObj.transform.SetParent(panel.transform, false);
             RectTransform tbRect = tabBarObj.AddComponent<RectTransform>();
             tbRect.anchorMin = new Vector2(0.5f, 1f);
             tbRect.anchorMax = new Vector2(0.5f, 1f);
             tbRect.pivot = new Vector2(0.5f, 1f);
-            tbRect.sizeDelta = new Vector2(740, 38);
+            tbRect.sizeDelta = new Vector2(780, 38);
             tbRect.anchoredPosition = new Vector2(0, -122);
 
             HorizontalLayoutGroup hlg = tabBarObj.AddComponent<HorizontalLayoutGroup>();
@@ -1560,15 +1562,15 @@ namespace SundayLastBreath.Editor
             hlg.childForceExpandWidth = true;
             hlg.childForceExpandHeight = true;
 
-            // Physical Tab Button
+            // Physical / Combat Tab Button
             GameObject physTabObj = new GameObject("Btn_PhysicalTab");
             physTabObj.transform.SetParent(tabBarObj.transform, false);
             Image physBg = physTabObj.AddComponent<Image>();
-            physBg.color = new Color(0.65f, 0.15f, 0.12f, 0.95f);
+            physBg.color = new Color(0.65f, 0.28f, 0.05f, 0.95f);
             Button physBtn = physTabObj.AddComponent<Button>();
             physBtn.targetGraphic = physBg;
             Outline physOutline = physTabObj.AddComponent<Outline>();
-            physOutline.effectColor = new Color(0.91f, 0.30f, 0.24f, 0.85f);
+            physOutline.effectColor = new Color(0.95f, 0.50f, 0.12f, 0.90f);
             physOutline.effectDistance = new Vector2(1, -1);
 
             GameObject physTxtObj = new GameObject("Text");
@@ -1576,7 +1578,7 @@ namespace SundayLastBreath.Editor
             RectTransform pttRect = physTxtObj.AddComponent<RectTransform>();
             StretchFull(pttRect);
             TextMeshProUGUI physTmp = physTxtObj.AddComponent<TextMeshProUGUI>();
-            physTmp.text = "<b>● PHYSICAL FLAWS (10)</b>";
+            physTmp.text = "<b>● COMBAT, FIELD & STEALTH (8)</b>";
             physTmp.fontSize = 13f;
             physTmp.fontStyle = FontStyles.Bold;
             physTmp.characterSpacing = 2f;
@@ -1584,7 +1586,7 @@ namespace SundayLastBreath.Editor
             physTmp.color = Color.white;
             physTmp.raycastTarget = false;
 
-            // Mental Tab Button
+            // Mental / Tech Tab Button
             GameObject mentalTabObj = new GameObject("Btn_MentalTab");
             mentalTabObj.transform.SetParent(tabBarObj.transform, false);
             Image mentalBg = mentalTabObj.AddComponent<Image>();
@@ -1600,7 +1602,7 @@ namespace SundayLastBreath.Editor
             RectTransform mttRect = mentalTxtObj.AddComponent<RectTransform>();
             StretchFull(mttRect);
             TextMeshProUGUI mentalTmp = mentalTxtObj.AddComponent<TextMeshProUGUI>();
-            mentalTmp.text = "<b>○ MENTAL & SOCIAL (10)</b>";
+            mentalTmp.text = "<b>○ MIND, TECH & SUPPORT (7)</b>";
             mentalTmp.fontSize = 13f;
             mentalTmp.fontStyle = FontStyles.Bold;
             mentalTmp.characterSpacing = 2f;
@@ -1608,7 +1610,7 @@ namespace SundayLastBreath.Editor
             mentalTmp.color = new Color(0.6f, 0.6f, 0.6f);
             mentalTmp.raycastTarget = false;
 
-            tabBarObj.SetActive(false);
+            tabBarObj.SetActive(true);
 
             so.FindProperty("weaknessTabBar").objectReferenceValue = tabBarObj;
             so.FindProperty("physicalTabButton").objectReferenceValue = physBtn;
@@ -1620,21 +1622,21 @@ namespace SundayLastBreath.Editor
             so.FindProperty("physicalTabOutline").objectReferenceValue = physOutline;
             so.FindProperty("mentalTabOutline").objectReferenceValue = mentalOutline;
 
-            // Responsive ScrollView with 5-column Grid
-            GameObject scrollObj = CreateScrollView(panel.transform, "HobbyScrollView", new Vector2(1540, 890), true, out Transform content);
+            // Responsive ScrollView with 4/5-column Grid (2 rows per tab)
+            GameObject scrollObj = CreateScrollView(panel.transform, "HobbyScrollView", new Vector2(1540, 840), true, out Transform content);
             RectTransform scrollRectTransform = scrollObj.GetComponent<RectTransform>();
-            scrollRectTransform.anchoredPosition = new Vector2(0, -58);
+            scrollRectTransform.anchoredPosition = new Vector2(0, -82);
 
             GridLayoutGroup glg = content.gameObject.AddComponent<GridLayoutGroup>();
-            glg.cellSize = new Vector2(280, 280);
-            glg.spacing = new Vector2(18, 16);
+            glg.cellSize = new Vector2(350, 385);
+            glg.spacing = new Vector2(22, 22);
             glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            glg.constraintCount = 5;
+            glg.constraintCount = 4;
             glg.padding = new RectOffset(20, 20, 10, 15);
             glg.childAlignment = TextAnchor.UpperCenter;
             so.FindProperty("hobbyCardsContainer").objectReferenceValue = content;
 
-            // Auto-detect screen & fit all 15 positive hobbies without scroll if requirements met
+            // Auto-detect screen & fit 2 rows per tab cleanly without scroll
             scrollObj.AddComponent<HobbySelectionScreenAdapter>();
 
             // Card Template (Prefab)
@@ -1853,8 +1855,8 @@ namespace SundayLastBreath.Editor
 
             // --- COLUMN 2: ATTRIBUTES & PROFICIENCIES ---
             GameObject col2 = CreateDossierCard(colsObj.transform, "Col2_Aptitudes", 440);
-            CreateSectionHeader(col2.transform, "02 // ATTRIBUTES & PROFICIENCIES");
-            CreateSubLabel(col2.transform, "CORE BIOLOGICAL ATTRIBUTES:");
+            CreateSectionHeader(col2.transform, "02 // S.P.A.I.C. ATTRIBUTES & PROFICIENCIES");
+            CreateSubLabel(col2.transform, "S.P.A.I.C. BIOLOGICAL APTITUDE INDEX:");
             so.FindProperty("summaryAttributesText").objectReferenceValue = CreateDossierRow(col2.transform, 13.5f, FontStyles.Normal, Color.white);
             CreateDivider(col2.transform);
             CreateSubLabel(col2.transform, "SURVIVAL & WEAPON PROFICIENCIES:");
@@ -1969,7 +1971,7 @@ namespace SundayLastBreath.Editor
             wRect.anchorMin = new Vector2(0, 0.5f);
             wRect.anchorMax = new Vector2(0, 0.5f);
             wRect.pivot = new Vector2(0, 0.5f);
-            wRect.sizeDelta = new Vector2(740, 50);
+            wRect.sizeDelta = new Vector2(680, 50);
             wRect.anchoredPosition = new Vector2(24, 0);
 
             TextMeshProUGUI wTmp = warnObj.AddComponent<TextMeshProUGUI>();
@@ -1978,7 +1980,7 @@ namespace SundayLastBreath.Editor
             wTmp.alignment = TextAlignmentOptions.MidlineLeft;
 
             // Start Over Button
-            Button restartBtn = CreateStandardButton(footerBar.transform, "↺ START OVER", () => screen.SendMessage("RestartCharacterCreation", UnityEngine.SendMessageOptions.DontRequireReceiver), new Vector2(210, 46), new Color(0.85f, 0.90f, 0.95f));
+            Button restartBtn = CreateStandardButton(footerBar.transform, "<< START OVER", () => screen.SendMessage("RestartCharacterCreation", UnityEngine.SendMessageOptions.DontRequireReceiver), new Vector2(210, 46), new Color(0.85f, 0.90f, 0.95f));
             restartBtn.gameObject.name = "Btn_StartOver";
             RectTransform rRect = restartBtn.GetComponent<RectTransform>();
             rRect.anchorMin = new Vector2(1, 0.5f);
@@ -2489,12 +2491,15 @@ namespace SundayLastBreath.Editor
             StretchFull(btRect);
             TextMeshProUGUI btTmp = btObj.AddComponent<TextMeshProUGUI>();
             btTmp.text = GetSelectButtonText(job);
-            btTmp.fontSize = 13.5f;
+            btTmp.fontSize = 14.5f;
             btTmp.fontStyle = FontStyles.Bold;
-            btTmp.characterSpacing = 2f;
+            btTmp.characterSpacing = 2.5f;
             btTmp.alignment = TextAlignmentOptions.Center;
             btTmp.color = Color.white;
             btTmp.raycastTarget = false;
+
+            JobCardView jobCardView = cardObj.AddComponent<JobCardView>();
+            jobCardView.Setup(job, () => onSelect?.Invoke());
         }
 
         private static GameObject BuildHobbyCardTemplate(Transform parent)
@@ -2502,13 +2507,13 @@ namespace SundayLastBreath.Editor
             GameObject cardObj = new GameObject("HobbyCardTemplate");
             cardObj.transform.SetParent(parent, false);
             RectTransform rect = cardObj.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(280, 280);
+            rect.sizeDelta = new Vector2(345, 310);
 
             // Card border outline (1px dark border)
             Image borderImg = cardObj.AddComponent<Image>();
-            borderImg.color = new Color(0.18f, 0.18f, 0.18f, 1f);
+            borderImg.color = new Color(0.20f, 0.22f, 0.26f, 1f);
 
-            // Inner dark panel (#080808)
+            // Inner dark panel (#080A0E)
             GameObject innerObj = new GameObject("Inner");
             innerObj.transform.SetParent(cardObj.transform, false);
             RectTransform inRect = innerObj.AddComponent<RectTransform>();
@@ -2516,7 +2521,7 @@ namespace SundayLastBreath.Editor
             inRect.offsetMin = new Vector2(1, 1);
             inRect.offsetMax = new Vector2(-1, -1);
             Image innerBg = innerObj.AddComponent<Image>();
-            innerBg.color = new Color(0.031f, 0.031f, 0.031f, 1f);
+            innerBg.color = new Color(0.035f, 0.045f, 0.065f, 1f);
 
             // Top accent bar (3px line)
             GameObject topBar = new GameObject("TopBorder");
@@ -2530,28 +2535,28 @@ namespace SundayLastBreath.Editor
             Image topBarImg = topBar.AddComponent<Image>();
             topBarImg.color = new Color(0.83f, 0.33f, 0f);
 
-            // Banner Container (Masked)
+            // Banner Container (Masked, 114px high)
             GameObject bannerObj = new GameObject("Banner");
             bannerObj.transform.SetParent(innerObj.transform, false);
             RectTransform bRect = bannerObj.AddComponent<RectTransform>();
             bRect.anchorMin = new Vector2(0f, 1f);
             bRect.anchorMax = new Vector2(1f, 1f);
             bRect.pivot = new Vector2(0.5f, 1f);
-            bRect.sizeDelta = new Vector2(0, 105);
+            bRect.sizeDelta = new Vector2(0, 114);
             bRect.anchoredPosition = new Vector2(0, -3);
             bannerObj.AddComponent<RectMask2D>();
             Image bBg = bannerObj.AddComponent<Image>();
-            bBg.color = new Color(0.06f, 0.06f, 0.06f, 0.6f);
+            bBg.color = new Color(0.05f, 0.07f, 0.10f, 0.85f);
 
-            // Trait Illustration Icon
+            // Larger Trait Illustration Icon (112x112)
             GameObject iconObj = new GameObject("Icon");
             iconObj.transform.SetParent(bannerObj.transform, false);
             RectTransform icRect = iconObj.AddComponent<RectTransform>();
             icRect.anchorMin = new Vector2(0.5f, 0.5f);
             icRect.anchorMax = new Vector2(0.5f, 0.5f);
             icRect.pivot = new Vector2(0.5f, 0.5f);
-            icRect.sizeDelta = new Vector2(88, 88);
-            icRect.anchoredPosition = new Vector2(0, -2);
+            icRect.sizeDelta = new Vector2(112, 112);
+            icRect.anchoredPosition = new Vector2(0, -1);
             Image icImg = iconObj.AddComponent<Image>();
             icImg.preserveAspect = true;
             icImg.raycastTarget = false;
@@ -2563,11 +2568,39 @@ namespace SundayLastBreath.Editor
             gRect.anchorMin = new Vector2(0f, 0f);
             gRect.anchorMax = new Vector2(1f, 0f);
             gRect.pivot = new Vector2(0.5f, 0f);
-            gRect.sizeDelta = new Vector2(0, 35);
+            gRect.sizeDelta = new Vector2(0, 34);
             gRect.anchoredPosition = Vector2.zero;
             Image gradImg = gradObj.AddComponent<Image>();
             gradImg.sprite = GetBottomFadeGradient();
             gradImg.raycastTarget = false;
+
+            // Archetype Category Badge (Top-Right of Banner)
+            GameObject badgeObj = new GameObject("CategoryBadge");
+            badgeObj.transform.SetParent(bannerObj.transform, false);
+            RectTransform catRect = badgeObj.AddComponent<RectTransform>();
+            catRect.anchorMin = new Vector2(1f, 1f);
+            catRect.anchorMax = new Vector2(1f, 1f);
+            catRect.pivot = new Vector2(1f, 1f);
+            catRect.sizeDelta = new Vector2(104f, 22f);
+            catRect.anchoredPosition = new Vector2(-6f, -6f);
+            Image catBgImg = badgeObj.AddComponent<Image>();
+            catBgImg.color = new Color(0.05f, 0.08f, 0.12f, 0.92f);
+            catBgImg.raycastTarget = false;
+            Outline catOl = badgeObj.AddComponent<Outline>();
+            catOl.effectColor = new Color(1f, 1f, 1f, 0.15f);
+            catOl.effectDistance = new Vector2(1f, -1f);
+
+            GameObject catTxtObj = new GameObject("BadgeText");
+            catTxtObj.transform.SetParent(badgeObj.transform, false);
+            RectTransform ctRect = catTxtObj.AddComponent<RectTransform>();
+            StretchFull(ctRect);
+            TextMeshProUGUI catTmp = catTxtObj.AddComponent<TextMeshProUGUI>();
+            catTmp.text = "TRAIT";
+            catTmp.fontSize = 11f;
+            catTmp.fontStyle = FontStyles.Bold;
+            catTmp.alignment = TextAlignmentOptions.Center;
+            catTmp.color = Color.white;
+            catTmp.raycastTarget = false;
 
             // Title
             GameObject titleObj = new GameObject("Title");
@@ -2576,10 +2609,10 @@ namespace SundayLastBreath.Editor
             tRect.anchorMin = new Vector2(0f, 1f);
             tRect.anchorMax = new Vector2(1f, 1f);
             tRect.pivot = new Vector2(0.5f, 1f);
-            tRect.sizeDelta = new Vector2(-20, 24);
-            tRect.anchoredPosition = new Vector2(0, -114);
+            tRect.sizeDelta = new Vector2(-20, 28);
+            tRect.anchoredPosition = new Vector2(0, -124);
             TextMeshProUGUI tTmp = titleObj.AddComponent<TextMeshProUGUI>();
-            tTmp.fontSize = 15;
+            tTmp.fontSize = 19f;
             tTmp.fontStyle = FontStyles.Bold;
             tTmp.characterSpacing = 1.5f;
             tTmp.alignment = TextAlignmentOptions.Center;
@@ -2593,13 +2626,13 @@ namespace SundayLastBreath.Editor
             dRect.anchorMin = new Vector2(0f, 1f);
             dRect.anchorMax = new Vector2(1f, 1f);
             dRect.pivot = new Vector2(0.5f, 1f);
-            dRect.sizeDelta = new Vector2(-24, 38);
-            dRect.anchoredPosition = new Vector2(0, -140);
+            dRect.sizeDelta = new Vector2(-24, 44);
+            dRect.anchoredPosition = new Vector2(0, -154);
             TextMeshProUGUI dTmp = descObj.AddComponent<TextMeshProUGUI>();
-            dTmp.fontSize = 11f;
-            dTmp.lineSpacing = 1.5f;
+            dTmp.fontSize = 13f;
+            dTmp.lineSpacing = 2.5f;
             dTmp.alignment = TextAlignmentOptions.Center;
-            dTmp.color = new Color(0.72f, 0.72f, 0.72f);
+            dTmp.color = new Color(0.84f, 0.88f, 0.92f);
             dTmp.textWrappingMode = TextWrappingModes.Normal;
             dTmp.overflowMode = TextOverflowModes.Ellipsis;
             dTmp.raycastTarget = false;
@@ -2611,40 +2644,40 @@ namespace SundayLastBreath.Editor
             stRect.anchorMin = new Vector2(0f, 1f);
             stRect.anchorMax = new Vector2(1f, 1f);
             stRect.pivot = new Vector2(0.5f, 1f);
-            stRect.sizeDelta = new Vector2(-30, 26);
-            stRect.anchoredPosition = new Vector2(0, -182);
+            stRect.sizeDelta = new Vector2(-24, 28);
+            stRect.anchoredPosition = new Vector2(0, -206);
             Image statsBgImg = statsObj.AddComponent<Image>();
-            statsBgImg.color = new Color(0.04f, 0.08f, 0.14f, 0.6f);
+            statsBgImg.color = new Color(0.04f, 0.09f, 0.16f, 0.75f);
 
             GameObject stTextObj = new GameObject("Text");
             stTextObj.transform.SetParent(statsObj.transform, false);
             RectTransform sttRect = stTextObj.AddComponent<RectTransform>();
             StretchFull(sttRect);
             TextMeshProUGUI stTmp = stTextObj.AddComponent<TextMeshProUGUI>();
-            stTmp.fontSize = 11f;
+            stTmp.fontSize = 12.5f;
             stTmp.fontStyle = FontStyles.Bold;
             stTmp.alignment = TextAlignmentOptions.Center;
-            stTmp.color = new Color(0.36f, 0.70f, 1.0f);
+            stTmp.color = new Color(0.42f, 0.78f, 1.0f);
             stTmp.raycastTarget = false;
 
-            // Select Button
+            // Bottom Interactive Action Strip
             GameObject btnObj = new GameObject("SelectBtn");
             btnObj.transform.SetParent(innerObj.transform, false);
             RectTransform bBtnRect = btnObj.AddComponent<RectTransform>();
-            bBtnRect.anchorMin = new Vector2(0.5f, 0f);
-            bBtnRect.anchorMax = new Vector2(0.5f, 0f);
+            bBtnRect.anchorMin = new Vector2(0f, 0f);
+            bBtnRect.anchorMax = new Vector2(1f, 0f);
             bBtnRect.pivot = new Vector2(0.5f, 0f);
-            bBtnRect.sizeDelta = new Vector2(240, 36);
-            bBtnRect.anchoredPosition = new Vector2(0, 14);
+            bBtnRect.sizeDelta = new Vector2(-24, 38);
+            bBtnRect.anchoredPosition = new Vector2(0, 12);
 
             Image btnBg = btnObj.AddComponent<Image>();
-            btnBg.color = new Color(0.09f, 0.09f, 0.09f, 0.98f);
+            btnBg.color = new Color(0.08f, 0.10f, 0.14f, 0.98f);
             Button bBtn = btnObj.AddComponent<Button>();
             bBtn.targetGraphic = btnBg;
 
             ColorBlock cb = bBtn.colors;
-            cb.normalColor = new Color(0.09f, 0.09f, 0.09f, 0.98f);
-            cb.highlightedColor = new Color(0.70f, 0.30f, 0.05f, 1f);
+            cb.normalColor = new Color(0.08f, 0.10f, 0.14f, 0.98f);
+            cb.highlightedColor = new Color(0.75f, 0.34f, 0.06f, 1f);
             cb.pressedColor = new Color(0.50f, 0.20f, 0.02f, 1f);
             cb.selectedColor = cb.normalColor;
             bBtn.colors = cb;
@@ -2654,8 +2687,8 @@ namespace SundayLastBreath.Editor
             RectTransform btRect = btObj.AddComponent<RectTransform>();
             StretchFull(btRect);
             TextMeshProUGUI btTmp = btObj.AddComponent<TextMeshProUGUI>();
-            btTmp.text = "SELECT";
-            btTmp.fontSize = 12.5f;
+            btTmp.text = "SELECT TRAIT";
+            btTmp.fontSize = 13.5f;
             btTmp.fontStyle = FontStyles.Bold;
             btTmp.characterSpacing = 2f;
             btTmp.alignment = TextAlignmentOptions.Center;
@@ -2673,6 +2706,8 @@ namespace SundayLastBreath.Editor
             cso.FindProperty("statsBg").objectReferenceValue = statsBgImg;
             cso.FindProperty("selectButton").objectReferenceValue = bBtn;
             cso.FindProperty("buttonText").objectReferenceValue = btTmp;
+            cso.FindProperty("categoryBadgeBg").objectReferenceValue = catBgImg;
+            cso.FindProperty("categoryBadgeText").objectReferenceValue = catTmp;
             cso.ApplyModifiedProperties();
 
             return cardObj;

@@ -10,7 +10,7 @@ namespace SundayLastBreath.UI
 {
     /// <summary>
     /// Master UI controller managing the entire multi-step Character Creation flow:
-    /// Gender -> First Name -> Last Name -> Job Selection -> (Student Training/Major/Minor) -> Primary Hobby -> Secondary Hobby -> Weakness -> Final Dossier
+    /// Unified Federal Bio-Emergency Citizen Intake Console -> Job Selection -> (Student Training/Major/Minor) -> Primary Hobby -> Secondary Hobby -> Weakness -> Final Dossier
     /// </summary>
     public class CharacterCreationScreen : ScreenBase
     {
@@ -64,7 +64,7 @@ namespace SundayLastBreath.UI
         [SerializeField] private Transform hobbyCardsContainer;
         [SerializeField] private GameObject hobbyCardPrefab;
 
-        [Header("Weakness Thematic Tabs")]
+        [Header("Thematic Category Tabs (Hobbies & Weaknesses)")]
         [SerializeField] private GameObject weaknessTabBar;
         [SerializeField] private Button physicalTabButton;
         [SerializeField] private Button mentalTabButton;
@@ -75,7 +75,12 @@ namespace SundayLastBreath.UI
         [SerializeField] private Outline physicalTabOutline;
         [SerializeField] private Outline mentalTabOutline;
 
-        private int activeWeaknessTab = 0; // 0 = Physical, 1 = Mental
+        private int activeWeaknessTab = 0; // 0 = Tab 1 (Action/Combat or Physical Flaws), 1 = Tab 2 (Mind/Tech/Support or Mental Flaws)
+
+        private static readonly HashSet<string> ActionFieldHobbyIds = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
+        {
+            "runner", "hunter", "boxer", "hiker", "archer", "baseball", "watchman", "parkour"
+        };
 
         private static readonly HashSet<string> PhysicalWeaknessIds = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
         {
@@ -94,8 +99,59 @@ namespace SundayLastBreath.UI
         [SerializeField] private Button beginSurvivalButton;
         [SerializeField] private Button restartCreationButton;
 
-        // Runtime creation data
+        // Preset Name Pools for the Unified Citizen Identity Console
+        private static readonly string[] MaleFirstNames = {
+            "James", "Michael", "Robert", "William", "David", "Neal",
+            "Marcus", "Ethan", "Cole", "Lucas", "Nathan", "Jack"
+        };
+
+        private static readonly string[] FemaleFirstNames = {
+            "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Nadia",
+            "Claire", "Elena", "Sarah", "Maya", "Rachel", "Hannah"
+        };
+
+        private static readonly string[] NonBinaryFirstNames = {
+            "Alex", "Jordan", "Taylor", "Quinn", "Casey", "Skyler",
+            "Morgan", "Riley", "Avery", "Rowan", "Cameron", "Ellis"
+        };
+
+        private static readonly string[] PresetLastNames = {
+            "Smith", "Johnson", "Williams", "Brown", "Jones", "Sage",
+            "Miller", "Vance", "Mercer", "Holloway", "Sterling", "Callahan"
+        };
+
+        // Unified Identity Console runtime UI references
+        private TextMeshProUGUI topBannerCaseIdText;
+        private TextMeshProUGUI idCardLastNameText;
+        private TextMeshProUGUI idCardFirstNameText;
+        private TextMeshProUGUI idCardMetaText;
+        private TextMeshProUGUI idCardMrzText;
+        private TextMeshProUGUI idCardEmblemText;
+        private Image idCardSilhouetteImg;
+        private TextMeshProUGUI idCardQuoteText;
+        private TextMeshProUGUI idCardActiveRecordText;
+        private Button genderMaleBtn;
+        private Button genderFemaleBtn;
+        private Button genderNonBinaryBtn;
+        private Transform firstNameChipsRoot;
+        private Transform lastNameChipsRoot;
+        private bool suppressInputCallback = false;
+
+        private static Sprite _cachedSilhouetteSprite;
+
+        // Hobby Top Bar runtime UI references
+        private TextMeshProUGUI hobbyLoadoutStatusText;
+
+        // Runtime creation state (tracked cleanly so Back navigation never duplicates stats/items)
         private CharacterData character = new CharacterData();
+        private string selectedJobId = "police";
+        private int studentAllocStr = 0;
+        private int studentAllocInt = 0;
+        private int studentAllocAgi = 0;
+        private int studentAllocCha = 0;
+        private int studentAllocPer = 0;
+        private string chosenMajorSkill = "";
+        private string chosenMinorSkill = "";
         private int hobbyStep = 1; // 1 = Primary, 2 = Secondary, 3 = Weakness
         private List<string> pickedHobbyIds = new List<string>();
         private int studentPointsRemaining = 5;
@@ -115,104 +171,17 @@ namespace SundayLastBreath.UI
                 clockTickSource.spatialBlend = 0f;
             }
 
+            EnsureIdentityConsoleBuilt();
+            EnsureJobBackButton();
+            EnsureHobbyTopBar();
             InitializeButtons();
+            SundayTypography.ApplyHierarchy(transform);
             HideAllPanels();
         }
 
         private void InitializeButtons()
         {
-            // 1. Gender Panel Buttons
-            if (genderPanel != null)
-            {
-                var buttons = genderPanel.GetComponentsInChildren<Button>(true);
-                foreach (var btn in buttons)
-                {
-                    string bName = btn.gameObject.name.ToUpper();
-                    if (bName.Contains("MALE") && !bName.Contains("FEMALE"))
-                    {
-                        btn.onClick.RemoveAllListeners();
-                        btn.onClick.AddListener(() => SelectGender("Male"));
-                    }
-                    else if (bName.Contains("FEMALE"))
-                    {
-                        btn.onClick.RemoveAllListeners();
-                        btn.onClick.AddListener(() => SelectGender("Female"));
-                    }
-                    else if (bName.Contains("NON-BINARY") || bName.Contains("NONBINARY"))
-                    {
-                        btn.onClick.RemoveAllListeners();
-                        btn.onClick.AddListener(() => SelectGender("Non-Binary"));
-                    }
-                }
-
-                Transform customRow = genderPanel.transform.Find("CustomGenderRow");
-                if (customRow != null)
-                {
-                    Button confirmBtn = customRow.Find("ConfirmBtn")?.GetComponent<Button>();
-                    if (confirmBtn != null)
-                    {
-                        confirmBtn.onClick.RemoveAllListeners();
-                        confirmBtn.onClick.AddListener(ConfirmCustomGender);
-                    }
-                }
-                if (customGenderInput != null)
-                {
-                    customGenderInput.onSubmit.RemoveAllListeners();
-                    customGenderInput.onSubmit.AddListener(_ => ConfirmCustomGender());
-                }
-            }
-
-            // 2. First Name Buttons
-            WireNameButtons(maleNamesContainer, SelectFirstName);
-            WireNameButtons(femaleNamesContainer, SelectFirstName);
-            WireNameButtons(nonBinaryNamesContainer, SelectFirstName);
-
-            if (firstNamePanel != null)
-            {
-                Transform customRow = firstNamePanel.transform.Find("CustomFirstNameRow");
-                if (customRow != null)
-                {
-                    Button confirmBtn = customRow.Find("ConfirmBtn")?.GetComponent<Button>();
-                    if (confirmBtn != null)
-                    {
-                        confirmBtn.onClick.RemoveAllListeners();
-                        confirmBtn.onClick.AddListener(ConfirmCustomFirstName);
-                    }
-                }
-                if (customFirstNameInput != null)
-                {
-                    customFirstNameInput.onSubmit.RemoveAllListeners();
-                    customFirstNameInput.onSubmit.AddListener(_ => ConfirmCustomFirstName());
-                }
-            }
-
-            // 3. Last Name Buttons
-            if (lastNamePanel != null)
-            {
-                Transform grid = lastNamePanel.transform.Find("LastNameGrid");
-                if (grid != null)
-                {
-                    WireNameButtons(grid, SelectLastName);
-                }
-
-                Transform customRow = lastNamePanel.transform.Find("CustomLastNameRow");
-                if (customRow != null)
-                {
-                    Button confirmBtn = customRow.Find("ConfirmBtn")?.GetComponent<Button>();
-                    if (confirmBtn != null)
-                    {
-                        confirmBtn.onClick.RemoveAllListeners();
-                        confirmBtn.onClick.AddListener(ConfirmCustomLastName);
-                    }
-                }
-                if (customLastNameInput != null)
-                {
-                    customLastNameInput.onSubmit.RemoveAllListeners();
-                    customLastNameInput.onSubmit.AddListener(_ => ConfirmCustomLastName());
-                }
-            }
-
-            // 4. Job Selection Buttons
+            // 1. Job Selection Cards (Interactive JobCardView with hover + click + upgraded badges)
             if (jobSelectionPanel != null)
             {
                 Transform content = jobSelectionPanel.transform.Find("JobScrollView/Viewport/Content");
@@ -223,19 +192,17 @@ namespace SundayLastBreath.UI
                         Transform card = content.Find("JobCard_" + job.id);
                         if (card != null)
                         {
-                            Button btn = card.GetComponentInChildren<Button>();
-                            if (btn != null)
-                            {
-                                string jId = job.id;
-                                btn.onClick.RemoveAllListeners();
-                                btn.onClick.AddListener(() => SelectJob(jId));
-                            }
+                            string jId = job.id;
+                            JobData capturedJob = job;
+                            JobCardView cardView = card.GetComponent<JobCardView>();
+                            if (cardView == null) cardView = card.gameObject.AddComponent<JobCardView>();
+                            cardView.Setup(capturedJob, () => SelectJob(jId));
                         }
                     }
                 }
             }
 
-            // 5. Student Training Buttons
+            // 2. Student Training Buttons
             if (studentTrainingPanel != null)
             {
                 Transform rows = null;
@@ -261,13 +228,11 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 6. Student Major Buttons
+            // 3. Student Major & Minor Buttons
             WireAcademicCards(studentMajorPanel, isMajor: true);
-
-            // 7. Student Minor Buttons
             WireAcademicCards(studentMinorPanel, isMajor: false);
 
-            // 8. Begin Survival Button
+            // 4. Summary Dossier Buttons
             if (beginSurvivalButton != null)
             {
                 beginSurvivalButton.onClick.RemoveAllListeners();
@@ -280,7 +245,7 @@ namespace SundayLastBreath.UI
                 restartCreationButton.onClick.AddListener(RestartCharacterCreation);
             }
 
-            // 9. Weakness Thematic Tab Buttons
+            // 5. Thematic Tab Buttons (used across Primary Hobby, Secondary Hobby, and Weakness!)
             if (physicalTabButton != null)
             {
                 physicalTabButton.onClick.RemoveAllListeners();
@@ -290,22 +255,6 @@ namespace SundayLastBreath.UI
             {
                 mentalTabButton.onClick.RemoveAllListeners();
                 mentalTabButton.onClick.AddListener(() => SwitchWeaknessTab(1));
-            }
-        }
-
-        private void WireNameButtons(Transform container, System.Action<string> onSelect)
-        {
-            if (container == null) return;
-            var buttons = container.GetComponentsInChildren<Button>(true);
-            foreach (var btn in buttons)
-            {
-                var tmp = btn.GetComponentInChildren<TextMeshProUGUI>();
-                if (tmp != null)
-                {
-                    string nameText = tmp.text.Trim();
-                    btn.onClick.RemoveAllListeners();
-                    btn.onClick.AddListener(() => onSelect(nameText));
-                }
             }
         }
 
@@ -339,7 +288,6 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                // Add PointerEnter & PointerExit triggers for instant hover preview and lock mechanics
                 EventTrigger rowTrigger = row.gameObject.GetComponent<EventTrigger>();
                 if (rowTrigger == null) rowTrigger = row.gameObject.AddComponent<EventTrigger>();
                 rowTrigger.triggers.Clear();
@@ -380,7 +328,6 @@ namespace SundayLastBreath.UI
                 if (inspectLockTimer <= 0f)
                 {
                     inspectLockTimer = 0f;
-                    // Lock window expired: seamlessly switch to currently hovered stat if mouse is over one
                     if (!string.IsNullOrEmpty(currentlyHoveredStat) &&
                         !string.Equals(currentInspectedStat, currentlyHoveredStat, System.StringComparison.OrdinalIgnoreCase))
                     {
@@ -402,15 +349,8 @@ namespace SundayLastBreath.UI
 
         protected override void OnScreenOpened()
         {
-            character = new CharacterData();
-            hobbyStep = 1;
-            pickedHobbyIds.Clear();
-            studentPointsRemaining = 5;
-            inspectLockTimer = 0f;
-            currentlyHoveredStat = null;
-            activeWeaknessTab = 0;
+            ResetCreationState();
 
-            // Start creation music & clock tick
             if (AudioManager.Instance != null && creationMusicClip != null)
             {
                 AudioManager.Instance.PlayBGM(creationMusicClip, 1.5f);
@@ -423,9 +363,166 @@ namespace SundayLastBreath.UI
                 clockTickSource.Play();
             }
 
-            // Step 1: Start at Gender Selection
+            EnsureIdentityConsoleBuilt();
+            EnsureJobBackButton();
+            EnsureHobbyTopBar();
             InitializeButtons();
+            SundayTypography.ApplyHierarchy(transform);
             ShowGenderPanel();
+        }
+
+        private void ResetCreationState()
+        {
+            character = new CharacterData();
+            character.gender = "Male";
+            character.firstName = "Neal";
+            character.lastName = "Sage";
+            selectedJobId = "police";
+            studentAllocStr = 0;
+            studentAllocInt = 0;
+            studentAllocAgi = 0;
+            studentAllocCha = 0;
+            studentAllocPer = 0;
+            chosenMajorSkill = "";
+            chosenMinorSkill = "";
+            hobbyStep = 1;
+            pickedHobbyIds.Clear();
+            studentPointsRemaining = 5;
+            inspectLockTimer = 0f;
+            currentlyHoveredStat = null;
+            activeWeaknessTab = 0;
+            dossierLayoutEnforced = false;
+        }
+
+        /// <summary>
+        /// Computes deterministic biometric & federal case file metadata from the citizen's identity
+        /// so Step 1 (Citizen Intake Console) and Step 4 (Final Summary Dossier) match 100%.
+        /// </summary>
+        private void GetCitizenBiometrics(out string docNo, out string dob, out string blood, out string sector, out string clearance, out string mrzLine1, out string mrzLine2)
+        {
+            string g = string.IsNullOrWhiteSpace(character.gender) ? "Male" : character.gender.Trim();
+            string fn = string.IsNullOrWhiteSpace(character.firstName) ? "Neal" : character.firstName.Trim();
+            string ln = string.IsNullOrWhiteSpace(character.lastName) ? "Sage" : character.lastName.Trim();
+
+            bool isMale = g.Equals("Male", System.StringComparison.OrdinalIgnoreCase);
+            bool isFemale = g.Equals("Female", System.StringComparison.OrdinalIgnoreCase);
+
+            int hash = Mathf.Abs((fn.ToUpperInvariant() + "|" + ln.ToUpperInvariant() + "|" + g.ToUpperInvariant()).GetHashCode());
+            int caseDigits = (hash % 9000) + 1000;
+            docNo = $"#EAS-2026-US{caseDigits}";
+
+            string[] bloodTypes = { "O-POS", "A-POS", "B-POS", "AB-POS", "O-NEG", "A-NEG" };
+            blood = bloodTypes[hash % bloodTypes.Length];
+
+            int birthMonth = (hash % 12) + 1;
+            int birthDay = (hash % 28) + 1;
+            dob = $"1999-{birthMonth:00}-{birthDay:00}";
+
+            sector = "SECTOR-04 // METRO GATE";
+            clearance = "TIER-1 CONDITIONAL";
+
+            string cleanLast = System.Text.RegularExpressions.Regex.Replace(ln.ToUpperInvariant(), "[^A-Z]", "");
+            string cleanFirst = System.Text.RegularExpressions.Regex.Replace(fn.ToUpperInvariant(), "[^A-Z]", "");
+            if (string.IsNullOrEmpty(cleanLast)) cleanLast = "SURVIVOR";
+            if (string.IsNullOrEmpty(cleanFirst)) cleanFirst = "UNKNOWN";
+
+            mrzLine1 = $"IDUSA<<{cleanLast}<<{cleanFirst}".PadRight(40, '<').Substring(0, 40);
+            string sexCode = isMale ? "M" : (isFemale ? "F" : "X");
+            mrzLine2 = $"202610194USA99{birthMonth:00}{birthDay:00}7{sexCode}3010192<<<<EAS{caseDigits}".PadRight(40, '<').Substring(0, 40);
+        }
+
+        private void RebuildCharacterFromSelections()
+        {
+            string savedGender = string.IsNullOrWhiteSpace(character.gender) ? "Male" : character.gender;
+            string savedFirst = string.IsNullOrWhiteSpace(character.firstName) ? "Neal" : character.firstName;
+            string savedLast = string.IsNullOrWhiteSpace(character.lastName) ? "Sage" : character.lastName;
+
+            character = new CharacterData
+            {
+                gender = savedGender,
+                firstName = savedFirst,
+                lastName = savedLast
+            };
+
+            JobData job = System.Array.Find(CharacterCreationDefinitions.Jobs, j => j.id.Equals(selectedJobId, System.StringComparison.OrdinalIgnoreCase));
+            if (job != null)
+            {
+                character.job = job.title;
+                character.str = job.str;
+                character.intl = job.intl;
+                character.agi = job.agi;
+                character.cha = job.cha;
+                character.per = job.per;
+
+                character.hpMax += job.hpBonus;
+                character.hp = character.hpMax;
+
+                character.staminaMax += job.staminaBonus;
+                character.baseStaminaMax += job.staminaBonus;
+                character.stamina = character.staminaMax;
+
+                character.humanity += job.humanityBonus;
+
+                character.shooting = job.shooting;
+                character.melee = job.melee;
+                character.stealth = job.stealth;
+                character.tech = job.tech;
+                character.medicine = job.medicine;
+                character.scavenging = job.scavenging;
+                character.survival = job.survival;
+                character.resolve = job.resolve;
+
+                if (job.perks != null)
+                {
+                    foreach (var perk in job.perks)
+                    {
+                        Sprite icon = null;
+#if UNITY_EDITOR
+                        string iconKey = perk.name.ToLower().Replace(" ", "_");
+                        icon = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/Perks/{iconKey}.png");
+#endif
+                        character.AddTrait(perk.name, perk.desc, icon);
+                    }
+                }
+
+                if (job.startingItems != null)
+                {
+                    foreach (var item in job.startingItems)
+                    {
+                        character.AddItem(item.item, item.qty);
+                    }
+                }
+            }
+
+            if (selectedJobId.Equals("student", System.StringComparison.OrdinalIgnoreCase))
+            {
+                character.str += studentAllocStr;
+                character.intl += studentAllocInt;
+                character.agi += studentAllocAgi;
+                character.cha += studentAllocCha;
+                character.per += studentAllocPer;
+
+                if (!string.IsNullOrEmpty(chosenMajorSkill))
+                {
+                    ApplyMajorToCharacter(chosenMajorSkill);
+                }
+                if (!string.IsNullOrEmpty(chosenMinorSkill))
+                {
+                    ApplyMinorToCharacter(chosenMinorSkill);
+                }
+            }
+
+            for (int i = 0; i < pickedHobbyIds.Count; i++)
+            {
+                string hId = pickedHobbyIds[i];
+                int stepNum = i + 1;
+                HobbyData hobby = System.Array.Find(CharacterCreationDefinitions.PositiveHobbies, h => h.id.Equals(hId, System.StringComparison.OrdinalIgnoreCase));
+                if (hobby == null)
+                {
+                    hobby = System.Array.Find(CharacterCreationDefinitions.DestructiveWeaknesses, w => w.id.Equals(hId, System.StringComparison.OrdinalIgnoreCase));
+                }
+                hobby?.applyEffect?.Invoke(character, stepNum);
+            }
         }
 
         private void HideAllPanels()
@@ -442,19 +539,28 @@ namespace SundayLastBreath.UI
             dossierLayoutEnforced = false;
         }
 
-        #region Step 1: Gender Selection
+        #region Step 1: Unified Federal Bio-Emergency Citizen Intake Console
         public void ShowGenderPanel()
         {
             HideAllPanels();
+            EnsureIdentityConsoleBuilt();
             if (genderPanel != null) genderPanel.SetActive(true);
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: true);
         }
 
         public void SelectGender(string gender)
         {
-            Debug.Log($"[CharacterCreationScreen] Gender selected: {gender}");
+            bool genderChanged = !string.Equals(character.gender, gender, System.StringComparison.OrdinalIgnoreCase);
             character.gender = gender;
+
+            if (genderChanged && IsPresetFirstName(character.firstName))
+            {
+                string[] pool = GetFirstNamePoolForGender(gender);
+                if (pool.Length > 0) character.firstName = pool[0];
+            }
+
             PlayClick();
-            ShowFirstNamePanel();
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: true);
         }
 
         public void ConfirmCustomGender()
@@ -468,30 +574,15 @@ namespace SundayLastBreath.UI
                 character.gender = "Survivor";
             }
             PlayClick();
-            ShowFirstNamePanel();
-        }
-        #endregion
-
-        #region Step 2: First Name Selection
-        public void ShowFirstNamePanel()
-        {
-            HideAllPanels();
-            if (firstNamePanel != null) firstNamePanel.SetActive(true);
-
-            // Filter presets based on gender
-            bool isMale = character.gender.Equals("Male", System.StringComparison.OrdinalIgnoreCase);
-            bool isFemale = character.gender.Equals("Female", System.StringComparison.OrdinalIgnoreCase);
-
-            if (maleNamesContainer != null) maleNamesContainer.gameObject.SetActive(isMale);
-            if (femaleNamesContainer != null) femaleNamesContainer.gameObject.SetActive(isFemale);
-            if (nonBinaryNamesContainer != null) nonBinaryNamesContainer.gameObject.SetActive(!isMale && !isFemale);
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: true);
         }
 
         public void SelectFirstName(string firstName)
         {
-            character.firstName = firstName;
+            if (string.IsNullOrWhiteSpace(firstName)) return;
+            character.firstName = firstName.Trim();
             PlayClick();
-            ShowLastNamePanel();
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: false);
         }
 
         public void ConfirmCustomFirstName()
@@ -500,23 +591,16 @@ namespace SundayLastBreath.UI
             {
                 character.firstName = customFirstNameInput.text.Trim();
                 PlayClick();
-                ShowLastNamePanel();
+                RefreshIdentityConsoleUI(rebuildFirstNameChips: false);
             }
-        }
-        #endregion
-
-        #region Step 3: Last Name Selection
-        public void ShowLastNamePanel()
-        {
-            HideAllPanels();
-            if (lastNamePanel != null) lastNamePanel.SetActive(true);
         }
 
         public void SelectLastName(string lastName)
         {
-            character.lastName = lastName;
+            if (string.IsNullOrWhiteSpace(lastName)) return;
+            character.lastName = lastName.Trim();
             PlayClick();
-            ShowJobSelectionPanel();
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: false);
         }
 
         public void ConfirmCustomLastName()
@@ -525,16 +609,984 @@ namespace SundayLastBreath.UI
             {
                 character.lastName = customLastNameInput.text.Trim();
                 PlayClick();
-                ShowJobSelectionPanel();
+                RefreshIdentityConsoleUI(rebuildFirstNameChips: false);
+            }
+        }
+
+        public void ShowFirstNamePanel() => ShowGenderPanel();
+        public void ShowLastNamePanel() => ShowJobSelectionPanel();
+
+        public void RollRandomFirstName()
+        {
+            string[] pool = GetFirstNamePoolForGender(character.gender);
+            if (pool.Length > 0)
+            {
+                string pick = pool[Random.Range(0, pool.Length)];
+                if (pool.Length > 1 && pick == character.firstName)
+                {
+                    pick = pool[(System.Array.IndexOf(pool, pick) + 1) % pool.Length];
+                }
+                character.firstName = pick;
+            }
+            PlayClick();
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: false);
+        }
+
+        public void RollRandomLastName()
+        {
+            if (PresetLastNames.Length > 0)
+            {
+                string pick = PresetLastNames[Random.Range(0, PresetLastNames.Length)];
+                if (PresetLastNames.Length > 1 && pick == character.lastName)
+                {
+                    pick = PresetLastNames[(System.Array.IndexOf(PresetLastNames, pick) + 1) % PresetLastNames.Length];
+                }
+                character.lastName = pick;
+            }
+            PlayClick();
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: false);
+        }
+
+        public void RandomizeNameOnly()
+        {
+            string[] pool = GetFirstNamePoolForGender(character.gender);
+            if (pool.Length > 0) character.firstName = pool[Random.Range(0, pool.Length)];
+            if (PresetLastNames.Length > 0) character.lastName = PresetLastNames[Random.Range(0, PresetLastNames.Length)];
+            PlayClick();
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: false);
+        }
+
+        public void RandomizeFullIdentity()
+        {
+            string[] genders = { "Male", "Female", "Non-Binary" };
+            character.gender = genders[Random.Range(0, genders.Length)];
+            string[] pool = GetFirstNamePoolForGender(character.gender);
+            if (pool.Length > 0) character.firstName = pool[Random.Range(0, pool.Length)];
+            if (PresetLastNames.Length > 0) character.lastName = PresetLastNames[Random.Range(0, PresetLastNames.Length)];
+            PlayClick();
+            RefreshIdentityConsoleUI(rebuildFirstNameChips: true);
+        }
+
+        public void ConfirmIdentityAndProceed()
+        {
+            if (string.IsNullOrWhiteSpace(character.gender)) character.gender = "Male";
+            if (string.IsNullOrWhiteSpace(character.firstName)) character.firstName = "Neal";
+            if (string.IsNullOrWhiteSpace(character.lastName)) character.lastName = "Sage";
+            PlayClick();
+            ShowJobSelectionPanel();
+        }
+
+        private string[] GetFirstNamePoolForGender(string gender)
+        {
+            if (string.Equals(gender, "Male", System.StringComparison.OrdinalIgnoreCase)) return MaleFirstNames;
+            if (string.Equals(gender, "Female", System.StringComparison.OrdinalIgnoreCase)) return FemaleFirstNames;
+            return NonBinaryFirstNames;
+        }
+
+        private bool IsPresetFirstName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return true;
+            foreach (var n in MaleFirstNames) if (string.Equals(n, name, System.StringComparison.OrdinalIgnoreCase)) return true;
+            foreach (var n in FemaleFirstNames) if (string.Equals(n, name, System.StringComparison.OrdinalIgnoreCase)) return true;
+            foreach (var n in NonBinaryFirstNames) if (string.Equals(n, name, System.StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+
+        public void EnsureIdentityConsoleBuilt()
+        {
+            if (genderPanel == null) return;
+
+            Transform existingFrame = genderPanel.transform.Find("IdentityConsoleFrame");
+            if (existingFrame != null && existingFrame.Find("V2_SyncedMarker") != null)
+            {
+                BindIdentityConsoleReferences(existingFrame);
+                return;
+            }
+
+            // Clear legacy or V1 objects
+            for (int i = genderPanel.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = genderPanel.transform.GetChild(i);
+                if (child.name != "Header")
+                {
+                    if (Application.isPlaying) Destroy(child.gameObject);
+                    else DestroyImmediate(child.gameObject);
+                }
+            }
+
+            // Update Top Screen Header Title & Subtitle
+            Transform header = genderPanel.transform.Find("Header");
+            if (header != null)
+            {
+                RectTransform hRect = header.GetComponent<RectTransform>();
+                if (hRect != null) hRect.anchoredPosition = new Vector2(0, -28);
+
+                TextMeshProUGUI tTmp = header.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (tTmp != null)
+                {
+                    tTmp.text = "CITIZEN IDENTITY & FEMA BIO-REGISTRY";
+                    tTmp.fontSize = 28f;
+                    SundayTypography.ApplyFont(tTmp, FontRole.Display);
+                }
+                TextMeshProUGUI sTmp = header.Find("Subtitle")?.GetComponent<TextMeshProUGUI>();
+                if (sTmp != null)
+                {
+                    sTmp.text = "\"Before the sirens wailed across the county, who was the person staring back in the darkened glass?\"";
+                    sTmp.fontSize = 15.5f;
+                    SundayTypography.ApplyFont(sTmp, FontRole.Narrative);
+                }
+            }
+
+            // Build Master Frame (1420 x 750) matching the exact Federal Dossier theme
+            GameObject frameObj = new GameObject("IdentityConsoleFrame");
+            frameObj.transform.SetParent(genderPanel.transform, false);
+            RectTransform fRect = frameObj.AddComponent<RectTransform>();
+            fRect.anchorMin = new Vector2(0.5f, 0.5f);
+            fRect.anchorMax = new Vector2(0.5f, 0.5f);
+            fRect.pivot = new Vector2(0.5f, 0.5f);
+            fRect.sizeDelta = new Vector2(1420f, 750f);
+            fRect.anchoredPosition = new Vector2(0f, -36f);
+
+            GameObject v2Marker = new GameObject("V2_SyncedMarker");
+            v2Marker.transform.SetParent(frameObj.transform, false);
+
+            Image fBg = frameObj.AddComponent<Image>();
+            fBg.color = new Color(0.05f, 0.07f, 0.10f, 0.98f);
+            Outline fOut = frameObj.AddComponent<Outline>();
+            fOut.effectColor = new Color(0.18f, 0.28f, 0.40f, 0.85f);
+            fOut.effectDistance = new Vector2(2f, -2f);
+            frameObj.AddComponent<RectMask2D>();
+
+            // Top Federal Header Banner (52px, matching Final Dossier HeaderBar!)
+            GameObject topStrip = new GameObject("TopBanner");
+            topStrip.transform.SetParent(frameObj.transform, false);
+            RectTransform tsRect = topStrip.AddComponent<RectTransform>();
+            tsRect.anchorMin = new Vector2(0f, 1f);
+            tsRect.anchorMax = new Vector2(1f, 1f);
+            tsRect.pivot = new Vector2(0.5f, 1f);
+            tsRect.sizeDelta = new Vector2(0f, 48f);
+            tsRect.anchoredPosition = Vector2.zero;
+            topStrip.AddComponent<Image>().color = new Color(0.08f, 0.12f, 0.18f, 1f);
+
+            GameObject goldBottomLine = new GameObject("GoldDivider");
+            goldBottomLine.transform.SetParent(topStrip.transform, false);
+            RectTransform gblRect = goldBottomLine.AddComponent<RectTransform>();
+            gblRect.anchorMin = new Vector2(0f, 0f);
+            gblRect.anchorMax = new Vector2(1f, 0f);
+            gblRect.pivot = new Vector2(0.5f, 0f);
+            gblRect.sizeDelta = new Vector2(0f, 2f);
+            gblRect.anchoredPosition = Vector2.zero;
+            goldBottomLine.AddComponent<Image>().color = new Color(0.85f, 0.68f, 0.25f, 1f);
+
+            CreateUIText(topStrip.transform, "BannerLeft",
+                "<b><color=#F5BF42>■ FEDERAL BIO-EMERGENCY AGENCY</color></b>   <color=#78909C>|</color>   <color=#8CC2E8>CDC · FEMA JOINT OUTBREAK RESPONSE TASKFORCE // STEP 01: CITIZEN INTAKE</color>",
+                12f, TextAlignmentOptions.MidlineLeft, Color.white, FontRole.Mono,
+                new Vector2(0f, 0f), new Vector2(0.62f, 1f), new Vector2(18f, 0f), Vector2.zero);
+
+            CreateUIText(topStrip.transform, "BannerRight",
+                "CASE FILE: #EAS-2026-US4349   |   <color=#EF5350><b>[ STATUS: CIVIL DANGER WARNING // LEVEL 4 ]</b></color>",
+                11.5f, TextAlignmentOptions.MidlineRight, new Color(0.75f, 0.84f, 0.92f), FontRole.Mono,
+                new Vector2(0.62f, 0f), new Vector2(1f, 1f), Vector2.zero, new Vector2(-18f, 0f));
+
+            // Console Body Area (1380 x 624)
+            GameObject bodyObj = new GameObject("ConsoleBody");
+            bodyObj.transform.SetParent(frameObj.transform, false);
+            RectTransform bRect = bodyObj.AddComponent<RectTransform>();
+            bRect.anchorMin = Vector2.zero;
+            bRect.anchorMax = Vector2.one;
+            bRect.offsetMin = new Vector2(20f, 70f);
+            bRect.offsetMax = new Vector2(-20f, -54f);
+
+            // =========================================================================
+            // LEFT COLUMN: Live Interactive Federal Bio-Emergency Citizen ID + Mirror Box
+            // =========================================================================
+            GameObject leftCol = new GameObject("LeftCol_CitizenCard");
+            leftCol.transform.SetParent(bodyObj.transform, false);
+            RectTransform lcRect = leftCol.AddComponent<RectTransform>();
+            lcRect.anchorMin = new Vector2(0f, 0f);
+            lcRect.anchorMax = new Vector2(0f, 1f);
+            lcRect.pivot = new Vector2(0f, 1f);
+            lcRect.sizeDelta = new Vector2(500f, 0f);
+            lcRect.anchoredPosition = Vector2.zero;
+
+            // 1. Federal Citizen Bio-ID Card (500 x 324)
+            GameObject idCard = new GameObject("USCitizenIDCard");
+            idCard.transform.SetParent(leftCol.transform, false);
+            RectTransform idRect = idCard.AddComponent<RectTransform>();
+            idRect.anchorMin = new Vector2(0f, 1f);
+            idRect.anchorMax = new Vector2(1f, 1f);
+            idRect.pivot = new Vector2(0.5f, 1f);
+            idRect.sizeDelta = new Vector2(0f, 324f);
+            idRect.anchoredPosition = new Vector2(0f, -4f);
+            idCard.AddComponent<Image>().color = new Color(0.05f, 0.09f, 0.15f, 0.98f);
+            Outline idOut = idCard.AddComponent<Outline>();
+            idOut.effectColor = new Color(0.18f, 0.34f, 0.52f, 0.95f);
+            idOut.effectDistance = new Vector2(1f, -1f);
+            idCard.AddComponent<RectMask2D>();
+
+            // ID Card Header Bar (34px)
+            GameObject idHeader = new GameObject("IDHeader");
+            idHeader.transform.SetParent(idCard.transform, false);
+            RectTransform idhRect = idHeader.AddComponent<RectTransform>();
+            idhRect.anchorMin = new Vector2(0f, 1f);
+            idhRect.anchorMax = new Vector2(1f, 1f);
+            idhRect.pivot = new Vector2(0.5f, 1f);
+            idhRect.sizeDelta = new Vector2(0f, 34f);
+            idhRect.anchoredPosition = Vector2.zero;
+            idHeader.AddComponent<Image>().color = new Color(0.08f, 0.16f, 0.28f, 1f);
+
+            GameObject idGoldBar = new GameObject("GoldTopLine");
+            idGoldBar.transform.SetParent(idHeader.transform, false);
+            RectTransform igbRect = idGoldBar.AddComponent<RectTransform>();
+            igbRect.anchorMin = new Vector2(0f, 1f);
+            igbRect.anchorMax = new Vector2(1f, 1f);
+            igbRect.pivot = new Vector2(0.5f, 1f);
+            igbRect.sizeDelta = new Vector2(0f, 3f);
+            igbRect.anchoredPosition = Vector2.zero;
+            idGoldBar.AddComponent<Image>().color = new Color(0.96f, 0.75f, 0.26f, 1f);
+
+            CreateUIText(idHeader.transform, "IDHeaderLeft", "<b>■ FEMA · CDC JOINT BIO-REGISTRY // CITIZEN ID PASS</b>",
+                12f, TextAlignmentOptions.MidlineLeft, new Color(0.55f, 0.85f, 0.98f), FontRole.Display,
+                new Vector2(0f, 0f), new Vector2(0.72f, 1f), new Vector2(14f, 0f), Vector2.zero);
+
+            CreateUIText(idHeader.transform, "IDHeaderRight", "<b>DAY ZERO 23:45</b>",
+                10.5f, TextAlignmentOptions.MidlineRight, new Color(1f, 0.88f, 0.50f), FontRole.Mono,
+                new Vector2(0.72f, 0f), new Vector2(1f, 1f), Vector2.zero, new Vector2(-14f, 0f));
+
+            // Portrait Box (126 x 162 at top-left of card body)
+            GameObject portraitBox = new GameObject("PortraitBox");
+            portraitBox.transform.SetParent(idCard.transform, false);
+            RectTransform pbRect = portraitBox.AddComponent<RectTransform>();
+            pbRect.anchorMin = new Vector2(0f, 1f);
+            pbRect.anchorMax = new Vector2(0f, 1f);
+            pbRect.pivot = new Vector2(0f, 1f);
+            pbRect.sizeDelta = new Vector2(126f, 162f);
+            pbRect.anchoredPosition = new Vector2(18f, -46f);
+            portraitBox.AddComponent<Image>().color = new Color(0.03f, 0.05f, 0.09f, 1f);
+            Outline pbOut = portraitBox.AddComponent<Outline>();
+            pbOut.effectColor = new Color(0.20f, 0.45f, 0.68f, 0.85f);
+            pbOut.effectDistance = new Vector2(1f, -1f);
+            portraitBox.AddComponent<RectMask2D>();
+
+            CreateUIText(portraitBox.transform, "ReticleTop", "[ BIO-SCAN ]",
+                9.5f, TextAlignmentOptions.Center, new Color(0.35f, 0.75f, 0.95f, 0.85f), FontRole.Mono,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -22f), new Vector2(0f, -4f));
+
+            // Procedural Survivor Silhouette Image inside PortraitBox
+            GameObject silObj = new GameObject("SilhouetteGraphic");
+            silObj.transform.SetParent(portraitBox.transform, false);
+            RectTransform silRect = silObj.AddComponent<RectTransform>();
+            silRect.anchorMin = new Vector2(0.5f, 0.5f);
+            silRect.anchorMax = new Vector2(0.5f, 0.5f);
+            silRect.pivot = new Vector2(0.5f, 0.5f);
+            silRect.sizeDelta = new Vector2(96f, 102f);
+            silRect.anchoredPosition = new Vector2(0f, 2f);
+            Image silImg = silObj.AddComponent<Image>();
+            silImg.sprite = GetOrCreateSilhouetteSprite();
+            silImg.preserveAspect = true;
+            silImg.color = new Color(0.45f, 0.82f, 0.98f, 0.90f);
+            silImg.raycastTarget = false;
+
+            CreateUIText(portraitBox.transform, "EmblemSymbol", "<b>[SUBJ: M]</b>",
+                10f, TextAlignmentOptions.Center, new Color(1f, 0.88f, 0.50f, 0.95f), FontRole.Mono,
+                new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 30f), new Vector2(0f, 48f));
+
+            GameObject scanPill = new GameObject("BioScanPill");
+            scanPill.transform.SetParent(portraitBox.transform, false);
+            RectTransform spRect = scanPill.AddComponent<RectTransform>();
+            spRect.anchorMin = new Vector2(0f, 0f);
+            spRect.anchorMax = new Vector2(1f, 0f);
+            spRect.pivot = new Vector2(0.5f, 0f);
+            spRect.sizeDelta = new Vector2(-12f, 22f);
+            spRect.anchoredPosition = new Vector2(0f, 6f);
+            scanPill.AddComponent<Image>().color = new Color(0.06f, 0.24f, 0.14f, 0.95f);
+
+            CreateUIText(scanPill.transform, "ScanText", "<b>✓ TIER-1 CLEAR</b>",
+                9f, TextAlignmentOptions.Center, new Color(0.30f, 0.92f, 0.55f), FontRole.Mono,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            // Live Identity Data Fields (Right of Portrait)
+            GameObject fieldsRoot = new GameObject("LiveFields");
+            fieldsRoot.transform.SetParent(idCard.transform, false);
+            RectTransform frRect = fieldsRoot.AddComponent<RectTransform>();
+            frRect.anchorMin = new Vector2(0f, 1f);
+            frRect.anchorMax = new Vector2(1f, 1f);
+            frRect.pivot = new Vector2(0f, 1f);
+            frRect.offsetMin = new Vector2(160f, -214f);
+            frRect.offsetMax = new Vector2(-18f, -44f);
+
+            CreateUIText(fieldsRoot.transform, "LblSurname", "01 // FAMILY SURNAME",
+                9.5f, TextAlignmentOptions.BottomLeft, new Color(0.45f, 0.60f, 0.72f), FontRole.Mono,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -14f), new Vector2(0f, 0f));
+
+            CreateUIText(fieldsRoot.transform, "ValSurname", "SAGE",
+                23f, TextAlignmentOptions.MidlineLeft, Color.white, FontRole.Display,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -42f), new Vector2(0f, -15f));
+
+            CreateUIText(fieldsRoot.transform, "LblGiven", "02 // GIVEN FIRST NAME",
+                9.5f, TextAlignmentOptions.BottomLeft, new Color(0.45f, 0.60f, 0.72f), FontRole.Mono,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -58f), new Vector2(0f, -44f));
+
+            CreateUIText(fieldsRoot.transform, "ValGiven", "NEAL",
+                20f, TextAlignmentOptions.MidlineLeft, new Color(1f, 0.85f, 0.45f), FontRole.Display,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -84f), new Vector2(0f, -59f));
+
+            GameObject idDiv = new GameObject("FieldDivider");
+            idDiv.transform.SetParent(fieldsRoot.transform, false);
+            RectTransform iddRect = idDiv.AddComponent<RectTransform>();
+            iddRect.anchorMin = new Vector2(0f, 1f);
+            iddRect.anchorMax = new Vector2(1f, 1f);
+            iddRect.pivot = new Vector2(0.5f, 1f);
+            iddRect.sizeDelta = new Vector2(0f, 1f);
+            iddRect.anchoredPosition = new Vector2(0f, -90f);
+            idDiv.AddComponent<Image>().color = new Color(0.16f, 0.28f, 0.42f, 0.85f);
+
+            CreateUIText(fieldsRoot.transform, "ValMetaGrid", "",
+                10.5f, TextAlignmentOptions.TopLeft, new Color(0.82f, 0.88f, 0.94f), FontRole.Mono,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -168f), new Vector2(0f, -96f));
+
+            // Bottom Machine-Readable Barcode Zone (MRZStrip, height 88px)
+            GameObject mrzStrip = new GameObject("MRZStrip");
+            mrzStrip.transform.SetParent(idCard.transform, false);
+            RectTransform mrzRect = mrzStrip.AddComponent<RectTransform>();
+            mrzRect.anchorMin = new Vector2(0f, 0f);
+            mrzRect.anchorMax = new Vector2(1f, 0f);
+            mrzRect.pivot = new Vector2(0.5f, 0f);
+            mrzRect.sizeDelta = new Vector2(0f, 88f);
+            mrzRect.anchoredPosition = Vector2.zero;
+            mrzStrip.AddComponent<Image>().color = new Color(0.03f, 0.05f, 0.08f, 1f);
+
+            GameObject mrzLine = new GameObject("TopLine");
+            mrzLine.transform.SetParent(mrzStrip.transform, false);
+            RectTransform mlRect = mrzLine.AddComponent<RectTransform>();
+            mlRect.anchorMin = new Vector2(0f, 1f);
+            mlRect.anchorMax = new Vector2(1f, 1f);
+            mlRect.pivot = new Vector2(0.5f, 1f);
+            mlRect.sizeDelta = new Vector2(0f, 1f);
+            mlRect.anchoredPosition = Vector2.zero;
+            mrzLine.AddComponent<Image>().color = new Color(0.16f, 0.28f, 0.42f, 0.9f);
+
+            CreateUIText(mrzStrip.transform, "BarcodeBars",
+                "||| || |||| | ||| |||| || | ||| |||| ||| || | |||| ||| | |||| || | ||| ||||",
+                11.5f, TextAlignmentOptions.Center, new Color(0.35f, 0.65f, 0.88f, 0.55f), FontRole.Mono,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(16f, -26f), new Vector2(-16f, -5f));
+
+            CreateUIText(mrzStrip.transform, "ValMrzCode", "",
+                10.5f, TextAlignmentOptions.Center, new Color(0.38f, 0.78f, 0.98f, 0.92f), FontRole.Mono,
+                new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(16f, 6f), new Vector2(-16f, -28f));
+
+            // 2. Psychological Mirror Reflection & Randomizer Box (500 x 284 at bottom of Left Column)
+            GameObject mirrorBox = new GameObject("MirrorProfileBox");
+            mirrorBox.transform.SetParent(leftCol.transform, false);
+            RectTransform mbRect = mirrorBox.AddComponent<RectTransform>();
+            mbRect.anchorMin = new Vector2(0f, 0f);
+            mbRect.anchorMax = new Vector2(1f, 0f);
+            mbRect.pivot = new Vector2(0.5f, 0f);
+            mbRect.sizeDelta = new Vector2(0f, 284f);
+            mbRect.anchoredPosition = new Vector2(0f, 4f);
+            mirrorBox.AddComponent<Image>().color = new Color(0.05f, 0.08f, 0.12f, 0.96f);
+            Outline mbOut = mirrorBox.AddComponent<Outline>();
+            mbOut.effectColor = new Color(0.15f, 0.24f, 0.35f, 0.85f);
+            mbOut.effectDistance = new Vector2(1f, -1f);
+            mirrorBox.AddComponent<RectMask2D>();
+
+            CreateModuleHeader(mirrorBox.transform, "■ MIRROR REFLECTION & SURVIVOR PROFILE");
+
+            // Properly wrapped inside MirrorProfileBox (anchor 0..1, offsetMin (18, 114), offsetMax (-18, -36))
+            TextMeshProUGUI quoteTmp = CreateUIText(mirrorBox.transform, "ValMirrorQuote", "",
+                13f, TextAlignmentOptions.TopLeft, new Color(0.82f, 0.86f, 0.90f), FontRole.Narrative,
+                Vector2.zero, Vector2.one, new Vector2(18f, 112f), new Vector2(-18f, -38f));
+            quoteTmp.lineSpacing = 4f;
+            quoteTmp.textWrappingMode = TextWrappingModes.Normal;
+            quoteTmp.overflowMode = TextOverflowModes.Ellipsis;
+
+            GameObject activePill = new GameObject("ActiveRecordPill");
+            activePill.transform.SetParent(mirrorBox.transform, false);
+            RectTransform apRect = activePill.AddComponent<RectTransform>();
+            apRect.anchorMin = new Vector2(0f, 0f);
+            apRect.anchorMax = new Vector2(1f, 0f);
+            apRect.pivot = new Vector2(0.5f, 0f);
+            apRect.sizeDelta = new Vector2(-32f, 34f);
+            apRect.anchoredPosition = new Vector2(0f, 66f);
+            activePill.AddComponent<Image>().color = new Color(0.03f, 0.06f, 0.10f, 0.95f);
+            Outline apOut = activePill.AddComponent<Outline>();
+            apOut.effectColor = new Color(0.18f, 0.36f, 0.52f, 0.7f);
+            apOut.effectDistance = new Vector2(1f, -1f);
+
+            CreateUIText(activePill.transform, "ValActiveRecord", "ACTIVE CITIZEN: NEAL SAGE  [MALE]",
+                11f, TextAlignmentOptions.Center, new Color(0.50f, 0.84f, 0.98f), FontRole.Mono,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            // Randomize Buttons Row at bottom of MirrorProfileBox (using clean [RNG] tag instead of missing glyph)
+            CreateTacticalActionButton(mirrorBox.transform, "Btn_RandomName", "[RNG] RANDOM NAME",
+                new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(16f, 14f), new Vector2(226f, 42f),
+                new Color(0.08f, 0.20f, 0.30f, 0.98f), new Color(0.20f, 0.60f, 0.86f, 0.85f), RandomizeNameOnly);
+
+            CreateTacticalActionButton(mirrorBox.transform, "Btn_RandomAll", "[RNG] RANDOM ALL",
+                new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-16f, 14f), new Vector2(226f, 42f),
+                new Color(0.26f, 0.14f, 0.05f, 0.98f), new Color(0.90f, 0.49f, 0.13f, 0.85f), RandomizeFullIdentity, pivotX: 1f);
+
+            // =========================================================================
+            // RIGHT COLUMN: Interactive Selection Modules (Gender, First Name, Surname)
+            // =========================================================================
+            GameObject rightCol = new GameObject("RightCol_Controls");
+            rightCol.transform.SetParent(bodyObj.transform, false);
+            RectTransform rcRect = rightCol.AddComponent<RectTransform>();
+            rcRect.anchorMin = new Vector2(1f, 0f);
+            rcRect.anchorMax = new Vector2(1f, 1f);
+            rcRect.pivot = new Vector2(1f, 1f);
+            rcRect.sizeDelta = new Vector2(860f, 0f);
+            rcRect.anchoredPosition = Vector2.zero;
+
+            // MODULE 01: GENDER IDENTITY (860 x 146 at Y = -4)
+            GameObject modGender = CreateControlModuleBox(rightCol.transform, "Module01_Gender", -4f, 146f,
+                "■ 01 // BIOLOGICAL SEX & GENDER IDENTITY");
+
+            CreateGenderArchetypeButton(modGender.transform, "Btn_Gender_Male", "[M]  MALE", "Standard Male Profile", 16f, () => SelectGender("Male"));
+            CreateGenderArchetypeButton(modGender.transform, "Btn_Gender_Female", "[F]  FEMALE", "Standard Female Profile", 296f, () => SelectGender("Female"));
+            CreateGenderArchetypeButton(modGender.transform, "Btn_Gender_NonBinary", "[NB] NON-BINARY", "Non-Binary / Fluid Profile", 576f, () => SelectGender("Non-Binary"));
+
+            CreateInlineCustomInput(modGender.transform, "CustomGenderRow", "CUSTOM IDENTITY:", "Or type custom identity (e.g. Survivor)...",
+                -102f, "APPLY", ConfirmCustomGender, out customGenderInput, (val) =>
+                {
+                    if (!suppressInputCallback && !string.IsNullOrWhiteSpace(val))
+                    {
+                        character.gender = val.Trim();
+                        RefreshIdentityConsoleUI(rebuildFirstNameChips: false, skipInputSync: true);
+                    }
+                });
+
+            // MODULE 02: GIVEN FIRST NAME (860 x 226 at Y = -162)
+            GameObject modFirst = CreateControlModuleBox(rightCol.transform, "Module02_FirstName", -162f, 226f,
+                "■ 02 // GIVEN NAME (FIRST NAME) — CLICK PRESET CHIP OR TYPE CUSTOM");
+
+            GameObject fnGridObj = new GameObject("FirstNameChipsGrid");
+            fnGridObj.transform.SetParent(modFirst.transform, false);
+            RectTransform fngRect = fnGridObj.AddComponent<RectTransform>();
+            fngRect.anchorMin = new Vector2(0f, 1f);
+            fngRect.anchorMax = new Vector2(1f, 1f);
+            fngRect.pivot = new Vector2(0.5f, 1f);
+            fngRect.sizeDelta = new Vector2(-32f, 132f);
+            fngRect.anchoredPosition = new Vector2(0f, -38f);
+            GridLayoutGroup fnGlg = fnGridObj.AddComponent<GridLayoutGroup>();
+            fnGlg.cellSize = new Vector2(196f, 36f);
+            fnGlg.spacing = new Vector2(14f, 8f);
+            fnGlg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            fnGlg.constraintCount = 4;
+            fnGlg.childAlignment = TextAnchor.UpperCenter;
+
+            CreateInlineCustomInput(modFirst.transform, "CustomFirstNameRow", "TYPE FIRST NAME:", "Type custom given name...",
+                -180f, "[RNG] ROLL FIRST", RollRandomFirstName, out customFirstNameInput, (val) =>
+                {
+                    if (!suppressInputCallback && !string.IsNullOrWhiteSpace(val))
+                    {
+                        character.firstName = val.Trim();
+                        RefreshIdentityConsoleUI(rebuildFirstNameChips: false, skipInputSync: true);
+                    }
+                });
+
+            // MODULE 03: FAMILY SURNAME (860 x 226 at Y = -400)
+            GameObject modLast = CreateControlModuleBox(rightCol.transform, "Module03_LastName", -400f, 226f,
+                "■ 03 // FAMILY SURNAME (LAST NAME) — CLICK PRESET CHIP OR TYPE CUSTOM");
+
+            GameObject lnGridObj = new GameObject("LastNameChipsGrid");
+            lnGridObj.transform.SetParent(modLast.transform, false);
+            RectTransform lngRect = lnGridObj.AddComponent<RectTransform>();
+            lngRect.anchorMin = new Vector2(0f, 1f);
+            lngRect.anchorMax = new Vector2(1f, 1f);
+            lngRect.pivot = new Vector2(0.5f, 1f);
+            lngRect.sizeDelta = new Vector2(-32f, 132f);
+            lngRect.anchoredPosition = new Vector2(0f, -38f);
+            GridLayoutGroup lnGlg = lnGridObj.AddComponent<GridLayoutGroup>();
+            lnGlg.cellSize = new Vector2(196f, 36f);
+            lnGlg.spacing = new Vector2(14f, 8f);
+            lnGlg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            lnGlg.constraintCount = 4;
+            lnGlg.childAlignment = TextAnchor.UpperCenter;
+
+            foreach (string surname in PresetLastNames)
+            {
+                string captured = surname;
+                CreateNameChipButton(lnGridObj.transform, captured, () => SelectLastName(captured));
+            }
+
+            CreateInlineCustomInput(modLast.transform, "CustomLastNameRow", "TYPE SURNAME:", "Type custom family surname...",
+                -180f, "[RNG] ROLL SURNAME", RollRandomLastName, out customLastNameInput, (val) =>
+                {
+                    if (!suppressInputCallback && !string.IsNullOrWhiteSpace(val))
+                    {
+                        character.lastName = val.Trim();
+                        RefreshIdentityConsoleUI(rebuildFirstNameChips: false, skipInputSync: true);
+                    }
+                });
+
+            // =========================================================================
+            // BOTTOM FOOTER ACTION BAR (62px)
+            // =========================================================================
+            GameObject footer = new GameObject("IdentityFooterBar");
+            footer.transform.SetParent(frameObj.transform, false);
+            RectTransform footRect = footer.AddComponent<RectTransform>();
+            footRect.anchorMin = new Vector2(0f, 0f);
+            footRect.anchorMax = new Vector2(1f, 0f);
+            footRect.pivot = new Vector2(0.5f, 0f);
+            footRect.sizeDelta = new Vector2(0f, 62f);
+            footRect.anchoredPosition = Vector2.zero;
+            footer.AddComponent<Image>().color = new Color(0.06f, 0.08f, 0.12f, 1f);
+
+            GameObject footLine = new GameObject("TopDivider");
+            footLine.transform.SetParent(footer.transform, false);
+            RectTransform flRect = footLine.AddComponent<RectTransform>();
+            flRect.anchorMin = new Vector2(0f, 1f);
+            flRect.anchorMax = new Vector2(1f, 1f);
+            flRect.pivot = new Vector2(0.5f, 1f);
+            flRect.sizeDelta = new Vector2(0f, 1.5f);
+            flRect.anchoredPosition = Vector2.zero;
+            footLine.AddComponent<Image>().color = new Color(0.18f, 0.28f, 0.40f, 0.85f);
+
+            CreateUIText(footer.transform, "FooterNotice",
+                "<color=#EF5350><b>[!] OFFICIAL NOTICE:</b></color> <color=#90A4AE>IDENTITY RECORD ABOVE WILL BE SEALED INTO YOUR FINAL FEDERAL BIO-EMERGENCY DOSSIER.</color>",
+                11f, TextAlignmentOptions.MidlineLeft, Color.white, FontRole.Mono,
+                new Vector2(0f, 0f), new Vector2(0.66f, 1f), new Vector2(22f, 0f), Vector2.zero);
+
+            CreateTacticalActionButton(footer.transform, "Btn_ConfirmIdentityProceed", "CONFIRM IDENTITY & SELECT VOCATION >>",
+                new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-22f, 0f), new Vector2(390f, 44f),
+                new Color(0.78f, 0.16f, 0.16f, 1f), new Color(1f, 0.45f, 0.35f, 0.9f), ConfirmIdentityAndProceed, pivotX: 1f, pivotY: 0.5f, fontSize: 15f);
+
+            BindIdentityConsoleReferences(frameObj.transform);
+            SundayTypography.ApplyHierarchy(genderPanel.transform);
+        }
+
+        private void BindIdentityConsoleReferences(Transform frame)
+        {
+            if (frame == null) return;
+
+            topBannerCaseIdText = frame.Find("TopBanner/BannerRight")?.GetComponent<TextMeshProUGUI>();
+            idCardLastNameText = frame.Find("ConsoleBody/LeftCol_CitizenCard/USCitizenIDCard/LiveFields/ValSurname")?.GetComponent<TextMeshProUGUI>();
+            idCardFirstNameText = frame.Find("ConsoleBody/LeftCol_CitizenCard/USCitizenIDCard/LiveFields/ValGiven")?.GetComponent<TextMeshProUGUI>();
+            idCardMetaText = frame.Find("ConsoleBody/LeftCol_CitizenCard/USCitizenIDCard/LiveFields/ValMetaGrid")?.GetComponent<TextMeshProUGUI>();
+            idCardMrzText = frame.Find("ConsoleBody/LeftCol_CitizenCard/USCitizenIDCard/MRZStrip/ValMrzCode")?.GetComponent<TextMeshProUGUI>();
+            idCardEmblemText = frame.Find("ConsoleBody/LeftCol_CitizenCard/USCitizenIDCard/PortraitBox/EmblemSymbol")?.GetComponent<TextMeshProUGUI>();
+            idCardSilhouetteImg = frame.Find("ConsoleBody/LeftCol_CitizenCard/USCitizenIDCard/PortraitBox/SilhouetteGraphic")?.GetComponent<Image>();
+            idCardQuoteText = frame.Find("ConsoleBody/LeftCol_CitizenCard/MirrorProfileBox/ValMirrorQuote")?.GetComponent<TextMeshProUGUI>();
+            idCardActiveRecordText = frame.Find("ConsoleBody/LeftCol_CitizenCard/MirrorProfileBox/ActiveRecordPill/ValActiveRecord")?.GetComponent<TextMeshProUGUI>();
+
+            genderMaleBtn = frame.Find("ConsoleBody/RightCol_Controls/Module01_Gender/Btn_Gender_Male")?.GetComponent<Button>();
+            genderFemaleBtn = frame.Find("ConsoleBody/RightCol_Controls/Module01_Gender/Btn_Gender_Female")?.GetComponent<Button>();
+            genderNonBinaryBtn = frame.Find("ConsoleBody/RightCol_Controls/Module01_Gender/Btn_Gender_NonBinary")?.GetComponent<Button>();
+
+            if (genderMaleBtn != null)
+            {
+                genderMaleBtn.onClick.RemoveAllListeners();
+                genderMaleBtn.onClick.AddListener(() => SelectGender("Male"));
+            }
+            if (genderFemaleBtn != null)
+            {
+                genderFemaleBtn.onClick.RemoveAllListeners();
+                genderFemaleBtn.onClick.AddListener(() => SelectGender("Female"));
+            }
+            if (genderNonBinaryBtn != null)
+            {
+                genderNonBinaryBtn.onClick.RemoveAllListeners();
+                genderNonBinaryBtn.onClick.AddListener(() => SelectGender("Non-Binary"));
+            }
+
+            firstNameChipsRoot = frame.Find("ConsoleBody/RightCol_Controls/Module02_FirstName/FirstNameChipsGrid");
+            lastNameChipsRoot = frame.Find("ConsoleBody/RightCol_Controls/Module03_LastName/LastNameChipsGrid");
+
+            if (lastNameChipsRoot != null)
+            {
+                for (int i = 0; i < lastNameChipsRoot.childCount; i++)
+                {
+                    Transform chip = lastNameChipsRoot.GetChild(i);
+                    Button b = chip.GetComponent<Button>();
+                    string chipName = chip.name.Replace("Chip_", "");
+                    if (b != null)
+                    {
+                        b.onClick.RemoveAllListeners();
+                        b.onClick.AddListener(() => SelectLastName(chipName));
+                    }
+                }
+            }
+
+            Button randNameBtn = frame.Find("ConsoleBody/LeftCol_CitizenCard/MirrorProfileBox/Btn_RandomName")?.GetComponent<Button>();
+            if (randNameBtn != null)
+            {
+                randNameBtn.onClick.RemoveAllListeners();
+                randNameBtn.onClick.AddListener(RandomizeNameOnly);
+            }
+
+            Button randAllBtn = frame.Find("ConsoleBody/LeftCol_CitizenCard/MirrorProfileBox/Btn_RandomAll")?.GetComponent<Button>();
+            if (randAllBtn != null)
+            {
+                randAllBtn.onClick.RemoveAllListeners();
+                randAllBtn.onClick.AddListener(RandomizeFullIdentity);
+            }
+
+            Button proceedBtn = frame.Find("IdentityFooterBar/Btn_ConfirmIdentityProceed")?.GetComponent<Button>();
+            if (proceedBtn != null)
+            {
+                proceedBtn.onClick.RemoveAllListeners();
+                proceedBtn.onClick.AddListener(ConfirmIdentityAndProceed);
+            }
+
+            BindInlineRow(frame.Find("ConsoleBody/RightCol_Controls/Module01_Gender/CustomGenderRow"), ConfirmCustomGender, ref customGenderInput, (val) =>
+            {
+                if (!suppressInputCallback && !string.IsNullOrWhiteSpace(val))
+                {
+                    character.gender = val.Trim();
+                    RefreshIdentityConsoleUI(rebuildFirstNameChips: false, skipInputSync: true);
+                }
+            });
+
+            BindInlineRow(frame.Find("ConsoleBody/RightCol_Controls/Module02_FirstName/CustomFirstNameRow"), RollRandomFirstName, ref customFirstNameInput, (val) =>
+            {
+                if (!suppressInputCallback && !string.IsNullOrWhiteSpace(val))
+                {
+                    character.firstName = val.Trim();
+                    RefreshIdentityConsoleUI(rebuildFirstNameChips: false, skipInputSync: true);
+                }
+            });
+
+            BindInlineRow(frame.Find("ConsoleBody/RightCol_Controls/Module03_LastName/CustomLastNameRow"), RollRandomLastName, ref customLastNameInput, (val) =>
+            {
+                if (!suppressInputCallback && !string.IsNullOrWhiteSpace(val))
+                {
+                    character.lastName = val.Trim();
+                    RefreshIdentityConsoleUI(rebuildFirstNameChips: false, skipInputSync: true);
+                }
+            });
+        }
+
+        private void BindInlineRow(Transform row, UnityEngine.Events.UnityAction onBtnClick, ref TMP_InputField fieldRef, UnityEngine.Events.UnityAction<string> onChanged)
+        {
+            if (row == null) return;
+            TMP_InputField inp = row.Find("InputField")?.GetComponent<TMP_InputField>();
+            if (inp != null)
+            {
+                fieldRef = inp;
+                inp.onValueChanged.RemoveAllListeners();
+                inp.onValueChanged.AddListener(onChanged);
+            }
+            Button actBtn = row.Find("ActionBtn")?.GetComponent<Button>();
+            if (actBtn != null)
+            {
+                actBtn.onClick.RemoveAllListeners();
+                actBtn.onClick.AddListener(onBtnClick);
+            }
+        }
+
+        private void RefreshIdentityConsoleUI(bool rebuildFirstNameChips, bool skipInputSync = false)
+        {
+            string g = string.IsNullOrWhiteSpace(character.gender) ? "Male" : character.gender.Trim();
+            string fn = string.IsNullOrWhiteSpace(character.firstName) ? "Neal" : character.firstName.Trim();
+            string ln = string.IsNullOrWhiteSpace(character.lastName) ? "Sage" : character.lastName.Trim();
+
+            bool isMale = g.Equals("Male", System.StringComparison.OrdinalIgnoreCase);
+            bool isFemale = g.Equals("Female", System.StringComparison.OrdinalIgnoreCase);
+            bool isNb = g.Equals("Non-Binary", System.StringComparison.OrdinalIgnoreCase);
+
+            // 1. Highlight active Gender Card (using clean ASCII tags)
+            StyleGenderButton(genderMaleBtn, isMale, "[M]  MALE");
+            StyleGenderButton(genderFemaleBtn, isFemale, "[F]  FEMALE");
+            StyleGenderButton(genderNonBinaryBtn, isNb, "[NB] NON-BINARY");
+
+            // 2. Rebuild First Name Chips if gender category changed
+            if (rebuildFirstNameChips && firstNameChipsRoot != null)
+            {
+                for (int i = firstNameChipsRoot.childCount - 1; i >= 0; i--)
+                {
+                    GameObject c = firstNameChipsRoot.GetChild(i).gameObject;
+                    if (Application.isPlaying) Destroy(c);
+                    else DestroyImmediate(c);
+                }
+
+                string[] pool = GetFirstNamePoolForGender(g);
+                foreach (string preset in pool)
+                {
+                    string captured = preset;
+                    CreateNameChipButton(firstNameChipsRoot, captured, () => SelectFirstName(captured));
+                }
+            }
+
+            // 3. Highlight active First Name & Last Name Chips
+            HighlightChipContainer(firstNameChipsRoot, fn);
+            HighlightChipContainer(lastNameChipsRoot, ln);
+
+            // 4. Sync InputFields without re-triggering callbacks
+            if (!skipInputSync)
+            {
+                suppressInputCallback = true;
+                if (customGenderInput != null)
+                    customGenderInput.text = (!isMale && !isFemale && !isNb) ? g : "";
+                if (customFirstNameInput != null)
+                    customFirstNameInput.text = fn;
+                if (customLastNameInput != null)
+                    customLastNameInput.text = ln;
+                suppressInputCallback = false;
+            }
+
+            // 5. Compute unified biometric data (shared 100% with Final Summary Dossier)
+            GetCitizenBiometrics(out string docNo, out string dob, out string blood, out string sector, out string clearance, out string mrzLine1, out string mrzLine2);
+
+            if (topBannerCaseIdText != null)
+            {
+                topBannerCaseIdText.text = $"CASE FILE: <color=#FFE082><b>{docNo}</b></color>   |   <color=#EF5350><b>[ STATUS: CIVIL DANGER WARNING // LEVEL 4 ]</b></color>";
+            }
+
+            if (idCardLastNameText != null) idCardLastNameText.text = ln.ToUpperInvariant();
+            if (idCardFirstNameText != null) idCardFirstNameText.text = fn.ToUpperInvariant();
+
+            Color profileTint = isMale
+                ? new Color(0.45f, 0.82f, 0.98f, 0.95f)
+                : (isFemale ? new Color(0.98f, 0.58f, 0.75f, 0.95f) : new Color(0.75f, 0.60f, 1.0f, 0.95f));
+
+            if (idCardSilhouetteImg != null)
+            {
+                idCardSilhouetteImg.color = profileTint;
+            }
+            if (idCardEmblemText != null)
+            {
+                string code = isMale ? "MALE" : (isFemale ? "FEMALE" : "NON-BINARY");
+                idCardEmblemText.text = $"<b>[{code}]</b>";
+                idCardEmblemText.color = profileTint;
+            }
+
+            if (idCardMetaText != null)
+            {
+                idCardMetaText.text =
+                    $"<color=#78909C>SEX / ID:</color> <color=#FFE082><b>{g.ToUpperInvariant()}</b></color><pos=52%><color=#78909C>BLOOD:</color> <color=#EF5350><b>{blood}</b></color>\n" +
+                    $"<color=#78909C>DOB:</color>      <color=#FFFFFF>{dob}</color><pos=52%><color=#78909C>ZONE:</color>  <color=#80CBC4>SECTOR-04</color>\n" +
+                    $"<color=#78909C>CASE ID:</color>  <color=#4FC3F7>{docNo}</color>";
+            }
+
+            if (idCardMrzText != null)
+            {
+                idCardMrzText.text = $"{mrzLine1}\n{mrzLine2}";
+            }
+
+            if (idCardQuoteText != null)
+            {
+                if (isMale)
+                {
+                    idCardQuoteText.text = $"\"A weathered reflection stares back from the darkened apartment glass. {fn} {ln}—broad shoulders tense under the low hum of emergency broadcasts. When Sunday night falls, hesitation is fatal.\"";
+                }
+                else if (isFemale)
+                {
+                    idCardQuoteText.text = $"\"Sharp, watchful eyes catch the dim streetlight through the blinds. {fn} {ln}—steady hands and a restless pulse as sirens echo across the district. Nobody is coming to save you tonight.\"";
+                }
+                else
+                {
+                    idCardQuoteText.text = $"\"An adaptable reflection caught between the old world and the silence to come. {fn} {ln}—old labels mean nothing to the infection outside, only nerve, instinct, and the will to endure.\"";
+                }
+            }
+
+            if (idCardActiveRecordText != null)
+            {
+                idCardActiveRecordText.text = $"<b>CITIZEN:</b> <color=#FFFFFF>{fn.ToUpperInvariant()} {ln.ToUpperInvariant()}</color>  <color=#78909C>|</color>  <b>CASE:</b> <color=#4FC3F7>{docNo}</color>";
+            }
+        }
+
+        private void StyleGenderButton(Button btn, bool isSelected, string baseTitle)
+        {
+            if (btn == null) return;
+            Image bg = btn.GetComponent<Image>();
+            Outline ol = btn.GetComponent<Outline>();
+            TextMeshProUGUI titleTmp = btn.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+            Image dotImg = btn.transform.Find("LeftStrip")?.GetComponent<Image>();
+
+            if (bg != null)
+                bg.color = isSelected ? new Color(0.24f, 0.13f, 0.04f, 0.98f) : new Color(0.06f, 0.09f, 0.14f, 0.95f);
+            if (ol != null)
+                ol.effectColor = isSelected ? new Color(0.95f, 0.55f, 0.15f, 1f) : new Color(0.18f, 0.28f, 0.40f, 0.75f);
+            if (dotImg != null)
+                dotImg.color = isSelected ? new Color(1f, 0.65f, 0.15f, 1f) : new Color(0.22f, 0.32f, 0.44f, 0.8f);
+            if (titleTmp != null)
+            {
+                titleTmp.text = isSelected ? $"● {baseTitle}" : baseTitle;
+                titleTmp.color = isSelected ? new Color(1f, 0.85f, 0.45f) : Color.white;
+            }
+        }
+
+        private void HighlightChipContainer(Transform container, string activeValue)
+        {
+            if (container == null) return;
+            for (int i = 0; i < container.childCount; i++)
+            {
+                Transform chip = container.GetChild(i);
+                string chipVal = chip.name.Replace("Chip_", "");
+                bool active = string.Equals(chipVal, activeValue, System.StringComparison.OrdinalIgnoreCase);
+
+                Image bg = chip.GetComponent<Image>();
+                Outline ol = chip.GetComponent<Outline>();
+                TextMeshProUGUI txt = chip.GetComponentInChildren<TextMeshProUGUI>();
+
+                if (bg != null)
+                    bg.color = active ? new Color(0.24f, 0.13f, 0.04f, 0.98f) : new Color(0.06f, 0.09f, 0.14f, 0.92f);
+                if (ol != null)
+                    ol.effectColor = active ? new Color(0.95f, 0.55f, 0.15f, 0.95f) : new Color(0.16f, 0.24f, 0.34f, 0.65f);
+                if (txt != null)
+                {
+                    txt.text = active ? $"<b>● {chipVal.ToUpperInvariant()}</b>" : chipVal.ToUpperInvariant();
+                    txt.color = active ? new Color(1f, 0.85f, 0.45f) : new Color(0.82f, 0.86f, 0.90f);
+                }
             }
         }
         #endregion
 
-        #region Step 4: Job Selection
+        #region Step 2: Job Selection
         public void ShowJobSelectionPanel()
         {
             HideAllPanels();
+            EnsureJobBackButton();
             if (jobSelectionPanel != null) jobSelectionPanel.SetActive(true);
+        }
+
+        private void EnsureJobBackButton()
+        {
+            if (jobSelectionPanel == null) return;
+
+            // Upgrade Header Title & Subtitle (constrained width so it never overlaps left button or right badge)
+            Transform header = jobSelectionPanel.transform.Find("Header");
+            if (header != null)
+            {
+                RectTransform hRect = header.GetComponent<RectTransform>();
+                if (hRect != null)
+                {
+                    hRect.anchorMin = new Vector2(0.5f, 1f);
+                    hRect.anchorMax = new Vector2(0.5f, 1f);
+                    hRect.pivot = new Vector2(0.5f, 1f);
+                    hRect.sizeDelta = new Vector2(780f, 82f);
+                    hRect.anchoredPosition = new Vector2(0f, -24f);
+                }
+
+                TextMeshProUGUI titleTmp = header.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (titleTmp != null)
+                {
+                    titleTmp.text = "PRE-OUTBREAK VOCATION <size=75%><color=#90A4AE>[SERVICE RECORD]</color></size>";
+                    SundayTypography.ApplyFont(titleTmp, FontRole.Display);
+                }
+                TextMeshProUGUI subTmp = header.Find("Subtitle")?.GetComponent<TextMeshProUGUI>();
+                if (subTmp != null)
+                {
+                    subTmp.text = "\"What was your life before the screaming started?\"";
+                    SundayTypography.ApplyFont(subTmp, FontRole.Narrative);
+                    RectTransform sRect = subTmp.GetComponent<RectTransform>();
+                    if (sRect != null) sRect.anchoredPosition = new Vector2(0f, -40f);
+                }
+            }
+
+            // Ensure S.P.A.I.C. Biometric Legend Pill Bar right below the subtitle so players immediately know the 5 attributes!
+            Transform legendTr = jobSelectionPanel.transform.Find("SPAICLegendBar");
+            if (legendTr == null)
+            {
+                GameObject legendObj = new GameObject("SPAICLegendBar");
+                legendObj.transform.SetParent(jobSelectionPanel.transform, false);
+                RectTransform lRect = legendObj.AddComponent<RectTransform>();
+                lRect.anchorMin = new Vector2(0.5f, 1f);
+                lRect.anchorMax = new Vector2(0.5f, 1f);
+                lRect.pivot = new Vector2(0.5f, 1f);
+                lRect.sizeDelta = new Vector2(1020f, 30f);
+                lRect.anchoredPosition = new Vector2(0f, -104f);
+
+                Image lBg = legendObj.AddComponent<Image>();
+                lBg.color = new Color(0.05f, 0.08f, 0.13f, 0.94f);
+                lBg.raycastTarget = false;
+
+                Outline lOl = legendObj.AddComponent<Outline>();
+                lOl.effectColor = new Color(0.20f, 0.34f, 0.50f, 0.75f);
+                lOl.effectDistance = new Vector2(1f, -1f);
+
+                CreateUIText(legendObj.transform, "LegendText",
+                    "<b><color=#F5BF42>■ S.P.A.I.C. APTITUDE INDEX:</color></b>    " +
+                    "<color=#EF5350><b>[STR]</b></color> Strength   ·   " +
+                    "<color=#FFA726><b>[PER]</b></color> Perception   ·   " +
+                    "<color=#66BB6A><b>[AGI]</b></color> Agility   ·   " +
+                    "<color=#42A5F5><b>[INT]</b></color> Intelligence   ·   " +
+                    "<color=#AB47BC><b>[CHA]</b></color> Charisma",
+                    11.5f, TextAlignmentOptions.Center, new Color(0.84f, 0.90f, 0.96f), FontRole.Mono,
+                    Vector2.zero, Vector2.one, new Vector2(10f, 0f), new Vector2(-10f, 0f));
+            }
+
+            // Ensure Top-Left Back Button
+            Transform existing = jobSelectionPanel.transform.Find("Btn_BackToIdentity");
+            if (existing != null)
+            {
+                TextMeshProUGUI t = existing.GetComponentInChildren<TextMeshProUGUI>();
+                if (t != null) t.text = "<b><< EDIT CITIZEN ID</b>";
+                Button b = existing.GetComponent<Button>();
+                if (b != null)
+                {
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() => { PlayClick(); ShowGenderPanel(); });
+                }
+            }
+            else
+            {
+                CreateTacticalActionButton(jobSelectionPanel.transform, "Btn_BackToIdentity", "<< EDIT CITIZEN ID",
+                    new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(190f, -48f), new Vector2(210f, 40f),
+                    new Color(0.08f, 0.12f, 0.18f, 0.95f), new Color(0.25f, 0.42f, 0.62f, 0.85f),
+                    () => { PlayClick(); ShowGenderPanel(); }, pivotX: 0f, pivotY: 1f, fontSize: 13f);
+            }
+
+            // Ensure Top-Right Federal Step & Citizen Status Badge (matching Step 1 & Step 3)
+            GetCitizenBiometrics(out string docNo, out _, out _, out _, out _, out _, out _);
+            Transform badgeTr = jobSelectionPanel.transform.Find("JobStepBadge");
+            TextMeshProUGUI badgeText;
+            if (badgeTr == null)
+            {
+                GameObject box = new GameObject("JobStepBadge");
+                box.transform.SetParent(jobSelectionPanel.transform, false);
+                RectTransform bRect = box.AddComponent<RectTransform>();
+                bRect.anchorMin = new Vector2(1f, 1f);
+                bRect.anchorMax = new Vector2(1f, 1f);
+                bRect.pivot = new Vector2(1f, 1f);
+                bRect.sizeDelta = new Vector2(390f, 48f);
+                bRect.anchoredPosition = new Vector2(-190f, -44f);
+                box.AddComponent<Image>().color = new Color(0.05f, 0.08f, 0.13f, 0.95f);
+                Outline ol = box.AddComponent<Outline>();
+                ol.effectColor = new Color(0.18f, 0.32f, 0.48f, 0.85f);
+                ol.effectDistance = new Vector2(1f, -1f);
+
+                badgeText = CreateUIText(box.transform, "StatusText", "",
+                    11f, TextAlignmentOptions.MidlineRight, new Color(0.80f, 0.88f, 0.95f), FontRole.Mono,
+                    Vector2.zero, Vector2.one, new Vector2(12f, 2f), new Vector2(-12f, -2f));
+            }
+            else
+            {
+                badgeText = badgeTr.Find("StatusText")?.GetComponent<TextMeshProUGUI>();
+            }
+
+            if (badgeText != null)
+            {
+                string citizenName = character.FullName.ToUpperInvariant();
+                badgeText.text =
+                    $"<color=#FFA726><b>STEP 02 // VOCATION</b></color>  |  CITIZEN: <color=#FFFFFF><b>{citizenName}</b></color>\n" +
+                    $"<color=#90A4AE>CASE FILE: <color=#4FC3F7>{docNo}</color> // GENDER: {character.gender.ToUpperInvariant()}</color>";
+            }
+
+            // Ensure all 6 JobCards have JobCardView attached and configured
+            Transform content = jobSelectionPanel.transform.Find("JobScrollView/Viewport/Content");
+            if (content != null)
+            {
+                foreach (var job in CharacterCreationDefinitions.Jobs)
+                {
+                    Transform card = content.Find("JobCard_" + job.id);
+                    if (card != null)
+                    {
+                        string jId = job.id;
+                        JobData capturedJob = job;
+                        JobCardView cardView = card.GetComponent<JobCardView>();
+                        if (cardView == null) cardView = card.gameObject.AddComponent<JobCardView>();
+                        cardView.Setup(capturedJob, () => SelectJob(jId));
+                    }
+                }
+            }
+
+            JobSelectionScreenAdapter jobAdapter = jobSelectionPanel.GetComponentInChildren<JobSelectionScreenAdapter>(true);
+            if (jobAdapter != null)
+            {
+                jobAdapter.UpdateLayout();
+            }
         }
 
         public void SelectJob(string jobId)
@@ -542,52 +1594,12 @@ namespace SundayLastBreath.UI
             JobData job = System.Array.Find(CharacterCreationDefinitions.Jobs, j => j.id.Equals(jobId, System.StringComparison.OrdinalIgnoreCase));
             if (job == null) return;
 
-            character.job = job.title;
-            character.str = job.str;
-            character.intl = job.intl;
-            character.agi = job.agi;
-            character.cha = job.cha;
-            character.per = job.per;
+            selectedJobId = job.id;
+            pickedHobbyIds.Clear();
+            hobbyStep = 1;
+            activeWeaknessTab = 0;
 
-            character.hpMax += job.hpBonus;
-            character.hp = character.hpMax;
-
-            character.staminaMax += job.staminaBonus;
-            character.baseStaminaMax += job.staminaBonus;
-            character.stamina = character.staminaMax;
-
-            character.humanity += job.humanityBonus;
-
-            character.shooting = job.shooting;
-            character.melee = job.melee;
-            character.stealth = job.stealth;
-            character.tech = job.tech;
-            character.medicine = job.medicine;
-            character.scavenging = job.scavenging;
-            character.survival = job.survival;
-            character.resolve = job.resolve;
-
-            if (job.perks != null)
-            {
-                foreach (var perk in job.perks)
-                {
-                    Sprite icon = null;
-#if UNITY_EDITOR
-                    string iconKey = perk.name.ToLower().Replace(" ", "_");
-                    icon = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/Perks/{iconKey}.png");
-#endif
-                    character.AddTrait(perk.name, perk.desc, icon);
-                }
-            }
-
-            if (job.startingItems != null)
-            {
-                foreach (var item in job.startingItems)
-                {
-                    character.AddItem(item.item, item.qty);
-                }
-            }
-
+            RebuildCharacterFromSelections();
             PlayClick();
 
             if (jobId.Equals("student", System.StringComparison.OrdinalIgnoreCase))
@@ -596,13 +1608,12 @@ namespace SundayLastBreath.UI
             }
             else
             {
-                hobbyStep = 1;
                 ShowHobbySelectionPanel();
             }
         }
         #endregion
 
-        #region Step 4b: Student Exclusive Training & Majors
+        #region Step 2b: Student Exclusive Training & Majors
         private string currentInspectedStat = "str";
         private string currentlyHoveredStat = null;
         private float inspectLockTimer = 0f;
@@ -611,11 +1622,46 @@ namespace SundayLastBreath.UI
         public void ShowStudentTrainingPanel()
         {
             HideAllPanels();
-            if (studentTrainingPanel != null) studentTrainingPanel.SetActive(true);
+            if (studentTrainingPanel != null)
+            {
+                studentTrainingPanel.SetActive(true);
+                EnsureStudentPanelSPAICOrder();
+            }
             inspectLockTimer = 0f;
             currentlyHoveredStat = null;
+            RebuildCharacterFromSelections();
             InspectStudentStat("str", lockSelection: false);
             UpdateStudentTrainingUI();
+        }
+
+        private void EnsureStudentPanelSPAICOrder()
+        {
+            if (studentTrainingPanel == null) return;
+            var allTransforms = studentTrainingPanel.GetComponentsInChildren<Transform>(true);
+            Transform rows = null;
+            foreach (var t in allTransforms)
+            {
+                if (t.name == "AllocTitle")
+                {
+                    TextMeshProUGUI titleTmp = t.GetComponent<TextMeshProUGUI>();
+                    if (titleTmp != null) titleTmp.text = "S.P.A.I.C. APTITUDE ALLOCATION";
+                }
+                else if (t.name == "AttributesRows")
+                {
+                    rows = t;
+                }
+            }
+
+            if (rows != null)
+            {
+                // Order rows as S.P.A.I.C.: STRENGTH, PERCEPTION, AGILITY, INTELLIGENCE, CHARISMA
+                string[] spaicRowOrder = { "Row_STRENGTH", "Row_PERCEPTION", "Row_AGILITY", "Row_INTELLIGENCE", "Row_CHARISMA" };
+                for (int i = 0; i < spaicRowOrder.Length; i++)
+                {
+                    Transform r = rows.Find(spaicRowOrder[i]);
+                    if (r != null) r.SetSiblingIndex(i);
+                }
+            }
         }
 
         public void OnRowPointerEnter(string stat)
@@ -663,13 +1709,14 @@ namespace SundayLastBreath.UI
 
             switch (stat.ToLower())
             {
-                case "str": if (character.str < 10) { character.str++; studentPointsRemaining--; } break;
-                case "int": if (character.intl < 10) { character.intl++; studentPointsRemaining--; } break;
-                case "agi": if (character.agi < 10) { character.agi++; studentPointsRemaining--; } break;
-                case "cha": if (character.cha < 10) { character.cha++; studentPointsRemaining--; } break;
-                case "per": if (character.per < 10) { character.per++; studentPointsRemaining--; } break;
+                case "str": if (2 + studentAllocStr < 10) { studentAllocStr++; studentPointsRemaining--; } break;
+                case "int": if (2 + studentAllocInt < 10) { studentAllocInt++; studentPointsRemaining--; } break;
+                case "agi": if (2 + studentAllocAgi < 10) { studentAllocAgi++; studentPointsRemaining--; } break;
+                case "cha": if (2 + studentAllocCha < 10) { studentAllocCha++; studentPointsRemaining--; } break;
+                case "per": if (2 + studentAllocPer < 10) { studentAllocPer++; studentPointsRemaining--; } break;
             }
 
+            RebuildCharacterFromSelections();
             InspectStudentStat(stat, lockSelection: true);
             PlayClick();
             UpdateStudentTrainingUI();
@@ -681,13 +1728,14 @@ namespace SundayLastBreath.UI
 
             switch (stat.ToLower())
             {
-                case "str": if (character.str > 2) { character.str--; studentPointsRemaining++; } break;
-                case "int": if (character.intl > 2) { character.intl--; studentPointsRemaining++; } break;
-                case "agi": if (character.agi > 2) { character.agi--; studentPointsRemaining++; } break;
-                case "cha": if (character.cha > 2) { character.cha--; studentPointsRemaining++; } break;
-                case "per": if (character.per > 2) { character.per--; studentPointsRemaining++; } break;
+                case "str": if (studentAllocStr > 0) { studentAllocStr--; studentPointsRemaining++; } break;
+                case "int": if (studentAllocInt > 0) { studentAllocInt--; studentPointsRemaining++; } break;
+                case "agi": if (studentAllocAgi > 0) { studentAllocAgi--; studentPointsRemaining++; } break;
+                case "cha": if (studentAllocCha > 0) { studentAllocCha--; studentPointsRemaining++; } break;
+                case "per": if (studentAllocPer > 0) { studentAllocPer--; studentPointsRemaining++; } break;
             }
 
+            RebuildCharacterFromSelections();
             InspectStudentStat(stat, lockSelection: true);
             PlayClick();
             UpdateStudentTrainingUI();
@@ -840,16 +1888,21 @@ namespace SundayLastBreath.UI
             }
         }
 
-        private string chosenMajorSkill = "";
-
         public void SelectStudentMajor(string skill)
         {
             chosenMajorSkill = skill.ToLower();
+            RebuildCharacterFromSelections();
+            PlayClick();
+            ShowStudentMinorPanel();
+        }
+
+        private void ApplyMajorToCharacter(string majorSkill)
+        {
             string perkName = null;
             string perkDesc = null;
             string perkIcon = null;
 
-            switch (chosenMajorSkill)
+            switch (majorSkill.ToLower())
             {
                 case "shooting":
                     character.shooting = 3;
@@ -897,9 +1950,6 @@ namespace SundayLastBreath.UI
 #endif
                 character.AddTrait(perkName, perkDesc, icon);
             }
-
-            PlayClick();
-            ShowStudentMinorPanel();
         }
 
         public void ShowStudentMinorPanel()
@@ -910,7 +1960,6 @@ namespace SundayLastBreath.UI
                 studentMinorPanel.SetActive(true);
                 WireAcademicCards(studentMinorPanel, isMajor: false);
 
-                // Filter out the skill already chosen as Major (matches Twine behavior)
                 AcademicCardView[] minorCards = studentMinorPanel.GetComponentsInChildren<AcademicCardView>(true);
                 foreach (var card in minorCards)
                 {
@@ -922,7 +1971,18 @@ namespace SundayLastBreath.UI
 
         public void SelectStudentMinor(string skill)
         {
-            switch (skill.ToLower())
+            chosenMinorSkill = skill.ToLower();
+            pickedHobbyIds.Clear();
+            hobbyStep = 1;
+            activeWeaknessTab = 0;
+            RebuildCharacterFromSelections();
+            PlayClick();
+            ShowHobbySelectionPanel();
+        }
+
+        private void ApplyMinorToCharacter(string minorSkill)
+        {
+            switch (minorSkill.ToLower())
             {
                 case "shooting": if (character.shooting < 3) character.shooting = 2; break;
                 case "melee": if (character.melee < 3) character.melee = 2; break;
@@ -932,51 +1992,53 @@ namespace SundayLastBreath.UI
                 case "survival": if (character.survival < 3) character.survival = 2; break;
                 case "resolve": if (character.resolve < 3) character.resolve = 2; break;
             }
-            PlayClick();
-            hobbyStep = 1;
-            ShowHobbySelectionPanel();
         }
         #endregion
 
-        #region Step 5: Hobbies & Weakness Selection
+        #region Step 3: Hobbies & Weakness Selection (Unified 2-Tab Categorized Layout)
         public void ShowHobbySelectionPanel()
         {
             HideAllPanels();
+            EnsureHobbyTopBar();
             if (hobbySelectionPanel != null) hobbySelectionPanel.SetActive(true);
+
+            RebuildCharacterFromSelections();
 
             if (hobbyHeaderTitle != null)
             {
+                SundayTypography.ApplyFont(hobbyHeaderTitle, FontRole.Display);
+                if (hobbyHeaderSubtitle != null)
+                    SundayTypography.ApplyFont(hobbyHeaderSubtitle, FontRole.Narrative);
+
                 if (hobbyStep == 1)
                 {
-                    hobbyHeaderTitle.text = "PRIMARY HOBBY <color=#888888>(+1-2 Stats / Items)</color>";
+                    hobbyHeaderTitle.text = "PRIMARY HOBBY <size=75%><color=#90A4AE>[+1-2 STATS & GEAR]</color></size>";
                     if (hobbyHeaderSubtitle != null)
                         hobbyHeaderSubtitle.text = "\"How did you spend your weekends before everything fell apart?\"";
                 }
                 else if (hobbyStep == 2)
                 {
-                    hobbyHeaderTitle.text = "SECONDARY HOBBY <color=#888888>(+1 Stat / Items)</color>";
+                    hobbyHeaderTitle.text = "SECONDARY HOBBY <size=75%><color=#90A4AE>[+1 STAT & TRAIT]</color></size>";
                     if (hobbyHeaderSubtitle != null)
                         hobbyHeaderSubtitle.text = "\"A secondary pursuit that kept your instincts sharp.\"";
                 }
                 else
                 {
-                    hobbyHeaderTitle.text = "SURVIVOR WEAKNESS <color=#E74C3C>(Critical Drawback)</color>";
+                    hobbyHeaderTitle.text = "SURVIVOR WEAKNESS <size=75%><color=#EF5350>[CRITICAL DRAWBACK]</color></size>";
                     if (hobbyHeaderSubtitle != null)
                         hobbyHeaderSubtitle.text = "\"Nobody survives untouched. What was your fatal flaw?\"";
                 }
             }
 
+            UpdateHobbyTopBarStatus();
+
+            // Enable the 2-Tab Thematic Category Bar on ALL 3 steps (Primary Hobby, Secondary Hobby, and Weakness!)
             if (weaknessTabBar != null)
             {
-                weaknessTabBar.SetActive(hobbyStep == 3);
+                weaknessTabBar.SetActive(true);
             }
+            UpdateWeaknessTabVisuals();
 
-            if (hobbyStep == 3)
-            {
-                UpdateWeaknessTabVisuals();
-            }
-
-            // Reset scroll position to top
             ScrollRect sr = hobbyCardsContainer != null ? hobbyCardsContainer.GetComponentInParent<ScrollRect>() : null;
             if (sr != null)
             {
@@ -984,6 +2046,122 @@ namespace SundayLastBreath.UI
             }
 
             PopulateHobbyCards();
+        }
+
+        private void EnsureHobbyTopBar()
+        {
+            if (hobbySelectionPanel == null) return;
+
+            Transform backBtn = hobbySelectionPanel.transform.Find("Btn_HobbyPreviousStep");
+            if (backBtn == null)
+            {
+                CreateTacticalActionButton(hobbySelectionPanel.transform, "Btn_HobbyPreviousStep", "<< PREVIOUS STEP",
+                    new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(190f, -48f), new Vector2(205f, 40f),
+                    new Color(0.08f, 0.12f, 0.18f, 0.95f), new Color(0.25f, 0.42f, 0.62f, 0.85f),
+                    OnHobbyBackClicked, pivotX: 0f, pivotY: 1f, fontSize: 13f);
+            }
+            else
+            {
+                TextMeshProUGUI t = backBtn.GetComponentInChildren<TextMeshProUGUI>();
+                if (t != null) t.text = "<b><< PREVIOUS STEP</b>";
+                Button b = backBtn.GetComponent<Button>();
+                if (b != null)
+                {
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(OnHobbyBackClicked);
+                }
+            }
+
+            Transform badgeObj = hobbySelectionPanel.transform.Find("HobbyLoadoutBadge");
+            if (badgeObj == null)
+            {
+                GameObject box = new GameObject("HobbyLoadoutBadge");
+                box.transform.SetParent(hobbySelectionPanel.transform, false);
+                RectTransform bRect = box.AddComponent<RectTransform>();
+                bRect.anchorMin = new Vector2(1f, 1f);
+                bRect.anchorMax = new Vector2(1f, 1f);
+                bRect.pivot = new Vector2(1f, 1f);
+                bRect.sizeDelta = new Vector2(390f, 48f);
+                bRect.anchoredPosition = new Vector2(-190f, -44f);
+                box.AddComponent<Image>().color = new Color(0.05f, 0.08f, 0.13f, 0.95f);
+                Outline ol = box.AddComponent<Outline>();
+                ol.effectColor = new Color(0.18f, 0.32f, 0.48f, 0.85f);
+                ol.effectDistance = new Vector2(1f, -1f);
+
+                hobbyLoadoutStatusText = CreateUIText(box.transform, "StatusText", "",
+                    10.5f, TextAlignmentOptions.MidlineRight, new Color(0.80f, 0.88f, 0.95f), FontRole.Mono,
+                    Vector2.zero, Vector2.one, new Vector2(12f, 2f), new Vector2(-12f, -2f));
+            }
+            else
+            {
+                hobbyLoadoutStatusText = badgeObj.Find("StatusText")?.GetComponent<TextMeshProUGUI>();
+            }
+        }
+
+        private void UpdateHobbyTopBarStatus()
+        {
+            if (hobbyLoadoutStatusText == null) return;
+
+            string primaryTitle = pickedHobbyIds.Count >= 1 ? GetHobbyTitleById(pickedHobbyIds[0]) : "NONE";
+            string secondaryTitle = pickedHobbyIds.Count >= 2 ? GetHobbyTitleById(pickedHobbyIds[1]) : "NONE";
+
+            string spaicLine = $"<color=#90A4AE>S.P.A.I.C.:</color> <color=#EF5350>STR:{character.str}</color> <color=#FFA726>PER:{character.per}</color> <color=#66BB6A>AGI:{character.agi}</color> <color=#42A5F5>INT:{character.intl}</color> <color=#AB47BC>CHA:{character.cha}</color>";
+
+            if (hobbyStep == 1)
+            {
+                hobbyLoadoutStatusText.text =
+                    $"<color=#FFA726><b>STEP 01/03</b></color>  |  VOCATION: <color=#FFFFFF><b>{character.job.ToUpperInvariant()}</b></color>\n" +
+                    spaicLine;
+            }
+            else if (hobbyStep == 2)
+            {
+                hobbyLoadoutStatusText.text =
+                    $"<color=#2ECC71><b>■ PRIMARY: {primaryTitle}</b></color>  |  <color=#FFA726><b>STEP 02/03</b></color>\n" +
+                    spaicLine;
+            }
+            else
+            {
+                hobbyLoadoutStatusText.text =
+                    $"<color=#2ECC71><b>■ {primaryTitle} + {secondaryTitle}</b></color>  |  <color=#EF5350><b>STEP 03/03</b></color>\n" +
+                    spaicLine;
+            }
+        }
+
+        private string GetHobbyTitleById(string id)
+        {
+            var h = System.Array.Find(CharacterCreationDefinitions.PositiveHobbies, x => x.id.Equals(id, System.StringComparison.OrdinalIgnoreCase));
+            return h != null ? h.title : id.ToUpperInvariant();
+        }
+
+        public void OnHobbyBackClicked()
+        {
+            PlayClick();
+            if (hobbyStep == 3)
+            {
+                if (pickedHobbyIds.Count >= 2) pickedHobbyIds.RemoveAt(pickedHobbyIds.Count - 1);
+                hobbyStep = 2;
+                activeWeaknessTab = 0;
+                ShowHobbySelectionPanel();
+            }
+            else if (hobbyStep == 2)
+            {
+                if (pickedHobbyIds.Count >= 1) pickedHobbyIds.RemoveAt(pickedHobbyIds.Count - 1);
+                hobbyStep = 1;
+                activeWeaknessTab = 0;
+                ShowHobbySelectionPanel();
+            }
+            else
+            {
+                pickedHobbyIds.Clear();
+                if (selectedJobId.Equals("student", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    ShowStudentMinorPanel();
+                }
+                else
+                {
+                    ShowJobSelectionPanel();
+                }
+            }
         }
 
         public void SwitchWeaknessTab(int tabIndex)
@@ -997,56 +2175,106 @@ namespace SundayLastBreath.UI
 
         private void UpdateWeaknessTabVisuals()
         {
-            bool isPhysical = activeWeaknessTab == 0;
+            bool isTab0 = activeWeaknessTab == 0;
 
-            if (physicalTabBg != null)
-                physicalTabBg.color = isPhysical ? new Color(0.65f, 0.15f, 0.12f, 0.95f) : new Color(0.08f, 0.08f, 0.08f, 0.85f);
-            if (mentalTabBg != null)
-                mentalTabBg.color = !isPhysical ? new Color(0.65f, 0.15f, 0.12f, 0.95f) : new Color(0.08f, 0.08f, 0.08f, 0.85f);
-
-            if (physicalTabText != null)
+            if (hobbyStep < 3)
             {
-                physicalTabText.text = isPhysical ? "<b><color=#FFFFFF>● PHYSICAL FLAWS (10)</color></b>" : "<b><color=#777777>○ PHYSICAL FLAWS (10)</color></b>";
-            }
-            if (mentalTabText != null)
-            {
-                mentalTabText.text = !isPhysical ? "<b><color=#FFFFFF>● MENTAL & SOCIAL (10)</color></b>" : "<b><color=#777777>○ MENTAL & SOCIAL (10)</color></b>";
-            }
+                // Positive Hobbies: Tab 0 = COMBAT, FIELD & STEALTH (8), Tab 1 = MIND, TECH & SUPPORT (7)
+                Color activeTab0Bg = new Color(0.72f, 0.32f, 0.06f, 0.95f);
+                Color activeTab1Bg = new Color(0.10f, 0.36f, 0.62f, 0.95f);
+                Color inactiveBg = new Color(0.08f, 0.09f, 0.12f, 0.88f);
 
-            if (physicalTabOutline != null)
-                physicalTabOutline.effectColor = isPhysical ? new Color(0.91f, 0.30f, 0.24f, 0.85f) : new Color(0.20f, 0.20f, 0.20f, 0.5f);
-            if (mentalTabOutline != null)
-                mentalTabOutline.effectColor = !isPhysical ? new Color(0.91f, 0.30f, 0.24f, 0.85f) : new Color(0.20f, 0.20f, 0.20f, 0.5f);
+                if (physicalTabBg != null) physicalTabBg.color = isTab0 ? activeTab0Bg : inactiveBg;
+                if (mentalTabBg != null) mentalTabBg.color = !isTab0 ? activeTab1Bg : inactiveBg;
+
+                if (physicalTabText != null)
+                {
+                    physicalTabText.text = isTab0
+                        ? "<b><color=#FFFFFF>● COMBAT, FIELD & STEALTH (8)</color></b>"
+                        : "<b><color=#8899AA>○ COMBAT, FIELD & STEALTH (8)</color></b>";
+                }
+                if (mentalTabText != null)
+                {
+                    mentalTabText.text = !isTab0
+                        ? "<b><color=#FFFFFF>● MIND, TECH & SUPPORT (7)</color></b>"
+                        : "<b><color=#8899AA>○ MIND, TECH & SUPPORT (7)</color></b>";
+                }
+
+                if (physicalTabOutline != null)
+                    physicalTabOutline.effectColor = isTab0 ? new Color(0.95f, 0.55f, 0.15f, 0.9f) : new Color(0.20f, 0.24f, 0.30f, 0.5f);
+                if (mentalTabOutline != null)
+                    mentalTabOutline.effectColor = !isTab0 ? new Color(0.29f, 0.68f, 0.98f, 0.9f) : new Color(0.20f, 0.24f, 0.30f, 0.5f);
+            }
+            else
+            {
+                // Weaknesses: Tab 0 = PHYSICAL FLAWS (10), Tab 1 = MENTAL & SOCIAL (10)
+                if (physicalTabBg != null)
+                    physicalTabBg.color = isTab0 ? new Color(0.65f, 0.15f, 0.12f, 0.95f) : new Color(0.08f, 0.08f, 0.08f, 0.85f);
+                if (mentalTabBg != null)
+                    mentalTabBg.color = !isTab0 ? new Color(0.65f, 0.15f, 0.12f, 0.95f) : new Color(0.08f, 0.08f, 0.08f, 0.85f);
+
+                if (physicalTabText != null)
+                {
+                    physicalTabText.text = isTab0 ? "<b><color=#FFFFFF>● PHYSICAL FLAWS (10)</color></b>" : "<b><color=#777777>○ PHYSICAL FLAWS (10)</color></b>";
+                }
+                if (mentalTabText != null)
+                {
+                    mentalTabText.text = !isTab0 ? "<b><color=#FFFFFF>● MENTAL & SOCIAL (10)</color></b>" : "<b><color=#777777>○ MENTAL & SOCIAL (10)</color></b>";
+                }
+
+                if (physicalTabOutline != null)
+                    physicalTabOutline.effectColor = isTab0 ? new Color(0.91f, 0.30f, 0.24f, 0.85f) : new Color(0.20f, 0.20f, 0.20f, 0.5f);
+                if (mentalTabOutline != null)
+                    mentalTabOutline.effectColor = !isTab0 ? new Color(0.91f, 0.30f, 0.24f, 0.85f) : new Color(0.20f, 0.20f, 0.20f, 0.5f);
+            }
         }
 
         private void PopulateHobbyCards()
         {
             if (hobbyCardsContainer == null || hobbyCardPrefab == null) return;
 
-            // Clear old cards
-            foreach (Transform child in hobbyCardsContainer)
+            for (int i = hobbyCardsContainer.childCount - 1; i >= 0; i--)
             {
+                Transform child = hobbyCardsContainer.GetChild(i);
+                child.gameObject.SetActive(false);
+                child.SetParent(null);
                 Destroy(child.gameObject);
             }
 
+            int spawnedCount = 0;
+
             if (hobbyStep < 3)
             {
+                // Collect and sort by Category Tag so identical tags (COMBAT, SURVIVAL, STEALTH, etc.) are always grouped together!
+                List<HobbyData> sortedHobbies = new List<HobbyData>();
                 foreach (var hobby in CharacterCreationDefinitions.PositiveHobbies)
                 {
-                    if (pickedHobbyIds.Contains(hobby.id)) continue;
+                    bool isActionField = ActionFieldHobbyIds.Contains(hobby.id);
+                    if (activeWeaknessTab == 0 && !isActionField) continue;
+                    if (activeWeaknessTab == 1 && isActionField) continue;
+                    sortedHobbies.Add(hobby);
+                }
+
+                sortedHobbies.Sort((a, b) => HobbyCardView.GetCategorySortOrder(a).CompareTo(HobbyCardView.GetCategorySortOrder(b)));
+
+                foreach (var hobby in sortedHobbies)
+                {
+                    bool isAlreadyEquipped = pickedHobbyIds.Contains(hobby.id);
 
                     GameObject cardObj = Instantiate(hobbyCardPrefab, hobbyCardsContainer);
                     cardObj.SetActive(true);
+                    spawnedCount++;
                     HobbyCardView cardView = cardObj.GetComponent<HobbyCardView>();
                     if (cardView != null)
                     {
-                        cardView.Setup(hobby, () => OnHobbySelected(hobby));
+                        HobbyData captured = hobby;
+                        cardView.Setup(captured, () => OnHobbySelected(captured), isEquippedPrimary: isAlreadyEquipped);
                     }
                 }
             }
             else
             {
-                // Weakness step: filtered by active tab (10 cards each in a 5x2 grid, 0 scrolling!)
+                // Weakness step: filtered by active tab (10 cards each in a 5x2 grid)
                 foreach (var hobby in CharacterCreationDefinitions.DestructiveWeaknesses)
                 {
                     if (pickedHobbyIds.Contains(hobby.id)) continue;
@@ -1057,26 +2285,29 @@ namespace SundayLastBreath.UI
 
                     GameObject cardObj = Instantiate(hobbyCardPrefab, hobbyCardsContainer);
                     cardObj.SetActive(true);
+                    spawnedCount++;
                     HobbyCardView cardView = cardObj.GetComponent<HobbyCardView>();
                     if (cardView != null)
                     {
-                        cardView.Setup(hobby, () => OnHobbySelected(hobby));
+                        HobbyData captured = hobby;
+                        cardView.Setup(captured, () => OnHobbySelected(captured), isEquippedPrimary: false);
                     }
                 }
             }
 
-            // Notify responsive adapter to fit or enable scroll
             HobbySelectionScreenAdapter adapter = hobbyCardsContainer.GetComponentInParent<HobbySelectionScreenAdapter>();
             if (adapter != null)
             {
-                adapter.UpdateLayout();
+                adapter.UpdateLayout(spawnedCount);
             }
         }
 
         public void OnHobbySelected(HobbyData hobby)
         {
+            if (pickedHobbyIds.Contains(hobby.id)) return;
+
             pickedHobbyIds.Add(hobby.id);
-            hobby.applyEffect?.Invoke(character, hobbyStep);
+            RebuildCharacterFromSelections();
             PlayClick();
 
             if (hobbyStep == 1)
@@ -1087,6 +2318,7 @@ namespace SundayLastBreath.UI
             else if (hobbyStep == 2)
             {
                 hobbyStep = 3;
+                activeWeaknessTab = 0;
                 ShowHobbySelectionPanel();
             }
             else
@@ -1096,44 +2328,102 @@ namespace SundayLastBreath.UI
         }
         #endregion
 
-        #region Step 6: Final Summary Dossier
+        #region Step 4: Final Summary Dossier (100% Synced with Step 1 Citizen Intake Record)
         public void ShowSummaryDossierPanel()
         {
             HideAllPanels();
+            RebuildCharacterFromSelections();
             if (summaryDossierPanel != null) summaryDossierPanel.SetActive(true);
             EnforceDossierLayout();
+            SundayTypography.ApplyHierarchy(summaryDossierPanel.transform);
             dossierLayoutEnforced = true;
 
+            GetCitizenBiometrics(out string docNo, out string dob, out string blood, out string sector, out string clearance, out string mrzLine1, out string mrzLine2);
+
+            // Sync top-right HeaderBar CaseId with Step 1's exact docNo
+            Transform caseIdTr = summaryDossierPanel.transform.Find("FederalDossierFrame/HeaderBar/MetaBlock/CaseId");
+            if (caseIdTr != null)
+            {
+                TextMeshProUGUI caseTmp = caseIdTr.GetComponent<TextMeshProUGUI>();
+                if (caseTmp != null)
+                {
+                    caseTmp.fontSize = 12.5f;
+                    caseTmp.text = $"CASE FILE: <color=#FFE082><b>{docNo}</b></color>   |   DATE: DAY ZERO 23:45";
+                }
+            }
+
             if (summaryNameText != null)
+            {
+                summaryNameText.fontSize = 24f;
                 summaryNameText.text = character.FullName.ToUpper();
+            }
 
             if (summaryIdentityText != null)
-                summaryIdentityText.text = $"GENDER: <color=#FFE082><b>{character.gender.ToUpper()}</b></color>   |   VOCATION: <color=#FFE082><b>{character.job.ToUpper()}</b></color>";
+            {
+                summaryIdentityText.fontSize = 13.5f;
+                summaryIdentityText.lineSpacing = 3f;
+                summaryIdentityText.text =
+                    $"GENDER: <color=#FFE082><b>{character.gender.ToUpper()}</b></color>   |   VOCATION: <color=#FFE082><b>{character.job.ToUpper()}</b></color>\n" +
+                    $"<size=95%><color=#90A4AE>DOB:</color> <color=#FFFFFF>{dob}</color>   |   <color=#90A4AE>BLOOD:</color> <color=#EF5350><b>{blood}</b></color>   |   <color=#90A4AE>ID:</color> <color=#4FC3F7>{docNo}</color></size>";
+            }
 
             if (summaryVitalsText != null)
+            {
+                summaryVitalsText.fontSize = 13.5f;
                 summaryVitalsText.text = $"<color=#EF5350><b>HP:</b> {character.hp}/{character.hpMax}</color>   |   <color=#FFA726><b>STAMINA:</b> {character.stamina}/{character.staminaMax}</color>   |   <color=#29B6F6><b>HUMANITY:</b> {character.humanity}/100</color>";
+            }
+
+            // Sync Col1_Identity screening protocol & barcode with Step 1's exact citizen record
+            Transform col1 = summaryDossierPanel.transform.Find("FederalDossierFrame/ColumnsContainer/Col1_Identity");
+            if (col1 != null)
+            {
+                TextMeshProUGUI[] col1Texts = col1.GetComponentsInChildren<TextMeshProUGUI>(true);
+                foreach (var t in col1Texts)
+                {
+                    if (t != null && t.text != null && t.text.Contains("CHECKPOINT:"))
+                    {
+                        t.fontSize = 12f;
+                        t.lineSpacing = 3f;
+                        t.text =
+                            $"• CHECKPOINT: <color=#FFE082>SECTOR-04 // METRO DECONTAM GATE</color>\n" +
+                            $"• BIOMETRIC RECORD: <color=#FFFFFF>DOB {dob} // BLOOD {blood}</color>\n" +
+                            $"• VIRAL ANTIGEN SWAB: <color=#66BB6A>NEGATIVE (NON-REACTIVE)</color>\n" +
+                            $"• RETINAL OCULAR SCAN: <color=#66BB6A>NORMAL (NO CAPILLARY RUPTURE)</color>\n" +
+                            $"• EPIDERMAL CHECK: <color=#66BB6A>NO INFECTED LACERATIONS / BITES</color>\n" +
+                            $"• STATUS: <color=#29B6F6><b>{clearance} CLEARANCE</b></color>\n\n" +
+                            $"<color=#4FC3F7><size=94%>{mrzLine1.Substring(0, Mathf.Min(28, mrzLine1.Length))}</size></color>  <color=#FFE082>{docNo}</color>";
+                        break;
+                    }
+                }
+            }
 
             if (summaryAttributesText != null)
             {
+                summaryAttributesText.fontSize = 14.5f;
+                summaryAttributesText.lineSpacing = 3f;
                 summaryAttributesText.text = 
-                    $"<color=#90A4AE>STR:</color> <mspace=0.6em><color=#FFFFFF><b>{character.str:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.str, 10)}</color>\n" +
-                    $"<color=#90A4AE>INT:</color> <mspace=0.6em><color=#FFFFFF><b>{character.intl:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.intl, 10)}</color>\n" +
-                    $"<color=#90A4AE>AGI:</color> <mspace=0.6em><color=#FFFFFF><b>{character.agi:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.agi, 10)}</color>\n" +
-                    $"<color=#90A4AE>CHA:</color> <mspace=0.6em><color=#FFFFFF><b>{character.cha:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.cha, 10)}</color>\n" +
-                    $"<color=#90A4AE>PER:</color> <mspace=0.6em><color=#FFFFFF><b>{character.per:00}</b></color></mspace>  <pos=26%><color=#FFA726>{FormatStatPips(character.per, 10)}</color>";
+                    $"<color=#EF5350><b>STR</b></color> <color=#90A4AE>(Strength):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.str:00}</b></color></mspace>  {FormatStatPips(character.str, 10)}\n" +
+                    $"<color=#FFA726><b>PER</b></color> <color=#90A4AE>(Perception):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.per:00}</b></color></mspace>  {FormatStatPips(character.per, 10)}\n" +
+                    $"<color=#66BB6A><b>AGI</b></color> <color=#90A4AE>(Agility):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.agi:00}</b></color></mspace>  {FormatStatPips(character.agi, 10)}\n" +
+                    $"<color=#42A5F5><b>INT</b></color> <color=#90A4AE>(Intelligence):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.intl:00}</b></color></mspace>  {FormatStatPips(character.intl, 10)}\n" +
+                    $"<color=#AB47BC><b>CHA</b></color> <color=#90A4AE>(Charisma):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.cha:00}</b></color></mspace>  {FormatStatPips(character.cha, 10)}";
             }
 
             if (summarySkillsText != null)
             {
+                summarySkillsText.fontSize = 13.5f;
+                summarySkillsText.lineSpacing = 3f;
                 summarySkillsText.text = 
-                    $"<color=#90A4AE>SHOOTING:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.shooting:00}</b></color></mspace><pos=50%><color=#90A4AE>MELEE:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.melee:00}</b></color></mspace>\n" +
-                    $"<color=#90A4AE>STEALTH:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.stealth:00}</b></color></mspace><pos=50%><color=#90A4AE>TECH:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.tech:00}</b></color></mspace>\n" +
-                    $"<color=#90A4AE>MEDICINE:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.medicine:00}</b></color></mspace><pos=50%><color=#90A4AE>SCAVENGING:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.scavenging:00}</b></color></mspace>\n" +
-                    $"<color=#90A4AE>SURVIVAL:</color> <pos=22%><mspace=0.6em><color=#FFE082><b>{character.survival:00}</b></color></mspace><pos=50%><color=#90A4AE>RESOLVE:</color> <pos=74%><mspace=0.6em><color=#FFE082><b>{character.resolve:00}</b></color></mspace>";
+                    $"<color=#90A4AE>SHOOTING:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.shooting:00}</b></color></mspace><pos=50%><color=#90A4AE>MELEE:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.melee:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>STEALTH:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.stealth:00}</b></color></mspace><pos=50%><color=#90A4AE>TECH:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.tech:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>MEDICINE:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.medicine:00}</b></color></mspace><pos=50%><color=#90A4AE>SCAVENGING:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.scavenging:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>SURVIVAL:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.survival:00}</b></color></mspace><pos=50%><color=#90A4AE>RESOLVE:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.resolve:00}</b></color></mspace>";
             }
 
             if (summaryTraitsText != null)
             {
+                summaryTraitsText.fontSize = 12.5f;
+                summaryTraitsText.lineSpacing = 3f;
                 string traitsList = "";
                 foreach (var t in character.traits)
                 {
@@ -1146,6 +2436,8 @@ namespace SundayLastBreath.UI
 
             if (summaryInventoryText != null)
             {
+                summaryInventoryText.fontSize = 12.5f;
+                summaryInventoryText.lineSpacing = 3f;
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 int idx = 0;
                 foreach (var item in character.inventory)
@@ -1169,7 +2461,7 @@ namespace SundayLastBreath.UI
         {
             int filled = Mathf.Clamp(val, 0, max);
             int empty = Mathf.Max(0, max - filled);
-            return $"{new string('■', filled)}{new string('□', empty)}";
+            return $"<color=#FFA726>{new string('■', filled)}</color><color=#243242>{new string('■', empty)}</color>";
         }
 
         private void EnforceDossierLayout()
@@ -1238,7 +2530,7 @@ namespace SundayLastBreath.UI
                     if (vlg != null)
                     {
                         vlg.padding = new RectOffset(16, 16, 12, 12);
-                        vlg.spacing = 5;
+                        vlg.spacing = 6;
                         vlg.childControlWidth = true;
                         vlg.childForceExpandWidth = true;
                         vlg.childControlHeight = false;
@@ -1261,8 +2553,8 @@ namespace SundayLastBreath.UI
                             sRect.anchorMin = new Vector2(0.5f, 0f);
                             sRect.anchorMax = new Vector2(0.5f, 0f);
                             sRect.pivot = new Vector2(0.5f, 0f);
-                            sRect.sizeDelta = new Vector2(185, 185);
-                            sRect.anchoredPosition = new Vector2(25, 25);
+                            sRect.sizeDelta = new Vector2(175, 175);
+                            sRect.anchoredPosition = new Vector2(25, 18);
                         }
                     }
                 }
@@ -1276,7 +2568,13 @@ namespace SundayLastBreath.UI
                         RectTransform abRect = advBox.GetComponent<RectTransform>();
                         if (abRect != null)
                         {
-                            abRect.sizeDelta = new Vector2(0, 115);
+                            abRect.sizeDelta = new Vector2(0, 138);
+                        }
+                        TextMeshProUGUI abTmp = advBox.GetComponentInChildren<TextMeshProUGUI>();
+                        if (abTmp != null)
+                        {
+                            abTmp.fontSize = 11.5f;
+                            abTmp.lineSpacing = 2.5f;
                         }
                     }
                 }
@@ -1290,7 +2588,13 @@ namespace SundayLastBreath.UI
                         RectTransform ebRect = edictBox.GetComponent<RectTransform>();
                         if (ebRect != null)
                         {
-                            ebRect.sizeDelta = new Vector2(0, 105);
+                            ebRect.sizeDelta = new Vector2(0, 128);
+                        }
+                        TextMeshProUGUI ebTmp = edictBox.GetComponentInChildren<TextMeshProUGUI>();
+                        if (ebTmp != null)
+                        {
+                            ebTmp.fontSize = 11.5f;
+                            ebTmp.lineSpacing = 2.5f;
                         }
                     }
                 }
@@ -1320,12 +2624,20 @@ namespace SundayLastBreath.UI
                     RectTransform nr = notice.GetComponent<RectTransform>();
                     if (nr != null)
                     {
-                        nr.sizeDelta = new Vector2(740, 50);
+                        nr.anchorMin = new Vector2(0, 0.5f);
+                        nr.anchorMax = new Vector2(0, 0.5f);
+                        nr.pivot = new Vector2(0, 0.5f);
+                        nr.sizeDelta = new Vector2(680, 50);
                         nr.anchoredPosition = new Vector2(24, 0);
+                    }
+                    TextMeshProUGUI nTmp = notice.GetComponent<TextMeshProUGUI>();
+                    if (nTmp != null)
+                    {
+                        nTmp.fontSize = 11.5f;
+                        nTmp.textWrappingMode = TextWrappingModes.Normal;
                     }
                 }
 
-                // Confirm button right
                 Transform begin = footer.Find("Btn_CONFIRM&COMMENCESURVIVAL>>");
                 if (begin != null)
                 {
@@ -1340,7 +2652,6 @@ namespace SundayLastBreath.UI
                     }
                 }
 
-                // Reset / Start Over button
                 Transform resetObj = footer.Find("Btn_StartOver");
                 if (resetObj == null)
                 {
@@ -1369,19 +2680,9 @@ namespace SundayLastBreath.UI
                     rBtn.colors = cb;
                     rBtn.onClick.AddListener(RestartCharacterCreation);
 
-                    GameObject textObj = new GameObject("Text");
-                    textObj.transform.SetParent(rBtnObj.transform, false);
-                    RectTransform tr = textObj.AddComponent<RectTransform>();
-                    tr.anchorMin = Vector2.zero;
-                    tr.anchorMax = Vector2.one;
-                    tr.offsetMin = Vector2.zero;
-                    tr.offsetMax = Vector2.zero;
-
-                    TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
-                    tmp.text = "<b><color=#CFD8DC>↺ START OVER</color></b>";
-                    tmp.fontSize = 13.5f;
-                    tmp.alignment = TextAlignmentOptions.Center;
-                    tmp.raycastTarget = false;
+                    TextMeshProUGUI tmp = CreateUIText(rBtnObj.transform, "Text", "<b><color=#CFD8DC><< START OVER</color></b>",
+                        13.5f, TextAlignmentOptions.Center, Color.white, FontRole.Display,
+                        Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
                     restartCreationButton = rBtn;
                 }
@@ -1396,6 +2697,8 @@ namespace SundayLastBreath.UI
                         rRect.sizeDelta = new Vector2(210, 46);
                         rRect.anchoredPosition = new Vector2(-386, 0);
                     }
+                    TextMeshProUGUI rTxt = resetObj.GetComponentInChildren<TextMeshProUGUI>();
+                    if (rTxt != null) rTxt.text = "<b><color=#CFD8DC><< START OVER</color></b>";
                     Button rBtn = resetObj.GetComponent<Button>();
                     if (rBtn != null)
                     {
@@ -1410,19 +2713,7 @@ namespace SundayLastBreath.UI
         public void RestartCharacterCreation()
         {
             PlayClick();
-            character = new CharacterData();
-            hobbyStep = 1;
-            pickedHobbyIds.Clear();
-            studentPointsRemaining = 5;
-            inspectLockTimer = 0f;
-            currentlyHoveredStat = null;
-            activeWeaknessTab = 0;
-            dossierLayoutEnforced = false;
-
-            if (customFirstNameInput != null) customFirstNameInput.text = "";
-            if (customLastNameInput != null) customLastNameInput.text = "";
-            if (customGenderInput != null) customGenderInput.text = "";
-
+            ResetCreationState();
             ShowGenderPanel();
         }
 
@@ -1443,6 +2734,284 @@ namespace SundayLastBreath.UI
         }
         #endregion
 
+        #region UI Construction Helpers
+        private static Sprite GetOrCreateSilhouetteSprite()
+        {
+            if (_cachedSilhouetteSprite != null) return _cachedSilhouetteSprite;
+
+            int w = 64;
+            int h = 72;
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Bilinear;
+            tex.wrapMode = TextureWrapMode.Clamp;
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    float nx = (x - w * 0.5f) / (w * 0.5f);
+                    // Head circle centered at y = 48, radius = 12
+                    float headDx = (x - 32f) / 11.5f;
+                    float headDy = (y - 49f) / 13.0f;
+                    float headDist = headDx * headDx + headDy * headDy;
+
+                    // Neck centered at y = 33..38
+                    bool inNeck = (y >= 31 && y <= 38) && Mathf.Abs(x - 32f) <= 5.5f;
+
+                    // Shoulders / torso (y = 6..33)
+                    float shoulderHalfWidth = 23f * Mathf.Clamp01((34f - y) / 10f);
+                    bool inTorso = (y >= 6 && y <= 33) && Mathf.Abs(x - 32f) <= shoulderHalfWidth;
+
+                    bool inside = (headDist <= 1.0f) || inNeck || inTorso;
+                    if (inside)
+                    {
+                        float scanline = (y % 3 == 0) ? 0.72f : 0.95f;
+                        tex.SetPixel(x, y, new Color(1f, 1f, 1f, scanline));
+                    }
+                    else
+                    {
+                        tex.SetPixel(x, y, Color.clear);
+                    }
+                }
+            }
+
+            tex.Apply();
+            _cachedSilhouetteSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f));
+            return _cachedSilhouetteSprite;
+        }
+
+        private static TextMeshProUGUI CreateUIText(Transform parent, string name, string content, float size,
+            TextAlignmentOptions align, Color color, FontRole role,
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+
+            // IMPORTANT: Add TextMeshProUGUI BEFORE setting RectTransform offsets so TMP's Reset() does not overwrite sizeDelta!
+            TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
+
+            RectTransform rt = tmp.rectTransform;
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.offsetMin = offsetMin;
+            rt.offsetMax = offsetMax;
+
+            tmp.text = content;
+            tmp.fontSize = size;
+            tmp.alignment = align;
+            tmp.color = color;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.overflowMode = TextOverflowModes.Ellipsis;
+            tmp.raycastTarget = false;
+            if (role == FontRole.Narrative) tmp.fontStyle = FontStyles.Italic;
+            SundayTypography.ApplyFont(tmp, role);
+            return tmp;
+        }
+
+        private static GameObject CreateControlModuleBox(Transform parent, string name, float topY, float height, string headerTitle)
+        {
+            GameObject box = new GameObject(name);
+            box.transform.SetParent(parent, false);
+            RectTransform rt = box.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 1f);
+            rt.anchorMax = new Vector2(1f, 1f);
+            rt.pivot = new Vector2(0.5f, 1f);
+            rt.sizeDelta = new Vector2(0f, height);
+            rt.anchoredPosition = new Vector2(0f, topY);
+
+            box.AddComponent<Image>().color = new Color(0.05f, 0.08f, 0.12f, 0.96f);
+            Outline ol = box.AddComponent<Outline>();
+            ol.effectColor = new Color(0.15f, 0.24f, 0.35f, 0.85f);
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            CreateModuleHeader(box.transform, headerTitle);
+            return box;
+        }
+
+        private static void CreateModuleHeader(Transform parent, string title)
+        {
+            GameObject hObj = new GameObject("ModuleHeader");
+            hObj.transform.SetParent(parent, false);
+            RectTransform hRect = hObj.AddComponent<RectTransform>();
+            hRect.anchorMin = new Vector2(0f, 1f);
+            hRect.anchorMax = new Vector2(1f, 1f);
+            hRect.pivot = new Vector2(0.5f, 1f);
+            hRect.sizeDelta = new Vector2(0f, 28f);
+            hRect.anchoredPosition = Vector2.zero;
+            hObj.AddComponent<Image>().color = new Color(0.08f, 0.14f, 0.22f, 0.98f);
+
+            CreateUIText(hObj.transform, "Title", $"<b>{title}</b>",
+                11.5f, TextAlignmentOptions.MidlineLeft, new Color(0.45f, 0.76f, 0.98f), FontRole.Mono,
+                Vector2.zero, Vector2.one, new Vector2(14f, 0f), new Vector2(-14f, 0f));
+        }
+
+        private static Button CreateGenderArchetypeButton(Transform parent, string name, string title, string sub, float posX, UnityEngine.Events.UnityAction onClick)
+        {
+            GameObject btnObj = new GameObject(name);
+            btnObj.transform.SetParent(parent, false);
+            RectTransform rt = btnObj.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 1f);
+            rt.anchorMax = new Vector2(0f, 1f);
+            rt.pivot = new Vector2(0f, 1f);
+            rt.sizeDelta = new Vector2(268f, 54f);
+            rt.anchoredPosition = new Vector2(posX, -38f);
+
+            Image bg = btnObj.AddComponent<Image>();
+            bg.color = new Color(0.06f, 0.09f, 0.14f, 0.95f);
+            Outline ol = btnObj.AddComponent<Outline>();
+            ol.effectColor = new Color(0.18f, 0.28f, 0.40f, 0.75f);
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            Button btn = btnObj.AddComponent<Button>();
+            btn.targetGraphic = bg;
+            if (onClick != null) btn.onClick.AddListener(onClick);
+
+            GameObject strip = new GameObject("LeftStrip");
+            strip.transform.SetParent(btnObj.transform, false);
+            RectTransform sRect = strip.AddComponent<RectTransform>();
+            sRect.anchorMin = new Vector2(0f, 0f);
+            sRect.anchorMax = new Vector2(0f, 1f);
+            sRect.pivot = new Vector2(0f, 0.5f);
+            sRect.sizeDelta = new Vector2(4f, 0f);
+            sRect.anchoredPosition = Vector2.zero;
+            strip.AddComponent<Image>().color = new Color(0.90f, 0.49f, 0.13f, 1f);
+
+            CreateUIText(btnObj.transform, "Title", title,
+                16f, TextAlignmentOptions.BottomLeft, Color.white, FontRole.Display,
+                new Vector2(0f, 0.42f), new Vector2(1f, 1f), new Vector2(16f, 0f), new Vector2(-10f, -4f));
+
+            CreateUIText(btnObj.transform, "Sub", sub,
+                10.5f, TextAlignmentOptions.TopLeft, new Color(0.58f, 0.68f, 0.78f), FontRole.Body,
+                new Vector2(0f, 0f), new Vector2(1f, 0.45f), new Vector2(16f, 4f), new Vector2(-10f, 0f));
+
+            return btn;
+        }
+
+        private static Button CreateNameChipButton(Transform parent, string label, UnityEngine.Events.UnityAction onClick)
+        {
+            GameObject chipObj = new GameObject("Chip_" + label);
+            chipObj.transform.SetParent(parent, false);
+            RectTransform rt = chipObj.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(196f, 36f);
+
+            Image bg = chipObj.AddComponent<Image>();
+            bg.color = new Color(0.06f, 0.09f, 0.14f, 0.92f);
+            Outline ol = chipObj.AddComponent<Outline>();
+            ol.effectColor = new Color(0.16f, 0.24f, 0.34f, 0.65f);
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            Button btn = chipObj.AddComponent<Button>();
+            btn.targetGraphic = bg;
+            if (onClick != null) btn.onClick.AddListener(onClick);
+
+            CreateUIText(chipObj.transform, "Text", label.ToUpperInvariant(),
+                13f, TextAlignmentOptions.Center, new Color(0.85f, 0.88f, 0.92f), FontRole.Mono,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            return btn;
+        }
+
+        private static void CreateInlineCustomInput(Transform parent, string name, string label, string placeholder,
+            float posY, string btnLabel, UnityEngine.Events.UnityAction onBtnClick,
+            out TMP_InputField inputField, UnityEngine.Events.UnityAction<string> onValueChanged)
+        {
+            GameObject row = new GameObject(name);
+            row.transform.SetParent(parent, false);
+            RectTransform rRect = row.AddComponent<RectTransform>();
+            rRect.anchorMin = new Vector2(0f, 1f);
+            rRect.anchorMax = new Vector2(1f, 1f);
+            rRect.pivot = new Vector2(0.5f, 1f);
+            rRect.sizeDelta = new Vector2(-32f, 34f);
+            rRect.anchoredPosition = new Vector2(0f, posY);
+
+            CreateUIText(row.transform, "Label", $"<b>{label}</b>",
+                11f, TextAlignmentOptions.MidlineLeft, new Color(0.58f, 0.70f, 0.82f), FontRole.Mono,
+                new Vector2(0f, 0f), new Vector2(0f, 1f), Vector2.zero, new Vector2(165f, 0f));
+
+            GameObject inputObj = new GameObject("InputField");
+            inputObj.transform.SetParent(row.transform, false);
+            RectTransform iRect = inputObj.AddComponent<RectTransform>();
+            iRect.anchorMin = new Vector2(0f, 0f);
+            iRect.anchorMax = new Vector2(1f, 1f);
+            iRect.offsetMin = new Vector2(170f, 0f);
+            iRect.offsetMax = new Vector2(-176f, 0f);
+
+            Image iBg = inputObj.AddComponent<Image>();
+            iBg.color = new Color(0.03f, 0.05f, 0.08f, 1f);
+            Outline iOl = inputObj.AddComponent<Outline>();
+            iOl.effectColor = new Color(0.20f, 0.34f, 0.50f, 0.85f);
+            iOl.effectDistance = new Vector2(1f, -1f);
+
+            inputField = inputObj.AddComponent<TMP_InputField>();
+
+            GameObject textArea = new GameObject("Text Area");
+            textArea.transform.SetParent(inputObj.transform, false);
+            RectTransform taRect = textArea.AddComponent<RectTransform>();
+            taRect.anchorMin = Vector2.zero;
+            taRect.anchorMax = Vector2.one;
+            taRect.offsetMin = new Vector2(12f, 2f);
+            taRect.offsetMax = new Vector2(-12f, -2f);
+            textArea.AddComponent<RectMask2D>();
+
+            TextMeshProUGUI phText = CreateUIText(textArea.transform, "Placeholder", placeholder,
+                13f, TextAlignmentOptions.MidlineLeft, new Color(0.42f, 0.50f, 0.58f, 0.75f), FontRole.Body,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            phText.fontStyle = FontStyles.Italic;
+
+            TextMeshProUGUI valText = CreateUIText(textArea.transform, "Text", "",
+                14f, TextAlignmentOptions.MidlineLeft, Color.white, FontRole.Body,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            inputField.textViewport = taRect;
+            inputField.textComponent = valText;
+            inputField.placeholder = phText;
+            if (onValueChanged != null) inputField.onValueChanged.AddListener(onValueChanged);
+
+            CreateTacticalActionButton(row.transform, "ActionBtn", btnLabel,
+                new Vector2(1f, 0f), new Vector2(1f, 1f), Vector2.zero, new Vector2(164f, 0f),
+                new Color(0.10f, 0.20f, 0.32f, 0.98f), new Color(0.25f, 0.52f, 0.78f, 0.85f),
+                onBtnClick, pivotX: 1f, pivotY: 0.5f, fontSize: 12f);
+        }
+
+        private static Button CreateTacticalActionButton(Transform parent, string name, string label,
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPos, Vector2 sizeDelta,
+            Color bgColor, Color outlineColor, UnityEngine.Events.UnityAction onClick,
+            float pivotX = 0f, float pivotY = 0f, float fontSize = 13f)
+        {
+            GameObject btnObj = new GameObject(name);
+            btnObj.transform.SetParent(parent, false);
+            RectTransform rt = btnObj.AddComponent<RectTransform>();
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.pivot = new Vector2(pivotX, pivotY);
+            rt.sizeDelta = sizeDelta;
+            rt.anchoredPosition = anchoredPos;
+
+            Image bg = btnObj.AddComponent<Image>();
+            bg.color = bgColor;
+            Outline ol = btnObj.AddComponent<Outline>();
+            ol.effectColor = outlineColor;
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            Button btn = btnObj.AddComponent<Button>();
+            btn.targetGraphic = bg;
+            ColorBlock cb = btn.colors;
+            cb.normalColor = bgColor;
+            cb.highlightedColor = Color.Lerp(bgColor, outlineColor, 0.45f);
+            cb.pressedColor = bgColor * 0.8f;
+            cb.selectedColor = bgColor;
+            btn.colors = cb;
+
+            if (onClick != null) btn.onClick.AddListener(onClick);
+
+            CreateUIText(btnObj.transform, "Text", $"<b>{label}</b>",
+                fontSize, TextAlignmentOptions.Center, Color.white, FontRole.Display,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            return btn;
+        }
+        #endregion
+
         private void PlayClick()
         {
             if (AudioManager.Instance != null)
@@ -1452,4 +3021,3 @@ namespace SundayLastBreath.UI
         }
     }
 }
-

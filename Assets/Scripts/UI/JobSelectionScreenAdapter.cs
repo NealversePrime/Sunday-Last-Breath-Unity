@@ -53,17 +53,17 @@ namespace SundayLastBreath.UI
 
             if (meetsRequirement)
             {
-                // Fit ScrollView container below header with comfortable top/bottom breathing room
+                // Fit ScrollView container below header & S.P.A.I.C. Legend Bar with comfortable top/bottom breathing room
                 float targetContainerWidth = Mathf.Min(canvasWidth - 100f, 1540f);
-                float targetContainerHeight = Mathf.Min(canvasHeight - 190f, 890f);
+                float targetContainerHeight = Mathf.Min(canvasHeight - 216f, 864f);
                 containerRect.sizeDelta = new Vector2(targetContainerWidth, targetContainerHeight);
-                containerRect.anchoredPosition = new Vector2(0f, -56f);
+                containerRect.anchoredPosition = new Vector2(0f, -72f);
 
                 // 3 columns, 2 rows
                 float spacingX = 24f;
                 float spacingY = 16f;
                 float cardW = 470f;
-                float cardH = 420f;
+                float cardH = 412f;
 
                 // Adjust card width slightly if container is wider/narrower
                 float availableGridW = targetContainerWidth - 30f;
@@ -76,7 +76,7 @@ namespace SundayLastBreath.UI
                 gridLayout.spacing = new Vector2(spacingX, spacingY);
                 gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
                 gridLayout.constraintCount = 3;
-                gridLayout.padding = new RectOffset(15, 15, 10, 10);
+                gridLayout.padding = new RectOffset(15, 15, 6, 10);
                 gridLayout.childAlignment = TextAnchor.UpperCenter;
 
                 if (scrollRect != null)

@@ -30,6 +30,7 @@ namespace SundayLastBreath.UI
         protected virtual void Awake()
         {
             _ = CanvasGroup;
+            SundayTypography.ApplyHierarchy(transform);
         }
 
         public virtual void Show(float duration = -1f, Action onComplete = null)
