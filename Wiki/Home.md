@@ -30,6 +30,7 @@ This Wiki serves as both the **complete narrative & systems documentation** extr
 | **[03. Characters, Companions & Factions](03-Characters-Companions-and-Factions.md)** | Character Bible & Relationship Arcs | Psychological profiles, trust variables, and reactive arcs for **Vane**, **Maya & Lily**, **Diane & Marcus**, **Officer Reyes**, and **Matriarch Evelyn**. |
 | **[04. Diegetic UI & Environmental Storytelling](04-Diegetic-UI-and-Environmental-Storytelling.md)** | In-World Media, Found Footage & Micro-Stories | Deep dive into smartphone feeds, radio transcripts, terminal hacking, and environmental storytelling in the Ascott Residency. |
 | **[05. Selected Writing Samples](05-Selected-Writing-Samples.md)** | Curated Script & Prose Excerpts | Clean, formatted script samples showcasing diegetic UI writing, environmental tragedy, multi-crisis triage, and morality-gated standoffs. |
+| **[06. Gameplay Mechanics: Hobbies, Perks & Status Roadmap](06-Gameplay-Mechanics-Hobbies-Perks-Roadmap.md)** | Mechanical Systems, Progression & Hooks | Full audit of 16 Hobbies, 20 Weaknesses, and 10 Perks categorized into Active, Passive Stat, and Pending, plus a 4-phase Unity implementation roadmap. |
 
 ---
 

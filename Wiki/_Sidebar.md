@@ -35,6 +35,12 @@
   * *Sample 3: The Lobby Triage*
   * *Sample 4: Oakhaven Standoff*
   * *Sample 5: Dawn vs. Night Reactivity*
+* **[06. Gameplay Mechanics: Hobbies, Perks & Status Roadmap](06-Gameplay-Mechanics-Hobbies-Perks-Roadmap.md)**
+  * *Status Dashboard (Active, Passive, Pending)*
+  * *Positive Hobbies (16 Total — $4 \times 2$ Grid)*
+  * *Destructive Weaknesses (20 Total — $5 \times 2$ Grid)*
+  * *Core Character Perks (10 Total)*
+  * *4-Phase Implementation Milestones*
 
 ---
 *Designed & Written by **Elang Esa (Neal Sage) Yudhistira***
