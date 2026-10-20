@@ -411,6 +411,21 @@ namespace SundayLastBreath.Data
                     c.AddTrait("VOLUNTEER", "Heal morale faster.");
                     c.AddItem("First Aid Kit", 1);
                 }
+            },
+            new HobbyData
+            {
+                id = "radio",
+                title = "RADIO OPERATOR",
+                description = "You monitor airwaves and emergency channels. High tactical awareness.",
+                statsPreview = "+TECH / +TACTICS",
+                applyEffect = (c, step) =>
+                {
+                    if (step == 1) { c.intl += 1; c.tech += 1; c.resolve += 1; }
+                    else { c.tech += 1; }
+                    c.AddTrait("RADIO OPERATOR", "Intercept CDC emergency channels and survivor distress calls.");
+                    c.AddItem("Walkie-Talkie", 1);
+                    c.AddItem("Battery", 2);
+                }
             }
         };
 

@@ -389,10 +389,11 @@ namespace SundayLastBreath.UI
                 case "watchman": return 30;
                 case "parkour": return 31;
 
-                // Tab 1: Row 1 = 3 TECH & MIND + 1 MEDICAL
+                // Tab 1: Row 1 = 4 TECH & MIND
                 case "mechanic": return 40;
-                case "gamer": return 41;
-                case "bookworm": return 42;
+                case "radio": return 41;
+                case "gamer": return 42;
+                case "bookworm": return 43;
                 // Tab 1: Row 2 = MEDICAL + SURVIVAL + DIPLOMACY
                 case "volunteer": return 50;
                 case "gardener": return 51;
@@ -437,6 +438,7 @@ namespace SundayLastBreath.UI
                     return "COMBAT";
 
                 case "mechanic":
+                case "radio":
                 case "gamer":
                 case "bookworm":
                     accent = new Color(0.16f, 0.71f, 0.96f, 1f); // Technical Cyan #29B6F6
