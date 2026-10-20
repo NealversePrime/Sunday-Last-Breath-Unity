@@ -12,7 +12,7 @@ namespace SundayLastBreath.UI
     /// Master UI controller managing the entire multi-step Character Creation flow:
     /// Unified Federal Bio-Emergency Citizen Intake Console -> Job Selection -> (Student Training/Major/Minor) -> Primary Hobby -> Secondary Hobby -> Weakness -> Final Dossier
     /// </summary>
-    public class CharacterCreationScreen : ScreenBase
+    public partial class CharacterCreationScreen : ScreenBase
     {
         [Header("Audio")]
         [SerializeField] private AudioClip creationMusicClip;
@@ -392,6 +392,7 @@ namespace SundayLastBreath.UI
             currentlyHoveredStat = null;
             activeWeaknessTab = 0;
             dossierLayoutEnforced = false;
+            ResetBargainState();
         }
 
         /// <summary>
@@ -453,6 +454,7 @@ namespace SundayLastBreath.UI
                 character.agi = job.agi;
                 character.cha = job.cha;
                 character.per = job.per;
+                character.lck = job.lck;
 
                 character.hpMax += job.hpBonus;
                 character.hp = character.hpMax;
@@ -523,6 +525,9 @@ namespace SundayLastBreath.UI
                 }
                 hobby?.applyEffect?.Invoke(character, stepNum);
             }
+
+            // Apply Step 4: Survival Bargain Allocations & Drawbacks
+            ApplyBargainToCharacter();
         }
 
         private void HideAllPanels()
@@ -535,6 +540,7 @@ namespace SundayLastBreath.UI
             if (studentMajorPanel != null) studentMajorPanel.SetActive(false);
             if (studentMinorPanel != null) studentMinorPanel.SetActive(false);
             if (hobbySelectionPanel != null) hobbySelectionPanel.SetActive(false);
+            if (bargainPanel != null) bargainPanel.SetActive(false);
             if (summaryDossierPanel != null) summaryDossierPanel.SetActive(false);
             dossierLayoutEnforced = false;
         }
@@ -1475,7 +1481,7 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // Ensure S.P.A.I.C. Biometric Legend Pill Bar right below the subtitle so players immediately know the 5 attributes!
+            // Ensure M.O.R.T.A.L. Biometric Legend Pill Bar right below the subtitle so players immediately know the 6 attributes!
             Transform legendTr = jobSelectionPanel.transform.Find("SPAICLegendBar");
             if (legendTr == null)
             {
@@ -1485,7 +1491,7 @@ namespace SundayLastBreath.UI
                 lRect.anchorMin = new Vector2(0.5f, 1f);
                 lRect.anchorMax = new Vector2(0.5f, 1f);
                 lRect.pivot = new Vector2(0.5f, 1f);
-                lRect.sizeDelta = new Vector2(1020f, 30f);
+                lRect.sizeDelta = new Vector2(1040f, 30f);
                 lRect.anchoredPosition = new Vector2(0f, -104f);
 
                 Image lBg = legendObj.AddComponent<Image>();
@@ -1497,12 +1503,13 @@ namespace SundayLastBreath.UI
                 lOl.effectDistance = new Vector2(1f, -1f);
 
                 CreateUIText(legendObj.transform, "LegendText",
-                    "<b><color=#F5BF42>■ S.P.A.I.C. APTITUDE INDEX:</color></b>    " +
-                    "<color=#EF5350><b>[STR]</b></color> Strength   ·   " +
-                    "<color=#FFA726><b>[PER]</b></color> Perception   ·   " +
-                    "<color=#66BB6A><b>[AGI]</b></color> Agility   ·   " +
-                    "<color=#42A5F5><b>[INT]</b></color> Intelligence   ·   " +
-                    "<color=#AB47BC><b>[CHA]</b></color> Charisma",
+                    "<b><color=#F5BF42>■ M.O.R.T.A.L. RATING:</color></b>    " +
+                    "<color=#EF5350><b>[M]</b></color> Might   ·   " +
+                    "<color=#FFA726><b>[O]</b></color> Observation   ·   " +
+                    "<color=#66BB6A><b>[R]</b></color> Reflex   ·   " +
+                    "<color=#42A5F5><b>[T]</b></color> Tactics   ·   " +
+                    "<color=#FFD54F><b>[A]</b></color> Auspice   ·   " +
+                    "<color=#AB47BC><b>[L]</b></color> Leadership",
                     11.5f, TextAlignmentOptions.Center, new Color(0.84f, 0.90f, 0.96f), FontRole.Mono,
                     Vector2.zero, Vector2.one, new Vector2(10f, 0f), new Vector2(-10f, 0f));
             }
@@ -2105,25 +2112,25 @@ namespace SundayLastBreath.UI
             string primaryTitle = pickedHobbyIds.Count >= 1 ? GetHobbyTitleById(pickedHobbyIds[0]) : "NONE";
             string secondaryTitle = pickedHobbyIds.Count >= 2 ? GetHobbyTitleById(pickedHobbyIds[1]) : "NONE";
 
-            string spaicLine = $"<color=#90A4AE>S.P.A.I.C.:</color> <color=#EF5350>STR:{character.str}</color> <color=#FFA726>PER:{character.per}</color> <color=#66BB6A>AGI:{character.agi}</color> <color=#42A5F5>INT:{character.intl}</color> <color=#AB47BC>CHA:{character.cha}</color>";
+            string mortalLine = $"<color=#90A4AE>M.O.R.T.A.L.:</color> <color=#EF5350>M:{character.str}</color> <color=#FFA726>O:{character.per}</color> <color=#66BB6A>R:{character.agi}</color> <color=#42A5F5>T:{character.intl}</color> <color=#FFD54F>A:{character.lck}</color> <color=#AB47BC>L:{character.cha}</color>";
 
             if (hobbyStep == 1)
             {
                 hobbyLoadoutStatusText.text =
-                    $"<color=#FFA726><b>STEP 01/03</b></color>  |  VOCATION: <color=#FFFFFF><b>{character.job.ToUpperInvariant()}</b></color>\n" +
-                    spaicLine;
+                    $"<color=#FFA726><b>STEP 01/02: PRIMARY HOBBY</b></color>  |  VOCATION: <color=#FFFFFF><b>{character.job.ToUpperInvariant()}</b></color>\n" +
+                    mortalLine;
             }
             else if (hobbyStep == 2)
             {
                 hobbyLoadoutStatusText.text =
-                    $"<color=#2ECC71><b>■ PRIMARY: {primaryTitle}</b></color>  |  <color=#FFA726><b>STEP 02/03</b></color>\n" +
-                    spaicLine;
+                    $"<color=#2ECC71><b>■ PRIMARY: {primaryTitle}</b></color>  |  <color=#FFA726><b>STEP 02/02: SECONDARY HOBBY</b></color>\n" +
+                    mortalLine;
             }
             else
             {
                 hobbyLoadoutStatusText.text =
-                    $"<color=#2ECC71><b>■ {primaryTitle} + {secondaryTitle}</b></color>  |  <color=#EF5350><b>STEP 03/03</b></color>\n" +
-                    spaicLine;
+                    $"<color=#2ECC71><b>■ {primaryTitle} + {secondaryTitle}</b></color>  |  <color=#EF5350><b>HOBBIES COMPLETED</b></color>\n" +
+                    mortalLine;
             }
         }
 
@@ -2317,13 +2324,12 @@ namespace SundayLastBreath.UI
             }
             else if (hobbyStep == 2)
             {
-                hobbyStep = 3;
-                activeWeaknessTab = 0;
-                ShowHobbySelectionPanel();
+                // Completed Primary & Secondary Hobby -> Transition to Step 4: The Survival Bargain (Drawbacks & M.O.R.T.A.L. Points)
+                ShowBargainPanel();
             }
             else
             {
-                ShowSummaryDossierPanel();
+                ShowBargainPanel();
             }
         }
         #endregion
@@ -2399,14 +2405,15 @@ namespace SundayLastBreath.UI
 
             if (summaryAttributesText != null)
             {
-                summaryAttributesText.fontSize = 14.5f;
-                summaryAttributesText.lineSpacing = 3f;
+                summaryAttributesText.fontSize = 13.5f;
+                summaryAttributesText.lineSpacing = 2.5f;
                 summaryAttributesText.text = 
-                    $"<color=#EF5350><b>STR</b></color> <color=#90A4AE>(Strength):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.str:00}</b></color></mspace>  {FormatStatPips(character.str, 10)}\n" +
-                    $"<color=#FFA726><b>PER</b></color> <color=#90A4AE>(Perception):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.per:00}</b></color></mspace>  {FormatStatPips(character.per, 10)}\n" +
-                    $"<color=#66BB6A><b>AGI</b></color> <color=#90A4AE>(Agility):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.agi:00}</b></color></mspace>  {FormatStatPips(character.agi, 10)}\n" +
-                    $"<color=#42A5F5><b>INT</b></color> <color=#90A4AE>(Intelligence):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.intl:00}</b></color></mspace>  {FormatStatPips(character.intl, 10)}\n" +
-                    $"<color=#AB47BC><b>CHA</b></color> <color=#90A4AE>(Charisma):</color> <pos=36%><mspace=0.6em><color=#FFFFFF><b>{character.cha:00}</b></color></mspace>  {FormatStatPips(character.cha, 10)}";
+                    $"<color=#EF5350><b>[M] MIGHT</b></color> <color=#90A4AE>(STR):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.str:00}</b></color></mspace>  {FormatStatPips(character.str, 10)}\n" +
+                    $"<color=#FFA726><b>[O] OBSERVATION</b></color> <color=#90A4AE>(PER):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.per:00}</b></color></mspace>  {FormatStatPips(character.per, 10)}\n" +
+                    $"<color=#66BB6A><b>[R] REFLEX</b></color> <color=#90A4AE>(AGI):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.agi:00}</b></color></mspace>  {FormatStatPips(character.agi, 10)}\n" +
+                    $"<color=#42A5F5><b>[T] TACTICS</b></color> <color=#90A4AE>(INT):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.intl:00}</b></color></mspace>  {FormatStatPips(character.intl, 10)}\n" +
+                    $"<color=#FFD54F><b>[A] AUSPICE</b></color> <color=#90A4AE>(LCK):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.lck:00}</b></color></mspace>  {FormatStatPips(character.lck, 10)}\n" +
+                    $"<color=#AB47BC><b>[L] LEADERSHIP</b></color> <color=#90A4AE>(CHA):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.cha:00}</b></color></mspace>  {FormatStatPips(character.cha, 10)}";
             }
 
             if (summarySkillsText != null)

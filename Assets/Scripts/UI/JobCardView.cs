@@ -361,12 +361,12 @@ namespace SundayLastBreath.UI
                 attrTmp.fontSize = 10f;
                 if (job.id.Equals("student", StringComparison.OrdinalIgnoreCase))
                 {
-                    attrTmp.text = "<color=#FFA726>S.P.A.I.C. BASE 2  |  +5 FREE AP</color>";
+                    attrTmp.text = "<color=#FFA726>M.O.R.T.A.L. BASE 2 | +5 AP</color>";
                 }
                 else
                 {
-                    // S.P.A.I.C. order with clear 3-letter tags: STR, PER, AGI, INT, CHA
-                    attrTmp.text = $"<color=#EF5350>STR:{job.str}</color> <color=#FFA726>PER:{job.per}</color> <color=#66BB6A>AGI:{job.agi}</color> <color=#42A5F5>INT:{job.intl}</color> <color=#AB47BC>CHA:{job.cha}</color>";
+                    // M.O.R.T.A.L. Order: Might, Observation, Reflex, Tactics, Auspice, Leadership
+                    attrTmp.text = $"<color=#EF5350>M:{job.str}</color> <color=#FFA726>O:{job.per}</color> <color=#66BB6A>R:{job.agi}</color> <color=#42A5F5>T:{job.intl}</color> <color=#FFD54F>A:{job.lck}</color> <color=#AB47BC>L:{job.cha}</color>";
                 }
                 SundayTypography.ApplyFont(attrTmp, FontRole.Mono);
             }

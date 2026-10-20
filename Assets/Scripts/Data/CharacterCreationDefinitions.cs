@@ -12,7 +12,7 @@ namespace SundayLastBreath.Data
         public string description;
         public string quote;
         public Color accentColor;
-        public int str, intl, agi, cha, per;
+        public int str, intl, agi, cha, per, lck;
         public int hpBonus, staminaBonus, humanityBonus;
         public int shooting, melee, stealth, tech, medicine, scavenging, survival, resolve;
         [NonSerialized] public (string name, string desc)[] perks;
@@ -76,7 +76,7 @@ namespace SundayLastBreath.Data
                 description = "You served on the force. Trained to handle firearms under extreme stress.",
                 quote = "\"Protect and Serve\" is just a memory. Now, it's \"Aim and Fire.\"",
                 accentColor = new Color(0.36f, 0.55f, 0.71f), // #5D8DB5
-                str = 5, intl = 4, agi = 6, cha = 3, per = 7,
+                str = 5, intl = 4, agi = 6, cha = 3, per = 7, lck = 4,
                 shooting = 3, melee = 2, resolve = 1,
                 perks = new[]
                 {
@@ -96,7 +96,7 @@ namespace SundayLastBreath.Data
                 description = "You built this city, and you know how to break it. You are physically powerful.",
                 quote = "Subtlety is not your strong suit. Force is.",
                 accentColor = new Color(0.62f, 0.11f, 0.11f), // #9E1B1B
-                str = 8, intl = 3, agi = 4, cha = 4, per = 3,
+                str = 8, intl = 3, agi = 4, cha = 4, per = 3, lck = 4,
                 hpBonus = 40,
                 melee = 3, tech = 2, survival = 2,
                 perks = new[]
@@ -117,7 +117,7 @@ namespace SundayLastBreath.Data
                 description = "You move silently and leave before anyone knows you were there.",
                 quote = "Why fight when you can just take what you want?",
                 accentColor = new Color(0.18f, 0.80f, 0.44f), // #2ECC71
-                str = 3, intl = 5, agi = 8, cha = 2, per = 6,
+                str = 3, intl = 5, agi = 8, cha = 2, per = 6, lck = 6,
                 staminaBonus = 40,
                 stealth = 3, scavenging = 2, survival = 1,
                 perks = new[]
@@ -139,7 +139,7 @@ namespace SundayLastBreath.Data
                 description = "You know exactly how the human body works—and how to take it apart.",
                 quote = "Knowledge is the only resource that doesn't run out.",
                 accentColor = new Color(0.20f, 0.60f, 0.86f), // #3498DB
-                str = 2, intl = 8, agi = 4, cha = 5, per = 5,
+                str = 2, intl = 8, agi = 4, cha = 5, per = 5, lck = 3,
                 humanityBonus = 20,
                 medicine = 3, tech = 2, resolve = 1,
                 perks = new[]
@@ -161,7 +161,7 @@ namespace SundayLastBreath.Data
                 description = "A natural leader. You can talk your way out of a gunfight and barter for life.",
                 quote = "Humans are the real threat. You know how to handle them.",
                 accentColor = new Color(0.61f, 0.35f, 0.71f), // #9B59B6
-                str = 3, intl = 5, agi = 3, cha = 9, per = 4,
+                str = 3, intl = 5, agi = 3, cha = 9, per = 4, lck = 5,
                 humanityBonus = 30,
                 scavenging = 2, medicine = 1, resolve = 3,
                 perks = new[]
@@ -182,7 +182,7 @@ namespace SundayLastBreath.Data
                 description = "A blank slate with infinite potential. You adapt faster than anyone else.",
                 quote = "You define your own survival.",
                 accentColor = Color.white,
-                str = 2, intl = 2, agi = 2, cha = 2, per = 2,
+                str = 2, intl = 2, agi = 2, cha = 2, per = 2, lck = 5,
                 perks = new[]
                 {
                     ("FAST LEARNER", "Gain XP 2x faster."),

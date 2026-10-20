@@ -36,7 +36,13 @@ namespace SundayLastBreath.Data
 
     /// <summary>
     /// Master data model for the survivor player character.
-    /// Matches StoryInit.twee variables 1:1.
+    /// Standardized to the M.O.R.T.A.L. attribute system:
+    /// [M] Might (str)
+    /// [O] Observation (per)
+    /// [R] Reflex (agi)
+    /// [T] Tactics (intl)
+    /// [A] Auspice (lck)
+    /// [L] Leadership (cha)
     /// </summary>
     [Serializable]
     public class CharacterData
@@ -59,12 +65,21 @@ namespace SundayLastBreath.Data
         public int thirst = 100;
         public int humanity = 50;
 
-        [Header("Attributes (1 - 10)")]
-        public int str = 3;
-        public int intl = 3;
-        public int agi = 3;
-        public int cha = 3;
-        public int per = 3;
+        [Header("M.O.R.T.A.L. Attributes (1 - 10)")]
+        public int str = 3;   // Might
+        public int per = 3;   // Observation
+        public int agi = 3;   // Reflex
+        public int intl = 3;  // Tactics
+        public int lck = 3;   // Auspice (Luck)
+        public int cha = 3;   // Leadership
+
+        // M.O.R.T.A.L. Property Mappings
+        public int Might       { get => str;  set => str = value; }
+        public int Observation { get => per;  set => per = value; }
+        public int Reflex      { get => agi;  set => agi = value; }
+        public int Tactics     { get => intl; set => intl = value; }
+        public int Auspice     { get => lck;  set => lck = value; }
+        public int Leadership  { get => cha;  set => cha = value; }
 
         [Header("Skills (0 - 5)")]
         public int shooting = 0;
@@ -76,9 +91,10 @@ namespace SundayLastBreath.Data
         public int survival = 0;
         public int resolve = 0;
 
-        [Header("Perks & Inventory")]
+        [Header("Perks, Drawbacks & Inventory")]
         public int bagLimit = 12;
         public List<TraitEntry> traits = new List<TraitEntry>();
+        public List<string> selectedDrawbacks = new List<string>();
         public List<InventoryEntry> inventory = new List<InventoryEntry>();
 
         public void AddTrait(string name, string desc, Sprite icon = null, bool isWeakness = false)
@@ -108,4 +124,3 @@ namespace SundayLastBreath.Data
         }
     }
 }
-

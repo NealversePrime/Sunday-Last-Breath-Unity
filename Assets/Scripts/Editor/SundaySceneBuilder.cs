@@ -612,6 +612,7 @@ namespace SundayLastBreath.Editor
 
             so.ApplyModifiedProperties();
             screen.EnsureIdentityConsoleBuilt();
+            screen.EnsureBargainPanelBuilt();
 
             obj.SetActive(false);
             return screen;
