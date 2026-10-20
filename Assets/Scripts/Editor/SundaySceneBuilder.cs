@@ -26,7 +26,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v10_auto.flag";
+                string flagPath = "Temp/scene_v11_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -143,15 +143,16 @@ namespace SundayLastBreath.Editor
 
             PrologueWakeUpScreen screen = obj.AddComponent<PrologueWakeUpScreen>();
 
-            // Fullscreen Dark Ambience Backdrop
+            // Fullscreen Dark Ambience Backdrop (Cosmetic, no raycasts)
             GameObject bgObj = new GameObject("DarkBackdrop");
             bgObj.transform.SetParent(obj.transform, false);
             RectTransform bgRect = bgObj.AddComponent<RectTransform>();
             StretchFull(bgRect);
             Image bgImg = bgObj.AddComponent<Image>();
             bgImg.color = new Color(0.04f, 0.05f, 0.07f, 1f);
+            bgImg.raycastTarget = false;
 
-            // Stage: TV Screen & Living Room Frame (Centered Top-Half)
+            // Stage: TV Screen & Living Room Frame (Centered Top-Half, no raycasts)
             GameObject stageObj = new GameObject("StageContainer");
             stageObj.transform.SetParent(obj.transform, false);
             RectTransform stageRect = stageObj.AddComponent<RectTransform>();
@@ -161,9 +162,9 @@ namespace SundayLastBreath.Editor
             stageRect.sizeDelta = new Vector2(860f, 440f);
             stageRect.anchoredPosition = new Vector2(0f, 130f);
 
-            // Outer Frame Box
             Image stageBg = stageObj.AddComponent<Image>();
             stageBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
+            stageBg.raycastTarget = false;
             Outline stageOl = stageObj.AddComponent<Outline>();
             stageOl.effectColor = new Color(0.20f, 0.28f, 0.38f, 0.8f);
             stageOl.effectDistance = new Vector2(1.5f, -1.5f);
@@ -179,6 +180,7 @@ namespace SundayLastBreath.Editor
             tvhRect.anchoredPosition = Vector2.zero;
             Image tvhBg = tvHeader.AddComponent<Image>();
             tvhBg.color = new Color(0.05f, 0.07f, 0.10f, 0.98f);
+            tvhBg.raycastTarget = false;
 
             GameObject tvhTitle = new GameObject("Title");
             tvhTitle.transform.SetParent(tvHeader.transform, false);
@@ -192,6 +194,7 @@ namespace SundayLastBreath.Editor
             tvhTmp.alignment = TextAlignmentOptions.MidlineLeft;
             tvhTmp.text = "<b>■ SURVEILLANCE FEED // APARTMENT 404 LIVING ROOM</b>";
             tvhTmp.color = new Color(0.60f, 0.72f, 0.85f);
+            tvhTmp.raycastTarget = false;
 
             GameObject tvhStatus = new GameObject("Status");
             tvhStatus.transform.SetParent(tvHeader.transform, false);
@@ -205,6 +208,7 @@ namespace SundayLastBreath.Editor
             tvhsTmp.alignment = TextAlignmentOptions.MidlineRight;
             tvhsTmp.text = "<color=#66BB6A>ONLINE</color>  |  CH: 04  |  23:45:00";
             tvhsTmp.color = new Color(0.80f, 0.88f, 0.95f);
+            tvhsTmp.raycastTarget = false;
 
             // TV Viewport Frame (Inset inside Stage)
             GameObject vpObj = new GameObject("Viewport");
@@ -222,6 +226,7 @@ namespace SundayLastBreath.Editor
             StretchFull(roomRect);
             Image roomImg = roomObj.AddComponent<Image>();
             roomImg.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+            roomImg.raycastTarget = false;
             FrameAnimationPlayer roomAnim = roomObj.AddComponent<FrameAnimationPlayer>();
             List<Sprite> roomFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomFrames");
             if (roomFrames.Count > 0)
@@ -242,6 +247,7 @@ namespace SundayLastBreath.Editor
             StretchFull(staticRect);
             Image staticImg = staticObj.AddComponent<Image>();
             staticImg.color = new Color(1f, 1f, 1f, 0.95f);
+            staticImg.raycastTarget = false;
             FrameAnimationPlayer staticAnim = staticObj.AddComponent<FrameAnimationPlayer>();
             List<Sprite> staticFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/StaticFrames");
             if (staticFrames.Count > 0)
@@ -263,26 +269,12 @@ namespace SundayLastBreath.Editor
             StretchFull(crtRect);
             Image crtImg = crtObj.AddComponent<Image>();
             crtImg.color = new Color(0f, 0f, 0f, 0.25f);
+            crtImg.raycastTarget = false;
             Outline crtOl = crtObj.AddComponent<Outline>();
             crtOl.effectColor = new Color(0.12f, 0.16f, 0.22f, 0.9f);
             crtOl.effectDistance = new Vector2(2f, -2f);
 
-            // Layer 4: TV Glitch Warning Text
-            GameObject glitchObj = new GameObject("TVGlitchText");
-            glitchObj.transform.SetParent(vpObj.transform, false);
-            RectTransform glitchRect = glitchObj.AddComponent<RectTransform>();
-            StretchFull(glitchRect);
-            TextMeshProUGUI glitchTmp = glitchObj.AddComponent<TextMeshProUGUI>();
-            glitchTmp.fontSize = 24f;
-            glitchTmp.alignment = TextAlignmentOptions.Center;
-            glitchTmp.fontStyle = FontStyles.Bold;
-            glitchTmp.text = "SSSHHHHHKKKKK...\n<size=70%><color=#EF5350>[ EMERGENCY BROADCAST INTERRUPT ]</color></size>";
-            glitchTmp.color = new Color(1f, 0.95f, 0.95f, 0.9f);
-            glitchObj.SetActive(false);
-
-            // ==========================================
             // Narration Box (Bottom Half)
-            // ==========================================
             GameObject narrObj = new GameObject("NarrationBox");
             narrObj.transform.SetParent(obj.transform, false);
             RectTransform narrRect = narrObj.AddComponent<RectTransform>();
@@ -294,14 +286,11 @@ namespace SundayLastBreath.Editor
 
             Image narrBg = narrObj.AddComponent<Image>();
             narrBg.color = new Color(0.06f, 0.08f, 0.11f, 0.96f);
+            narrBg.raycastTarget = false;
 
             Outline narrOl = narrObj.AddComponent<Outline>();
             narrOl.effectColor = new Color(0.24f, 0.32f, 0.42f, 0.8f);
             narrOl.effectDistance = new Vector2(1.5f, -1.5f);
-
-            Button narrBtn = narrObj.AddComponent<Button>();
-            narrBtn.targetGraphic = narrBg;
-            narrBtn.onClick.AddListener(screen.OnDialogueAreaClicked);
 
             // Left Highlight Strip
             GameObject nStrip = new GameObject("LeftHighlightStrip");
@@ -313,6 +302,7 @@ namespace SundayLastBreath.Editor
             nsRect.anchoredPosition = new Vector2(2.5f, 0f);
             Image nsImg = nStrip.AddComponent<Image>();
             nsImg.color = new Color(0.95f, 0.65f, 0.15f, 0.9f);
+            nsImg.raycastTarget = false;
 
             // Header Strip on Narration Box
             GameObject nhObj = new GameObject("HeaderBar");
@@ -325,6 +315,7 @@ namespace SundayLastBreath.Editor
             nhRect.anchoredPosition = Vector2.zero;
             Image nhBg = nhObj.AddComponent<Image>();
             nhBg.color = new Color(0.09f, 0.12f, 0.16f, 0.95f);
+            nhBg.raycastTarget = false;
 
             // Speaker Label
             GameObject spkObj = new GameObject("SpeakerLabel");
@@ -340,6 +331,7 @@ namespace SundayLastBreath.Editor
             spkTmp.fontStyle = FontStyles.Bold;
             spkTmp.text = "SYSTEM // SATURDAY NIGHT 23:45";
             spkTmp.color = new Color(0.95f, 0.65f, 0.15f, 1f);
+            spkTmp.raycastTarget = false;
 
             // Body Narrative Text
             GameObject bodyObj = new GameObject("NarrativeBody");
@@ -355,6 +347,7 @@ namespace SundayLastBreath.Editor
             bodyTmp.alignment = TextAlignmentOptions.TopLeft;
             bodyTmp.color = new Color(0.90f, 0.94f, 0.98f);
             bodyTmp.text = "";
+            bodyTmp.raycastTarget = false;
 
             // Continue Prompt Indicator (Bottom Right)
             GameObject promptObj = new GameObject("ContinuePrompt");
@@ -369,23 +362,40 @@ namespace SundayLastBreath.Editor
             prTmp.fontSize = 12f;
             prTmp.fontStyle = FontStyles.Bold;
             prTmp.alignment = TextAlignmentOptions.MidlineRight;
-            prTmp.text = "<color=#FFA726>CLICK TO ADVANCE</color> <color=#FFFFFF>▶</color>";
+            prTmp.text = "<color=#FFA726>CLICK ANYWHERE TO ADVANCE</color> <color=#FFFFFF>▶</color>";
             prTmp.color = new Color(0.95f, 0.65f, 0.15f, 0.9f);
+            prTmp.raycastTarget = false;
             promptObj.SetActive(false);
 
-            // Action Button: FOCUS ON YOUR REFLECTION...
+            // ==========================================
+            // FULLSCREEN INVISIBLE CLICK CATCHER BUTTON
+            // Covers entire screen: allows clicking ANYWHERE without obstruction!
+            // ==========================================
+            GameObject clickCatcher = new GameObject("FullScreenClickCatcher");
+            clickCatcher.transform.SetParent(obj.transform, false);
+            RectTransform ccRect = clickCatcher.AddComponent<RectTransform>();
+            StretchFull(ccRect);
+            Image ccImg = clickCatcher.AddComponent<Image>();
+            ccImg.color = Color.clear;
+            ccImg.raycastTarget = true;
+            Button ccBtn = clickCatcher.AddComponent<Button>();
+            ccBtn.targetGraphic = ccImg;
+            ccBtn.onClick.AddListener(screen.OnDialogueAreaClicked);
+
+            // Action Button: FOCUS ON YOUR REFLECTION... (Above click catcher)
             GameObject btnObj = new GameObject("Btn_FocusReflection");
-            btnObj.transform.SetParent(narrObj.transform, false);
+            btnObj.transform.SetParent(obj.transform, false);
             RectTransform btnRect = btnObj.AddComponent<RectTransform>();
             btnRect.anchorMin = new Vector2(0.5f, 0f);
             btnRect.anchorMax = new Vector2(0.5f, 0f);
             btnRect.pivot = new Vector2(0.5f, 0f);
-            btnRect.sizeDelta = new Vector2(440f, 48f);
-            btnRect.anchoredPosition = new Vector2(0f, 18f);
+            btnRect.sizeDelta = new Vector2(440f, 52f);
+            btnRect.anchoredPosition = new Vector2(0f, 54f);
 
             CanvasGroup btnCg = btnObj.AddComponent<CanvasGroup>();
             Image btnBg = btnObj.AddComponent<Image>();
-            btnBg.color = new Color(0.85f, 0.35f, 0.08f, 0.95f);
+            btnBg.color = new Color(0.85f, 0.35f, 0.08f, 0.98f);
+            btnBg.raycastTarget = true;
             Outline btnOl = btnObj.AddComponent<Outline>();
             btnOl.effectColor = new Color(1f, 0.70f, 0.25f, 0.95f);
             btnOl.effectDistance = new Vector2(1.5f, -1.5f);
@@ -397,11 +407,12 @@ namespace SundayLastBreath.Editor
             RectTransform btRect = btnTextObj.AddComponent<RectTransform>();
             StretchFull(btRect);
             TextMeshProUGUI btTmp = btnTextObj.AddComponent<TextMeshProUGUI>();
-            btTmp.fontSize = 15f;
+            btTmp.fontSize = 15.5f;
             btTmp.fontStyle = FontStyles.Bold;
             btTmp.alignment = TextAlignmentOptions.Center;
             btTmp.text = "<b>FOCUS ON YOUR REFLECTION... >></b>";
             btTmp.color = Color.white;
+            btTmp.raycastTarget = false;
             btnObj.SetActive(false);
 
             // Audio Clips
@@ -415,7 +426,6 @@ namespace SundayLastBreath.Editor
             so.FindProperty("tvStaticImage").objectReferenceValue = staticImg;
             so.FindProperty("livingRoomAnimPlayer").objectReferenceValue = roomAnim;
             so.FindProperty("tvStaticAnimPlayer").objectReferenceValue = staticAnim;
-            so.FindProperty("tvGlitchText").objectReferenceValue = glitchTmp;
             so.FindProperty("speakerLabel").objectReferenceValue = spkTmp;
             so.FindProperty("narrativeBodyText").objectReferenceValue = bodyTmp;
             so.FindProperty("continuePrompt").objectReferenceValue = promptObj;

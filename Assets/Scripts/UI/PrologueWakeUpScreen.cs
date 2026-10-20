@@ -18,14 +18,13 @@ namespace SundayLastBreath.UI
     /// TV broadcast cut to static -> frantic sirens -> distant cut-off scream ->
     /// stumble to balcony window -> "FOCUS ON YOUR REFLECTION..." -> Character Creation.
     /// Supports animated frame loops for both the living room and the TV static noise.
-    /// Universal input compatibility using new Input System + IPointerClickHandler.
+    /// Universal input compatibility using new Input System + IPointerClickHandler + Fullscreen click catcher.
     /// </summary>
     public class PrologueWakeUpScreen : ScreenBase, IPointerClickHandler
     {
         [Header("Stage Visuals")]
         [SerializeField] private Image roomBackdropImage;
         [SerializeField] private Image tvStaticImage;
-        [SerializeField] private TextMeshProUGUI tvGlitchText;
         [SerializeField] private CanvasGroup tvFrameGroup;
 
         [Header("Animation Players")]
@@ -171,7 +170,6 @@ namespace SundayLastBreath.UI
                 tvStaticImage.color = c;
             }
 
-            if (tvGlitchText != null) tvGlitchText.gameObject.SetActive(false);
             if (focusReflectionButton != null) focusReflectionButton.gameObject.SetActive(false);
             if (continuePrompt != null) continuePrompt.SetActive(false);
 
@@ -251,7 +249,6 @@ namespace SundayLastBreath.UI
                     // Quiet peaceful night
                     if (speakerLabel != null) speakerLabel.text = "SYSTEM // SATURDAY NIGHT 23:45";
                     if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
-                    if (tvGlitchText != null) tvGlitchText.gameObject.SetActive(false);
                     break;
 
                 case 2:
@@ -273,12 +270,6 @@ namespace SundayLastBreath.UI
                     if (tvStaticAnimPlayer != null)
                     {
                         tvStaticAnimPlayer.Play();
-                    }
-
-                    if (tvGlitchText != null)
-                    {
-                        tvGlitchText.gameObject.SetActive(true);
-                        tvGlitchText.text = "SSSHHHHHKKKKK...\n<size=70%><color=#EF5350>[ EMERGENCY BROADCAST INTERRUPT ]</color></size>";
                     }
 
                     if (roomBackdropImage != null)
@@ -428,3 +419,4 @@ namespace SundayLastBreath.UI
         }
     }
 }
+
