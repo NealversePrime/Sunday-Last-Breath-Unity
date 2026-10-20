@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -26,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v11_auto.flag";
+                string flagPath = "Temp/scene_v12_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -380,7 +381,7 @@ namespace SundayLastBreath.Editor
             ccImg.raycastTarget = true;
             Button ccBtn = clickCatcher.AddComponent<Button>();
             ccBtn.targetGraphic = ccImg;
-            ccBtn.onClick.AddListener(screen.OnDialogueAreaClicked);
+            UnityEventTools.AddPersistentListener(ccBtn.onClick, screen.OnDialogueAreaClicked);
 
             // Action Button: FOCUS ON YOUR REFLECTION... (Above click catcher)
             GameObject btnObj = new GameObject("Btn_FocusReflection");
@@ -401,6 +402,7 @@ namespace SundayLastBreath.Editor
             btnOl.effectDistance = new Vector2(1.5f, -1.5f);
             Button focusBtn = btnObj.AddComponent<Button>();
             focusBtn.targetGraphic = btnBg;
+            UnityEventTools.AddPersistentListener(focusBtn.onClick, screen.OnFocusReflectionClicked);
 
             GameObject btnTextObj = new GameObject("Text");
             btnTextObj.transform.SetParent(btnObj.transform, false);
@@ -430,6 +432,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("narrativeBodyText").objectReferenceValue = bodyTmp;
             so.FindProperty("continuePrompt").objectReferenceValue = promptObj;
             so.FindProperty("focusReflectionButton").objectReferenceValue = focusBtn;
+            so.FindProperty("fullScreenClickCatcher").objectReferenceValue = ccBtn;
             so.FindProperty("staticClip").objectReferenceValue = staticClip;
             so.FindProperty("sirensClip").objectReferenceValue = sirensClip;
             so.FindProperty("screamClip").objectReferenceValue = screamClip;

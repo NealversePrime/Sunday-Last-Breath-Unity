@@ -36,6 +36,7 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI narrativeBodyText;
         [SerializeField] private GameObject continuePrompt;
         [SerializeField] private Button focusReflectionButton;
+        [SerializeField] private Button fullScreenClickCatcher;
 
         [Header("Audio Sources")]
         [SerializeField] private AudioSource staticSource;
@@ -82,6 +83,12 @@ namespace SundayLastBreath.UI
             base.Awake();
 
             InitializeAudioSources();
+
+            if (fullScreenClickCatcher != null)
+            {
+                fullScreenClickCatcher.onClick.RemoveAllListeners();
+                fullScreenClickCatcher.onClick.AddListener(OnDialogueAreaClicked);
+            }
 
             if (focusReflectionButton != null)
             {
@@ -183,15 +190,40 @@ namespace SundayLastBreath.UI
         {
             if (!CanvasGroup.interactable || currentStep <= 0 || currentStep > NarrativeSteps.Length) return;
 
+            // If action button is active, let player click the action button specifically,
+            // or trigger it with Space / Enter
+            if (focusReflectionButton != null && focusReflectionButton.gameObject.activeSelf)
+            {
 #if ENABLE_INPUT_SYSTEM
-            if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || 
-                                             Keyboard.current.enterKey.wasPressedThisFrame || 
-                                             Keyboard.current.numpadEnterKey.wasPressedThisFrame))
+                if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || 
+                                                 Keyboard.current.enterKey.wasPressedThisFrame || 
+                                                 Keyboard.current.numpadEnterKey.wasPressedThisFrame))
+                {
+                    OnFocusReflectionClicked();
+                }
+#elif ENABLE_LEGACY_INPUT_MANAGER
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                {
+                    OnFocusReflectionClicked();
+                }
+#endif
+                return;
+            }
+
+#if ENABLE_INPUT_SYSTEM
+            bool mouseClicked = (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) ||
+                                (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame);
+            bool keyPressed = Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || 
+                                                          Keyboard.current.enterKey.wasPressedThisFrame || 
+                                                          Keyboard.current.numpadEnterKey.wasPressedThisFrame);
+            if (mouseClicked || keyPressed)
             {
                 OnDialogueAreaClicked();
             }
 #elif ENABLE_LEGACY_INPUT_MANAGER
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            bool mouseClicked = Input.GetMouseButtonDown(0);
+            bool keyPressed = Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
+            if (mouseClicked || keyPressed)
             {
                 OnDialogueAreaClicked();
             }
@@ -360,7 +392,7 @@ namespace SundayLastBreath.UI
             }
         }
 
-        private void OnFocusReflectionClicked()
+        public void OnFocusReflectionClicked()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
 
