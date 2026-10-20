@@ -3,7 +3,11 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using SundayLastBreath.Core;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace SundayLastBreath.UI
 {
@@ -13,14 +17,20 @@ namespace SundayLastBreath.UI
     /// Follows the authentic Twine narrative arc: Saturday night talk show -> 
     /// TV broadcast cut to static -> frantic sirens -> distant cut-off scream ->
     /// stumble to balcony window -> "FOCUS ON YOUR REFLECTION..." -> Character Creation.
+    /// Supports animated frame loops for both the living room and the TV static noise.
+    /// Universal input compatibility using new Input System + IPointerClickHandler.
     /// </summary>
-    public class PrologueWakeUpScreen : ScreenBase
+    public class PrologueWakeUpScreen : ScreenBase, IPointerClickHandler
     {
         [Header("Stage Visuals")]
         [SerializeField] private Image roomBackdropImage;
         [SerializeField] private Image tvStaticImage;
         [SerializeField] private TextMeshProUGUI tvGlitchText;
         [SerializeField] private CanvasGroup tvFrameGroup;
+
+        [Header("Animation Players")]
+        [SerializeField] private FrameAnimationPlayer livingRoomAnimPlayer;
+        [SerializeField] private FrameAnimationPlayer tvStaticAnimPlayer;
 
         [Header("Narration Box")]
         [SerializeField] private TextMeshProUGUI speakerLabel;
@@ -46,7 +56,6 @@ namespace SundayLastBreath.UI
         private bool isTyping = false;
         private string currentFullText = "";
         private Coroutine typeRoutine;
-        private Coroutine staticFlickerRoutine;
 
         private static readonly string[] NarrativeSteps = new string[]
         {
@@ -126,8 +135,10 @@ namespace SundayLastBreath.UI
         {
             base.OnScreenClosed();
             StopAllAudio();
-            if (staticFlickerRoutine != null) StopCoroutine(staticFlickerRoutine);
             if (typeRoutine != null) StopCoroutine(typeRoutine);
+
+            if (livingRoomAnimPlayer != null) livingRoomAnimPlayer.Stop();
+            if (tvStaticAnimPlayer != null) tvStaticAnimPlayer.Stop();
         }
 
         public void StartPrologueSequence()
@@ -135,22 +146,32 @@ namespace SundayLastBreath.UI
             currentStep = 0;
             isTyping = false;
 
-            // Reset visual stage
+            // Start living room animation (NO SIGNAL glitching screen)
+            if (livingRoomAnimPlayer != null)
+            {
+                livingRoomAnimPlayer.Play();
+            }
+
+            if (roomBackdropImage != null)
+            {
+                roomBackdropImage.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+            }
+
+            // TV static starts inactive
+            if (tvStaticAnimPlayer != null)
+            {
+                tvStaticAnimPlayer.Stop();
+            }
+
             if (tvStaticImage != null)
             {
+                tvStaticImage.gameObject.SetActive(false);
                 Color c = tvStaticImage.color;
-                c.a = 0.05f;
+                c.a = 0f;
                 tvStaticImage.color = c;
             }
 
             if (tvGlitchText != null) tvGlitchText.gameObject.SetActive(false);
-            if (roomBackdropImage != null)
-            {
-                Color rc = roomBackdropImage.color;
-                rc.a = 0.35f;
-                roomBackdropImage.color = rc;
-            }
-
             if (focusReflectionButton != null) focusReflectionButton.gameObject.SetActive(false);
             if (continuePrompt != null) continuePrompt.SetActive(false);
 
@@ -162,13 +183,28 @@ namespace SundayLastBreath.UI
 
         private void Update()
         {
-            // Allow advancing via Space, Return, or Screen Click
-            if (CanvasGroup.interactable && currentStep > 0 && currentStep <= NarrativeSteps.Length)
+            if (!CanvasGroup.interactable || currentStep <= 0 || currentStep > NarrativeSteps.Length) return;
+
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || 
+                                             Keyboard.current.enterKey.wasPressedThisFrame || 
+                                             Keyboard.current.numpadEnterKey.wasPressedThisFrame))
             {
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
-                {
-                    OnDialogueAreaClicked();
-                }
+                OnDialogueAreaClicked();
+            }
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            {
+                OnDialogueAreaClicked();
+            }
+#endif
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (CanvasGroup.interactable)
+            {
+                OnDialogueAreaClicked();
             }
         }
 
@@ -214,7 +250,7 @@ namespace SundayLastBreath.UI
                 case 1:
                     // Quiet peaceful night
                     if (speakerLabel != null) speakerLabel.text = "SYSTEM // SATURDAY NIGHT 23:45";
-                    if (tvStaticImage != null) tvStaticImage.color = new Color(1f, 1f, 1f, 0.05f);
+                    if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
                     if (tvGlitchText != null) tvGlitchText.gameObject.SetActive(false);
                     break;
 
@@ -228,7 +264,17 @@ namespace SundayLastBreath.UI
                         staticSource.Play();
                     }
 
-                    if (tvStaticImage != null) tvStaticImage.color = new Color(1f, 1f, 1f, 0.95f);
+                    if (tvStaticImage != null)
+                    {
+                        tvStaticImage.gameObject.SetActive(true);
+                        tvStaticImage.color = new Color(1f, 1f, 1f, 0.95f);
+                    }
+
+                    if (tvStaticAnimPlayer != null)
+                    {
+                        tvStaticAnimPlayer.Play();
+                    }
+
                     if (tvGlitchText != null)
                     {
                         tvGlitchText.gameObject.SetActive(true);
@@ -237,11 +283,8 @@ namespace SundayLastBreath.UI
 
                     if (roomBackdropImage != null)
                     {
-                        roomBackdropImage.color = new Color(0.9f, 0.2f, 0.2f, 0.75f);
+                        roomBackdropImage.color = new Color(1f, 0.4f, 0.4f, 0.85f);
                     }
-
-                    if (staticFlickerRoutine != null) StopCoroutine(staticFlickerRoutine);
-                    staticFlickerRoutine = StartCoroutine(AnimateStaticNoise());
                     break;
 
                 case 3:
@@ -330,6 +373,10 @@ namespace SundayLastBreath.UI
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
 
+            // Stop animations
+            if (livingRoomAnimPlayer != null) livingRoomAnimPlayer.Stop();
+            if (tvStaticAnimPlayer != null) tvStaticAnimPlayer.Stop();
+
             // Fade out audio over 1.5 seconds
             if (staticSource != null && staticSource.isPlaying) StartCoroutine(FadeAudioSource(staticSource, staticSource.volume, 0f, 1.5f));
             if (sirensSource != null && sirensSource.isPlaying) StartCoroutine(FadeAudioSource(sirensSource, sirensSource.volume, 0f, 1.5f));
@@ -342,21 +389,6 @@ namespace SundayLastBreath.UI
                     GameManager.Instance.TransitionFromPrologueToCharacterCreation();
                 }
             });
-        }
-
-        private IEnumerator AnimateStaticNoise()
-        {
-            while (true)
-            {
-                if (tvStaticImage != null)
-                {
-                    float alpha = UnityEngine.Random.Range(0.65f, 0.98f);
-                    Color c = tvStaticImage.color;
-                    c.a = alpha;
-                    tvStaticImage.color = c;
-                }
-                yield return new WaitForSecondsRealtime(UnityEngine.Random.Range(0.04f, 0.09f));
-            }
         }
 
         private IEnumerator FadeAudioSource(AudioSource src, float from, float to, float duration)
@@ -396,4 +428,3 @@ namespace SundayLastBreath.UI
         }
     }
 }
-

@@ -26,7 +26,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v9_auto.flag";
+                string flagPath = "Temp/scene_v10_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -215,25 +215,46 @@ namespace SundayLastBreath.Editor
             vpRect.offsetMin = new Vector2(12f, 12f);
             vpRect.offsetMax = new Vector2(-12f, -36f);
 
-            // Layer 1: Living Room Background
+            // Layer 1: Living Room Background (Animated GIF frames)
             GameObject roomObj = new GameObject("RoomBackdrop");
             roomObj.transform.SetParent(vpObj.transform, false);
             RectTransform roomRect = roomObj.AddComponent<RectTransform>();
             StretchFull(roomRect);
             Image roomImg = roomObj.AddComponent<Image>();
-            Sprite roomSprite = LoadSpriteSafe("Assets/Sprites/Prologue/bg_living_room_red.png");
-            if (roomSprite != null) roomImg.sprite = roomSprite;
-            roomImg.color = new Color(0.85f, 0.35f, 0.35f, 0.35f);
+            roomImg.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+            FrameAnimationPlayer roomAnim = roomObj.AddComponent<FrameAnimationPlayer>();
+            List<Sprite> roomFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomFrames");
+            if (roomFrames.Count > 0)
+            {
+                AssignFramesToPlayer(roomAnim, roomFrames, 12f, true);
+                roomImg.sprite = roomFrames[0];
+            }
+            else
+            {
+                Sprite roomSprite = LoadSpriteSafe("Assets/Sprites/Prologue/bg_living_room_red.png");
+                if (roomSprite != null) roomImg.sprite = roomSprite;
+            }
 
-            // Layer 2: TV Static
+            // Layer 2: TV Static (Animated GIF frames)
             GameObject staticObj = new GameObject("TVStatic");
             staticObj.transform.SetParent(vpObj.transform, false);
             RectTransform staticRect = staticObj.AddComponent<RectTransform>();
             StretchFull(staticRect);
             Image staticImg = staticObj.AddComponent<Image>();
-            Sprite staticSprite = LoadSpriteSafe("Assets/Sprites/Prologue/tv_static.png");
-            if (staticSprite != null) staticImg.sprite = staticSprite;
-            staticImg.color = new Color(1f, 1f, 1f, 0.05f);
+            staticImg.color = new Color(1f, 1f, 1f, 0.95f);
+            FrameAnimationPlayer staticAnim = staticObj.AddComponent<FrameAnimationPlayer>();
+            List<Sprite> staticFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/StaticFrames");
+            if (staticFrames.Count > 0)
+            {
+                AssignFramesToPlayer(staticAnim, staticFrames, 24f, true);
+                staticImg.sprite = staticFrames[0];
+            }
+            else
+            {
+                Sprite staticSprite = LoadSpriteSafe("Assets/Sprites/Prologue/tv_static.png");
+                if (staticSprite != null) staticImg.sprite = staticSprite;
+            }
+            staticObj.SetActive(false);
 
             // Layer 3: CRT Scanlines / Vignette Overlay
             GameObject crtObj = new GameObject("CRTScanlineOverlay");
@@ -392,6 +413,8 @@ namespace SundayLastBreath.Editor
             SerializedObject so = new SerializedObject(screen);
             so.FindProperty("roomBackdropImage").objectReferenceValue = roomImg;
             so.FindProperty("tvStaticImage").objectReferenceValue = staticImg;
+            so.FindProperty("livingRoomAnimPlayer").objectReferenceValue = roomAnim;
+            so.FindProperty("tvStaticAnimPlayer").objectReferenceValue = staticAnim;
             so.FindProperty("tvGlitchText").objectReferenceValue = glitchTmp;
             so.FindProperty("speakerLabel").objectReferenceValue = spkTmp;
             so.FindProperty("narrativeBodyText").objectReferenceValue = bodyTmp;
