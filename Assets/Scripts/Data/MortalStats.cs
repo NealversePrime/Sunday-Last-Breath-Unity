@@ -78,115 +78,228 @@ namespace SundayLastBreath.Data
 
         public static readonly DrawbackData[] AllDrawbacks = new DrawbackData[]
         {
+            // === PHYSICAL FLAWS (1-10) ===
+            new DrawbackData(
+                "smoker",
+                "SMOKER",
+                DrawbackCategory.Physical,
+                "Lungs of tar and chronic chemical reliance. Under crisis, cravings severely disrupt focus.",
+                "-20 Max Stamina. Suffers aim tremors and slower reactions when craving nicotine.",
+                icon: "trait_smoker",
+                bonus: 2,
+                items: new[] { ("Cigarettes", 1), ("Lighter", 1) },
+                apply: c => { c.staminaMax -= 20; c.stamina = c.staminaMax; }
+            ),
+            new DrawbackData(
+                "alcoholic",
+                "ALCOHOLIC",
+                DrawbackCategory.Physical,
+                "Dulled reflexes and tremors without ethanol. Shakes impair fine motor coordination.",
+                "-1 Tactics (INT). Suffers shooting inaccuracy and weapon handling penalties during withdrawal.",
+                icon: "trait_alcoholic",
+                bonus: 2,
+                items: new[] { ("Whiskey", 1) },
+                apply: c => { c.Tactics = Mathf.Max(1, c.Tactics - 1); }
+            ),
             new DrawbackData(
                 "asthmatic",
                 "ASTHMATIC",
                 DrawbackCategory.Physical,
-                "Chronic bronchial constriction under stress. High exertion rapidly drains your reserves.",
-                "-15 Max Stamina. Sprinting drains stamina 25% faster.",
+                "Chronic bronchial constriction under stress. High physical exertion rapidly drains your reserves.",
+                "-20 Max Stamina. Sprinting drains stamina 50% faster without an Inhaler.",
                 icon: "trait_asthmatic",
                 bonus: 2,
                 items: new[] { ("Inhaler", 1) },
-                apply: c => { c.staminaMax -= 15; c.stamina = c.staminaMax; }
+                apply: c => { c.staminaMax -= 20; c.stamina = c.staminaMax; }
             ),
             new DrawbackData(
-                "poor_vision",
+                "blind",
                 "POOR VISION",
                 DrawbackCategory.Physical,
-                "Severe uncorrected myopia. Without proper illumination, shapes blur into the dark.",
-                "-1 Observation. Night exploration vision radius reduced by 30%.",
+                "Severe uncorrected myopia. Without proper illumination or corrective lenses, shapes blur.",
+                "-2 Observation (PER). Night exploration and ranged accuracy severely penalized.",
                 icon: "trait_blind",
                 bonus: 2,
-                items: new[] { ("Eyeglasses", 1) },
-                apply: c => { c.Observation = Mathf.Max(1, c.Observation - 1); }
+                items: new[] { ("Glasses", 1) },
+                apply: c => { c.Observation = Mathf.Max(1, c.Observation - 2); }
             ),
             new DrawbackData(
-                "hemophilia",
-                "HEMOPHILIA",
+                "badknee",
+                "BAD KNEE",
                 DrawbackCategory.Physical,
-                "Impaired blood coagulation. Wounds remain open and dangerous far longer.",
-                "Bleeding wounds deal 2x damage over time and require double bandaging.",
+                "Chronic joint degradation from prior injury. Sudden sprints and heavy carrying induce sharp pain.",
+                "-1 Reflex (AGI). Cannot perform rapid flee maneuvers during tactical combat.",
+                icon: "trait_badknee",
+                bonus: 2,
+                items: new[] { ("Cane", 1) },
+                apply: c => { c.Reflex = Mathf.Max(1, c.Reflex - 1); }
+            ),
+            new DrawbackData(
+                "glutton",
+                "GLUTTON",
+                DrawbackCategory.Physical,
+                "High metabolic appetite. Starvation debuffs set in twice as fast during survival marches.",
+                "-1 Reflex (AGI). Consumes double food rations; suffers stat penalties when hungry.",
+                icon: "trait_glutton",
+                bonus: 2,
+                items: new[] { ("Bag of Chips", 2) },
+                apply: c => { c.Reflex = Mathf.Max(1, c.Reflex - 1); }
+            ),
+            new DrawbackData(
+                "fragile",
+                "FRAGILE",
+                DrawbackCategory.Physical,
+                "Impaired tissue and bone density. Wounds tear easily and trauma risks severe fractures.",
+                "-20 Max HP. Bleeding wounds deal double damage over time and require multiple bandages.",
                 icon: "trait_fragile",
                 bonus: 2,
                 items: new[] { ("Bandage", 3) },
-                apply: c => { /* Handled in medical/status system */ }
+                apply: c => { c.hpMax -= 20; c.hp = c.hpMax; }
             ),
             new DrawbackData(
-                "feeble",
-                "FEEBLE",
+                "insomniac",
+                "INSOMNIAC",
                 DrawbackCategory.Physical,
-                "Underdeveloped muscular density. Forcing doors and swinging heavy tools is agonizing.",
-                "-2 Might. Melee blunt damage reduced by 25%.",
+                "Chronic sleep deprivation. You remain hyper-vigilant, but your body never fully repairs.",
+                "-10 Max HP. Shelter rest yields 50% less stamina recovery.",
+                icon: "trait_insomniac",
+                bonus: 2,
+                items: new[] { ("Sleeping Pills", 1) },
+                apply: c => { c.hpMax -= 10; c.hp = c.hpMax; }
+            ),
+            new DrawbackData(
+                "clumsy",
+                "CLUMSY",
+                DrawbackCategory.Physical,
+                "Heavy, uncoordinated footing. Sneaking through debris often triggers acoustic alerts.",
+                "-1 Reflex (AGI). Stealth movement produces 2x louder acoustic noise.",
                 icon: "trait_clumsy",
                 bonus: 2,
-                items: null,
+                items: new[] { ("Hard Hat", 1) },
+                apply: c => { c.Reflex = Mathf.Max(1, c.Reflex - 1); }
+            ),
+            new DrawbackData(
+                "germophobe",
+                "GERMOPHOBE",
+                DrawbackCategory.Physical,
+                "Obsessive aversion to bodily filth and viral bio-rot. Handling infected gore induces nausea.",
+                "-15 Humanity. Scavenging infected corpses causes morale collapse and nausea debuffs.",
+                icon: "trait_germophobe",
+                bonus: 2,
+                items: new[] { ("Hand Sanitizer", 1) },
+                apply: c => { c.humanity = Mathf.Max(0, c.humanity - 15); }
+            ),
+
+            // === MENTAL & BEHAVIORAL FLAWS (11-20) ===
+            new DrawbackData(
+                "coward",
+                "COWARD",
+                DrawbackCategory.Mental,
+                "Freezes under lethal pressure. Adrenaline floods your system, causing involuntary muscle shakes.",
+                "-2 Might (STR). QTE crisis indicators move 25% faster during high-tension encounters.",
+                icon: "trait_coward",
+                bonus: 2,
+                items: new[] { ("Pepper Spray", 1) },
                 apply: c => { c.Might = Mathf.Max(1, c.Might - 2); }
             ),
             new DrawbackData(
-                "brittle_bones",
-                "BRITTLE BONES",
-                DrawbackCategory.Physical,
-                "Low bone mineral density. Impacts and falls pose severe fracture risks.",
-                "Blunt trauma and falling damage increased by 35%. Limbs fracture easily.",
-                icon: "trait_badknee",
+                "pyro",
+                "PYROMANIAC",
+                DrawbackCategory.Behavioral,
+                "Morbid obsession with open fire. Recklessly risks burning vital resources and shelter.",
+                "-15 Humanity. Refuses to enter unlit corridors without flares or active incendiaries.",
+                icon: "trait_pyro",
                 bonus: 2,
-                items: new[] { ("Painkillers", 1), ("Splint", 1) },
-                apply: c => { /* Handled in trauma system */ }
+                items: new[] { ("Lighter", 1), ("Jerry Can", 1) },
+                apply: c => { c.humanity = Mathf.Max(0, c.humanity - 15); }
             ),
             new DrawbackData(
-                "heavy_sleeper",
-                "HEAVY SLEEPER",
-                DrawbackCategory.Mental,
-                "Once asleep, you do not easily rouse. Unmonitored camp rests become deadly gambles.",
-                "Rest recovery takes 50% longer. Increased ambush probability during shelter rest.",
-                icon: "trait_insomniac",
+                "lonewolf",
+                "LONE WOLF",
+                DrawbackCategory.Behavioral,
+                "Abrasive, standoffish loner. Disdains team coordination and group shelter.",
+                "-2 Leadership (CHA). Camp rest morale drops when traveling in groups.",
+                icon: "trait_lonewolf",
                 bonus: 2,
-                items: new[] { ("Energy Drink", 2) },
-                apply: c => { /* Handled in shelter rest system */ }
+                items: new[] { ("Combat Knife", 1) },
+                apply: c => { c.Leadership = Mathf.Max(1, c.Leadership - 2); }
             ),
             new DrawbackData(
-                "nervous_tremor",
-                "NERVOUS TREMOR",
+                "luddite",
+                "LUDDITE",
                 DrawbackCategory.Mental,
-                "Adrenaline floods your system too intensely, causing involuntary muscle shakes under fire.",
-                "QTE minigame indicator moves 25% faster in high-tension crisis encounters.",
-                icon: "trait_coward",
+                "Deep distrust of electronic computers, sensors, and automated terminal locks.",
+                "-2 Tactics (INT). Cannot operate electronic terminals, keypads, or GPS trackers.",
+                icon: "trait_luddite",
                 bonus: 2,
-                items: new[] { ("Beta Blockers", 1) },
-                apply: c => { /* Handled in QTE system */ }
+                items: new[] { ("Old Map", 1) },
+                apply: c => { c.Tactics = Mathf.Max(1, c.Tactics - 2); }
             ),
             new DrawbackData(
-                "paranoid_insomnia",
-                "PARANOID INSOMNIA",
+                "pacifist",
+                "PACIFIST",
                 DrawbackCategory.Mental,
-                "You perceive betrayal in every whisper. You refuse to let your guard down near others.",
-                "Cannot rest in the same room as companions. -1 Leadership in group dialogue.",
+                "Moral revulsion toward lethal violence against humans. Sparing lives is an obsession.",
+                "Lethal combat choices incur massive -25 Humanity loss and severe guilt penalties.",
+                icon: "trait_pacifist",
+                bonus: 2,
+                items: null,
+                apply: c => { /* Handled in morality system */ }
+            ),
+            new DrawbackData(
+                "gambler",
+                "GAMBLER",
+                DrawbackCategory.Behavioral,
+                "Impulsive risk-taker who wagers safety on blind chance and superstitious impulse.",
+                "-2 Auspice (LCK). 10% chance of critical hit, but 10% chance of weapon jamming.",
+                icon: "trait_gambler",
+                bonus: 2,
+                items: new[] { ("Deck of Cards", 1) },
+                apply: c => { c.Auspice = Mathf.Max(1, c.Auspice - 2); }
+            ),
+            new DrawbackData(
+                "sheltered",
+                "SHELTERED",
+                DrawbackCategory.Behavioral,
+                "Naive and unaccustomed to urban peril. Easily misled by predatory survivors.",
+                "-1 Observation (PER). Blind to booby traps and hostile deceit in dialogue.",
+                icon: "trait_sheltered",
+                bonus: 2,
+                items: new[] { ("Luxury Watch", 1) },
+                apply: c => { c.Observation = Mathf.Max(1, c.Observation - 1); }
+            ),
+            new DrawbackData(
+                "shopaholic",
+                "SHOPAHOLIC",
+                DrawbackCategory.Behavioral,
+                "Hoards useless consumer luxury items. Refuses to discard trinkets in survival emergencies.",
+                "-2 Inventory Backpack Slots. Cannot drop prized luxury collectibles.",
+                icon: "trait_shopaholic",
+                bonus: 2,
+                items: new[] { ("Designer Bag", 1) },
+                apply: c => { c.bagLimit = Mathf.Max(4, c.bagLimit - 2); }
+            ),
+            new DrawbackData(
+                "arrogant",
+                "ARROGANT",
+                DrawbackCategory.Behavioral,
+                "Condescending know-it-all. Disregards companion advice and alienates potential allies.",
+                "-2 Leadership (CHA). Companion trust increases 50% slower; dialogue irritates allies.",
+                icon: "trait_arrogant",
+                bonus: 2,
+                items: new[] { ("Encyclopedia", 1) },
+                apply: c => { c.Leadership = Mathf.Max(1, c.Leadership - 2); }
+            ),
+            new DrawbackData(
+                "paranoid",
+                "PARANOID",
+                DrawbackCategory.Mental,
+                "Pathological suspicion. Sees conspiracy and betrayal in every shadow.",
+                "-1 Leadership (CHA). Refuses to sleep in the same room as companions.",
                 icon: "trait_paranoid",
                 bonus: 2,
                 items: new[] { ("Flashlight", 1) },
                 apply: c => { c.Leadership = Mathf.Max(1, c.Leadership - 1); }
-            ),
-            new DrawbackData(
-                "nicotine_addict",
-                "NICOTINE DEPENDENT",
-                DrawbackCategory.Behavioral,
-                "A persistent chemical addiction. In prolonged withdrawal, your focus unravels.",
-                "-1 Tactics & -1 Reflex when craving. Relieved by smoking cigarettes.",
-                icon: "trait_smoker",
-                bonus: 2,
-                items: new[] { ("Cigarettes", 1), ("Lighter", 1) },
-                apply: c => { /* Handled in status addiction system */ }
-            ),
-            new DrawbackData(
-                "jinxed",
-                "JINXED",
-                DrawbackCategory.Behavioral,
-                "Trouble seems to find you where others slip by unnoticed.",
-                "-2 Auspice (Luck). Weapon jamming chance slightly elevated.",
-                icon: "trait_gambler",
-                bonus: 2,
-                items: new[] { ("Lucky Coin", 1) },
-                apply: c => { c.Auspice = Mathf.Max(1, c.Auspice - 2); }
             )
         };
     }

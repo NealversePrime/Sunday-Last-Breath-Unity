@@ -2197,7 +2197,7 @@ namespace SundayLastBreath.UI
 
             if (hobbyStep < 3)
             {
-                // Positive Hobbies: Tab 0 = COMBAT, FIELD & STEALTH (8), Tab 1 = MIND, TECH & SUPPORT (7)
+                // Positive Hobbies: Tab 0 = COMBAT, FIELD & STEALTH (8), Tab 1 = MIND, TECH & SUPPORT (8)
                 Color activeTab0Bg = new Color(0.72f, 0.32f, 0.06f, 0.95f);
                 Color activeTab1Bg = new Color(0.10f, 0.36f, 0.62f, 0.95f);
                 Color inactiveBg = new Color(0.08f, 0.09f, 0.12f, 0.88f);
@@ -2214,8 +2214,8 @@ namespace SundayLastBreath.UI
                 if (mentalTabText != null)
                 {
                     mentalTabText.text = !isTab0
-                        ? "<b><color=#FFFFFF>● MIND, TECH & SUPPORT (7)</color></b>"
-                        : "<b><color=#8899AA>○ MIND, TECH & SUPPORT (7)</color></b>";
+                        ? "<b><color=#FFFFFF>● MIND, TECH & SUPPORT (8)</color></b>"
+                        : "<b><color=#8899AA>○ MIND, TECH & SUPPORT (8)</color></b>";
                 }
 
                 if (physicalTabOutline != null)
