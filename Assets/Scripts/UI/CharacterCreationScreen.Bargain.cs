@@ -215,6 +215,9 @@ namespace SundayLastBreath.UI
             if (bargainPanel != null && bargainPanel.transform.Find("BargainBuiltMarker_V2") != null)
             {
                 BindBargainReferences();
+                // Panel was built in the editor and saved into the scene. Runtime (non-persistent)
+                // onClick listeners are NOT serialized, so they must be re-attached at runtime.
+                if (Application.isPlaying) WireBargainListeners();
                 return;
             }
 
@@ -691,6 +694,72 @@ namespace SundayLastBreath.UI
 
             _bargainProceedButtonText = CreateUIText(fwdObj.transform, "Label", "<b>PROCEED TO DOSSIER >></b>", 13f, TextAlignmentOptions.Center, Color.black, FontRole.Display,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        }
+
+        /// <summary>
+        /// Re-attaches all runtime onClick listeners of the Bargain panel (drawback cards, M.O.R.T.A.L. +/- buttons,
+        /// Back and Proceed buttons). Required because listeners added via AddListener in the editor-time build
+        /// are not saved into the scene file.
+        /// </summary>
+        private void WireBargainListeners()
+        {
+            if (bargainPanel == null) return;
+
+            // Drawback cards
+            Transform cardsRoot = bargainPanel.transform.Find("SplitContainer/Col_Drawbacks/DrawbackScroll/Viewport/Content");
+            if (cardsRoot != null)
+            {
+                for (int i = 0; i < cardsRoot.childCount; i++)
+                {
+                    Transform card = cardsRoot.GetChild(i);
+                    if (!card.name.StartsWith("Drawback_")) continue;
+                    Button btn = card.GetComponent<Button>();
+                    if (btn == null) continue;
+                    string capturedId = card.name.Substring("Drawback_".Length);
+                    btn.onClick.RemoveAllListeners();
+                    btn.onClick.AddListener(() => ToggleDrawback(capturedId));
+                }
+            }
+
+            // M.O.R.T.A.L. +/- rows
+            Transform rowsRoot = bargainPanel.transform.Find("SplitContainer/Col_Allocator/RowsContainer");
+            if (rowsRoot != null)
+            {
+                for (int i = 0; i < rowsRoot.childCount; i++)
+                {
+                    Transform row = rowsRoot.GetChild(i);
+                    if (!row.name.StartsWith("Row_")) continue;
+                    if (!Enum.TryParse(row.name.Substring("Row_".Length), out MortalStatType statType)) continue;
+
+                    Button minus = row.Find("Controls/Btn_Minus")?.GetComponent<Button>();
+                    Button plus = row.Find("Controls/Btn_Plus")?.GetComponent<Button>();
+                    if (minus != null)
+                    {
+                        minus.onClick.RemoveAllListeners();
+                        minus.onClick.AddListener(() => ModifyMortalStat(statType, -1));
+                    }
+                    if (plus != null)
+                    {
+                        plus.onClick.RemoveAllListeners();
+                        plus.onClick.AddListener(() => ModifyMortalStat(statType, 1));
+                    }
+                }
+            }
+
+            // Footer navigation
+            Button back = bargainPanel.transform.Find("Footer/Btn_BackToHobbies")?.GetComponent<Button>();
+            if (back != null)
+            {
+                back.onClick.RemoveAllListeners();
+                back.onClick.AddListener(OnBackFromBargainClicked);
+            }
+
+            Button proceed = bargainPanel.transform.Find("Footer/Btn_ProceedToDossier")?.GetComponent<Button>();
+            if (proceed != null)
+            {
+                proceed.onClick.RemoveAllListeners();
+                proceed.onClick.AddListener(OnProceedFromBargainClicked);
+            }
         }
 
         private void BindBargainReferences()
