@@ -1856,8 +1856,8 @@ namespace SundayLastBreath.Editor
 
             // --- COLUMN 2: ATTRIBUTES & PROFICIENCIES ---
             GameObject col2 = CreateDossierCard(colsObj.transform, "Col2_Aptitudes", 440);
-            CreateSectionHeader(col2.transform, "02 // S.P.A.I.C. ATTRIBUTES & PROFICIENCIES");
-            CreateSubLabel(col2.transform, "S.P.A.I.C. BIOLOGICAL APTITUDE INDEX:");
+            CreateSectionHeader(col2.transform, "02 // M.O.R.T.A.L. ATTRIBUTES & PROFICIENCIES");
+            CreateSubLabel(col2.transform, "M.O.R.T.A.L. BIOLOGICAL APTITUDE INDEX:");
             so.FindProperty("summaryAttributesText").objectReferenceValue = CreateDossierRow(col2.transform, 13.5f, FontStyles.Normal, Color.white);
             CreateDivider(col2.transform);
             CreateSubLabel(col2.transform, "SURVIVAL & WEAPON PROFICIENCIES:");
@@ -2855,6 +2855,7 @@ namespace SundayLastBreath.Editor
             tmp.fontStyle = style;
             tmp.color = color;
             tmp.alignment = TextAlignmentOptions.TopLeft;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
 
             ContentSizeFitter csf = obj.AddComponent<ContentSizeFitter>();
             csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;

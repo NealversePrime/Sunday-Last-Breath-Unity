@@ -703,7 +703,7 @@ namespace SundayLastBreath.UI
             if (genderPanel == null) return;
 
             Transform existingFrame = genderPanel.transform.Find("IdentityConsoleFrame");
-            if (existingFrame != null && existingFrame.Find("V2_SyncedMarker") != null)
+            if (existingFrame != null && existingFrame.Find("V3_AvatarMarker") != null)
             {
                 BindIdentityConsoleReferences(existingFrame);
                 return;
@@ -753,8 +753,8 @@ namespace SundayLastBreath.UI
             fRect.sizeDelta = new Vector2(1420f, 750f);
             fRect.anchoredPosition = new Vector2(0f, -36f);
 
-            GameObject v2Marker = new GameObject("V2_SyncedMarker");
-            v2Marker.transform.SetParent(frameObj.transform, false);
+            GameObject v3Marker = new GameObject("V3_AvatarMarker");
+            v3Marker.transform.SetParent(frameObj.transform, false);
 
             Image fBg = frameObj.AddComponent<Image>();
             fBg.color = new Color(0.05f, 0.07f, 0.10f, 0.98f);
@@ -876,39 +876,50 @@ namespace SundayLastBreath.UI
 
             CreateUIText(portraitBox.transform, "ReticleTop", "[ BIO-SCAN ]",
                 9.5f, TextAlignmentOptions.Center, new Color(0.35f, 0.75f, 0.95f, 0.85f), FontRole.Mono,
-                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -22f), new Vector2(0f, -4f));
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -20f), new Vector2(0f, -4f));
 
-            // Procedural Survivor Silhouette Image inside PortraitBox
+            // Survivor Glitch Avatar Graphic inside PortraitBox
             GameObject silObj = new GameObject("SilhouetteGraphic");
             silObj.transform.SetParent(portraitBox.transform, false);
             RectTransform silRect = silObj.AddComponent<RectTransform>();
             silRect.anchorMin = new Vector2(0.5f, 0.5f);
             silRect.anchorMax = new Vector2(0.5f, 0.5f);
             silRect.pivot = new Vector2(0.5f, 0.5f);
-            silRect.sizeDelta = new Vector2(96f, 102f);
-            silRect.anchoredPosition = new Vector2(0f, 2f);
+            silRect.sizeDelta = new Vector2(104f, 96f);
+            silRect.anchoredPosition = new Vector2(0f, 10f); // Placed with clear margin above [MALE] badge
             Image silImg = silObj.AddComponent<Image>();
             silImg.sprite = GetOrCreateSilhouetteSprite();
             silImg.preserveAspect = true;
-            silImg.color = new Color(0.45f, 0.82f, 0.98f, 0.90f);
+            silImg.color = Color.white;
             silImg.raycastTarget = false;
 
-            CreateUIText(portraitBox.transform, "EmblemSymbol", "<b>[SUBJ: M]</b>",
-                10f, TextAlignmentOptions.Center, new Color(1f, 0.88f, 0.50f, 0.95f), FontRole.Mono,
-                new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 30f), new Vector2(0f, 48f));
+            // Animate glitch avatar if frame sequence is available
+            List<Sprite> playerFrames = LoadPlayerFrames();
+            if (playerFrames != null && playerFrames.Count > 0)
+            {
+                FrameAnimationPlayer animPlayer = silObj.AddComponent<FrameAnimationPlayer>();
+                animPlayer.SetFrames(playerFrames, 12f, true);
+                animPlayer.Play();
+            }
 
+            // Subject / Gender badge placed cleanly below avatar photo
+            CreateUIText(portraitBox.transform, "EmblemSymbol", "<b>[MALE]</b>",
+                9.5f, TextAlignmentOptions.Center, new Color(1f, 0.88f, 0.50f, 0.95f), FontRole.Mono,
+                new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 26f), new Vector2(0f, 42f));
+
+            // Verification status pill at bottom
             GameObject scanPill = new GameObject("BioScanPill");
             scanPill.transform.SetParent(portraitBox.transform, false);
             RectTransform spRect = scanPill.AddComponent<RectTransform>();
             spRect.anchorMin = new Vector2(0f, 0f);
             spRect.anchorMax = new Vector2(1f, 0f);
             spRect.pivot = new Vector2(0.5f, 0f);
-            spRect.sizeDelta = new Vector2(-12f, 22f);
-            spRect.anchoredPosition = new Vector2(0f, 6f);
+            spRect.sizeDelta = new Vector2(-12f, 18f);
+            spRect.anchoredPosition = new Vector2(0f, 5f);
             scanPill.AddComponent<Image>().color = new Color(0.06f, 0.24f, 0.14f, 0.95f);
 
             CreateUIText(scanPill.transform, "ScanText", "<b>✓ TIER-1 CLEAR</b>",
-                9f, TextAlignmentOptions.Center, new Color(0.30f, 0.92f, 0.55f), FontRole.Mono,
+                8.5f, TextAlignmentOptions.Center, new Color(0.30f, 0.92f, 0.55f), FontRole.Mono,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             // Live Identity Data Fields (Right of Portrait)
@@ -1348,7 +1359,7 @@ namespace SundayLastBreath.UI
 
             if (idCardSilhouetteImg != null)
             {
-                idCardSilhouetteImg.color = profileTint;
+                idCardSilhouetteImg.color = Color.white;
             }
             if (idCardEmblemText != null)
             {
@@ -2403,34 +2414,53 @@ namespace SundayLastBreath.UI
                 }
             }
 
+            // Sync Col2 Aptitudes header and biological index to M.O.R.T.A.L.
+            Transform col2 = summaryDossierPanel.transform.Find("FederalDossierFrame/ColumnsContainer/Col2_Aptitudes");
+            if (col2 != null)
+            {
+                TextMeshProUGUI[] col2Texts = col2.GetComponentsInChildren<TextMeshProUGUI>(true);
+                foreach (var t in col2Texts)
+                {
+                    if (t != null && t.text != null)
+                    {
+                        if (t.text.Contains("S.P.A.I.C. ATTRIBUTES"))
+                            t.text = "02 // M.O.R.T.A.L. ATTRIBUTES & PROFICIENCIES";
+                        else if (t.text.Contains("S.P.A.I.C. BIOLOGICAL"))
+                            t.text = "M.O.R.T.A.L. BIOLOGICAL APTITUDE INDEX:";
+                    }
+                }
+            }
+
             if (summaryAttributesText != null)
             {
-                summaryAttributesText.fontSize = 13.5f;
+                summaryAttributesText.fontSize = 13f;
                 summaryAttributesText.lineSpacing = 2.5f;
                 summaryAttributesText.text = 
-                    $"<color=#EF5350><b>[M] MIGHT</b></color> <color=#90A4AE>(STR):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.str:00}</b></color></mspace>  {FormatStatPips(character.str, 10)}\n" +
-                    $"<color=#FFA726><b>[O] OBSERVATION</b></color> <color=#90A4AE>(PER):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.per:00}</b></color></mspace>  {FormatStatPips(character.per, 10)}\n" +
-                    $"<color=#66BB6A><b>[R] REFLEX</b></color> <color=#90A4AE>(AGI):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.agi:00}</b></color></mspace>  {FormatStatPips(character.agi, 10)}\n" +
-                    $"<color=#42A5F5><b>[T] TACTICS</b></color> <color=#90A4AE>(INT):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.intl:00}</b></color></mspace>  {FormatStatPips(character.intl, 10)}\n" +
-                    $"<color=#FFD54F><b>[A] AUSPICE</b></color> <color=#90A4AE>(LCK):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.lck:00}</b></color></mspace>  {FormatStatPips(character.lck, 10)}\n" +
-                    $"<color=#AB47BC><b>[L] LEADERSHIP</b></color> <color=#90A4AE>(CHA):</color> <pos=38%><mspace=0.6em><color=#FFFFFF><b>{character.cha:00}</b></color></mspace>  {FormatStatPips(character.cha, 10)}";
+                    $"<color=#EF5350><b>[M] MIGHT</b></color><pos=42%><color=#90A4AE>(STR)</color><pos=54%><mspace=0.6em><color=#FFFFFF><b>{character.str:00}</b></color></mspace><pos=64%>{FormatStatPips(character.str, 10)}\n" +
+                    $"<color=#FFA726><b>[O] OBSERVATION</b></color><pos=42%><color=#90A4AE>(PER)</color><pos=54%><mspace=0.6em><color=#FFFFFF><b>{character.per:00}</b></color></mspace><pos=64%>{FormatStatPips(character.per, 10)}\n" +
+                    $"<color=#66BB6A><b>[R] REFLEX</b></color><pos=42%><color=#90A4AE>(AGI)</color><pos=54%><mspace=0.6em><color=#FFFFFF><b>{character.agi:00}</b></color></mspace><pos=64%>{FormatStatPips(character.agi, 10)}\n" +
+                    $"<color=#42A5F5><b>[T] TACTICS</b></color><pos=42%><color=#90A4AE>(INT)</color><pos=54%><mspace=0.6em><color=#FFFFFF><b>{character.intl:00}</b></color></mspace><pos=64%>{FormatStatPips(character.intl, 10)}\n" +
+                    $"<color=#FFD54F><b>[A] AUSPICE</b></color><pos=42%><color=#90A4AE>(LCK)</color><pos=54%><mspace=0.6em><color=#FFFFFF><b>{character.lck:00}</b></color></mspace><pos=64%>{FormatStatPips(character.lck, 10)}\n" +
+                    $"<color=#AB47BC><b>[L] LEADERSHIP</b></color><pos=42%><color=#90A4AE>(CHA)</color><pos=54%><mspace=0.6em><color=#FFFFFF><b>{character.cha:00}</b></color></mspace><pos=64%>{FormatStatPips(character.cha, 10)}";
             }
 
             if (summarySkillsText != null)
             {
-                summarySkillsText.fontSize = 13.5f;
+                summarySkillsText.fontSize = 12.5f;
                 summarySkillsText.lineSpacing = 3f;
                 summarySkillsText.text = 
-                    $"<color=#90A4AE>SHOOTING:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.shooting:00}</b></color></mspace><pos=50%><color=#90A4AE>MELEE:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.melee:00}</b></color></mspace>\n" +
-                    $"<color=#90A4AE>STEALTH:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.stealth:00}</b></color></mspace><pos=50%><color=#90A4AE>TECH:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.tech:00}</b></color></mspace>\n" +
-                    $"<color=#90A4AE>MEDICINE:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.medicine:00}</b></color></mspace><pos=50%><color=#90A4AE>SCAVENGING:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.scavenging:00}</b></color></mspace>\n" +
-                    $"<color=#90A4AE>SURVIVAL:</color> <pos=24%><mspace=0.6em><color=#FFE082><b>{character.survival:00}</b></color></mspace><pos=50%><color=#90A4AE>RESOLVE:</color> <pos=76%><mspace=0.6em><color=#FFE082><b>{character.resolve:00}</b></color></mspace>";
+                    $"<color=#90A4AE>SHOOTING:</color> <pos=26%><mspace=0.6em><color=#FFE082><b>{character.shooting:00}</b></color></mspace><pos=52%><color=#90A4AE>MELEE:</color> <pos=78%><mspace=0.6em><color=#FFE082><b>{character.melee:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>STEALTH:</color> <pos=26%><mspace=0.6em><color=#FFE082><b>{character.stealth:00}</b></color></mspace><pos=52%><color=#90A4AE>TECH:</color> <pos=78%><mspace=0.6em><color=#FFE082><b>{character.tech:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>MEDICINE:</color> <pos=26%><mspace=0.6em><color=#FFE082><b>{character.medicine:00}</b></color></mspace><pos=52%><color=#90A4AE>SCAVENGING:</color> <pos=78%><mspace=0.6em><color=#FFE082><b>{character.scavenging:00}</b></color></mspace>\n" +
+                    $"<color=#90A4AE>SURVIVAL:</color> <pos=26%><mspace=0.6em><color=#FFE082><b>{character.survival:00}</b></color></mspace><pos=52%><color=#90A4AE>RESOLVE:</color> <pos=78%><mspace=0.6em><color=#FFE082><b>{character.resolve:00}</b></color></mspace>";
             }
 
             if (summaryTraitsText != null)
             {
-                summaryTraitsText.fontSize = 12.5f;
-                summaryTraitsText.lineSpacing = 3f;
+                summaryTraitsText.fontSize = 11.5f;
+                summaryTraitsText.lineSpacing = 2.5f;
+                summaryTraitsText.textWrappingMode = TextWrappingModes.Normal;
+                summaryTraitsText.overflowMode = TextOverflowModes.Overflow;
                 string traitsList = "";
                 foreach (var t in character.traits)
                 {
@@ -2569,6 +2599,18 @@ namespace SundayLastBreath.UI
                 Transform col2 = cols.Find("Col2_Aptitudes");
                 if (col2 != null)
                 {
+                    TextMeshProUGUI[] col2Texts = col2.GetComponentsInChildren<TextMeshProUGUI>(true);
+                    foreach (var t in col2Texts)
+                    {
+                        if (t != null && t.text != null)
+                        {
+                            if (t.text.Contains("S.P.A.I.C. ATTRIBUTES"))
+                                t.text = "02 // M.O.R.T.A.L. ATTRIBUTES & PROFICIENCIES";
+                            else if (t.text.Contains("S.P.A.I.C. BIOLOGICAL"))
+                                t.text = "M.O.R.T.A.L. BIOLOGICAL APTITUDE INDEX:";
+                        }
+                    }
+
                     Transform advBox = col2.Find("AdvisoryBox");
                     if (advBox != null)
                     {
@@ -2589,6 +2631,12 @@ namespace SundayLastBreath.UI
                 Transform col3 = cols.Find("Col3_Manifest");
                 if (col3 != null)
                 {
+                    if (summaryTraitsText != null)
+                    {
+                        summaryTraitsText.textWrappingMode = TextWrappingModes.Normal;
+                        summaryTraitsText.overflowMode = TextOverflowModes.Overflow;
+                    }
+
                     Transform edictBox = col3.Find("EdictBox");
                     if (edictBox != null)
                     {
@@ -2742,10 +2790,64 @@ namespace SundayLastBreath.UI
         #endregion
 
         #region UI Construction Helpers
+        private static List<Sprite> _cachedPlayerFrames;
+
+        public static List<Sprite> LoadPlayerFrames()
+        {
+            if (_cachedPlayerFrames != null && _cachedPlayerFrames.Count > 0) return _cachedPlayerFrames;
+
+            _cachedPlayerFrames = new List<Sprite>();
+            string framesFolder = "Assets/Sprites/Avatars/PlayerFrames";
+            if (System.IO.Directory.Exists(framesFolder))
+            {
+                string[] files = System.IO.Directory.GetFiles(framesFolder, "player_*.png");
+                System.Array.Sort(files);
+                foreach (var file in files)
+                {
+                    Sprite s = LoadSpriteSafe(file);
+                    if (s != null) _cachedPlayerFrames.Add(s);
+                }
+            }
+            return _cachedPlayerFrames;
+        }
+
+        public static Sprite LoadSpriteSafe(string path)
+        {
+#if UNITY_EDITOR
+            Sprite s = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (s != null) return s;
+#endif
+            if (!System.IO.File.Exists(path)) return null;
+            try
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(path);
+                Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                if (tex.LoadImage(bytes))
+                {
+                    tex.filterMode = FilterMode.Bilinear;
+                    return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[CharacterCreationScreen] Could not load sprite at {path}: {ex.Message}");
+            }
+            return null;
+        }
+
         private static Sprite GetOrCreateSilhouetteSprite()
         {
             if (_cachedSilhouetteSprite != null) return _cachedSilhouetteSprite;
 
+            // 1. Try loading primary avatar from Assets/Sprites/Avatars/player.png
+            Sprite loaded = LoadSpriteSafe("Assets/Sprites/Avatars/player.png");
+            if (loaded != null)
+            {
+                _cachedSilhouetteSprite = loaded;
+                return _cachedSilhouetteSprite;
+            }
+
+            // 2. Procedural fallback if asset not present
             int w = 64;
             int h = 72;
             Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);

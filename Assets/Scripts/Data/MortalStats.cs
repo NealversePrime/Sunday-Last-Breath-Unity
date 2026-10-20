@@ -29,6 +29,7 @@ namespace SundayLastBreath.Data
         public DrawbackCategory category;
         public string description;
         public string penaltySummary;
+        public string iconName;
         public int bonusPointsGranted = 2;
         [NonSerialized] public (string item, int qty)[] startingItems;
         public Action<CharacterData> onApply;
@@ -39,6 +40,7 @@ namespace SundayLastBreath.Data
             DrawbackCategory category, 
             string desc, 
             string penalty, 
+            string icon = null,
             int bonus = 2, 
             (string item, int qty)[] items = null,
             Action<CharacterData> apply = null)
@@ -48,6 +50,7 @@ namespace SundayLastBreath.Data
             this.category = category;
             this.description = desc;
             this.penaltySummary = penalty;
+            this.iconName = !string.IsNullOrEmpty(icon) ? icon : ("trait_" + id);
             this.bonusPointsGranted = bonus;
             this.startingItems = items;
             this.onApply = apply;
@@ -81,9 +84,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Physical,
                 "Chronic bronchial constriction under stress. High exertion rapidly drains your reserves.",
                 "-15 Max Stamina. Sprinting drains stamina 25% faster.",
-                2,
-                new[] { ("Inhaler", 1) },
-                c => { c.staminaMax -= 15; c.stamina = c.staminaMax; }
+                icon: "trait_asthmatic",
+                bonus: 2,
+                items: new[] { ("Inhaler", 1) },
+                apply: c => { c.staminaMax -= 15; c.stamina = c.staminaMax; }
             ),
             new DrawbackData(
                 "poor_vision",
@@ -91,9 +95,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Physical,
                 "Severe uncorrected myopia. Without proper illumination, shapes blur into the dark.",
                 "-1 Observation. Night exploration vision radius reduced by 30%.",
-                2,
-                new[] { ("Eyeglasses", 1) },
-                c => { c.Observation = Mathf.Max(1, c.Observation - 1); }
+                icon: "trait_blind",
+                bonus: 2,
+                items: new[] { ("Eyeglasses", 1) },
+                apply: c => { c.Observation = Mathf.Max(1, c.Observation - 1); }
             ),
             new DrawbackData(
                 "hemophilia",
@@ -101,9 +106,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Physical,
                 "Impaired blood coagulation. Wounds remain open and dangerous far longer.",
                 "Bleeding wounds deal 2x damage over time and require double bandaging.",
-                2,
-                new[] { ("Bandage", 3) },
-                c => { /* Handled in medical/status system */ }
+                icon: "trait_fragile",
+                bonus: 2,
+                items: new[] { ("Bandage", 3) },
+                apply: c => { /* Handled in medical/status system */ }
             ),
             new DrawbackData(
                 "feeble",
@@ -111,9 +117,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Physical,
                 "Underdeveloped muscular density. Forcing doors and swinging heavy tools is agonizing.",
                 "-2 Might. Melee blunt damage reduced by 25%.",
-                2,
-                null,
-                c => { c.Might = Mathf.Max(1, c.Might - 2); }
+                icon: "trait_clumsy",
+                bonus: 2,
+                items: null,
+                apply: c => { c.Might = Mathf.Max(1, c.Might - 2); }
             ),
             new DrawbackData(
                 "brittle_bones",
@@ -121,9 +128,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Physical,
                 "Low bone mineral density. Impacts and falls pose severe fracture risks.",
                 "Blunt trauma and falling damage increased by 35%. Limbs fracture easily.",
-                2,
-                new[] { ("Painkillers", 1), ("Splint", 1) },
-                c => { /* Handled in trauma system */ }
+                icon: "trait_badknee",
+                bonus: 2,
+                items: new[] { ("Painkillers", 1), ("Splint", 1) },
+                apply: c => { /* Handled in trauma system */ }
             ),
             new DrawbackData(
                 "heavy_sleeper",
@@ -131,9 +139,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Mental,
                 "Once asleep, you do not easily rouse. Unmonitored camp rests become deadly gambles.",
                 "Rest recovery takes 50% longer. Increased ambush probability during shelter rest.",
-                2,
-                new[] { ("Energy Drink", 2) },
-                c => { /* Handled in shelter rest system */ }
+                icon: "trait_insomniac",
+                bonus: 2,
+                items: new[] { ("Energy Drink", 2) },
+                apply: c => { /* Handled in shelter rest system */ }
             ),
             new DrawbackData(
                 "nervous_tremor",
@@ -141,9 +150,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Mental,
                 "Adrenaline floods your system too intensely, causing involuntary muscle shakes under fire.",
                 "QTE minigame indicator moves 25% faster in high-tension crisis encounters.",
-                2,
-                new[] { ("Beta Blockers", 1) },
-                c => { /* Handled in QTE system */ }
+                icon: "trait_coward",
+                bonus: 2,
+                items: new[] { ("Beta Blockers", 1) },
+                apply: c => { /* Handled in QTE system */ }
             ),
             new DrawbackData(
                 "paranoid_insomnia",
@@ -151,9 +161,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Mental,
                 "You perceive betrayal in every whisper. You refuse to let your guard down near others.",
                 "Cannot rest in the same room as companions. -1 Leadership in group dialogue.",
-                2,
-                new[] { ("Flashlight", 1) },
-                c => { c.Leadership = Mathf.Max(1, c.Leadership - 1); }
+                icon: "trait_paranoid",
+                bonus: 2,
+                items: new[] { ("Flashlight", 1) },
+                apply: c => { c.Leadership = Mathf.Max(1, c.Leadership - 1); }
             ),
             new DrawbackData(
                 "nicotine_addict",
@@ -161,9 +172,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Behavioral,
                 "A persistent chemical addiction. In prolonged withdrawal, your focus unravels.",
                 "-1 Tactics & -1 Reflex when craving. Relieved by smoking cigarettes.",
-                2,
-                new[] { ("Cigarettes", 1), ("Lighter", 1) },
-                c => { /* Handled in status addiction system */ }
+                icon: "trait_smoker",
+                bonus: 2,
+                items: new[] { ("Cigarettes", 1), ("Lighter", 1) },
+                apply: c => { /* Handled in status addiction system */ }
             ),
             new DrawbackData(
                 "jinxed",
@@ -171,9 +183,10 @@ namespace SundayLastBreath.Data
                 DrawbackCategory.Behavioral,
                 "Trouble seems to find you where others slip by unnoticed.",
                 "-2 Auspice (Luck). Weapon jamming chance slightly elevated.",
-                2,
-                new[] { ("Lucky Coin", 1) },
-                c => { c.Auspice = Mathf.Max(1, c.Auspice - 2); }
+                icon: "trait_gambler",
+                bonus: 2,
+                items: new[] { ("Lucky Coin", 1) },
+                apply: c => { c.Auspice = Mathf.Max(1, c.Auspice - 2); }
             )
         };
     }

@@ -64,7 +64,8 @@ namespace SundayLastBreath.UI
                 if (drawback != null)
                 {
                     drawback.onApply?.Invoke(character);
-                    character.AddTrait(drawback.title, drawback.penaltySummary, null, isWeakness: true);
+                    Sprite drawbackIcon = LoadSpriteSafe($"Assets/Sprites/Traits/{drawback.iconName}.png");
+                    character.AddTrait(drawback.title, drawback.penaltySummary, drawbackIcon, isWeakness: true);
                     if (drawback.startingItems != null)
                     {
                         foreach (var it in drawback.startingItems)
@@ -211,10 +212,20 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            if (bargainPanel != null && bargainPanel.transform.Find("BargainBuiltMarker") != null)
+            if (bargainPanel != null && bargainPanel.transform.Find("BargainBuiltMarker_V2") != null)
             {
                 BindBargainReferences();
                 return;
+            }
+
+            if (bargainPanel != null)
+            {
+                for (int i = bargainPanel.transform.childCount - 1; i >= 0; i--)
+                {
+                    Transform c = bargainPanel.transform.GetChild(i);
+                    if (Application.isPlaying) Destroy(c.gameObject);
+                    else DestroyImmediate(c.gameObject);
+                }
             }
 
             if (bargainPanel == null)
@@ -231,7 +242,7 @@ namespace SundayLastBreath.UI
             }
 
             // Build Marker
-            GameObject marker = new GameObject("BargainBuiltMarker");
+            GameObject marker = new GameObject("BargainBuiltMarker_V2");
             marker.transform.SetParent(bargainPanel.transform, false);
 
             // Dark Atmosphere Background
@@ -334,6 +345,10 @@ namespace SundayLastBreath.UI
             sr.vertical = true;
             sr.scrollSensitivity = 28f;
 
+            Image scrImg = scrollObj.AddComponent<Image>();
+            scrImg.color = Color.clear;
+            scrImg.raycastTarget = true;
+
             GameObject vpObj = new GameObject("Viewport");
             vpObj.transform.SetParent(scrollObj.transform, false);
             RectTransform vpRect = vpObj.AddComponent<RectTransform>();
@@ -341,6 +356,9 @@ namespace SundayLastBreath.UI
             vpRect.anchorMax = Vector2.one;
             vpRect.offsetMin = Vector2.zero;
             vpRect.offsetMax = Vector2.zero;
+            Image vpImg = vpObj.AddComponent<Image>();
+            vpImg.color = Color.clear;
+            vpImg.raycastTarget = true;
             vpObj.AddComponent<RectMask2D>();
             sr.viewport = vpRect;
 
@@ -379,8 +397,8 @@ namespace SundayLastBreath.UI
             card.transform.SetParent(parent, false);
 
             LayoutElement le = card.AddComponent<LayoutElement>();
-            le.minHeight = 84f;
-            le.preferredHeight = 84f;
+            le.minHeight = 88f;
+            le.preferredHeight = 88f;
 
             Image bg = card.AddComponent<Image>();
             bg.color = new Color(0.07f, 0.10f, 0.14f, 0.94f);
@@ -405,18 +423,62 @@ namespace SundayLastBreath.UI
             Image sImg = strip.AddComponent<Image>();
             sImg.color = new Color(0.85f, 0.25f, 0.25f, 0.85f);
 
-            // Title + Bonus Badge
+            // Trait / Drawback Graphic Icon Box (56x56)
+            GameObject iconBox = new GameObject("IconBox");
+            iconBox.transform.SetParent(card.transform, false);
+            RectTransform ibRect = iconBox.AddComponent<RectTransform>();
+            ibRect.anchorMin = new Vector2(0f, 0.5f);
+            ibRect.anchorMax = new Vector2(0f, 0.5f);
+            ibRect.pivot = new Vector2(0f, 0.5f);
+            ibRect.sizeDelta = new Vector2(56f, 56f);
+            ibRect.anchoredPosition = new Vector2(14f, 0f);
+
+            Image ibBg = iconBox.AddComponent<Image>();
+            ibBg.color = new Color(0.04f, 0.06f, 0.09f, 0.95f);
+
+            Outline ibOl = iconBox.AddComponent<Outline>();
+            ibOl.effectColor = new Color(0.70f, 0.20f, 0.20f, 0.5f);
+            ibOl.effectDistance = new Vector2(1f, -1f);
+
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(iconBox.transform, false);
+            RectTransform iRect = iconObj.AddComponent<RectTransform>();
+            iRect.anchorMin = Vector2.zero;
+            iRect.anchorMax = Vector2.one;
+            iRect.offsetMin = new Vector2(4f, 4f);
+            iRect.offsetMax = new Vector2(-4f, -4f);
+
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+
+            Sprite traitSprite = LoadSpriteSafe($"Assets/Sprites/Traits/{db.iconName}.png");
+            if (traitSprite != null)
+            {
+                iconImg.sprite = traitSprite;
+                iconImg.color = new Color(0.95f, 0.95f, 0.95f, 0.95f);
+            }
+            else
+            {
+                iconImg.gameObject.SetActive(false);
+            }
+
+            // Title + Bonus Badge (Shifted right of IconBox: x = 80px)
             string catTag = $"[{db.category.ToString().ToUpper()}]";
             CreateUIText(card.transform, "TitleLine",
                 $"<b><color=#FFFFFF>{db.title}</color></b>   <color=#4FC3F7><size=11>{catTag}</size></color>   <color=#66BB6A><b>[+2 PTS]</b></color>",
                 13.5f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
-                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(16f, -24f), new Vector2(-110f, 0f));
+                new Vector2(0f, 0.5f), new Vector2(1f, 1f), new Vector2(80f, 0f), new Vector2(-116f, -6f));
 
-            // Penalty Description
-            CreateUIText(card.transform, "PenaltyText",
+            // Penalty Description (Shifted right of IconBox: x = 80px)
+            TextMeshProUGUI penTmp = CreateUIText(card.transform, "PenaltyText",
                 $"<color=#EF5350><b>FLAW:</b></color> <color=#CFD8DC>{db.penaltySummary}</color>",
-                11.5f, TextAlignmentOptions.Left, new Color(0.85f, 0.90f, 0.95f), FontRole.Body,
-                new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(16f, 8f), new Vector2(-110f, -24f));
+                11f, TextAlignmentOptions.Left, new Color(0.85f, 0.90f, 0.95f), FontRole.Body,
+                new Vector2(0f, 0f), new Vector2(1f, 0.5f), new Vector2(80f, 6f), new Vector2(-116f, 0f));
+            if (penTmp != null)
+            {
+                penTmp.textWrappingMode = TextWrappingModes.Normal;
+            }
 
             // Selection Status Pill Button
             GameObject pillObj = new GameObject("SelectBadge");
@@ -683,11 +745,14 @@ namespace SundayLastBreath.UI
                     Transform badge = card.Find("SelectBadge");
                     Image badgeBg = badge?.GetComponent<Image>();
                     TextMeshProUGUI badgeLabel = badge?.GetComponentInChildren<TextMeshProUGUI>();
+                    Transform iconBox = card.Find("IconBox");
+                    Outline ibOl = iconBox?.GetComponent<Outline>();
 
                     if (isSelected)
                     {
                         if (bg != null) bg.color = new Color(0.14f, 0.08f, 0.08f, 0.98f);
                         if (ol != null) { ol.effectColor = new Color(0.92f, 0.28f, 0.28f, 0.95f); ol.effectDistance = new Vector2(2f, -2f); }
+                        if (ibOl != null) ibOl.effectColor = new Color(0.95f, 0.35f, 0.35f, 0.95f);
                         if (badgeBg != null) badgeBg.color = new Color(0.85f, 0.25f, 0.25f, 1f);
                         if (badgeLabel != null) badgeLabel.text = "ACCEPTED";
                     }
@@ -696,6 +761,7 @@ namespace SundayLastBreath.UI
                         bool canSelect = drawbacksCount < 2;
                         if (bg != null) bg.color = canSelect ? new Color(0.07f, 0.10f, 0.14f, 0.94f) : new Color(0.05f, 0.07f, 0.09f, 0.6f);
                         if (ol != null) { ol.effectColor = new Color(0.20f, 0.28f, 0.36f, 0.6f); ol.effectDistance = new Vector2(1f, -1f); }
+                        if (ibOl != null) ibOl.effectColor = canSelect ? new Color(0.70f, 0.20f, 0.20f, 0.5f) : new Color(0.35f, 0.15f, 0.15f, 0.3f);
                         if (badgeBg != null) badgeBg.color = canSelect ? new Color(0.12f, 0.16f, 0.22f, 0.9f) : new Color(0.08f, 0.10f, 0.13f, 0.4f);
                         if (badgeLabel != null) badgeLabel.text = canSelect ? "SELECT" : "LOCKED";
                     }
