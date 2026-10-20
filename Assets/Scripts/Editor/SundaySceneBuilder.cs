@@ -26,7 +26,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v8_auto.flag";
+                string flagPath = "Temp/scene_v9_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -101,6 +101,7 @@ namespace SundayLastBreath.Editor
             StudioSplashScreen splashScreen = BuildSplashScreen(screensObj.transform);
             DisclaimerScreen disclaimerScreen = BuildDisclaimerScreen(screensObj.transform);
             TitleScreen titleScreen = BuildTitleScreen(screensObj.transform);
+            PrologueWakeUpScreen prologueScreen = BuildPrologueWakeUpScreen(screensObj.transform);
             CharacterCreationScreen creationScreen = BuildCharacterCreationScreen(screensObj.transform);
             SundayTypography.ApplyHierarchy(screensObj.transform);
 
@@ -112,6 +113,7 @@ namespace SundayLastBreath.Editor
             gameSo.FindProperty("studioSplashScreen").objectReferenceValue = splashScreen;
             gameSo.FindProperty("disclaimerScreen").objectReferenceValue = disclaimerScreen;
             gameSo.FindProperty("titleScreen").objectReferenceValue = titleScreen;
+            gameSo.FindProperty("prologueWakeUpScreen").objectReferenceValue = prologueScreen;
             gameSo.FindProperty("characterCreationScreen").objectReferenceValue = creationScreen;
             gameSo.ApplyModifiedProperties();
 
@@ -130,6 +132,277 @@ namespace SundayLastBreath.Editor
             AssetDatabase.Refresh();
 
             Debug.Log("<color=green><b>[Sunday's Last Breath]</b> Main Menu Scene built successfully at: " + scenePath + "</color>");
+        }
+
+        private static PrologueWakeUpScreen BuildPrologueWakeUpScreen(Transform parent)
+        {
+            GameObject obj = new GameObject("PrologueWakeUpScreen");
+            obj.transform.SetParent(parent, false);
+            RectTransform rect = obj.AddComponent<RectTransform>();
+            StretchFull(rect);
+
+            PrologueWakeUpScreen screen = obj.AddComponent<PrologueWakeUpScreen>();
+
+            // Fullscreen Dark Ambience Backdrop
+            GameObject bgObj = new GameObject("DarkBackdrop");
+            bgObj.transform.SetParent(obj.transform, false);
+            RectTransform bgRect = bgObj.AddComponent<RectTransform>();
+            StretchFull(bgRect);
+            Image bgImg = bgObj.AddComponent<Image>();
+            bgImg.color = new Color(0.04f, 0.05f, 0.07f, 1f);
+
+            // Stage: TV Screen & Living Room Frame (Centered Top-Half)
+            GameObject stageObj = new GameObject("StageContainer");
+            stageObj.transform.SetParent(obj.transform, false);
+            RectTransform stageRect = stageObj.AddComponent<RectTransform>();
+            stageRect.anchorMin = new Vector2(0.5f, 0.5f);
+            stageRect.anchorMax = new Vector2(0.5f, 0.5f);
+            stageRect.pivot = new Vector2(0.5f, 0.5f);
+            stageRect.sizeDelta = new Vector2(860f, 440f);
+            stageRect.anchoredPosition = new Vector2(0f, 130f);
+
+            // Outer Frame Box
+            Image stageBg = stageObj.AddComponent<Image>();
+            stageBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
+            Outline stageOl = stageObj.AddComponent<Outline>();
+            stageOl.effectColor = new Color(0.20f, 0.28f, 0.38f, 0.8f);
+            stageOl.effectDistance = new Vector2(1.5f, -1.5f);
+
+            // Header Bar on TV Frame
+            GameObject tvHeader = new GameObject("HeaderBar");
+            tvHeader.transform.SetParent(stageObj.transform, false);
+            RectTransform tvhRect = tvHeader.AddComponent<RectTransform>();
+            tvhRect.anchorMin = new Vector2(0f, 1f);
+            tvhRect.anchorMax = new Vector2(1f, 1f);
+            tvhRect.pivot = new Vector2(0.5f, 1f);
+            tvhRect.sizeDelta = new Vector2(0f, 32f);
+            tvhRect.anchoredPosition = Vector2.zero;
+            Image tvhBg = tvHeader.AddComponent<Image>();
+            tvhBg.color = new Color(0.05f, 0.07f, 0.10f, 0.98f);
+
+            GameObject tvhTitle = new GameObject("Title");
+            tvhTitle.transform.SetParent(tvHeader.transform, false);
+            RectTransform tvhtRect = tvhTitle.AddComponent<RectTransform>();
+            tvhtRect.anchorMin = new Vector2(0f, 0f);
+            tvhtRect.anchorMax = new Vector2(1f, 1f);
+            tvhtRect.offsetMin = new Vector2(16f, 0f);
+            tvhtRect.offsetMax = new Vector2(-16f, 0f);
+            TextMeshProUGUI tvhTmp = tvhTitle.AddComponent<TextMeshProUGUI>();
+            tvhTmp.fontSize = 11.5f;
+            tvhTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            tvhTmp.text = "<b>■ SURVEILLANCE FEED // APARTMENT 404 LIVING ROOM</b>";
+            tvhTmp.color = new Color(0.60f, 0.72f, 0.85f);
+
+            GameObject tvhStatus = new GameObject("Status");
+            tvhStatus.transform.SetParent(tvHeader.transform, false);
+            RectTransform tvhsRect = tvhStatus.AddComponent<RectTransform>();
+            tvhsRect.anchorMin = new Vector2(0f, 0f);
+            tvhsRect.anchorMax = new Vector2(1f, 1f);
+            tvhsRect.offsetMin = new Vector2(16f, 0f);
+            tvhsRect.offsetMax = new Vector2(-16f, 0f);
+            TextMeshProUGUI tvhsTmp = tvhStatus.AddComponent<TextMeshProUGUI>();
+            tvhsTmp.fontSize = 11.5f;
+            tvhsTmp.alignment = TextAlignmentOptions.MidlineRight;
+            tvhsTmp.text = "<color=#66BB6A>ONLINE</color>  |  CH: 04  |  23:45:00";
+            tvhsTmp.color = new Color(0.80f, 0.88f, 0.95f);
+
+            // TV Viewport Frame (Inset inside Stage)
+            GameObject vpObj = new GameObject("Viewport");
+            vpObj.transform.SetParent(stageObj.transform, false);
+            RectTransform vpRect = vpObj.AddComponent<RectTransform>();
+            vpRect.anchorMin = new Vector2(0f, 0f);
+            vpRect.anchorMax = new Vector2(1f, 1f);
+            vpRect.offsetMin = new Vector2(12f, 12f);
+            vpRect.offsetMax = new Vector2(-12f, -36f);
+
+            // Layer 1: Living Room Background
+            GameObject roomObj = new GameObject("RoomBackdrop");
+            roomObj.transform.SetParent(vpObj.transform, false);
+            RectTransform roomRect = roomObj.AddComponent<RectTransform>();
+            StretchFull(roomRect);
+            Image roomImg = roomObj.AddComponent<Image>();
+            Sprite roomSprite = LoadSpriteSafe("Assets/Sprites/Prologue/bg_living_room_red.png");
+            if (roomSprite != null) roomImg.sprite = roomSprite;
+            roomImg.color = new Color(0.85f, 0.35f, 0.35f, 0.35f);
+
+            // Layer 2: TV Static
+            GameObject staticObj = new GameObject("TVStatic");
+            staticObj.transform.SetParent(vpObj.transform, false);
+            RectTransform staticRect = staticObj.AddComponent<RectTransform>();
+            StretchFull(staticRect);
+            Image staticImg = staticObj.AddComponent<Image>();
+            Sprite staticSprite = LoadSpriteSafe("Assets/Sprites/Prologue/tv_static.png");
+            if (staticSprite != null) staticImg.sprite = staticSprite;
+            staticImg.color = new Color(1f, 1f, 1f, 0.05f);
+
+            // Layer 3: CRT Scanlines / Vignette Overlay
+            GameObject crtObj = new GameObject("CRTScanlineOverlay");
+            crtObj.transform.SetParent(vpObj.transform, false);
+            RectTransform crtRect = crtObj.AddComponent<RectTransform>();
+            StretchFull(crtRect);
+            Image crtImg = crtObj.AddComponent<Image>();
+            crtImg.color = new Color(0f, 0f, 0f, 0.25f);
+            Outline crtOl = crtObj.AddComponent<Outline>();
+            crtOl.effectColor = new Color(0.12f, 0.16f, 0.22f, 0.9f);
+            crtOl.effectDistance = new Vector2(2f, -2f);
+
+            // Layer 4: TV Glitch Warning Text
+            GameObject glitchObj = new GameObject("TVGlitchText");
+            glitchObj.transform.SetParent(vpObj.transform, false);
+            RectTransform glitchRect = glitchObj.AddComponent<RectTransform>();
+            StretchFull(glitchRect);
+            TextMeshProUGUI glitchTmp = glitchObj.AddComponent<TextMeshProUGUI>();
+            glitchTmp.fontSize = 24f;
+            glitchTmp.alignment = TextAlignmentOptions.Center;
+            glitchTmp.fontStyle = FontStyles.Bold;
+            glitchTmp.text = "SSSHHHHHKKKKK...\n<size=70%><color=#EF5350>[ EMERGENCY BROADCAST INTERRUPT ]</color></size>";
+            glitchTmp.color = new Color(1f, 0.95f, 0.95f, 0.9f);
+            glitchObj.SetActive(false);
+
+            // ==========================================
+            // Narration Box (Bottom Half)
+            // ==========================================
+            GameObject narrObj = new GameObject("NarrationBox");
+            narrObj.transform.SetParent(obj.transform, false);
+            RectTransform narrRect = narrObj.AddComponent<RectTransform>();
+            narrRect.anchorMin = new Vector2(0.5f, 0f);
+            narrRect.anchorMax = new Vector2(0.5f, 0f);
+            narrRect.pivot = new Vector2(0.5f, 0f);
+            narrRect.sizeDelta = new Vector2(1080f, 260f);
+            narrRect.anchoredPosition = new Vector2(0f, 36f);
+
+            Image narrBg = narrObj.AddComponent<Image>();
+            narrBg.color = new Color(0.06f, 0.08f, 0.11f, 0.96f);
+
+            Outline narrOl = narrObj.AddComponent<Outline>();
+            narrOl.effectColor = new Color(0.24f, 0.32f, 0.42f, 0.8f);
+            narrOl.effectDistance = new Vector2(1.5f, -1.5f);
+
+            Button narrBtn = narrObj.AddComponent<Button>();
+            narrBtn.targetGraphic = narrBg;
+            narrBtn.onClick.AddListener(screen.OnDialogueAreaClicked);
+
+            // Left Highlight Strip
+            GameObject nStrip = new GameObject("LeftHighlightStrip");
+            nStrip.transform.SetParent(narrObj.transform, false);
+            RectTransform nsRect = nStrip.AddComponent<RectTransform>();
+            nsRect.anchorMin = new Vector2(0f, 0f);
+            nsRect.anchorMax = new Vector2(0f, 1f);
+            nsRect.sizeDelta = new Vector2(5f, 0f);
+            nsRect.anchoredPosition = new Vector2(2.5f, 0f);
+            Image nsImg = nStrip.AddComponent<Image>();
+            nsImg.color = new Color(0.95f, 0.65f, 0.15f, 0.9f);
+
+            // Header Strip on Narration Box
+            GameObject nhObj = new GameObject("HeaderBar");
+            nhObj.transform.SetParent(narrObj.transform, false);
+            RectTransform nhRect = nhObj.AddComponent<RectTransform>();
+            nhRect.anchorMin = new Vector2(0f, 1f);
+            nhRect.anchorMax = new Vector2(1f, 1f);
+            nhRect.pivot = new Vector2(0.5f, 1f);
+            nhRect.sizeDelta = new Vector2(0f, 36f);
+            nhRect.anchoredPosition = Vector2.zero;
+            Image nhBg = nhObj.AddComponent<Image>();
+            nhBg.color = new Color(0.09f, 0.12f, 0.16f, 0.95f);
+
+            // Speaker Label
+            GameObject spkObj = new GameObject("SpeakerLabel");
+            spkObj.transform.SetParent(nhObj.transform, false);
+            RectTransform spkRect = spkObj.AddComponent<RectTransform>();
+            spkRect.anchorMin = new Vector2(0f, 0f);
+            spkRect.anchorMax = new Vector2(1f, 1f);
+            spkRect.offsetMin = new Vector2(20f, 0f);
+            spkRect.offsetMax = new Vector2(-20f, 0f);
+            TextMeshProUGUI spkTmp = spkObj.AddComponent<TextMeshProUGUI>();
+            spkTmp.fontSize = 13f;
+            spkTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            spkTmp.fontStyle = FontStyles.Bold;
+            spkTmp.text = "SYSTEM // SATURDAY NIGHT 23:45";
+            spkTmp.color = new Color(0.95f, 0.65f, 0.15f, 1f);
+
+            // Body Narrative Text
+            GameObject bodyObj = new GameObject("NarrativeBody");
+            bodyObj.transform.SetParent(narrObj.transform, false);
+            RectTransform bodyRect = bodyObj.AddComponent<RectTransform>();
+            bodyRect.anchorMin = new Vector2(0f, 0f);
+            bodyRect.anchorMax = new Vector2(1f, 1f);
+            bodyRect.offsetMin = new Vector2(28f, 24f);
+            bodyRect.offsetMax = new Vector2(-28f, -48f);
+            TextMeshProUGUI bodyTmp = bodyObj.AddComponent<TextMeshProUGUI>();
+            bodyTmp.fontSize = 19f;
+            bodyTmp.lineSpacing = 10f;
+            bodyTmp.alignment = TextAlignmentOptions.TopLeft;
+            bodyTmp.color = new Color(0.90f, 0.94f, 0.98f);
+            bodyTmp.text = "";
+
+            // Continue Prompt Indicator (Bottom Right)
+            GameObject promptObj = new GameObject("ContinuePrompt");
+            promptObj.transform.SetParent(narrObj.transform, false);
+            RectTransform prRect = promptObj.AddComponent<RectTransform>();
+            prRect.anchorMin = new Vector2(1f, 0f);
+            prRect.anchorMax = new Vector2(1f, 0f);
+            prRect.pivot = new Vector2(1f, 0f);
+            prRect.sizeDelta = new Vector2(240f, 28f);
+            prRect.anchoredPosition = new Vector2(-24f, 14f);
+            TextMeshProUGUI prTmp = promptObj.AddComponent<TextMeshProUGUI>();
+            prTmp.fontSize = 12f;
+            prTmp.fontStyle = FontStyles.Bold;
+            prTmp.alignment = TextAlignmentOptions.MidlineRight;
+            prTmp.text = "<color=#FFA726>CLICK TO ADVANCE</color> <color=#FFFFFF>▶</color>";
+            prTmp.color = new Color(0.95f, 0.65f, 0.15f, 0.9f);
+            promptObj.SetActive(false);
+
+            // Action Button: FOCUS ON YOUR REFLECTION...
+            GameObject btnObj = new GameObject("Btn_FocusReflection");
+            btnObj.transform.SetParent(narrObj.transform, false);
+            RectTransform btnRect = btnObj.AddComponent<RectTransform>();
+            btnRect.anchorMin = new Vector2(0.5f, 0f);
+            btnRect.anchorMax = new Vector2(0.5f, 0f);
+            btnRect.pivot = new Vector2(0.5f, 0f);
+            btnRect.sizeDelta = new Vector2(440f, 48f);
+            btnRect.anchoredPosition = new Vector2(0f, 18f);
+
+            CanvasGroup btnCg = btnObj.AddComponent<CanvasGroup>();
+            Image btnBg = btnObj.AddComponent<Image>();
+            btnBg.color = new Color(0.85f, 0.35f, 0.08f, 0.95f);
+            Outline btnOl = btnObj.AddComponent<Outline>();
+            btnOl.effectColor = new Color(1f, 0.70f, 0.25f, 0.95f);
+            btnOl.effectDistance = new Vector2(1.5f, -1.5f);
+            Button focusBtn = btnObj.AddComponent<Button>();
+            focusBtn.targetGraphic = btnBg;
+
+            GameObject btnTextObj = new GameObject("Text");
+            btnTextObj.transform.SetParent(btnObj.transform, false);
+            RectTransform btRect = btnTextObj.AddComponent<RectTransform>();
+            StretchFull(btRect);
+            TextMeshProUGUI btTmp = btnTextObj.AddComponent<TextMeshProUGUI>();
+            btTmp.fontSize = 15f;
+            btTmp.fontStyle = FontStyles.Bold;
+            btTmp.alignment = TextAlignmentOptions.Center;
+            btTmp.text = "<b>FOCUS ON YOUR REFLECTION... >></b>";
+            btTmp.color = Color.white;
+            btnObj.SetActive(false);
+
+            // Audio Clips
+            AudioClip staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/static.mp3");
+            AudioClip sirensClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/sirens.mp3");
+            AudioClip screamClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/scream.mp3");
+
+            // Wire Serialized Properties
+            SerializedObject so = new SerializedObject(screen);
+            so.FindProperty("roomBackdropImage").objectReferenceValue = roomImg;
+            so.FindProperty("tvStaticImage").objectReferenceValue = staticImg;
+            so.FindProperty("tvGlitchText").objectReferenceValue = glitchTmp;
+            so.FindProperty("speakerLabel").objectReferenceValue = spkTmp;
+            so.FindProperty("narrativeBodyText").objectReferenceValue = bodyTmp;
+            so.FindProperty("continuePrompt").objectReferenceValue = promptObj;
+            so.FindProperty("focusReflectionButton").objectReferenceValue = focusBtn;
+            so.FindProperty("staticClip").objectReferenceValue = staticClip;
+            so.FindProperty("sirensClip").objectReferenceValue = sirensClip;
+            so.FindProperty("screamClip").objectReferenceValue = screamClip;
+            so.ApplyModifiedProperties();
+
+            return screen;
         }
 
         private static StudioSplashScreen BuildSplashScreen(Transform parent)

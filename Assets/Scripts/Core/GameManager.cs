@@ -9,6 +9,7 @@ namespace SundayLastBreath.Core
         StudioSplash,
         Disclaimer,
         Title,
+        PrologueWakeUp,
         CharacterCreation,
         InGame
     }
@@ -27,6 +28,7 @@ namespace SundayLastBreath.Core
         [SerializeField] private StudioSplashScreen studioSplashScreen;
         [SerializeField] private DisclaimerScreen disclaimerScreen;
         [SerializeField] private TitleScreen titleScreen;
+        [SerializeField] private PrologueWakeUpScreen prologueWakeUpScreen;
         [SerializeField] private CharacterCreationScreen characterCreationScreen;
 
         public GameState CurrentState => currentState;
@@ -47,6 +49,7 @@ namespace SundayLastBreath.Core
             if (studioSplashScreen == null) studioSplashScreen = FindAnyObjectByType<StudioSplashScreen>(FindObjectsInactive.Include);
             if (disclaimerScreen == null) disclaimerScreen = FindAnyObjectByType<DisclaimerScreen>(FindObjectsInactive.Include);
             if (titleScreen == null) titleScreen = FindAnyObjectByType<TitleScreen>(FindObjectsInactive.Include);
+            if (prologueWakeUpScreen == null) prologueWakeUpScreen = FindAnyObjectByType<PrologueWakeUpScreen>(FindObjectsInactive.Include);
             if (characterCreationScreen == null) characterCreationScreen = FindAnyObjectByType<CharacterCreationScreen>(FindObjectsInactive.Include);
         }
 
@@ -101,8 +104,30 @@ namespace SundayLastBreath.Core
 
         public void StartNewGame()
         {
+            currentState = GameState.PrologueWakeUp;
+            Debug.Log("[GameManager] Starting New Game! Transitioning to Prologue Awakening...");
+
+            HideAllScreensInstant();
+
+            if (prologueWakeUpScreen != null)
+            {
+                prologueWakeUpScreen.Show(0.8f);
+            }
+            else if (characterCreationScreen != null)
+            {
+                Debug.LogWarning("[GameManager] PrologueWakeUpScreen not found, falling back to CharacterCreationScreen.");
+                characterCreationScreen.Show(0.8f);
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] Neither PrologueWakeUpScreen nor CharacterCreationScreen assigned!");
+            }
+        }
+
+        public void TransitionFromPrologueToCharacterCreation()
+        {
             currentState = GameState.CharacterCreation;
-            Debug.Log("[GameManager] Starting New Game! Transitioning to Character Creation...");
+            Debug.Log("[GameManager] Focusing on reflection... Transitioning to Citizen Intake Console.");
 
             HideAllScreensInstant();
 
@@ -125,7 +150,7 @@ namespace SundayLastBreath.Core
                       $"Vitals: HP {character.hp}/{character.hpMax}, Stamina {character.stamina}/{character.staminaMax}\n" +
                       $"Traits Acquired: {character.traits.Count} | Starting Items: {character.inventory.Count}");
 
-            // Ready to transition to Prologue!
+            // Ready to transition to Prologue Unit 404!
         }
 
         private void HideAllScreensInstant()
@@ -133,6 +158,7 @@ namespace SundayLastBreath.Core
             if (studioSplashScreen != null) studioSplashScreen.HideInstant();
             if (disclaimerScreen != null) disclaimerScreen.HideInstant();
             if (titleScreen != null) titleScreen.HideInstant();
+            if (prologueWakeUpScreen != null) prologueWakeUpScreen.HideInstant();
             if (characterCreationScreen != null) characterCreationScreen.HideInstant();
         }
     }
