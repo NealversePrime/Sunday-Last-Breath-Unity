@@ -50,12 +50,16 @@ namespace SundayLastBreath.UI
 
         [Header("Typewriter Settings")]
         [SerializeField] private float charactersPerSecond = 35f;
+        [Tooltip("Minimum time (in seconds) between clicks to prevent accidental double-clicks or faulty mouse switches from skipping text.")]
+        [SerializeField] private float clickDebounceDelay = 0.35f;
 
         // Sequence State
         private int currentStep = 0;
         private bool isTyping = false;
+        private bool isTransitioning = false;
         private string currentFullText = "";
         private Coroutine typeRoutine;
+        private float lastClickTime = -999f;
 
         private static readonly string[] NarrativeSteps = new string[]
         {
@@ -151,6 +155,8 @@ namespace SundayLastBreath.UI
         {
             currentStep = 0;
             isTyping = false;
+            isTransitioning = false;
+            lastClickTime = Time.unscaledTime;
 
             // Start living room animation (NO SIGNAL glitching screen)
             if (livingRoomAnimPlayer != null)
@@ -240,11 +246,21 @@ namespace SundayLastBreath.UI
 
         public void OnDialogueAreaClicked()
         {
+            if (isTransitioning) return;
+
             if (focusReflectionButton != null && focusReflectionButton.gameObject.activeSelf)
             {
                 // Action button is active, let player click the button specifically
                 return;
             }
+
+            // Anti-double-click debounce guard:
+            // Prevents hardware switch bounce or accidental rapid double-clicks from skipping narrative text.
+            if (Time.unscaledTime - lastClickTime < clickDebounceDelay)
+            {
+                return;
+            }
+            lastClickTime = Time.unscaledTime;
 
             if (isTyping)
             {
@@ -394,6 +410,14 @@ namespace SundayLastBreath.UI
 
         public void OnFocusReflectionClicked()
         {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            if (focusReflectionButton != null)
+            {
+                focusReflectionButton.interactable = false;
+            }
+
             if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
 
             // Stop animations
