@@ -227,6 +227,11 @@ namespace SundayLastBreath.UI
             if (staticSource == null) staticSource = CreateChildAudioSource("StaticSource", true);
             if (radioSource == null) radioSource = CreateChildAudioSource("RadioSource", false);
             if (sfxSource == null) sfxSource = CreateChildAudioSource("SFXSource", false);
+
+            if (staticClip != null && staticClip.name.Contains("radio_static_ebs"))
+            {
+                staticClip = null;
+            }
         }
 
         private AudioSource CreateChildAudioSource(string name, bool loop)
@@ -1137,11 +1142,18 @@ namespace SundayLastBreath.UI
 
                     // Stop EAS broadcast, start low TV static
                     if (ebsBroadcastSource != null) ebsBroadcastSource.Stop();
-                    if (staticSource != null && staticClip != null)
+                    if (staticSource != null)
                     {
-                        staticSource.clip = staticClip;
-                        staticSource.volume = 0.2f;
-                        staticSource.Play();
+                        if (staticClip != null && !staticClip.name.Contains("radio_static_ebs"))
+                        {
+                            staticSource.clip = staticClip;
+                            staticSource.volume = 0.2f;
+                            staticSource.Play();
+                        }
+                        else
+                        {
+                            staticSource.Stop();
+                        }
                     }
 
                     if (monologueBox != null)
@@ -1171,6 +1183,7 @@ namespace SundayLastBreath.UI
 
                 case 3:
                     // Beat 3: Table Stash
+                    if (staticSource != null) staticSource.Stop();
                     if (beat3Container != null) beat3Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#F59E0B>CHANNEL: EQUIPMENT INSPECTION</color>";
