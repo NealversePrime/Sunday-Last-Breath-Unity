@@ -19,7 +19,7 @@ namespace SundayLastBreath.UI
     /// persistent Left & Right Survivor PDA panels (Status, Skills, Traits, Map, Lore,
     /// Active Loadout, Backpack Grid, and Floor Items) filling the widescreen side wings.
     /// </summary>
-    public class ApartmentHubScreen : ScreenBase, IPointerClickHandler
+    public class ApartmentHubScreen : ScreenBase
     {
         [Header("Top HUD (Twine Style)")]
         [SerializeField] private Button pdaMenuButton;
@@ -251,6 +251,14 @@ namespace SundayLastBreath.UI
             {
                 fullScreenClickCatcher.onClick.RemoveAllListeners();
                 fullScreenClickCatcher.onClick.AddListener(OnDialogueAreaClicked);
+            }
+
+            if (continuePrompt != null)
+            {
+                Button promptBtn = continuePrompt.GetComponent<Button>();
+                if (promptBtn == null) promptBtn = continuePrompt.AddComponent<Button>();
+                promptBtn.onClick.RemoveAllListeners();
+                promptBtn.onClick.AddListener(OnDialogueAreaClicked);
             }
 
             if (packGearButton != null)
@@ -500,10 +508,7 @@ namespace SundayLastBreath.UI
             }
         }
 
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            OnDialogueAreaClicked();
-        }
+        // Note: Global OnPointerClick removed to prevent background/tab clicks from advancing dialogue.
 
         private void OnDialogueAreaClicked()
         {
