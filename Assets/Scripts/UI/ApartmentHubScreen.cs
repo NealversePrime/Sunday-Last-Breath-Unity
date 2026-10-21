@@ -19,10 +19,11 @@ namespace SundayLastBreath.UI
     /// Prologue_Phone.twee, Prologue_Radio.twee, and Prologue_Hacking.twee.
     /// 
     /// Adheres to the Nintendo 3DS 60/40 screen layout:
-    /// - Top Stage (60%): Animated Red Living Room loop, clock, vitals HUD, objective banner.
-    /// - Bottom Dock (40%): Narrative awakening sequence (EAS broadcast, monologue, table stash)
+    /// - Top Stage (60%): Centered framed Living Room Viewport (1152x610), tactical telemetry wings,
+    ///   vitals HUD, real-time clock, and dynamic objective tracker pill.
+    /// - Bottom Dock (40%): Narrative awakening sequence (Beats 1-3) with dedicated containers
     ///   followed by the interactive apartment hub menu and modal sub-views (Phone, Radio, Hacking).
-    /// Includes mouse double-click debounce protection and multi-input advancement.
+    /// Includes mouse double-click debounce protection and multi-input advancement (Space, Enter, Click).
     /// </summary>
     public class ApartmentHubScreen : ScreenBase, IPointerClickHandler
     {
@@ -35,18 +36,36 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI vitalsHpText;
         [SerializeField] private TextMeshProUGUI vitalsStaminaText;
 
+        [Header("Bottom Dock Header")]
+        [SerializeField] private TextMeshProUGUI dockHeaderLocation;
+        [SerializeField] private TextMeshProUGUI dockHeaderChannel;
+
         [Header("Narration Box (Bottom 40% - Awakening Sequence)")]
         [SerializeField] private GameObject awakeningContainer;
-        [SerializeField] private TextMeshProUGUI awakeningTitle;
-        [SerializeField] private TextMeshProUGUI awakeningBodyText;
+
+        [Header("Beat 1: EAS Warning")]
+        [SerializeField] private GameObject beat1Container;
+        [SerializeField] private TextMeshProUGUI beat1IntroText;
         [SerializeField] private GameObject easAlertBox;
+        [SerializeField] private TextMeshProUGUI easAlertText;
+
+        [Header("Beat 2: Reaction Monologue")]
+        [SerializeField] private GameObject beat2Container;
+        [SerializeField] private TextMeshProUGUI beat2IntroText;
         [SerializeField] private GameObject monologueBox;
         [SerializeField] private Image monologueAvatar;
         [SerializeField] private TextMeshProUGUI monologueSpeakerText;
         [SerializeField] private TextMeshProUGUI monologueSpeechText;
+        [SerializeField] private TextMeshProUGUI beat2FootnoteText;
+
+        [Header("Beat 3: Table Stash")]
+        [SerializeField] private GameObject beat3Container;
+        [SerializeField] private TextMeshProUGUI beat3NarrativeText;
         [SerializeField] private GameObject tableStashDisplay;
         [SerializeField] private Transform tableStashGrid;
         [SerializeField] private GameObject tableEmptyNotice;
+
+        [Header("Prompts & Click Catchers")]
         [SerializeField] private GameObject continuePrompt;
         [SerializeField] private Button fullScreenClickCatcher;
 
@@ -109,7 +128,8 @@ namespace SundayLastBreath.UI
         private bool isTyping = false;
         private Coroutine typeRoutine;
         private Coroutine hackingRoutine;
-        private string targetTypewriterText = "";
+        private TextMeshProUGUI activeTypewriterTarget;
+        private string activeFullText = "";
 
         // Cached frames for player avatar animation
         private List<Sprite> cachedAvatarFrames;
@@ -311,7 +331,6 @@ namespace SundayLastBreath.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            // Handled via fullScreenClickCatcher or direct clicks
             OnDialogueAreaClicked();
         }
 
@@ -351,20 +370,21 @@ namespace SundayLastBreath.UI
         #region Awakening Sequence (Beats 1 - 3)
         private void ShowAwakeningStep(int step)
         {
-            awakeningContainer.SetActive(true);
-            hubMenuContainer.SetActive(false);
+            if (awakeningContainer != null) awakeningContainer.SetActive(true);
+            if (hubMenuContainer != null) hubMenuContainer.SetActive(false);
             if (continuePrompt != null) continuePrompt.SetActive(true);
 
-            if (easAlertBox != null) easAlertBox.SetActive(false);
-            if (monologueBox != null) monologueBox.SetActive(false);
-            if (tableStashDisplay != null) tableStashDisplay.SetActive(false);
+            if (beat1Container != null) beat1Container.SetActive(false);
+            if (beat2Container != null) beat2Container.SetActive(false);
+            if (beat3Container != null) beat3Container.SetActive(false);
 
             switch (step)
             {
                 case 1:
                     // Beat 1: Civil Danger Warning (EAS Broadcast)
-                    if (awakeningTitle != null) awakeningTitle.text = "CIVIL DANGER WARNING";
-                    if (easAlertBox != null) easAlertBox.SetActive(true);
+                    if (beat1Container != null) beat1Container.SetActive(true);
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
+                    if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#EF4444>CHANNEL: EMERGENCY BROADCAST SYSTEM</color>";
 
                     // Play emergency warning TTS / robotic broadcast
                     if (ebsBroadcastSource != null && ebsWarningClip != null)
@@ -375,13 +395,16 @@ namespace SundayLastBreath.UI
                     }
 
                     StartTypewriter(
+                        beat1IntroText,
                         "You turn away from the glass. The silence in your apartment breaks—not with a scream, but with an agonizing, electronic tone pulsing from the television."
                     );
                     break;
 
                 case 2:
                     // Beat 2: The Reaction
-                    if (awakeningTitle != null) awakeningTitle.text = "THE REACTION";
+                    if (beat2Container != null) beat2Container.SetActive(true);
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // INTERNAL MONOLOGUE ]</color>";
+                    if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#60A5FA>CHANNEL: NEURAL APPRAISAL</color>";
 
                     // Stop EAS broadcast, start low TV static
                     if (ebsBroadcastSource != null) ebsBroadcastSource.Stop();
@@ -398,7 +421,7 @@ namespace SundayLastBreath.UI
                         StartAvatarAnimation();
                         if (monologueSpeakerText != null)
                         {
-                            monologueSpeakerText.text = currentPlayer != null ? currentPlayer.FullName.ToUpper() : "YOU";
+                            monologueSpeakerText.text = currentPlayer != null ? $"YOU // {currentPlayer.FullName.ToUpper()}" : "YOU";
                         }
                         if (monologueSpeechText != null)
                         {
@@ -406,15 +429,23 @@ namespace SundayLastBreath.UI
                         }
                     }
 
+                    if (beat2IntroText != null)
+                    {
+                        beat2IntroText.text = "The robotic voice cuts out. Cold static returns to the TV.";
+                    }
+
                     StartTypewriter(
-                        "The robotic voice cuts out. Cold static returns to the TV.\n\n" +
+                        beat2FootnoteText,
                         "Through the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens. And closer... the muffled sound of heavy, frantic footsteps pounding down the hallway outside your door."
                     );
                     break;
 
                 case 3:
                     // Beat 3: Table Stash
-                    if (awakeningTitle != null) awakeningTitle.text = "UNIT 404 // LIVING ROOM";
+                    if (beat3Container != null) beat3Container.SetActive(true);
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
+                    if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#F59E0B>CHANNEL: EQUIPMENT INSPECTION</color>";
+
                     if (tableStashDisplay != null)
                     {
                         tableStashDisplay.SetActive(true);
@@ -422,6 +453,7 @@ namespace SundayLastBreath.UI
                     }
 
                     StartTypewriter(
+                        beat3NarrativeText,
                         "You are standing in the middle of your living room in your pajamas. You feel naked. Vulnerable.\n\n" +
                         "You glance around the dim room, illuminated only by the harsh red glow of the TV. Your everyday carry sits on the cramped desk. But your heavier equipment rests by the front door, exactly where you dropped it after yesterday's shift.\n\n" +
                         "It's not a tactical survival kit. But right now, the tools of your trade are the only thing standing between you and whatever violent outbreak is tearing the city apart."
@@ -450,24 +482,26 @@ namespace SundayLastBreath.UI
             return "\"Lethal force authorized... They don't lock down the whole city for mass hysteria. And this front door isn't heavy enough to keep a panicked mob out.\"";
         }
 
-        private void StartTypewriter(string fullText)
+        private void StartTypewriter(TextMeshProUGUI target, string fullText)
         {
-            targetTypewriterText = fullText;
+            activeTypewriterTarget = target;
+            activeFullText = fullText;
+
             if (typeRoutine != null) StopCoroutine(typeRoutine);
-            typeRoutine = StartCoroutine(TypewriterRoutine(fullText));
+            typeRoutine = StartCoroutine(TypewriterRoutine(target, fullText));
         }
 
-        private IEnumerator TypewriterRoutine(string text)
+        private IEnumerator TypewriterRoutine(TextMeshProUGUI target, string text)
         {
             isTyping = true;
-            if (awakeningBodyText != null) awakeningBodyText.text = "";
+            if (target != null) target.text = "";
 
             float delay = 1f / Mathf.Max(1f, typewriterSpeed);
             for (int i = 0; i <= text.Length; i++)
             {
-                if (awakeningBodyText != null)
+                if (target != null)
                 {
-                    awakeningBodyText.text = text.Substring(0, i);
+                    target.text = text.Substring(0, i);
                 }
                 yield return new WaitForSecondsRealtime(delay);
             }
@@ -478,7 +512,7 @@ namespace SundayLastBreath.UI
         private void CompleteTypewriterInstant()
         {
             if (typeRoutine != null) StopCoroutine(typeRoutine);
-            if (awakeningBodyText != null) awakeningBodyText.text = targetTypewriterText;
+            if (activeTypewriterTarget != null) activeTypewriterTarget.text = activeFullText;
             isTyping = false;
         }
 
@@ -510,9 +544,12 @@ namespace SundayLastBreath.UI
         #region Hub Menu Mode
         private void ShowHubMenu()
         {
-            awakeningContainer.SetActive(false);
-            hubMenuContainer.SetActive(true);
+            if (awakeningContainer != null) awakeningContainer.SetActive(false);
+            if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
             if (continuePrompt != null) continuePrompt.SetActive(false);
+
+            if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // ACTIONS ]</color>";
+            if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#10B981>STATUS: READY FOR TRANSIT</color>";
 
             EvaluateHubButtonStates();
         }
@@ -839,8 +876,8 @@ namespace SundayLastBreath.UI
         {
             if (currentPlayer != null)
             {
-                if (vitalsHpText != null) vitalsHpText.text = $"HP: {currentPlayer.hp}/{currentPlayer.hpMax}";
-                if (vitalsStaminaText != null) vitalsStaminaText.text = $"STM: {currentPlayer.stamina}/{currentPlayer.staminaMax}";
+                if (vitalsHpText != null) vitalsHpText.text = $"<color=#FF5555><b>HP</b></color> {currentPlayer.hp}/{currentPlayer.hpMax}";
+                if (vitalsStaminaText != null) vitalsStaminaText.text = $"<color=#55FF88><b>STM</b></color> {currentPlayer.stamina}/{currentPlayer.staminaMax}";
             }
         }
 
@@ -882,12 +919,21 @@ namespace SundayLastBreath.UI
             card.transform.SetParent(parent, false);
 
             LayoutElement le = card.AddComponent<LayoutElement>();
-            le.preferredWidth = 90f;
-            le.preferredHeight = 100f;
+            le.preferredWidth = 92f;
+            le.preferredHeight = 96f;
+
+            Image cardBg = card.AddComponent<Image>();
+            cardBg.color = new Color(0.08f, 0.10f, 0.14f, 0.90f);
+            cardBg.raycastTarget = false;
+
+            Outline cardOl = card.AddComponent<Outline>();
+            cardOl.effectColor = new Color(0.25f, 0.35f, 0.45f, 0.6f);
+            cardOl.effectDistance = new Vector2(1f, -1f);
 
             VerticalLayoutGroup vlg = card.AddComponent<VerticalLayoutGroup>();
             vlg.childAlignment = TextAnchor.MiddleCenter;
-            vlg.spacing = 6f;
+            vlg.spacing = 4f;
+            vlg.padding = new RectOffset(6, 6, 6, 6);
             vlg.childControlWidth = true;
             vlg.childControlHeight = false;
 
@@ -895,8 +941,8 @@ namespace SundayLastBreath.UI
             GameObject iconObj = new GameObject("Icon");
             iconObj.transform.SetParent(card.transform, false);
             LayoutElement iconLe = iconObj.AddComponent<LayoutElement>();
-            iconLe.preferredWidth = 48f;
-            iconLe.preferredHeight = 48f;
+            iconLe.preferredWidth = 44f;
+            iconLe.preferredHeight = 44f;
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
@@ -916,9 +962,9 @@ namespace SundayLastBreath.UI
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(card.transform, false);
             TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-            label.fontSize = 11f;
+            label.fontSize = 10.5f;
             label.alignment = TextAlignmentOptions.Center;
-            label.color = new Color(0.85f, 0.85f, 0.85f);
+            label.color = new Color(0.85f, 0.88f, 0.92f);
             label.text = quantity > 1 ? $"{itemId} (x{quantity})" : itemId;
             label.raycastTarget = false;
         }
