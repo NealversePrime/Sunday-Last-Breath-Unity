@@ -31,6 +31,10 @@ namespace SundayLastBreath.UI
         [SerializeField] private FrameAnimationPlayer livingRoomAnimPlayer;
         [SerializeField] private FrameAnimationPlayer tvStaticAnimPlayer;
 
+        [Header("Living Room Frame Collections")]
+        [SerializeField] private System.Collections.Generic.List<Sprite> normalLivingRoomFrames = new System.Collections.Generic.List<Sprite>();
+        [SerializeField] private System.Collections.Generic.List<Sprite> redLivingRoomFrames = new System.Collections.Generic.List<Sprite>();
+
         [Header("Narration Box")]
         [SerializeField] private TextMeshProUGUI speakerLabel;
         [SerializeField] private TextMeshProUGUI narrativeBodyText;
@@ -158,15 +162,19 @@ namespace SundayLastBreath.UI
             isTransitioning = false;
             lastClickTime = Time.unscaledTime;
 
-            // Start living room animation (NO SIGNAL glitching screen)
+            // Start living room animation with NORMAL peaceful Saturday night frames
             if (livingRoomAnimPlayer != null)
             {
+                if (normalLivingRoomFrames != null && normalLivingRoomFrames.Count > 0)
+                {
+                    livingRoomAnimPlayer.SetFrames(normalLivingRoomFrames, 8f, true);
+                }
                 livingRoomAnimPlayer.Play();
             }
 
             if (roomBackdropImage != null)
             {
-                roomBackdropImage.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+                roomBackdropImage.color = Color.white;
             }
 
             // TV static starts inactive
@@ -297,6 +305,11 @@ namespace SundayLastBreath.UI
                     // Quiet peaceful night
                     if (speakerLabel != null) speakerLabel.text = "<color=#94A3B8>[ SATURDAY NIGHT 23:45 ]</color>";
                     if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
+                    if (livingRoomAnimPlayer != null && normalLivingRoomFrames != null && normalLivingRoomFrames.Count > 0)
+                    {
+                        livingRoomAnimPlayer.SetFrames(normalLivingRoomFrames, 8f, true);
+                    }
+                    if (roomBackdropImage != null) roomBackdropImage.color = Color.white;
                     break;
 
                 case 2:
@@ -319,16 +332,15 @@ namespace SundayLastBreath.UI
                     {
                         tvStaticAnimPlayer.Play();
                     }
-
-                    if (roomBackdropImage != null)
-                    {
-                        roomBackdropImage.color = new Color(1f, 0.4f, 0.4f, 0.85f);
-                    }
                     break;
 
                 case 3:
-                    // Shock / living room strobe
+                    // Shock / living room strobe - switches to RED Emergency Alert System frames
                     if (speakerLabel != null) speakerLabel.text = "<color=#F59E0B>[ WAKING UP ]</color>";
+                    if (livingRoomAnimPlayer != null && redLivingRoomFrames != null && redLivingRoomFrames.Count > 0)
+                    {
+                        livingRoomAnimPlayer.SetFrames(redLivingRoomFrames, 8f, true);
+                    }
                     break;
 
                 case 4:

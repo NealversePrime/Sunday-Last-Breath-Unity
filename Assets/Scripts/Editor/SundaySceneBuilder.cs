@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v14_auto.flag";
+                string flagPath = "Temp/scene_v15_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -229,10 +229,13 @@ namespace SundayLastBreath.Editor
             roomImg.preserveAspect = true;
             roomImg.raycastTarget = false;
             FrameAnimationPlayer roomAnim = roomObj.AddComponent<FrameAnimationPlayer>();
-            List<Sprite> roomFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomFrames");
+            List<Sprite> normalFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomNormalFrames");
+            if (normalFrames.Count == 0) normalFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomFrames");
+            List<Sprite> redFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomRedFrames");
+            List<Sprite> roomFrames = normalFrames;
             if (roomFrames.Count > 0)
             {
-                AssignFramesToPlayer(roomAnim, roomFrames, 12f, true);
+                AssignFramesToPlayer(roomAnim, roomFrames, 8f, true);
                 roomImg.sprite = roomFrames[0];
             }
             else
@@ -453,6 +456,8 @@ namespace SundayLastBreath.Editor
             so.FindProperty("staticClip").objectReferenceValue = staticClip;
             so.FindProperty("sirensClip").objectReferenceValue = sirensClip;
             so.FindProperty("screamClip").objectReferenceValue = screamClip;
+            AssignSpriteListToProperty(so, "normalLivingRoomFrames", normalFrames);
+            AssignSpriteListToProperty(so, "redLivingRoomFrames", redFrames);
             so.ApplyModifiedProperties();
 
             return screen;
@@ -879,6 +884,19 @@ namespace SundayLastBreath.Editor
             so.FindProperty("framesPerSecond").floatValue = fps;
             so.FindProperty("loop").boolValue = loop;
             so.ApplyModifiedProperties();
+        }
+
+        private static void AssignSpriteListToProperty(SerializedObject so, string propName, List<Sprite> sprites)
+        {
+            if (so == null || sprites == null) return;
+            SerializedProperty prop = so.FindProperty(propName);
+            if (prop == null) return;
+            prop.ClearArray();
+            for (int i = 0; i < sprites.Count; i++)
+            {
+                prop.InsertArrayElementAtIndex(i);
+                prop.GetArrayElementAtIndex(i).objectReferenceValue = sprites[i];
+            }
         }
 
         private static CharacterCreationScreen BuildCharacterCreationScreen(Transform parent)
