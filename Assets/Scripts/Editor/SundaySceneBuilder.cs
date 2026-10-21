@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v25_auto.flag";
+                string flagPath = "Temp/scene_v26_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -1651,8 +1651,7 @@ namespace SundayLastBreath.Editor
             // Audio Clips
             AudioClip atmosphereClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/BGM/atmosphere.mp3");
             AudioClip ebsWarningClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/ebs_warning.mp3");
-            AudioClip staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/radio_static_ebs.mp3");
-            if (staticClip == null) staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/static.mp3");
+            AudioClip staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/static.mp3");
             AudioClip policeRadioClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/police_radio.mp3");
             AudioClip clickClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
 
