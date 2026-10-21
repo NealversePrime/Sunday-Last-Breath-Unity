@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v24_auto.flag";
+                string flagPath = "Temp/scene_v25_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -385,7 +385,7 @@ namespace SundayLastBreath.Editor
             prTmp.fontSize = 12f;
             prTmp.fontStyle = FontStyles.Bold;
             prTmp.alignment = TextAlignmentOptions.MidlineRight;
-            prTmp.text = "<color=#FFA726>CLICK ANYWHERE OR SPACE TO ADVANCE</color> <color=#FFFFFF>▶</color>";
+            prTmp.text = "<color=#FFA726>CLICK ANYWHERE OR SPACE TO ADVANCE</color> <color=#FFFFFF>>></color>";
             prTmp.color = new Color(0.95f, 0.65f, 0.15f, 0.9f);
             prTmp.raycastTarget = false;
             promptObj.SetActive(false);
@@ -695,9 +695,9 @@ namespace SundayLastBreath.Editor
             brHlg.childControlWidth = true; brHlg.childControlHeight = true;
             brHlg.childForceExpandWidth = true; brHlg.childForceExpandHeight = true;
 
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModeNarrative", "📜 NARRATIVE & LOG [1]", out Button btnNarrative, out Image indNarrative, true);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "📟 SURVIVOR PDA [2 / TAB]", out Button btnPDA, out Image indPDA, false);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "🎒 TACTICAL GEAR [3 / I]", out Button btnGear, out Image indGear, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModeNarrative", "[1] NARRATIVE & LOG", out Button btnNarrative, out Image indNarrative, true);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "[2] SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "[3] TACTICAL GEAR [I]", out Button btnGear, out Image indGear, false);
 
             // =========================================================================
             // 4. BOTTOM SCREEN: INTERACTIVE TOUCH CONSOLE (Lower 40% of Screen)
@@ -983,7 +983,7 @@ namespace SundayLastBreath.Editor
             seRect.sizeDelta = new Vector2(0f, 22f);
 
             // Continue Prompt
-            TextMeshProUGUI prTmp = CreateTMPText(awakeObj.transform, "ContinuePrompt", "CLICK TO CONTINUE <color=#FFA726>▶</color>", 12.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            TextMeshProUGUI prTmp = CreateTMPText(awakeObj.transform, "ContinuePrompt", "CLICK TO CONTINUE <color=#FFA726>>></color>", 12.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
             RectTransform prRect = prTmp.rectTransform;
             prRect.anchorMin = new Vector2(1f, 0f); prRect.anchorMax = new Vector2(1f, 0f);
             prRect.pivot = new Vector2(1f, 0f);
@@ -1173,12 +1173,12 @@ namespace SundayLastBreath.Editor
 
             GameObject fillArea = new GameObject("Fill Area", typeof(RectTransform));
             fillArea.transform.SetParent(sliderObj.transform, false);
-            RectTransform faRect = fillArea.AddComponent<RectTransform>();
+            RectTransform faRect = fillArea.GetComponent<RectTransform>();
             StretchFull(faRect);
 
             GameObject sldFill = new GameObject("Fill", typeof(RectTransform));
             sldFill.transform.SetParent(fillArea.transform, false);
-            RectTransform sfRect = sldFill.AddComponent<RectTransform>();
+            RectTransform sfRect = sldFill.GetComponent<RectTransform>();
             StretchFull(sfRect);
             Image sfImg = sldFill.AddComponent<Image>();
             sfImg.color = new Color(0.22f, 0.45f, 0.82f);
@@ -1331,7 +1331,7 @@ namespace SundayLastBreath.Editor
 
             GameObject humFillObj = new GameObject("Fill", typeof(RectTransform));
             humFillObj.transform.SetParent(humTrack.transform, false);
-            RectTransform hfRect = humFillObj.AddComponent<RectTransform>();
+            RectTransform hfRect = humFillObj.GetComponent<RectTransform>();
             StretchFull(hfRect);
             Image pdaHumFillImg = humFillObj.AddComponent<Image>();
             pdaHumFillImg.color = new Color(0.36f, 0.61f, 0.84f);
