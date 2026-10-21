@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v12_auto.flag";
+                string flagPath = "Temp/scene_v13_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -135,7 +135,7 @@ namespace SundayLastBreath.Editor
             Debug.Log("<color=green><b>[Sunday's Last Breath]</b> Main Menu Scene built successfully at: " + scenePath + "</color>");
         }
 
-        private static PrologueWakeUpScreen BuildPrologueWakeUpScreen(Transform parent)
+                private static PrologueWakeUpScreen BuildPrologueWakeUpScreen(Transform parent)
         {
             GameObject obj = new GameObject("PrologueWakeUpScreen");
             obj.transform.SetParent(parent, false);
@@ -144,7 +144,7 @@ namespace SundayLastBreath.Editor
 
             PrologueWakeUpScreen screen = obj.AddComponent<PrologueWakeUpScreen>();
 
-            // Fullscreen Dark Ambience Backdrop (Cosmetic, no raycasts)
+            // Fullscreen Dark Ambience Backdrop (Base floor)
             GameObject bgObj = new GameObject("DarkBackdrop");
             bgObj.transform.SetParent(obj.transform, false);
             RectTransform bgRect = bgObj.AddComponent<RectTransform>();
@@ -153,80 +153,80 @@ namespace SundayLastBreath.Editor
             bgImg.color = new Color(0.04f, 0.05f, 0.07f, 1f);
             bgImg.raycastTarget = false;
 
-            // Stage: TV Screen & Living Room Frame (Centered Top-Half, no raycasts)
-            GameObject stageObj = new GameObject("StageContainer");
-            stageObj.transform.SetParent(obj.transform, false);
-            RectTransform stageRect = stageObj.AddComponent<RectTransform>();
-            stageRect.anchorMin = new Vector2(0.5f, 0.5f);
-            stageRect.anchorMax = new Vector2(0.5f, 0.5f);
-            stageRect.pivot = new Vector2(0.5f, 0.5f);
-            stageRect.sizeDelta = new Vector2(860f, 440f);
-            stageRect.anchoredPosition = new Vector2(0f, 130f);
+            // =========================================================================
+            // TOP SCREEN (3DS TOP VISUAL STAGE: 60% HEIGHT - Anchors Y: 0.40f to 1.0f)
+            // Stretches 100% edge-to-edge across the 1920x1080 display.
+            // =========================================================================
+            GameObject topScreenObj = new GameObject("TopVisualStage");
+            topScreenObj.transform.SetParent(obj.transform, false);
+            RectTransform topRect = topScreenObj.AddComponent<RectTransform>();
+            topRect.anchorMin = new Vector2(0f, 0.40f);
+            topRect.anchorMax = new Vector2(1f, 1f);
+            topRect.offsetMin = Vector2.zero;
+            topRect.offsetMax = Vector2.zero;
 
-            Image stageBg = stageObj.AddComponent<Image>();
-            stageBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
-            stageBg.raycastTarget = false;
-            Outline stageOl = stageObj.AddComponent<Outline>();
-            stageOl.effectColor = new Color(0.20f, 0.28f, 0.38f, 0.8f);
-            stageOl.effectDistance = new Vector2(1.5f, -1.5f);
+            Image topBg = topScreenObj.AddComponent<Image>();
+            topBg.color = new Color(0.03f, 0.04f, 0.06f, 1f);
+            topBg.raycastTarget = false;
 
-            // Header Bar on TV Frame
-            GameObject tvHeader = new GameObject("HeaderBar");
-            tvHeader.transform.SetParent(stageObj.transform, false);
-            RectTransform tvhRect = tvHeader.AddComponent<RectTransform>();
-            tvhRect.anchorMin = new Vector2(0f, 1f);
-            tvhRect.anchorMax = new Vector2(1f, 1f);
-            tvhRect.pivot = new Vector2(0.5f, 1f);
-            tvhRect.sizeDelta = new Vector2(0f, 32f);
-            tvhRect.anchoredPosition = Vector2.zero;
-            Image tvhBg = tvHeader.AddComponent<Image>();
-            tvhBg.color = new Color(0.05f, 0.07f, 0.10f, 0.98f);
-            tvhBg.raycastTarget = false;
+            // Top Header Bar (Tactical Status Rail)
+            GameObject topHeader = new GameObject("TopStatusRail");
+            topHeader.transform.SetParent(topScreenObj.transform, false);
+            RectTransform thRect = topHeader.AddComponent<RectTransform>();
+            thRect.anchorMin = new Vector2(0f, 1f);
+            thRect.anchorMax = new Vector2(1f, 1f);
+            thRect.pivot = new Vector2(0.5f, 1f);
+            thRect.sizeDelta = new Vector2(0f, 36f);
+            thRect.anchoredPosition = Vector2.zero;
+            Image thBg = topHeader.AddComponent<Image>();
+            thBg.color = new Color(0.06f, 0.08f, 0.12f, 0.98f);
+            thBg.raycastTarget = false;
 
-            GameObject tvhTitle = new GameObject("Title");
-            tvhTitle.transform.SetParent(tvHeader.transform, false);
-            RectTransform tvhtRect = tvhTitle.AddComponent<RectTransform>();
-            tvhtRect.anchorMin = new Vector2(0f, 0f);
-            tvhtRect.anchorMax = new Vector2(1f, 1f);
-            tvhtRect.offsetMin = new Vector2(16f, 0f);
-            tvhtRect.offsetMax = new Vector2(-16f, 0f);
-            TextMeshProUGUI tvhTmp = tvhTitle.AddComponent<TextMeshProUGUI>();
-            tvhTmp.fontSize = 11.5f;
-            tvhTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            tvhTmp.text = "<b>■ SURVEILLANCE FEED // APARTMENT 404 LIVING ROOM</b>";
-            tvhTmp.color = new Color(0.60f, 0.72f, 0.85f);
-            tvhTmp.raycastTarget = false;
+            GameObject thTitle = new GameObject("Title");
+            thTitle.transform.SetParent(topHeader.transform, false);
+            RectTransform thtRect = thTitle.AddComponent<RectTransform>();
+            thtRect.anchorMin = new Vector2(0f, 0f);
+            thtRect.anchorMax = new Vector2(1f, 1f);
+            thtRect.offsetMin = new Vector2(24f, 0f);
+            thtRect.offsetMax = new Vector2(-24f, 0f);
+            TextMeshProUGUI thTmp = thTitle.AddComponent<TextMeshProUGUI>();
+            thTmp.fontSize = 12f;
+            thTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            thTmp.text = "<b>■ UNIT 404 // LIVING ROOM INTERIOR</b>";
+            thTmp.color = new Color(0.65f, 0.75f, 0.88f);
+            thTmp.raycastTarget = false;
 
-            GameObject tvhStatus = new GameObject("Status");
-            tvhStatus.transform.SetParent(tvHeader.transform, false);
-            RectTransform tvhsRect = tvhStatus.AddComponent<RectTransform>();
-            tvhsRect.anchorMin = new Vector2(0f, 0f);
-            tvhsRect.anchorMax = new Vector2(1f, 1f);
-            tvhsRect.offsetMin = new Vector2(16f, 0f);
-            tvhsRect.offsetMax = new Vector2(-16f, 0f);
-            TextMeshProUGUI tvhsTmp = tvhStatus.AddComponent<TextMeshProUGUI>();
-            tvhsTmp.fontSize = 11.5f;
-            tvhsTmp.alignment = TextAlignmentOptions.MidlineRight;
-            tvhsTmp.text = "<color=#66BB6A>ONLINE</color>  |  CH: 04  |  23:45:00";
-            tvhsTmp.color = new Color(0.80f, 0.88f, 0.95f);
-            tvhsTmp.raycastTarget = false;
+            GameObject thStatus = new GameObject("Status");
+            thStatus.transform.SetParent(topHeader.transform, false);
+            RectTransform thsRect = thStatus.AddComponent<RectTransform>();
+            thsRect.anchorMin = new Vector2(0f, 0f);
+            thsRect.anchorMax = new Vector2(1f, 1f);
+            thsRect.offsetMin = new Vector2(24f, 0f);
+            thsRect.offsetMax = new Vector2(-24f, 0f);
+            TextMeshProUGUI thsTmp = thStatus.AddComponent<TextMeshProUGUI>();
+            thsTmp.fontSize = 12f;
+            thsTmp.alignment = TextAlignmentOptions.MidlineRight;
+            thsTmp.text = "<color=#FFA726>SATURDAY NIGHT</color>  |  CH: 04  |  23:45:00";
+            thsTmp.color = new Color(0.80f, 0.88f, 0.95f);
+            thsTmp.raycastTarget = false;
 
-            // TV Viewport Frame (Inset inside Stage)
-            GameObject vpObj = new GameObject("Viewport");
-            vpObj.transform.SetParent(stageObj.transform, false);
+            // Visual Stage Viewport (Inset below status rail)
+            GameObject vpObj = new GameObject("StageViewport");
+            vpObj.transform.SetParent(topScreenObj.transform, false);
             RectTransform vpRect = vpObj.AddComponent<RectTransform>();
-            vpRect.anchorMin = new Vector2(0f, 0f);
-            vpRect.anchorMax = new Vector2(1f, 1f);
-            vpRect.offsetMin = new Vector2(12f, 12f);
-            vpRect.offsetMax = new Vector2(-12f, -36f);
+            vpRect.anchorMin = Vector2.zero;
+            vpRect.anchorMax = Vector2.one;
+            vpRect.offsetMin = new Vector2(0f, 0f);
+            vpRect.offsetMax = new Vector2(0f, -36f);
 
-            // Layer 1: Living Room Background (Animated GIF frames)
+            // Layer 1: Living Room Background (Animated GIF frames / Artwork)
             GameObject roomObj = new GameObject("RoomBackdrop");
             roomObj.transform.SetParent(vpObj.transform, false);
             RectTransform roomRect = roomObj.AddComponent<RectTransform>();
             StretchFull(roomRect);
             Image roomImg = roomObj.AddComponent<Image>();
             roomImg.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+            roomImg.preserveAspect = true;
             roomImg.raycastTarget = false;
             FrameAnimationPlayer roomAnim = roomObj.AddComponent<FrameAnimationPlayer>();
             List<Sprite> roomFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomFrames");
@@ -248,6 +248,7 @@ namespace SundayLastBreath.Editor
             StretchFull(staticRect);
             Image staticImg = staticObj.AddComponent<Image>();
             staticImg.color = new Color(1f, 1f, 1f, 0.95f);
+            staticImg.preserveAspect = true;
             staticImg.raycastTarget = false;
             FrameAnimationPlayer staticAnim = staticObj.AddComponent<FrameAnimationPlayer>();
             List<Sprite> staticFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/StaticFrames");
@@ -269,101 +270,117 @@ namespace SundayLastBreath.Editor
             RectTransform crtRect = crtObj.AddComponent<RectTransform>();
             StretchFull(crtRect);
             Image crtImg = crtObj.AddComponent<Image>();
-            crtImg.color = new Color(0f, 0f, 0f, 0.25f);
+            crtImg.color = new Color(0f, 0f, 0f, 0.18f);
             crtImg.raycastTarget = false;
-            Outline crtOl = crtObj.AddComponent<Outline>();
-            crtOl.effectColor = new Color(0.12f, 0.16f, 0.22f, 0.9f);
-            crtOl.effectDistance = new Vector2(2f, -2f);
 
-            // Narration Box (Bottom Half)
-            GameObject narrObj = new GameObject("NarrationBox");
-            narrObj.transform.SetParent(obj.transform, false);
-            RectTransform narrRect = narrObj.AddComponent<RectTransform>();
-            narrRect.anchorMin = new Vector2(0.5f, 0f);
-            narrRect.anchorMax = new Vector2(0.5f, 0f);
-            narrRect.pivot = new Vector2(0.5f, 0f);
-            narrRect.sizeDelta = new Vector2(1080f, 260f);
-            narrRect.anchoredPosition = new Vector2(0f, 36f);
+            // =========================================================================
+            // PHYSICAL 3DS BEZEL / SEAM DIVIDER (Border at Y: 40%)
+            // =========================================================================
+            GameObject dividerObj = new GameObject("SeamDividerRail");
+            dividerObj.transform.SetParent(obj.transform, false);
+            RectTransform divRect = dividerObj.AddComponent<RectTransform>();
+            divRect.anchorMin = new Vector2(0f, 0.40f);
+            divRect.anchorMax = new Vector2(1f, 0.40f);
+            divRect.pivot = new Vector2(0.5f, 0.5f);
+            divRect.sizeDelta = new Vector2(0f, 4f);
+            divRect.anchoredPosition = Vector2.zero;
+            Image divImg = dividerObj.AddComponent<Image>();
+            divImg.color = new Color(0.85f, 0.55f, 0.15f, 0.95f); // Amber CDC tactical seam
+            divImg.raycastTarget = false;
+            Outline divOl = dividerObj.AddComponent<Outline>();
+            divOl.effectColor = new Color(0.1f, 0.1f, 0.15f, 0.8f);
+            divOl.effectDistance = new Vector2(0f, -2f);
 
-            Image narrBg = narrObj.AddComponent<Image>();
-            narrBg.color = new Color(0.06f, 0.08f, 0.11f, 0.96f);
-            narrBg.raycastTarget = false;
+            // =========================================================================
+            // BOTTOM SCREEN (3DS BOTTOM NARRATIVE & TACTICAL DOCK: 40% HEIGHT)
+            // Docked flush to the bottom and side rails of the screen (0 to 1920 x 432px).
+            // =========================================================================
+            GameObject botScreenObj = new GameObject("BottomNarrativeDock");
+            botScreenObj.transform.SetParent(obj.transform, false);
+            RectTransform botRect = botScreenObj.AddComponent<RectTransform>();
+            botRect.anchorMin = Vector2.zero;
+            botRect.anchorMax = new Vector2(1f, 0.40f);
+            botRect.offsetMin = Vector2.zero;
+            botRect.offsetMax = Vector2.zero;
 
-            Outline narrOl = narrObj.AddComponent<Outline>();
-            narrOl.effectColor = new Color(0.24f, 0.32f, 0.42f, 0.8f);
-            narrOl.effectDistance = new Vector2(1.5f, -1.5f);
+            Image botBg = botScreenObj.AddComponent<Image>();
+            botBg.color = new Color(0.06f, 0.08f, 0.11f, 0.98f);
+            botBg.raycastTarget = false;
 
-            // Left Highlight Strip
-            GameObject nStrip = new GameObject("LeftHighlightStrip");
-            nStrip.transform.SetParent(narrObj.transform, false);
-            RectTransform nsRect = nStrip.AddComponent<RectTransform>();
-            nsRect.anchorMin = new Vector2(0f, 0f);
-            nsRect.anchorMax = new Vector2(0f, 1f);
-            nsRect.sizeDelta = new Vector2(5f, 0f);
-            nsRect.anchoredPosition = new Vector2(2.5f, 0f);
-            Image nsImg = nStrip.AddComponent<Image>();
-            nsImg.color = new Color(0.95f, 0.65f, 0.15f, 0.9f);
-            nsImg.raycastTarget = false;
+            // Header Bar on Bottom Dock (Speaker & Channel status)
+            GameObject botHeader = new GameObject("HeaderBar");
+            botHeader.transform.SetParent(botScreenObj.transform, false);
+            RectTransform bhRect = botHeader.AddComponent<RectTransform>();
+            bhRect.anchorMin = new Vector2(0f, 1f);
+            bhRect.anchorMax = new Vector2(1f, 1f);
+            bhRect.pivot = new Vector2(0.5f, 1f);
+            bhRect.sizeDelta = new Vector2(0f, 38f);
+            bhRect.anchoredPosition = Vector2.zero;
+            Image bhBg = botHeader.AddComponent<Image>();
+            bhBg.color = new Color(0.09f, 0.12f, 0.16f, 0.98f);
+            bhBg.raycastTarget = false;
 
-            // Header Strip on Narration Box
-            GameObject nhObj = new GameObject("HeaderBar");
-            nhObj.transform.SetParent(narrObj.transform, false);
-            RectTransform nhRect = nhObj.AddComponent<RectTransform>();
-            nhRect.anchorMin = new Vector2(0f, 1f);
-            nhRect.anchorMax = new Vector2(1f, 1f);
-            nhRect.pivot = new Vector2(0.5f, 1f);
-            nhRect.sizeDelta = new Vector2(0f, 36f);
-            nhRect.anchoredPosition = Vector2.zero;
-            Image nhBg = nhObj.AddComponent<Image>();
-            nhBg.color = new Color(0.09f, 0.12f, 0.16f, 0.95f);
-            nhBg.raycastTarget = false;
-
-            // Speaker Label
+            // Speaker Label (Left)
             GameObject spkObj = new GameObject("SpeakerLabel");
-            spkObj.transform.SetParent(nhObj.transform, false);
+            spkObj.transform.SetParent(botHeader.transform, false);
             RectTransform spkRect = spkObj.AddComponent<RectTransform>();
             spkRect.anchorMin = new Vector2(0f, 0f);
-            spkRect.anchorMax = new Vector2(1f, 1f);
-            spkRect.offsetMin = new Vector2(20f, 0f);
-            spkRect.offsetMax = new Vector2(-20f, 0f);
+            spkRect.anchorMax = new Vector2(0.6f, 1f);
+            spkRect.offsetMin = new Vector2(32f, 0f);
+            spkRect.offsetMax = Vector2.zero;
             TextMeshProUGUI spkTmp = spkObj.AddComponent<TextMeshProUGUI>();
-            spkTmp.fontSize = 13f;
+            spkTmp.fontSize = 13.5f;
             spkTmp.alignment = TextAlignmentOptions.MidlineLeft;
             spkTmp.fontStyle = FontStyles.Bold;
             spkTmp.text = "SYSTEM // SATURDAY NIGHT 23:45";
             spkTmp.color = new Color(0.95f, 0.65f, 0.15f, 1f);
             spkTmp.raycastTarget = false;
 
-            // Body Narrative Text
+            // Right Channel Indicator
+            GameObject chObj = new GameObject("SubChannel");
+            chObj.transform.SetParent(botHeader.transform, false);
+            RectTransform chRect = chObj.AddComponent<RectTransform>();
+            chRect.anchorMin = new Vector2(0.6f, 0f);
+            chRect.anchorMax = new Vector2(1f, 1f);
+            chRect.offsetMin = Vector2.zero;
+            chRect.offsetMax = new Vector2(-32f, 0f);
+            TextMeshProUGUI chTmp = chObj.AddComponent<TextMeshProUGUI>();
+            chTmp.fontSize = 12f;
+            chTmp.alignment = TextAlignmentOptions.MidlineRight;
+            chTmp.text = "<color=#94A3B8>TACTICAL TERMINAL</color>  |  <color=#38BDF8>M.O.R.T.A.L. DOCK</color>";
+            chTmp.color = new Color(0.60f, 0.70f, 0.85f);
+            chTmp.raycastTarget = false;
+
+            // Body Narrative Text Container
             GameObject bodyObj = new GameObject("NarrativeBody");
-            bodyObj.transform.SetParent(narrObj.transform, false);
+            bodyObj.transform.SetParent(botScreenObj.transform, false);
             RectTransform bodyRect = bodyObj.AddComponent<RectTransform>();
-            bodyRect.anchorMin = new Vector2(0f, 0f);
-            bodyRect.anchorMax = new Vector2(1f, 1f);
-            bodyRect.offsetMin = new Vector2(28f, 24f);
-            bodyRect.offsetMax = new Vector2(-28f, -48f);
+            bodyRect.anchorMin = Vector2.zero;
+            bodyRect.anchorMax = Vector2.one;
+            bodyRect.offsetMin = new Vector2(40f, 50f);
+            bodyRect.offsetMax = new Vector2(-40f, -50f);
             TextMeshProUGUI bodyTmp = bodyObj.AddComponent<TextMeshProUGUI>();
-            bodyTmp.fontSize = 19f;
-            bodyTmp.lineSpacing = 10f;
+            bodyTmp.fontSize = 20f;
+            bodyTmp.lineSpacing = 12f;
             bodyTmp.alignment = TextAlignmentOptions.TopLeft;
-            bodyTmp.color = new Color(0.90f, 0.94f, 0.98f);
+            bodyTmp.color = new Color(0.92f, 0.95f, 0.98f);
             bodyTmp.text = "";
             bodyTmp.raycastTarget = false;
 
             // Continue Prompt Indicator (Bottom Right)
             GameObject promptObj = new GameObject("ContinuePrompt");
-            promptObj.transform.SetParent(narrObj.transform, false);
+            promptObj.transform.SetParent(botScreenObj.transform, false);
             RectTransform prRect = promptObj.AddComponent<RectTransform>();
             prRect.anchorMin = new Vector2(1f, 0f);
             prRect.anchorMax = new Vector2(1f, 0f);
             prRect.pivot = new Vector2(1f, 0f);
-            prRect.sizeDelta = new Vector2(240f, 28f);
-            prRect.anchoredPosition = new Vector2(-24f, 14f);
+            prRect.sizeDelta = new Vector2(360f, 32f);
+            prRect.anchoredPosition = new Vector2(-32f, 12f);
             TextMeshProUGUI prTmp = promptObj.AddComponent<TextMeshProUGUI>();
             prTmp.fontSize = 12f;
             prTmp.fontStyle = FontStyles.Bold;
             prTmp.alignment = TextAlignmentOptions.MidlineRight;
-            prTmp.text = "<color=#FFA726>CLICK ANYWHERE TO ADVANCE</color> <color=#FFFFFF>▶</color>";
+            prTmp.text = "<color=#FFA726>CLICK ANYWHERE OR SPACE TO ADVANCE</color> <color=#FFFFFF>▶</color>";
             prTmp.color = new Color(0.95f, 0.65f, 0.15f, 0.9f);
             prTmp.raycastTarget = false;
             promptObj.SetActive(false);
@@ -385,13 +402,13 @@ namespace SundayLastBreath.Editor
 
             // Action Button: FOCUS ON YOUR REFLECTION... (Above click catcher)
             GameObject btnObj = new GameObject("Btn_FocusReflection");
-            btnObj.transform.SetParent(obj.transform, false);
+            btnObj.transform.SetParent(botScreenObj.transform, false);
             RectTransform btnRect = btnObj.AddComponent<RectTransform>();
             btnRect.anchorMin = new Vector2(0.5f, 0f);
             btnRect.anchorMax = new Vector2(0.5f, 0f);
             btnRect.pivot = new Vector2(0.5f, 0f);
-            btnRect.sizeDelta = new Vector2(440f, 52f);
-            btnRect.anchoredPosition = new Vector2(0f, 54f);
+            btnRect.sizeDelta = new Vector2(460f, 52f);
+            btnRect.anchoredPosition = new Vector2(0f, 20f);
 
             CanvasGroup btnCg = btnObj.AddComponent<CanvasGroup>();
             Image btnBg = btnObj.AddComponent<Image>();
