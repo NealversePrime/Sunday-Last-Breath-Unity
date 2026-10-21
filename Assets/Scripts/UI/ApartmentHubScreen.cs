@@ -36,6 +36,17 @@ namespace SundayLastBreath.UI
         [SerializeField] private Button floorItemsButton;
         [SerializeField] private TextMeshProUGUI floorItemsCountText;
 
+        [Header("3DS Switchable Console (Seam Bezel)")]
+        [SerializeField] private Button btnModeNarrative;
+        [SerializeField] private Button btnModePDA;
+        [SerializeField] private Button btnModeGear;
+        [SerializeField] private Image modeIndicatorNarrative;
+        [SerializeField] private Image modeIndicatorPDA;
+        [SerializeField] private Image modeIndicatorGear;
+        [SerializeField] private GameObject dockContainerNarrative;
+        [SerializeField] private GameObject dockContainerPDA;
+        [SerializeField] private GameObject dockContainerGear;
+
         [Header("Left Wing: Embedded Survivor PDA")]
         [SerializeField] private Button pdaTabStatusBtn;
         [SerializeField] private Button pdaTabSkillsBtn;
@@ -247,6 +258,23 @@ namespace SundayLastBreath.UI
 
         private void HookUIButtons()
         {
+            // 3DS Console Mode Switcher Buttons
+            if (btnModeNarrative != null)
+            {
+                btnModeNarrative.onClick.RemoveAllListeners();
+                btnModeNarrative.onClick.AddListener(() => SwitchConsoleMode(ConsoleMode.Narrative));
+            }
+            if (btnModePDA != null)
+            {
+                btnModePDA.onClick.RemoveAllListeners();
+                btnModePDA.onClick.AddListener(() => SwitchConsoleMode(ConsoleMode.PDA));
+            }
+            if (btnModeGear != null)
+            {
+                btnModeGear.onClick.RemoveAllListeners();
+                btnModeGear.onClick.AddListener(() => SwitchConsoleMode(ConsoleMode.Gear));
+            }
+
             if (fullScreenClickCatcher != null)
             {
                 fullScreenClickCatcher.onClick.RemoveAllListeners();
@@ -400,6 +428,7 @@ namespace SundayLastBreath.UI
             PopulateTableStashUI();
             RefreshAllPDAPanels();
             SwitchPDATab("STATUS", playSound: false);
+            SwitchConsoleMode(ConsoleMode.Narrative, playSound: false);
             EvaluateHubButtonStates();
 
             // Load player avatar frames
@@ -482,10 +511,75 @@ namespace SundayLastBreath.UI
             if (sfxSource != null) sfxSource.Stop();
         }
 
+        public enum ConsoleMode { Narrative, PDA, Gear }
+        private ConsoleMode currentConsoleMode = ConsoleMode.Narrative;
+
+        public void SwitchConsoleMode(ConsoleMode mode, bool playSound = true)
+        {
+            currentConsoleMode = mode;
+            if (dockContainerNarrative != null) dockContainerNarrative.SetActive(mode == ConsoleMode.Narrative);
+            if (dockContainerPDA != null) dockContainerPDA.SetActive(mode == ConsoleMode.PDA);
+            if (dockContainerGear != null) dockContainerGear.SetActive(mode == ConsoleMode.Gear);
+
+            UpdateModeButtonVisuals();
+
+            if (mode == ConsoleMode.PDA) RefreshAllPDAPanels();
+            else if (mode == ConsoleMode.Gear) RefreshRightGearPanel();
+
+            if (playSound) PlayClickSFX();
+        }
+
+        private void UpdateModeButtonVisuals()
+        {
+            if (modeIndicatorNarrative != null) modeIndicatorNarrative.gameObject.SetActive(currentConsoleMode == ConsoleMode.Narrative);
+            if (modeIndicatorPDA != null) modeIndicatorPDA.gameObject.SetActive(currentConsoleMode == ConsoleMode.PDA);
+            if (modeIndicatorGear != null) modeIndicatorGear.gameObject.SetActive(currentConsoleMode == ConsoleMode.Gear);
+        }
+
         private void Update()
         {
+            // Hotkeys for 3DS Switchable Console Mode
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null)
+            {
+                if (Keyboard.current.digit1Key.wasPressedThisFrame || Keyboard.current.numpad1Key.wasPressedThisFrame)
+                {
+                    SwitchConsoleMode(ConsoleMode.Narrative);
+                }
+                else if (Keyboard.current.digit2Key.wasPressedThisFrame || Keyboard.current.numpad2Key.wasPressedThisFrame || Keyboard.current.tabKey.wasPressedThisFrame || Keyboard.current.pKey.wasPressedThisFrame)
+                {
+                    SwitchConsoleMode(ConsoleMode.PDA);
+                }
+                else if (Keyboard.current.digit3Key.wasPressedThisFrame || Keyboard.current.numpad3Key.wasPressedThisFrame || Keyboard.current.iKey.wasPressedThisFrame)
+                {
+                    SwitchConsoleMode(ConsoleMode.Gear);
+                }
+                else if (Keyboard.current.escapeKey.wasPressedThisFrame && currentConsoleMode != ConsoleMode.Narrative)
+                {
+                    SwitchConsoleMode(ConsoleMode.Narrative);
+                }
+            }
+#else
+            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                SwitchConsoleMode(ConsoleMode.Narrative);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2) || Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.P))
+            {
+                SwitchConsoleMode(ConsoleMode.PDA);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3) || Input.GetKeyDown(KeyCode.I))
+            {
+                SwitchConsoleMode(ConsoleMode.Gear);
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape) && currentConsoleMode != ConsoleMode.Narrative)
+            {
+                SwitchConsoleMode(ConsoleMode.Narrative);
+            }
+#endif
+
             // Debounced multi-input check (Space or Enter to advance awakening dialogue)
-            if (!introSeen && awakeningContainer != null && awakeningContainer.activeSelf)
+            if (!introSeen && awakeningContainer != null && awakeningContainer.activeSelf && currentConsoleMode == ConsoleMode.Narrative)
             {
                 bool spacePressed = false;
                 bool enterPressed = false;
