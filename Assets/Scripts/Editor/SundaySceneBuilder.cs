@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v15_auto.flag";
+                string flagPath = "Temp/scene_v16_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -250,7 +250,7 @@ namespace SundayLastBreath.Editor
             RectTransform staticRect = staticObj.AddComponent<RectTransform>();
             StretchFull(staticRect);
             Image staticImg = staticObj.AddComponent<Image>();
-            staticImg.color = new Color(1f, 1f, 1f, 0.95f);
+            staticImg.color = new Color(1f, 1f, 1f, 0f);
             staticImg.preserveAspect = true;
             staticImg.raycastTarget = false;
             FrameAnimationPlayer staticAnim = staticObj.AddComponent<FrameAnimationPlayer>();
@@ -405,7 +405,8 @@ namespace SundayLastBreath.Editor
 
             // Action Button: FOCUS ON YOUR REFLECTION... (Above click catcher)
             GameObject btnObj = new GameObject("Btn_FocusReflection");
-            btnObj.transform.SetParent(botScreenObj.transform, false);
+            btnObj.transform.SetParent(obj.transform, false);
+            btnObj.transform.SetAsLastSibling();
             RectTransform btnRect = btnObj.AddComponent<RectTransform>();
             btnRect.anchorMin = new Vector2(0.5f, 0f);
             btnRect.anchorMax = new Vector2(0.5f, 0f);
@@ -414,6 +415,9 @@ namespace SundayLastBreath.Editor
             btnRect.anchoredPosition = new Vector2(0f, 20f);
 
             CanvasGroup btnCg = btnObj.AddComponent<CanvasGroup>();
+            btnCg.alpha = 1f;
+            btnCg.interactable = true;
+            btnCg.blocksRaycasts = true;
             Image btnBg = btnObj.AddComponent<Image>();
             btnBg.color = new Color(0.85f, 0.35f, 0.08f, 0.98f);
             btnBg.raycastTarget = true;

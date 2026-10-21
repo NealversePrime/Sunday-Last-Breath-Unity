@@ -204,26 +204,6 @@ namespace SundayLastBreath.UI
         {
             if (!CanvasGroup.interactable || currentStep <= 0 || currentStep > NarrativeSteps.Length) return;
 
-            // If action button is active, let player click the action button specifically,
-            // or trigger it with Space / Enter
-            if (focusReflectionButton != null && focusReflectionButton.gameObject.activeSelf)
-            {
-#if ENABLE_INPUT_SYSTEM
-                if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || 
-                                                 Keyboard.current.enterKey.wasPressedThisFrame || 
-                                                 Keyboard.current.numpadEnterKey.wasPressedThisFrame))
-                {
-                    OnFocusReflectionClicked();
-                }
-#elif ENABLE_LEGACY_INPUT_MANAGER
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-                {
-                    OnFocusReflectionClicked();
-                }
-#endif
-                return;
-            }
-
 #if ENABLE_INPUT_SYSTEM
             bool mouseClicked = (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) ||
                                 (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame);
@@ -232,14 +212,28 @@ namespace SundayLastBreath.UI
                                                           Keyboard.current.numpadEnterKey.wasPressedThisFrame);
             if (mouseClicked || keyPressed)
             {
-                OnDialogueAreaClicked();
+                if (focusReflectionButton != null && focusReflectionButton.gameObject.activeSelf)
+                {
+                    OnFocusReflectionClicked();
+                }
+                else
+                {
+                    OnDialogueAreaClicked();
+                }
             }
 #elif ENABLE_LEGACY_INPUT_MANAGER
             bool mouseClicked = Input.GetMouseButtonDown(0);
             bool keyPressed = Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
             if (mouseClicked || keyPressed)
             {
-                OnDialogueAreaClicked();
+                if (focusReflectionButton != null && focusReflectionButton.gameObject.activeSelf)
+                {
+                    OnFocusReflectionClicked();
+                }
+                else
+                {
+                    OnDialogueAreaClicked();
+                }
             }
 #endif
         }
@@ -258,7 +252,7 @@ namespace SundayLastBreath.UI
 
             if (focusReflectionButton != null && focusReflectionButton.gameObject.activeSelf)
             {
-                // Action button is active, let player click the button specifically
+                OnFocusReflectionClicked();
                 return;
             }
 
@@ -313,7 +307,8 @@ namespace SundayLastBreath.UI
                     break;
 
                 case 2:
-                    // Broadcast dies: JUMPSCARE TV STATIC!
+                    // Broadcast dies: JUMPSCARE TV STATIC AUDIO!
+                    // (Old obsolete NO SIGNAL box is disabled so it doesn't overlap the pixel art living room)
                     if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ SUDDEN SILENCE ]</color>";
                     if (staticClip != null && staticSource != null)
                     {
@@ -324,14 +319,15 @@ namespace SundayLastBreath.UI
 
                     if (tvStaticImage != null)
                     {
-                        tvStaticImage.gameObject.SetActive(true);
-                        tvStaticImage.color = new Color(1f, 1f, 1f, 0.95f);
+                        tvStaticImage.gameObject.SetActive(false);
                     }
 
                     if (tvStaticAnimPlayer != null)
                     {
-                        tvStaticAnimPlayer.Play();
+                        tvStaticAnimPlayer.Stop();
                     }
+
+                    StartCoroutine(DoCrtGlitchPulse());
                     break;
 
                 case 3:
@@ -369,6 +365,17 @@ namespace SundayLastBreath.UI
                     if (speakerLabel != null) speakerLabel.text = "<color=#38BDF8>[ WINDOW REFLECTION ]</color>";
                     break;
             }
+        }
+
+        private IEnumerator DoCrtGlitchPulse()
+        {
+            if (roomBackdropImage == null) yield break;
+            Color orig = roomBackdropImage.color;
+            roomBackdropImage.color = new Color(0.12f, 0.12f, 0.18f, 1f);
+            yield return new WaitForSecondsRealtime(0.08f);
+            roomBackdropImage.color = new Color(1.25f, 1.25f, 1.35f, 1f);
+            yield return new WaitForSecondsRealtime(0.06f);
+            roomBackdropImage.color = orig;
         }
 
         private IEnumerator TypewriterRoutine(string targetText)
@@ -414,8 +421,14 @@ namespace SundayLastBreath.UI
                 if (focusReflectionButton != null)
                 {
                     focusReflectionButton.gameObject.SetActive(true);
+                    focusReflectionButton.interactable = true;
                     CanvasGroup btnCg = focusReflectionButton.GetComponent<CanvasGroup>();
-                    if (btnCg != null) StartCoroutine(FadeCanvasGroup(btnCg, 0f, 1f, 0.8f));
+                    if (btnCg != null)
+                    {
+                        btnCg.interactable = true;
+                        btnCg.blocksRaycasts = true;
+                        StartCoroutine(FadeCanvasGroup(btnCg, 0f, 1f, 0.5f));
+                    }
                 }
             }
         }
@@ -424,6 +437,8 @@ namespace SundayLastBreath.UI
         {
             if (isTransitioning) return;
             isTransitioning = true;
+
+            Debug.Log("[PrologueWakeUpScreen] Focus on reflection clicked! Transitioning to Character Creation...");
 
             if (focusReflectionButton != null)
             {
