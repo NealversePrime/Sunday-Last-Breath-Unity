@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v16_auto.flag";
+                string flagPath = "Temp/scene_v17_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -250,8 +250,8 @@ namespace SundayLastBreath.Editor
             RectTransform staticRect = staticObj.AddComponent<RectTransform>();
             StretchFull(staticRect);
             Image staticImg = staticObj.AddComponent<Image>();
-            staticImg.color = new Color(1f, 1f, 1f, 0f);
-            staticImg.preserveAspect = true;
+            staticImg.color = Color.white;
+            staticImg.preserveAspect = false;
             staticImg.raycastTarget = false;
             FrameAnimationPlayer staticAnim = staticObj.AddComponent<FrameAnimationPlayer>();
             List<Sprite> staticFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/StaticFrames");

@@ -296,20 +296,27 @@ namespace SundayLastBreath.UI
             switch (step)
             {
                 case 1:
-                    // Quiet peaceful night
+                    // Beat 1: Quiet peaceful night -> TV NORMAL (Bag.gif)
                     if (speakerLabel != null) speakerLabel.text = "<color=#94A3B8>[ SATURDAY NIGHT 23:45 ]</color>";
                     if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
+                    if (tvStaticAnimPlayer != null) tvStaticAnimPlayer.Stop();
+                    if (staticSource != null && staticSource.isPlaying) staticSource.Stop();
+
+                    if (roomBackdropImage != null)
+                    {
+                        roomBackdropImage.gameObject.SetActive(true);
+                        roomBackdropImage.color = Color.white;
+                    }
                     if (livingRoomAnimPlayer != null && normalLivingRoomFrames != null && normalLivingRoomFrames.Count > 0)
                     {
                         livingRoomAnimPlayer.SetFrames(normalLivingRoomFrames, 8f, true);
+                        livingRoomAnimPlayer.Play();
                     }
-                    if (roomBackdropImage != null) roomBackdropImage.color = Color.white;
                     break;
 
                 case 2:
-                    // Broadcast dies: JUMPSCARE TV STATIC AUDIO!
-                    // (Old obsolete NO SIGNAL box is disabled so it doesn't overlap the pixel art living room)
-                    if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ SUDDEN SILENCE ]</color>";
+                    // Beat 2: Broadcast dies -> TV STATIC SCREEN! (Ruangan ditutup, layar penuh TV static)
+                    if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ TRANSMISSION LOSS ]</color>";
                     if (staticClip != null && staticSource != null)
                     {
                         staticSource.clip = staticClip;
@@ -317,31 +324,71 @@ namespace SundayLastBreath.UI
                         staticSource.Play();
                     }
 
+                    // Hide living room completely so it never peeks/stacks through
+                    if (roomBackdropImage != null)
+                    {
+                        roomBackdropImage.gameObject.SetActive(false);
+                    }
+                    if (livingRoomAnimPlayer != null)
+                    {
+                        livingRoomAnimPlayer.Stop();
+                    }
+
+                    // Show full TV static screen
                     if (tvStaticImage != null)
                     {
-                        tvStaticImage.gameObject.SetActive(false);
+                        tvStaticImage.gameObject.SetActive(true);
+                        tvStaticImage.color = Color.white;
                     }
-
                     if (tvStaticAnimPlayer != null)
                     {
-                        tvStaticAnimPlayer.Stop();
+                        tvStaticAnimPlayer.Play();
                     }
-
-                    StartCoroutine(DoCrtGlitchPulse());
                     break;
 
                 case 3:
-                    // Shock / living room strobe - switches to RED Emergency Alert System frames
+                    // Beat 3: Shock / Waking up -> TV STATIC CONTINUES ("hingga beat 3")
                     if (speakerLabel != null) speakerLabel.text = "<color=#F59E0B>[ WAKING UP ]</color>";
-                    if (livingRoomAnimPlayer != null && redLivingRoomFrames != null && redLivingRoomFrames.Count > 0)
+                    if (roomBackdropImage != null)
                     {
-                        livingRoomAnimPlayer.SetFrames(redLivingRoomFrames, 8f, true);
+                        roomBackdropImage.gameObject.SetActive(false);
+                    }
+                    if (tvStaticImage != null)
+                    {
+                        tvStaticImage.gameObject.SetActive(true);
+                        tvStaticImage.color = Color.white;
+                    }
+                    if (tvStaticAnimPlayer != null && !tvStaticAnimPlayer.IsPlaying)
+                    {
+                        tvStaticAnimPlayer.Play();
                     }
                     break;
 
                 case 4:
-                    // Distant emergency sirens fade in
+                    // Beat 4: Beyond the glass -> LIVING ROOM TV MERAH (Bag (1).gif) + DISTANT SIRENS!
                     if (speakerLabel != null) speakerLabel.text = "<color=#94A3B8>[ THE NIGHT AIR ]</color>";
+
+                    // TV static shuts off
+                    if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
+                    if (tvStaticAnimPlayer != null) tvStaticAnimPlayer.Stop();
+                    if (staticSource != null && staticSource.isPlaying)
+                    {
+                        StartCoroutine(FadeAudioSource(staticSource, staticSource.volume, 0f, 1.0f));
+                    }
+
+                    // Living room appears with RED Emergency Alert System frames
+                    if (roomBackdropImage != null)
+                    {
+                        roomBackdropImage.gameObject.SetActive(true);
+                        roomBackdropImage.color = Color.white;
+                    }
+                    if (livingRoomAnimPlayer != null && redLivingRoomFrames != null && redLivingRoomFrames.Count > 0)
+                    {
+                        livingRoomAnimPlayer.SetFrames(redLivingRoomFrames, 8f, true);
+                        livingRoomAnimPlayer.Play();
+                    }
+
+                    // Distant emergency sirens fade in
                     if (sirensClip != null && sirensSource != null)
                     {
                         sirensSource.clip = sirensClip;
@@ -352,8 +399,12 @@ namespace SundayLastBreath.UI
                     break;
 
                 case 5:
-                    // Terrifying scream cut short in the dark
+                    // Beat 5: Screams in the dark -> SUARA TERIAKAN!
                     if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ ECHOES IN THE DARK ]</color>";
+                    if (roomBackdropImage != null && !roomBackdropImage.gameObject.activeSelf)
+                    {
+                        roomBackdropImage.gameObject.SetActive(true);
+                    }
                     if (screamClip != null && sfxSource != null)
                     {
                         sfxSource.PlayOneShot(screamClip, 0.95f);
@@ -361,21 +412,10 @@ namespace SundayLastBreath.UI
                     break;
 
                 case 6:
-                    // Stumble to balcony, window reflection
+                    // Beat 6: Stumble to balcony, window reflection -> Character Creation prompt
                     if (speakerLabel != null) speakerLabel.text = "<color=#38BDF8>[ WINDOW REFLECTION ]</color>";
                     break;
             }
-        }
-
-        private IEnumerator DoCrtGlitchPulse()
-        {
-            if (roomBackdropImage == null) yield break;
-            Color orig = roomBackdropImage.color;
-            roomBackdropImage.color = new Color(0.12f, 0.12f, 0.18f, 1f);
-            yield return new WaitForSecondsRealtime(0.08f);
-            roomBackdropImage.color = new Color(1.25f, 1.25f, 1.35f, 1f);
-            yield return new WaitForSecondsRealtime(0.06f);
-            roomBackdropImage.color = orig;
         }
 
         private IEnumerator TypewriterRoutine(string targetText)
