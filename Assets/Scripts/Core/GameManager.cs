@@ -11,6 +11,8 @@ namespace SundayLastBreath.Core
         Title,
         PrologueWakeUp,
         CharacterCreation,
+        ApartmentHub,
+        Hallway,
         InGame
     }
 
@@ -30,6 +32,7 @@ namespace SundayLastBreath.Core
         [SerializeField] private TitleScreen titleScreen;
         [SerializeField] private PrologueWakeUpScreen prologueWakeUpScreen;
         [SerializeField] private CharacterCreationScreen characterCreationScreen;
+        [SerializeField] private ApartmentHubScreen apartmentHubScreen;
 
         public GameState CurrentState => currentState;
         public SundayLastBreath.Data.CharacterData CurrentPlayer { get; private set; }
@@ -51,6 +54,7 @@ namespace SundayLastBreath.Core
             if (titleScreen == null) titleScreen = FindAnyObjectByType<TitleScreen>(FindObjectsInactive.Include);
             if (prologueWakeUpScreen == null) prologueWakeUpScreen = FindAnyObjectByType<PrologueWakeUpScreen>(FindObjectsInactive.Include);
             if (characterCreationScreen == null) characterCreationScreen = FindAnyObjectByType<CharacterCreationScreen>(FindObjectsInactive.Include);
+            if (apartmentHubScreen == null) apartmentHubScreen = FindAnyObjectByType<ApartmentHubScreen>(FindObjectsInactive.Include);
         }
 
         private void Start()
@@ -144,13 +148,35 @@ namespace SundayLastBreath.Core
         public void CompleteCharacterCreation(SundayLastBreath.Data.CharacterData character)
         {
             CurrentPlayer = character;
-            currentState = GameState.InGame;
+            currentState = GameState.ApartmentHub;
             Debug.Log($"<color=green><b>[GameManager] Character Creation Complete!</b></color>\n" +
                       $"Name: {character.FullName} | Gender: {character.gender} | Job: {character.job}\n" +
                       $"Vitals: HP {character.hp}/{character.hpMax}, Stamina {character.stamina}/{character.staminaMax}\n" +
                       $"Traits Acquired: {character.traits.Count} | Starting Items: {character.inventory.Count}");
 
-            // Ready to transition to Prologue Unit 404!
+            GoToApartmentHub();
+        }
+
+        public void GoToApartmentHub()
+        {
+            currentState = GameState.ApartmentHub;
+            HideAllScreensInstant();
+
+            if (apartmentHubScreen != null)
+            {
+                apartmentHubScreen.InitializeWithCharacter(CurrentPlayer);
+                apartmentHubScreen.Show(0.8f);
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] ApartmentHubScreen not assigned!");
+            }
+        }
+
+        public void TransitionFromApartmentToHallway()
+        {
+            currentState = GameState.Hallway;
+            Debug.Log("<color=yellow>[GameManager] Transitioning from Apartment Unit 404 to 4th Floor Hallway...</color>");
         }
 
         private void HideAllScreensInstant()
@@ -160,6 +186,7 @@ namespace SundayLastBreath.Core
             if (titleScreen != null) titleScreen.HideInstant();
             if (prologueWakeUpScreen != null) prologueWakeUpScreen.HideInstant();
             if (characterCreationScreen != null) characterCreationScreen.HideInstant();
+            if (apartmentHubScreen != null) apartmentHubScreen.HideInstant();
         }
     }
 }

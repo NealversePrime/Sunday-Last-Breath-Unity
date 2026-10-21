@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v17_auto.flag";
+                string flagPath = "Temp/scene_v18_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -104,6 +104,7 @@ namespace SundayLastBreath.Editor
             TitleScreen titleScreen = BuildTitleScreen(screensObj.transform);
             PrologueWakeUpScreen prologueScreen = BuildPrologueWakeUpScreen(screensObj.transform);
             CharacterCreationScreen creationScreen = BuildCharacterCreationScreen(screensObj.transform);
+            ApartmentHubScreen apartmentHubScreen = BuildApartmentHubScreen(screensObj.transform);
             SundayTypography.ApplyHierarchy(screensObj.transform);
 
             // 7. GameManager
@@ -116,6 +117,7 @@ namespace SundayLastBreath.Editor
             gameSo.FindProperty("titleScreen").objectReferenceValue = titleScreen;
             gameSo.FindProperty("prologueWakeUpScreen").objectReferenceValue = prologueScreen;
             gameSo.FindProperty("characterCreationScreen").objectReferenceValue = creationScreen;
+            gameSo.FindProperty("apartmentHubScreen").objectReferenceValue = apartmentHubScreen;
             gameSo.ApplyModifiedProperties();
 
             // Save Scene
@@ -467,6 +469,824 @@ namespace SundayLastBreath.Editor
             return screen;
         }
 
+        private static ApartmentHubScreen BuildApartmentHubScreen(Transform parent)
+        {
+            GameObject obj = new GameObject("ApartmentHubScreen");
+            obj.transform.SetParent(parent, false);
+            RectTransform rect = obj.AddComponent<RectTransform>();
+            StretchFull(rect);
+
+            ApartmentHubScreen screen = obj.AddComponent<ApartmentHubScreen>();
+
+            // Fullscreen Dark Ambience Backdrop (Base floor)
+            GameObject bgObj = new GameObject("DarkBackdrop");
+            bgObj.transform.SetParent(obj.transform, false);
+            RectTransform bgRect = bgObj.AddComponent<RectTransform>();
+            StretchFull(bgRect);
+            Image bgImg = bgObj.AddComponent<Image>();
+            bgImg.color = new Color(0.04f, 0.05f, 0.07f, 1f);
+            bgImg.raycastTarget = false;
+
+            // =========================================================================
+            // TOP SCREEN (3DS TOP VISUAL STAGE: 60% HEIGHT - Anchors Y: 0.40f to 1.0f)
+            // =========================================================================
+            GameObject topScreenObj = new GameObject("TopVisualStage");
+            topScreenObj.transform.SetParent(obj.transform, false);
+            RectTransform topRect = topScreenObj.AddComponent<RectTransform>();
+            topRect.anchorMin = new Vector2(0f, 0.40f);
+            topRect.anchorMax = new Vector2(1f, 1f);
+            topRect.offsetMin = Vector2.zero;
+            topRect.offsetMax = Vector2.zero;
+
+            Image topBg = topScreenObj.AddComponent<Image>();
+            topBg.color = new Color(0.03f, 0.04f, 0.06f, 1f);
+            topBg.raycastTarget = false;
+
+            // Top Header Bar (Tactical Status Rail)
+            GameObject topHeader = new GameObject("TopStatusRail");
+            topHeader.transform.SetParent(topScreenObj.transform, false);
+            RectTransform thRect = topHeader.AddComponent<RectTransform>();
+            thRect.anchorMin = new Vector2(0f, 1f);
+            thRect.anchorMax = new Vector2(1f, 1f);
+            thRect.pivot = new Vector2(0.5f, 1f);
+            thRect.sizeDelta = new Vector2(0f, 36f);
+            thRect.anchoredPosition = Vector2.zero;
+            Image thBg = topHeader.AddComponent<Image>();
+            thBg.color = new Color(0.06f, 0.08f, 0.12f, 0.98f);
+            thBg.raycastTarget = false;
+
+            GameObject thTitle = new GameObject("Title");
+            thTitle.transform.SetParent(topHeader.transform, false);
+            RectTransform thtRect = thTitle.AddComponent<RectTransform>();
+            thtRect.anchorMin = new Vector2(0f, 0f);
+            thtRect.anchorMax = new Vector2(1f, 1f);
+            thtRect.offsetMin = new Vector2(24f, 0f);
+            thtRect.offsetMax = new Vector2(-24f, 0f);
+            TextMeshProUGUI thtTmp = thTitle.AddComponent<TextMeshProUGUI>();
+            thtTmp.fontSize = 12f;
+            thtTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            thtTmp.text = "<b>■ UNIT 404 // LIVING ROOM INTERIOR</b>";
+            thtTmp.color = new Color(0.85f, 0.35f, 0.35f);
+            thtTmp.raycastTarget = false;
+
+            GameObject thStatus = new GameObject("ClockStatus");
+            thStatus.transform.SetParent(topHeader.transform, false);
+            RectTransform thsRect = thStatus.AddComponent<RectTransform>();
+            thsRect.anchorMin = new Vector2(0f, 0f);
+            thsRect.anchorMax = new Vector2(1f, 1f);
+            thsRect.offsetMin = new Vector2(24f, 0f);
+            thsRect.offsetMax = new Vector2(-24f, 0f);
+            TextMeshProUGUI thsTmp = thStatus.AddComponent<TextMeshProUGUI>();
+            thsTmp.fontSize = 12f;
+            thsTmp.alignment = TextAlignmentOptions.MidlineRight;
+            thsTmp.text = "<color=#FFA726>SATURDAY NIGHT</color>  |  23:45";
+            thsTmp.color = new Color(0.80f, 0.88f, 0.95f);
+            thsTmp.raycastTarget = false;
+
+            // Visual Stage Viewport (Inset below status rail)
+            GameObject vpObj = new GameObject("StageViewport");
+            vpObj.transform.SetParent(topScreenObj.transform, false);
+            RectTransform vpRect = vpObj.AddComponent<RectTransform>();
+            vpRect.anchorMin = Vector2.zero;
+            vpRect.anchorMax = Vector2.one;
+            vpRect.offsetMin = Vector2.zero;
+            vpRect.offsetMax = new Vector2(0f, -36f);
+
+            // Layer 1: Living Room Red Backdrop (Animated GIF frames)
+            GameObject roomObj = new GameObject("RoomBackdrop");
+            roomObj.transform.SetParent(vpObj.transform, false);
+            RectTransform roomRect = roomObj.AddComponent<RectTransform>();
+            StretchFull(roomRect);
+            Image roomImg = roomObj.AddComponent<Image>();
+            roomImg.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+            roomImg.preserveAspect = true;
+            roomImg.raycastTarget = false;
+            FrameAnimationPlayer roomAnim = roomObj.AddComponent<FrameAnimationPlayer>();
+            List<Sprite> redFrames = LoadSpritesFromFolder("Assets/Sprites/Prologue/LivingRoomRedFrames");
+            if (redFrames.Count > 0)
+            {
+                AssignFramesToPlayer(roomAnim, redFrames, 8f, true);
+                roomImg.sprite = redFrames[0];
+            }
+            else
+            {
+                Sprite roomSprite = LoadSpriteSafe("Assets/Sprites/Prologue/bg_living_room_red.png");
+                if (roomSprite != null) roomImg.sprite = roomSprite;
+            }
+
+            // HUD Overlay: Vitals Panel (Top-Left) & Objective Badge (Top-Right)
+            GameObject hudObj = new GameObject("HUDOverlay");
+            hudObj.transform.SetParent(vpObj.transform, false);
+            RectTransform hudRect = hudObj.AddComponent<RectTransform>();
+            StretchFull(hudRect);
+
+            // Vitals Panel
+            GameObject vitalsObj = new GameObject("VitalsPanel");
+            vitalsObj.transform.SetParent(hudObj.transform, false);
+            RectTransform vitalsRect = vitalsObj.AddComponent<RectTransform>();
+            vitalsRect.anchorMin = new Vector2(0f, 1f);
+            vitalsRect.anchorMax = new Vector2(0f, 1f);
+            vitalsRect.pivot = new Vector2(0f, 1f);
+            vitalsRect.anchoredPosition = new Vector2(24f, -14f);
+            vitalsRect.sizeDelta = new Vector2(280f, 44f);
+            Image vitalsBg = vitalsObj.AddComponent<Image>();
+            vitalsBg.color = new Color(0.04f, 0.06f, 0.09f, 0.88f);
+            vitalsBg.raycastTarget = false;
+
+            HorizontalLayoutGroup vHlg = vitalsObj.AddComponent<HorizontalLayoutGroup>();
+            vHlg.childAlignment = TextAnchor.MiddleCenter;
+            vHlg.spacing = 16f;
+            vHlg.padding = new RectOffset(12, 12, 6, 6);
+
+            GameObject hpObj = new GameObject("HPText");
+            hpObj.transform.SetParent(vitalsObj.transform, false);
+            TextMeshProUGUI hpTmp = hpObj.AddComponent<TextMeshProUGUI>();
+            hpTmp.fontSize = 12f;
+            hpTmp.text = "<color=#ff4444><b>HP</b></color> 100/100";
+            hpTmp.color = Color.white;
+            hpTmp.alignment = TextAlignmentOptions.Center;
+
+            GameObject stmObj = new GameObject("STMText");
+            stmObj.transform.SetParent(vitalsObj.transform, false);
+            TextMeshProUGUI stmTmp = stmObj.AddComponent<TextMeshProUGUI>();
+            stmTmp.fontSize = 12f;
+            stmTmp.text = "<color=#44ff88><b>STM</b></color> 100/100";
+            stmTmp.color = Color.white;
+            stmTmp.alignment = TextAlignmentOptions.Center;
+
+            // Objective Badge
+            GameObject objBadge = new GameObject("ObjectiveBadge");
+            objBadge.transform.SetParent(hudObj.transform, false);
+            RectTransform objRect = objBadge.AddComponent<RectTransform>();
+            objRect.anchorMin = new Vector2(1f, 1f);
+            objRect.anchorMax = new Vector2(1f, 1f);
+            objRect.pivot = new Vector2(1f, 1f);
+            objRect.anchoredPosition = new Vector2(-24f, -14f);
+            objRect.sizeDelta = new Vector2(460f, 44f);
+            Image objBg = objBadge.AddComponent<Image>();
+            objBg.color = new Color(0.04f, 0.06f, 0.09f, 0.88f);
+            objBg.raycastTarget = false;
+
+            GameObject objTextObj = new GameObject("ObjectiveText");
+            objTextObj.transform.SetParent(objBadge.transform, false);
+            RectTransform otRect = objTextObj.AddComponent<RectTransform>();
+            StretchFull(otRect);
+            otRect.offsetMin = new Vector2(14f, 0f);
+            otRect.offsetMax = new Vector2(-14f, 0f);
+            TextMeshProUGUI objTmp = objTextObj.AddComponent<TextMeshProUGUI>();
+            objTmp.fontSize = 12f;
+            objTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            objTmp.text = "<b>[!] OBJECTIVE:</b> Gather your starter gear from the table";
+            objTmp.color = new Color(0.95f, 0.85f, 0.5f);
+            objTmp.raycastTarget = false;
+
+            // =========================================================================
+            // BOTTOM SCREEN (3DS BOTTOM DOCK: 40% HEIGHT - Anchors Y: 0.0f to 0.40f)
+            // =========================================================================
+            GameObject botScreenObj = new GameObject("BottomNarrativeDock");
+            botScreenObj.transform.SetParent(obj.transform, false);
+            RectTransform botRect = botScreenObj.AddComponent<RectTransform>();
+            botRect.anchorMin = new Vector2(0f, 0f);
+            botRect.anchorMax = new Vector2(1f, 0.40f);
+            botRect.offsetMin = Vector2.zero;
+            botRect.offsetMax = Vector2.zero;
+
+            Image botBg = botScreenObj.AddComponent<Image>();
+            botBg.color = new Color(0.03f, 0.04f, 0.05f, 1f);
+            botBg.raycastTarget = false;
+
+            // Divider Line
+            GameObject divObj = new GameObject("ScreenDivider");
+            divObj.transform.SetParent(botScreenObj.transform, false);
+            RectTransform divRect = divObj.AddComponent<RectTransform>();
+            divRect.anchorMin = new Vector2(0f, 1f);
+            divRect.anchorMax = new Vector2(1f, 1f);
+            divRect.pivot = new Vector2(0.5f, 1f);
+            divRect.sizeDelta = new Vector2(0f, 2f);
+            divRect.anchoredPosition = Vector2.zero;
+            Image divImg = divObj.AddComponent<Image>();
+            divImg.color = new Color(0.2f, 0.28f, 0.38f, 0.85f);
+            divImg.raycastTarget = false;
+
+            // Fullscreen click catcher for dialogue advancement
+            GameObject ccObj = new GameObject("FullScreenClickCatcher");
+            ccObj.transform.SetParent(botScreenObj.transform, false);
+            RectTransform ccRect = ccObj.AddComponent<RectTransform>();
+            StretchFull(ccRect);
+            Image ccImg = ccObj.AddComponent<Image>();
+            ccImg.color = new Color(0f, 0f, 0f, 0.005f);
+            ccImg.raycastTarget = true;
+            Button ccBtn = ccObj.AddComponent<Button>();
+            ccBtn.targetGraphic = ccImg;
+
+            // -------------------------------------------------------------------------
+            // Mode A: Awakening Sequence Container (Beats 1 to 3)
+            // -------------------------------------------------------------------------
+            GameObject awakeObj = new GameObject("AwakeningContainer");
+            awakeObj.transform.SetParent(botScreenObj.transform, false);
+            RectTransform awakeRect = awakeObj.AddComponent<RectTransform>();
+            StretchFull(awakeRect);
+            awakeRect.offsetMin = new Vector2(40f, 24f);
+            awakeRect.offsetMax = new Vector2(-40f, -20f);
+
+            GameObject atObj = new GameObject("Title");
+            atObj.transform.SetParent(awakeObj.transform, false);
+            RectTransform atRect = atObj.AddComponent<RectTransform>();
+            atRect.anchorMin = new Vector2(0f, 1f);
+            atRect.anchorMax = new Vector2(1f, 1f);
+            atRect.pivot = new Vector2(0f, 1f);
+            atRect.sizeDelta = new Vector2(0f, 24f);
+            atRect.anchoredPosition = Vector2.zero;
+            TextMeshProUGUI atTmp = atObj.AddComponent<TextMeshProUGUI>();
+            atTmp.fontSize = 13f;
+            atTmp.fontStyle = FontStyles.Bold;
+            atTmp.color = new Color(0.9f, 0.35f, 0.35f);
+            atTmp.text = "CIVIL DANGER WARNING";
+            atTmp.raycastTarget = false;
+
+            GameObject abObj = new GameObject("BodyText");
+            abObj.transform.SetParent(awakeObj.transform, false);
+            RectTransform abRect = abObj.AddComponent<RectTransform>();
+            abRect.anchorMin = new Vector2(0f, 0f);
+            abRect.anchorMax = new Vector2(1f, 1f);
+            abRect.offsetMin = new Vector2(0f, 40f);
+            abRect.offsetMax = new Vector2(0f, -32f);
+            TextMeshProUGUI abTmp = abObj.AddComponent<TextMeshProUGUI>();
+            abTmp.fontSize = 15f;
+            abTmp.color = new Color(0.88f, 0.88f, 0.90f);
+            abTmp.lineSpacing = 16f;
+            abTmp.raycastTarget = false;
+
+            // EAS Alert Box Sub-Panel
+            GameObject easBox = new GameObject("EASAlertBox");
+            easBox.transform.SetParent(awakeObj.transform, false);
+            RectTransform easRect = easBox.AddComponent<RectTransform>();
+            easRect.anchorMin = new Vector2(0f, 0f);
+            easRect.anchorMax = new Vector2(1f, 1f);
+            easRect.offsetMin = new Vector2(0f, 40f);
+            easRect.offsetMax = new Vector2(0f, -36f);
+            Image easImg = easBox.AddComponent<Image>();
+            easImg.color = new Color(0.22f, 0.02f, 0.02f, 0.75f);
+            easImg.raycastTarget = false;
+
+            GameObject easTextObj = new GameObject("EASText");
+            easTextObj.transform.SetParent(easBox.transform, false);
+            RectTransform easTextRect = easTextObj.AddComponent<RectTransform>();
+            StretchFull(easTextRect);
+            easTextRect.offsetMin = new Vector2(20f, 14f);
+            easTextRect.offsetMax = new Vector2(-20f, -14f);
+            TextMeshProUGUI easTmp = easTextObj.AddComponent<TextMeshProUGUI>();
+            easTmp.fontSize = 13f;
+            easTmp.color = new Color(1f, 0.8f, 0.8f);
+            easTmp.lineSpacing = 14f;
+            easTmp.text = "<color=#e74c3c><b>EMERGENCY ALERT SYSTEM\nCIVIL DANGER WARNING</b></color>\n\n" +
+                          "\"The following message is transmitted at the request of the King County Sheriff's Office. This is not a test.\n\n" +
+                          "A Civil Danger Warning is in effect for the Seattle metropolitan area. Authorities reported a rapidly spreading biological hazard. Affected individuals exhibit extreme, unprovoked violence. The pathogen is highly contagious through fluid contact.\n\n" +
+                          "Shelter in place immediately. Major interstates are closed. Lock all doors, turn off lights, and remain completely silent. The National Guard has been deployed. Lethal force is authorized.\"";
+            easTmp.raycastTarget = false;
+
+            // Monologue Box Sub-Panel (Beat 2)
+            GameObject monoBox = new GameObject("MonologueBox");
+            monoBox.transform.SetParent(awakeObj.transform, false);
+            RectTransform monoRect = monoBox.AddComponent<RectTransform>();
+            monoRect.anchorMin = new Vector2(0f, 0f);
+            monoRect.anchorMax = new Vector2(1f, 1f);
+            monoRect.offsetMin = new Vector2(0f, 40f);
+            monoRect.offsetMax = new Vector2(0f, -36f);
+            Image monoBg = monoBox.AddComponent<Image>();
+            monoBg.color = new Color(0.05f, 0.07f, 0.10f, 0.90f);
+            monoBg.raycastTarget = false;
+
+            HorizontalLayoutGroup mHlg = monoBox.AddComponent<HorizontalLayoutGroup>();
+            mHlg.padding = new RectOffset(16, 16, 12, 12);
+            mHlg.spacing = 16f;
+            mHlg.childControlWidth = false;
+            mHlg.childControlHeight = true;
+
+            GameObject mAvatarObj = new GameObject("Avatar");
+            mAvatarObj.transform.SetParent(monoBox.transform, false);
+            LayoutElement mAle = mAvatarObj.AddComponent<LayoutElement>();
+            mAle.preferredWidth = 72f;
+            mAle.preferredHeight = 72f;
+            Image mAvatarImg = mAvatarObj.AddComponent<Image>();
+            mAvatarImg.preserveAspect = true;
+            mAvatarImg.raycastTarget = false;
+
+            GameObject mSpeechContainer = new GameObject("SpeechContainer");
+            mSpeechContainer.transform.SetParent(monoBox.transform, false);
+            LayoutElement mSle = mSpeechContainer.AddComponent<LayoutElement>();
+            mSle.flexibleWidth = 1f;
+            VerticalLayoutGroup mVlg = mSpeechContainer.AddComponent<VerticalLayoutGroup>();
+            mVlg.spacing = 6f;
+
+            GameObject mSpkObj = new GameObject("Speaker");
+            mSpkObj.transform.SetParent(mSpeechContainer.transform, false);
+            TextMeshProUGUI mSpkTmp = mSpkObj.AddComponent<TextMeshProUGUI>();
+            mSpkTmp.fontSize = 12f;
+            mSpkTmp.fontStyle = FontStyles.Bold;
+            mSpkTmp.color = new Color(0.95f, 0.75f, 0.35f);
+            mSpkTmp.text = "YOU";
+
+            GameObject mTextObj = new GameObject("Speech");
+            mTextObj.transform.SetParent(mSpeechContainer.transform, false);
+            TextMeshProUGUI mTextTmp = mTextObj.AddComponent<TextMeshProUGUI>();
+            mTextTmp.fontSize = 14f;
+            mTextTmp.fontStyle = FontStyles.Italic;
+            mTextTmp.color = new Color(0.9f, 0.9f, 0.95f);
+            mTextTmp.text = "\"Lethal force authorized... They don't lock down the whole city for mass hysteria.\"";
+
+            // Table Stash Sub-Panel (Beat 3)
+            GameObject stashObj = new GameObject("TableStashDisplay");
+            stashObj.transform.SetParent(awakeObj.transform, false);
+            RectTransform stashRect = stashObj.AddComponent<RectTransform>();
+            stashRect.anchorMin = new Vector2(0f, 0f);
+            stashRect.anchorMax = new Vector2(1f, 1f);
+            stashRect.offsetMin = new Vector2(0f, 40f);
+            stashRect.offsetMax = new Vector2(0f, -36f);
+            Image stashBg = stashObj.AddComponent<Image>();
+            stashBg.color = new Color(0.04f, 0.06f, 0.08f, 0.88f);
+            stashBg.raycastTarget = false;
+
+            VerticalLayoutGroup sVlg = stashObj.AddComponent<VerticalLayoutGroup>();
+            sVlg.padding = new RectOffset(16, 16, 12, 12);
+            sVlg.spacing = 8f;
+
+            GameObject stashHeader = new GameObject("Header");
+            stashHeader.transform.SetParent(stashObj.transform, false);
+            TextMeshProUGUI shTmp = stashHeader.AddComponent<TextMeshProUGUI>();
+            shTmp.fontSize = 12f;
+            shTmp.fontStyle = FontStyles.Bold;
+            shTmp.color = new Color(0.95f, 0.75f, 0.35f);
+            shTmp.text = "TABLE STASH // CURRENT WORK GEAR & WEAPONS";
+
+            GameObject sGridObj = new GameObject("Grid");
+            sGridObj.transform.SetParent(stashObj.transform, false);
+            HorizontalLayoutGroup sgHlg = sGridObj.AddComponent<HorizontalLayoutGroup>();
+            sgHlg.spacing = 14f;
+            sgHlg.childAlignment = TextAnchor.MiddleLeft;
+
+            GameObject sEmptyObj = new GameObject("EmptyNotice");
+            sEmptyObj.transform.SetParent(stashObj.transform, false);
+            TextMeshProUGUI seTmp = sEmptyObj.AddComponent<TextMeshProUGUI>();
+            seTmp.fontSize = 13f;
+            seTmp.fontStyle = FontStyles.Italic;
+            seTmp.color = new Color(0.6f, 0.6f, 0.6f);
+            seTmp.text = "(Table is empty)";
+
+            // Continue Prompt
+            GameObject promptObj = new GameObject("ContinuePrompt");
+            promptObj.transform.SetParent(awakeObj.transform, false);
+            RectTransform prRect = promptObj.AddComponent<RectTransform>();
+            prRect.anchorMin = new Vector2(1f, 0f);
+            prRect.anchorMax = new Vector2(1f, 0f);
+            prRect.pivot = new Vector2(1f, 0f);
+            prRect.anchoredPosition = new Vector2(0f, 4f);
+            prRect.sizeDelta = new Vector2(250f, 28f);
+            TextMeshProUGUI prTmp = promptObj.AddComponent<TextMeshProUGUI>();
+            prTmp.fontSize = 13f;
+            prTmp.fontStyle = FontStyles.Bold;
+            prTmp.alignment = TextAlignmentOptions.MidlineRight;
+            prTmp.text = "CLICK TO CONTINUE <color=#FFA726>▶</color>";
+            prTmp.color = new Color(0.85f, 0.85f, 0.85f);
+            promptObj.AddComponent<PulsingText>();
+
+            // -------------------------------------------------------------------------
+            // Mode B: Interactive Hub Menu Container
+            // -------------------------------------------------------------------------
+            GameObject menuObj = new GameObject("HubMenuContainer");
+            menuObj.transform.SetParent(botScreenObj.transform, false);
+            RectTransform menuRect = menuObj.AddComponent<RectTransform>();
+            StretchFull(menuRect);
+            menuRect.offsetMin = new Vector2(40f, 18f);
+            menuRect.offsetMax = new Vector2(-40f, -16f);
+            menuObj.SetActive(false);
+
+            VerticalLayoutGroup mVlg2 = menuObj.AddComponent<VerticalLayoutGroup>();
+            mVlg2.spacing = 6f;
+            mVlg2.childControlWidth = true;
+            mVlg2.childControlHeight = false;
+
+            // Pack Gear Button
+            CreateApartmentMenuButton(menuObj.transform, "Btn_PackGear", "GATHER YOUR GEAR & SUPPLIES",
+                "4 Minutes | Gear up. Grab your work equipment by the door and raid the kitchen for anything useful.",
+                new Color(0.95f, 0.75f, 0.35f), out Button btnPack, out TextMeshProUGUI _, out TextMeshProUGUI _);
+
+            // Packed Success Banner (visible after packing)
+            GameObject pBanner = new GameObject("PackedSuccessBanner");
+            pBanner.transform.SetParent(menuObj.transform, false);
+            LayoutElement pBle = pBanner.AddComponent<LayoutElement>();
+            pBle.preferredHeight = 44f;
+            Image pbImg = pBanner.AddComponent<Image>();
+            pbImg.color = new Color(0.04f, 0.16f, 0.06f, 0.90f);
+            pbImg.raycastTarget = false;
+            GameObject pbTextObj = new GameObject("Text");
+            pbTextObj.transform.SetParent(pBanner.transform, false);
+            RectTransform pbTextRect = pbTextObj.AddComponent<RectTransform>();
+            StretchFull(pbTextRect);
+            pbTextRect.offsetMin = new Vector2(14f, 0f);
+            pbTextRect.offsetMax = new Vector2(-14f, 0f);
+            TextMeshProUGUI pbTmp = pbTextObj.AddComponent<TextMeshProUGUI>();
+            pbTmp.fontSize = 12f;
+            pbTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            pbTmp.color = new Color(0.4f, 1f, 0.5f);
+            pbTmp.text = "✓ You geared up. You strapped on your heavy equipment, shoved smaller items into your pockets, and pulled a Kitchen Knife from the block.";
+            pBanner.SetActive(false);
+
+            // Check News Feed Button
+            CreateApartmentMenuButton(menuObj.transform, "Btn_CheckPhone", "CHECK NEWS FEED / PHONE",
+                "1 Minute | See what the internet knows before the grid goes down.",
+                new Color(0.35f, 0.75f, 0.95f), out Button btnPhone, out TextMeshProUGUI _, out TextMeshProUGUI _);
+
+            // Listen Radio Button
+            CreateApartmentMenuButton(menuObj.transform, "Btn_ListenRadio", "LISTEN TO EMERGENCY BAND [POLICE]",
+                "3 Minutes | Monitor encrypted dispatch channels. Find out where lines are breaking.",
+                new Color(0.95f, 0.75f, 0.35f), out Button btnRadio, out TextMeshProUGUI radioLbl, out TextMeshProUGUI radioSub);
+
+            // Hack Terminal Button
+            CreateApartmentMenuButton(menuObj.transform, "Btn_HackTerminal", "BYPASS GOV FIREWALL [TECH 3]",
+                "8 Minutes | Breach military-grade encryption to extract classified directives.",
+                new Color(0.35f, 0.95f, 0.45f), out Button btnHacking, out TextMeshProUGUI hackLbl, out TextMeshProUGUI hackSub);
+
+            // Leave Apartment Button (Urgent Red)
+            CreateApartmentMenuButton(menuObj.transform, "Btn_LeaveApartment", "LEAVE APARTMENT",
+                "Exit to the 4th Floor Hallway. Ready your weapon. There is no turning back.",
+                new Color(0.95f, 0.3f, 0.3f), out Button btnLeave, out TextMeshProUGUI _, out TextMeshProUGUI _,
+                new Color(0.20f, 0.05f, 0.05f, 0.95f));
+
+            // -------------------------------------------------------------------------
+            // Modal Overlays (Phone, Radio, Hacking)
+            // -------------------------------------------------------------------------
+            GameObject modalsRoot = new GameObject("ModalOverlays");
+            modalsRoot.transform.SetParent(obj.transform, false);
+            RectTransform modRect = modalsRoot.AddComponent<RectTransform>();
+            StretchFull(modRect);
+
+            // 1. Phone Modal
+            GameObject phoneObj = BuildPhoneModal(modalsRoot.transform, out Button closePhoneBtn);
+            phoneObj.SetActive(false);
+
+            // 2. Radio Modal
+            GameObject radioObj = BuildRadioModal(modalsRoot.transform, out Button closeRadioBtn);
+            radioObj.SetActive(false);
+
+            // 3. Hacking Modal
+            GameObject hackObj = BuildHackingModal(modalsRoot.transform, out TextMeshProUGUI hackTerminalTmp, out GameObject hackFinishObj, out Button closeHackBtn);
+            hackObj.SetActive(false);
+
+            // Audio Clips
+            AudioClip atmosphereClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/BGM/atmosphere.mp3");
+            AudioClip ebsWarningClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/ebs_warning.mp3");
+            AudioClip staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/static.mp3");
+            AudioClip policeRadioClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/police_radio.mp3");
+            AudioClip clickClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
+
+            // Wire Serialized Properties
+            SerializedObject so = new SerializedObject(screen);
+            so.FindProperty("stageBackdropImage").objectReferenceValue = roomImg;
+            so.FindProperty("livingRoomAnimPlayer").objectReferenceValue = roomAnim;
+            so.FindProperty("clockText").objectReferenceValue = thsTmp;
+            so.FindProperty("locationText").objectReferenceValue = thtTmp;
+            so.FindProperty("objectiveText").objectReferenceValue = objTmp;
+            so.FindProperty("vitalsHpText").objectReferenceValue = hpTmp;
+            so.FindProperty("vitalsStaminaText").objectReferenceValue = stmTmp;
+
+            so.FindProperty("awakeningContainer").objectReferenceValue = awakeObj;
+            so.FindProperty("awakeningTitle").objectReferenceValue = atTmp;
+            so.FindProperty("awakeningBodyText").objectReferenceValue = abTmp;
+            so.FindProperty("easAlertBox").objectReferenceValue = easBox;
+            so.FindProperty("monologueBox").objectReferenceValue = monoBox;
+            so.FindProperty("monologueAvatar").objectReferenceValue = mAvatarImg;
+            so.FindProperty("monologueSpeakerText").objectReferenceValue = mSpkTmp;
+            so.FindProperty("monologueSpeechText").objectReferenceValue = mTextTmp;
+            so.FindProperty("tableStashDisplay").objectReferenceValue = stashObj;
+            so.FindProperty("tableStashGrid").objectReferenceValue = sGridObj.transform;
+            so.FindProperty("tableEmptyNotice").objectReferenceValue = sEmptyObj;
+            so.FindProperty("continuePrompt").objectReferenceValue = promptObj;
+            so.FindProperty("fullScreenClickCatcher").objectReferenceValue = ccBtn;
+
+            so.FindProperty("hubMenuContainer").objectReferenceValue = menuObj;
+            so.FindProperty("packGearButton").objectReferenceValue = btnPack;
+            so.FindProperty("packedSuccessBanner").objectReferenceValue = pBanner;
+            so.FindProperty("checkPhoneButton").objectReferenceValue = btnPhone;
+            so.FindProperty("listenRadioButton").objectReferenceValue = btnRadio;
+            so.FindProperty("listenRadioLabel").objectReferenceValue = radioLbl;
+            so.FindProperty("listenRadioSub").objectReferenceValue = radioSub;
+            so.FindProperty("hackTerminalButton").objectReferenceValue = btnHacking;
+            so.FindProperty("hackTerminalLabel").objectReferenceValue = hackLbl;
+            so.FindProperty("hackTerminalSub").objectReferenceValue = hackSub;
+            so.FindProperty("leaveApartmentButton").objectReferenceValue = btnLeave;
+
+            so.FindProperty("phoneModal").objectReferenceValue = phoneObj;
+            so.FindProperty("closePhoneButton").objectReferenceValue = closePhoneBtn;
+            so.FindProperty("radioModal").objectReferenceValue = radioObj;
+            so.FindProperty("closeRadioButton").objectReferenceValue = closeRadioBtn;
+            so.FindProperty("hackingModal").objectReferenceValue = hackObj;
+            so.FindProperty("hackingTerminalText").objectReferenceValue = hackTerminalTmp;
+            so.FindProperty("hackingFinishContainer").objectReferenceValue = hackFinishObj;
+            so.FindProperty("closeHackingButton").objectReferenceValue = closeHackBtn;
+
+            if (atmosphereClip != null) so.FindProperty("atmosphereClip").objectReferenceValue = atmosphereClip;
+            if (ebsWarningClip != null) so.FindProperty("ebsWarningClip").objectReferenceValue = ebsWarningClip;
+            if (staticClip != null) so.FindProperty("staticClip").objectReferenceValue = staticClip;
+            if (policeRadioClip != null) so.FindProperty("policeRadioClip").objectReferenceValue = policeRadioClip;
+            if (clickClip != null) so.FindProperty("clickClip").objectReferenceValue = clickClip;
+
+            so.ApplyModifiedProperties();
+
+            // Register item sprites with ItemDatabase
+            RegisterItemSprites();
+
+            return screen;
+        }
+
+        private static void CreateApartmentMenuButton(Transform parent, string name, string mainText, string subText,
+            Color accentColor, out Button button, out TextMeshProUGUI mainLabel, out TextMeshProUGUI subLabel, Color? bgColor = null)
+        {
+            GameObject btnObj = new GameObject(name);
+            btnObj.transform.SetParent(parent, false);
+            LayoutElement le = btnObj.AddComponent<LayoutElement>();
+            le.preferredHeight = 52f;
+            le.flexibleWidth = 1f;
+
+            Image bg = btnObj.AddComponent<Image>();
+            bg.color = bgColor ?? new Color(0.06f, 0.08f, 0.12f, 0.95f);
+            bg.raycastTarget = true;
+
+            button = btnObj.AddComponent<Button>();
+            button.targetGraphic = bg;
+
+            ColorBlock cb = button.colors;
+            cb.normalColor = bg.color;
+            cb.highlightedColor = new Color(bg.color.r + 0.08f, bg.color.g + 0.08f, bg.color.b + 0.08f, 1f);
+            cb.pressedColor = new Color(bg.color.r - 0.03f, bg.color.g - 0.03f, bg.color.b - 0.03f, 1f);
+            cb.disabledColor = new Color(0.03f, 0.04f, 0.05f, 0.5f);
+            button.colors = cb;
+
+            // Accent Bar
+            GameObject barObj = new GameObject("AccentBar");
+            barObj.transform.SetParent(btnObj.transform, false);
+            RectTransform barRect = barObj.AddComponent<RectTransform>();
+            barRect.anchorMin = new Vector2(0f, 0f);
+            barRect.anchorMax = new Vector2(0f, 1f);
+            barRect.pivot = new Vector2(0f, 0.5f);
+            barRect.sizeDelta = new Vector2(4f, 0f);
+            barRect.anchoredPosition = Vector2.zero;
+            Image barImg = barObj.AddComponent<Image>();
+            barImg.color = accentColor;
+            barImg.raycastTarget = false;
+
+            // Text Container
+            GameObject textCont = new GameObject("TextContainer");
+            textCont.transform.SetParent(btnObj.transform, false);
+            RectTransform tcRect = textCont.AddComponent<RectTransform>();
+            StretchFull(tcRect);
+            tcRect.offsetMin = new Vector2(16f, 4f);
+            tcRect.offsetMax = new Vector2(-16f, -4f);
+
+            VerticalLayoutGroup vlg = textCont.AddComponent<VerticalLayoutGroup>();
+            vlg.childAlignment = TextAnchor.MiddleLeft;
+            vlg.spacing = 2f;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+
+            GameObject mLblObj = new GameObject("MainLabel");
+            mLblObj.transform.SetParent(textCont.transform, false);
+            mainLabel = mLblObj.AddComponent<TextMeshProUGUI>();
+            mainLabel.fontSize = 13f;
+            mainLabel.fontStyle = FontStyles.Bold;
+            mainLabel.color = Color.white;
+            mainLabel.text = mainText;
+            mainLabel.raycastTarget = false;
+
+            GameObject sLblObj = new GameObject("SubLabel");
+            sLblObj.transform.SetParent(textCont.transform, false);
+            subLabel = sLblObj.AddComponent<TextMeshProUGUI>();
+            subLabel.fontSize = 11f;
+            subLabel.color = new Color(0.72f, 0.75f, 0.80f);
+            subLabel.text = subText;
+            subLabel.raycastTarget = false;
+        }
+
+        private static GameObject BuildPhoneModal(Transform parent, out Button closeButton)
+        {
+            GameObject modalObj = new GameObject("PhoneModal");
+            modalObj.transform.SetParent(parent, false);
+            RectTransform rect = modalObj.AddComponent<RectTransform>();
+            StretchFull(rect);
+
+            Image backdrop = modalObj.AddComponent<Image>();
+            backdrop.color = new Color(0f, 0f, 0f, 0.88f);
+            backdrop.raycastTarget = true;
+
+            GameObject phonePanel = new GameObject("PhonePanel");
+            phonePanel.transform.SetParent(modalObj.transform, false);
+            RectTransform pRect = phonePanel.AddComponent<RectTransform>();
+            pRect.sizeDelta = new Vector2(440f, 620f);
+            pRect.anchoredPosition = Vector2.zero;
+            Image pBg = phonePanel.AddComponent<Image>();
+            pBg.color = new Color(0.04f, 0.04f, 0.05f, 0.98f);
+
+            VerticalLayoutGroup vlg = phonePanel.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(16, 16, 14, 14);
+            vlg.spacing = 10f;
+
+            // Status bar
+            GameObject sbObj = new GameObject("StatusBar");
+            sbObj.transform.SetParent(phonePanel.transform, false);
+            TextMeshProUGUI sbTmp = sbObj.AddComponent<TextMeshProUGUI>();
+            sbTmp.fontSize = 11f;
+            sbTmp.text = "<color=#ff4444>⚠ NO SIGNAL</color>                       <color=#ff4444>12%</color> 🔋";
+            sbTmp.alignment = TextAlignmentOptions.Center;
+
+            // Header
+            GameObject hObj = new GameObject("Header");
+            hObj.transform.SetParent(phonePanel.transform, false);
+            TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
+            hTmp.fontSize = 14f;
+            hTmp.fontStyle = FontStyles.Bold;
+            hTmp.text = "Trending: <color=#e74c3c>#SeattleLockdown</color>";
+
+            // Tweets Text Container
+            GameObject feedObj = new GameObject("FeedText");
+            feedObj.transform.SetParent(phonePanel.transform, false);
+            LayoutElement fle = feedObj.AddComponent<LayoutElement>();
+            fle.preferredHeight = 360f;
+            fle.flexibleHeight = 1f;
+            TextMeshProUGUI fTmp = feedObj.AddComponent<TextMeshProUGUI>();
+            fTmp.fontSize = 12f;
+            fTmp.color = new Color(0.85f, 0.85f, 0.9f);
+            fTmp.lineSpacing = 12f;
+            fTmp.text = "<b>CityScanner</b> @CityScanner_WA • 2m\n" +
+                        "Does anyone know what's happening at the 5th St Hospital? Seeing police in gas masks and riot gear. They aren't letting ambulances through. Stay away!!\n\n" +
+                        "<color=#5dade2><b>NewsWire Breaking ☑</b></color> @NewsWire_Alerts • 4m\n" +
+                        "EMERGENCY: CDC reporting 'unprecedented neuro-aggressive pathogen' causing extreme psychosis and unprovoked violence. Authorities urge citizens to avoid public spaces.\n\n" +
+                        "<b>User_9921</b> @anon_9921 • 11m\n" +
+                        "<color=#ff5555>[ATTACHED VIDEO: BLURRY]</color>\n" +
+                        "Look at his face! That's not rabies! The cops shot him three times in the chest and he kept running! Oh my god, he's— <i>[VIDEO ENDS]</i>\n\n" +
+                        "<color=#666666><i>Connection lost. Tap to retry.</i></color>";
+
+            // Outro note
+            GameObject oObj = new GameObject("Outro");
+            oObj.transform.SetParent(phonePanel.transform, false);
+            TextMeshProUGUI oTmp = oObj.AddComponent<TextMeshProUGUI>();
+            oTmp.fontSize = 11f;
+            oTmp.color = new Color(0.7f, 0.7f, 0.7f);
+            oTmp.text = "A traffic map shows military checkpoints barricading bridges out of Seattle. Then the signal dies. The internet is gone.";
+
+            // Close Button
+            CreateApartmentMenuButton(phonePanel.transform, "Btn_ClosePhone", "LOWER THE PHONE AND RETURN",
+                "Add Intel to Lore Database.", new Color(0.35f, 0.75f, 0.95f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
+
+            return modalObj;
+        }
+
+        private static GameObject BuildRadioModal(Transform parent, out Button closeButton)
+        {
+            GameObject modalObj = new GameObject("RadioModal");
+            modalObj.transform.SetParent(parent, false);
+            RectTransform rect = modalObj.AddComponent<RectTransform>();
+            StretchFull(rect);
+
+            Image backdrop = modalObj.AddComponent<Image>();
+            backdrop.color = new Color(0f, 0f, 0f, 0.88f);
+            backdrop.raycastTarget = true;
+
+            GameObject radioPanel = new GameObject("RadioPanel");
+            radioPanel.transform.SetParent(modalObj.transform, false);
+            RectTransform pRect = radioPanel.AddComponent<RectTransform>();
+            pRect.sizeDelta = new Vector2(560f, 480f);
+            pRect.anchoredPosition = Vector2.zero;
+            Image pBg = radioPanel.AddComponent<Image>();
+            pBg.color = new Color(0.04f, 0.05f, 0.07f, 0.98f);
+
+            VerticalLayoutGroup vlg = radioPanel.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(18, 18, 14, 14);
+            vlg.spacing = 10f;
+
+            // Freq Header
+            GameObject hObj = new GameObject("FreqHeader");
+            hObj.transform.SetParent(radioPanel.transform, false);
+            TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
+            hTmp.fontSize = 13f;
+            hTmp.fontStyle = FontStyles.Bold;
+            hTmp.color = new Color(0.95f, 0.75f, 0.35f);
+            hTmp.text = "FREQ: 154.790 MHz                     <color=#ff4444>● REC</color>";
+
+            // Transcript Body
+            GameObject tObj = new GameObject("Transcript");
+            tObj.transform.SetParent(radioPanel.transform, false);
+            LayoutElement tle = tObj.AddComponent<LayoutElement>();
+            tle.preferredHeight = 260f;
+            tle.flexibleHeight = 1f;
+            TextMeshProUGUI tTmp = tObj.AddComponent<TextMeshProUGUI>();
+            tTmp.fontSize = 12f;
+            tTmp.color = new Color(0.65f, 0.85f, 0.85f);
+            tTmp.lineSpacing = 12f;
+            tTmp.text = "<color=#888888>[STATIC HISS]</color>\n\n" +
+                        "<b>UNIT 4-CHARLIE:</b>\n" +
+                        "<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing! They just keep coming!\"</i>\n\n" +
+                        "<color=#888888>[HEAVY STRUGGLE / THUD]</color>\n\n" +
+                        "<b>DISPATCH (CALM):</b>\n" +
+                        "<i>\"4-Charlie, unrestricted lethal force is authorized. All units: Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. Aim for the head. Avoid all physical contact.\"</i>\n\n" +
+                        "<color=#888888>[SIGNAL CUTS OUT]</color>";
+
+            // Outro
+            GameObject oObj = new GameObject("Outro");
+            oObj.transform.SetParent(radioPanel.transform, false);
+            TextMeshProUGUI oTmp = oObj.AddComponent<TextMeshProUGUI>();
+            oTmp.fontSize = 11f;
+            oTmp.color = new Color(0.7f, 0.7f, 0.7f);
+            oTmp.text = "<color=#ff5555>'Aim for the head.'</color> Total lethal force. Standard body shots are useless. Whatever is outside, the law is officially dead.";
+
+            // Close Button
+            CreateApartmentMenuButton(radioPanel.transform, "Btn_CloseRadio", "KILL THE RADIO AND RETURN",
+                "Add tactical intel to your PDA.", new Color(0.95f, 0.75f, 0.35f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
+
+            return modalObj;
+        }
+
+        private static GameObject BuildHackingModal(Transform parent, out TextMeshProUGUI terminalText, out GameObject finishContainer, out Button closeButton)
+        {
+            GameObject modalObj = new GameObject("HackingModal");
+            modalObj.transform.SetParent(parent, false);
+            RectTransform rect = modalObj.AddComponent<RectTransform>();
+            StretchFull(rect);
+
+            Image backdrop = modalObj.AddComponent<Image>();
+            backdrop.color = new Color(0f, 0f, 0f, 0.88f);
+            backdrop.raycastTarget = true;
+
+            GameObject hackPanel = new GameObject("HackingPanel");
+            hackPanel.transform.SetParent(modalObj.transform, false);
+            RectTransform pRect = hackPanel.AddComponent<RectTransform>();
+            pRect.sizeDelta = new Vector2(660f, 520f);
+            pRect.anchoredPosition = Vector2.zero;
+            Image pBg = hackPanel.AddComponent<Image>();
+            pBg.color = new Color(0.02f, 0.02f, 0.02f, 0.98f);
+
+            VerticalLayoutGroup vlg = hackPanel.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(18, 18, 14, 14);
+            vlg.spacing = 10f;
+
+            // Terminal Header
+            GameObject hObj = new GameObject("Header");
+            hObj.transform.SetParent(hackPanel.transform, false);
+            TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
+            hTmp.fontSize = 12f;
+            hTmp.fontStyle = FontStyles.Bold;
+            hTmp.color = new Color(0.3f, 1f, 0.3f);
+            hTmp.text = "SYS_ADMIN - SECURE_NODE_04                         <color=#ff4444>[ENCRYPTED]</color>";
+
+            // Terminal Text Body
+            GameObject tObj = new GameObject("TerminalText");
+            tObj.transform.SetParent(hackPanel.transform, false);
+            LayoutElement tle = tObj.AddComponent<LayoutElement>();
+            tle.preferredHeight = 260f;
+            tle.flexibleHeight = 1f;
+            terminalText = tObj.AddComponent<TextMeshProUGUI>();
+            terminalText.fontSize = 12f;
+            terminalText.color = new Color(0.35f, 0.95f, 0.35f);
+            terminalText.lineSpacing = 10f;
+            terminalText.text = "> BYPASSING 256-BIT AES ENCRYPTION...\n> ACCESSING SECURE MILITARY NODE...";
+
+            // Finish Container
+            finishContainer = new GameObject("FinishContainer");
+            finishContainer.transform.SetParent(hackPanel.transform, false);
+            VerticalLayoutGroup fVlg = finishContainer.AddComponent<VerticalLayoutGroup>();
+            fVlg.spacing = 8f;
+
+            GameObject foObj = new GameObject("Outro");
+            foObj.transform.SetParent(finishContainer.transform, false);
+            TextMeshProUGUI foTmp = foObj.AddComponent<TextMeshProUGUI>();
+            foTmp.fontSize = 11f;
+            foTmp.color = new Color(0.85f, 0.85f, 0.85f);
+            foTmp.text = "<color=#ff4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military is firebombing the city at dawn. You secured a <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your device.";
+
+            CreateApartmentMenuButton(finishContainer.transform, "Btn_CloseHacking", "WIPE DRIVE & CLOSE LAPTOP",
+                "Save the Tier-1 Passkey to your PDA and log off.", new Color(0.35f, 0.95f, 0.45f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
+
+            return modalObj;
+        }
+
+        private static void RegisterItemSprites()
+        {
+            string itemsFolder = "Assets/Sprites/Items";
+            if (!Directory.Exists(itemsFolder)) return;
+
+            string[] files = Directory.GetFiles(itemsFolder, "*.png");
+            foreach (string f in files)
+            {
+                string relPath = f.Replace("\\", "/");
+                Sprite s = AssetDatabase.LoadAssetAtPath<Sprite>(relPath);
+                if (s != null)
+                {
+                    string idName = Path.GetFileNameWithoutExtension(f);
+                    ItemDatabase.RegisterIcon(idName, s);
+                }
+            }
+        }
+
+        // --- SPLASH ---
         private static StudioSplashScreen BuildSplashScreen(Transform parent)
         {
             GameObject obj = new GameObject("StudioSplashScreen");
