@@ -295,13 +295,13 @@ namespace SundayLastBreath.UI
             {
                 case 1:
                     // Quiet peaceful night
-                    if (speakerLabel != null) speakerLabel.text = "SYSTEM // SATURDAY NIGHT 23:45";
+                    if (speakerLabel != null) speakerLabel.text = "<color=#94A3B8>[ SATURDAY NIGHT 23:45 ]</color>";
                     if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
                     break;
 
                 case 2:
                     // Broadcast dies: JUMPSCARE TV STATIC!
-                    if (speakerLabel != null) speakerLabel.text = "SYSTEM // TRANSMISSION LOSS";
+                    if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ SUDDEN SILENCE ]</color>";
                     if (staticClip != null && staticSource != null)
                     {
                         staticSource.clip = staticClip;
@@ -328,12 +328,12 @@ namespace SundayLastBreath.UI
 
                 case 3:
                     // Shock / living room strobe
-                    if (speakerLabel != null) speakerLabel.text = "INTERNAL MONOLOGUE // DISORIENTATION";
+                    if (speakerLabel != null) speakerLabel.text = "<color=#F59E0B>[ WAKING UP ]</color>";
                     break;
 
                 case 4:
                     // Distant emergency sirens fade in
-                    if (speakerLabel != null) speakerLabel.text = "EXTERNAL SENSORY // CITY PERIMETER";
+                    if (speakerLabel != null) speakerLabel.text = "<color=#94A3B8>[ THE NIGHT AIR ]</color>";
                     if (sirensClip != null && sirensSource != null)
                     {
                         sirensSource.clip = sirensClip;
@@ -345,7 +345,7 @@ namespace SundayLastBreath.UI
 
                 case 5:
                     // Terrifying scream cut short in the dark
-                    if (speakerLabel != null) speakerLabel.text = "ACOUSTIC BREACH // STREET LEVEL";
+                    if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ ECHOES IN THE DARK ]</color>";
                     if (screamClip != null && sfxSource != null)
                     {
                         sfxSource.PlayOneShot(screamClip, 0.95f);
@@ -354,7 +354,7 @@ namespace SundayLastBreath.UI
 
                 case 6:
                     // Stumble to balcony, window reflection
-                    if (speakerLabel != null) speakerLabel.text = "DARK GLASS REFLECTION // UNIT 404";
+                    if (speakerLabel != null) speakerLabel.text = "<color=#38BDF8>[ WINDOW REFLECTION ]</color>";
                     break;
             }
         }

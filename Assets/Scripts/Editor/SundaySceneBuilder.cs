@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v13_auto.flag";
+                string flagPath = "Temp/scene_v14_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -206,7 +206,7 @@ namespace SundayLastBreath.Editor
             TextMeshProUGUI thsTmp = thStatus.AddComponent<TextMeshProUGUI>();
             thsTmp.fontSize = 12f;
             thsTmp.alignment = TextAlignmentOptions.MidlineRight;
-            thsTmp.text = "<color=#FFA726>SATURDAY NIGHT</color>  |  CH: 04  |  23:45:00";
+            thsTmp.text = "<color=#FFA726>SATURDAY NIGHT</color>  |  23:45";
             thsTmp.color = new Color(0.80f, 0.88f, 0.95f);
             thsTmp.raycastTarget = false;
 
@@ -332,7 +332,7 @@ namespace SundayLastBreath.Editor
             spkTmp.fontSize = 13.5f;
             spkTmp.alignment = TextAlignmentOptions.MidlineLeft;
             spkTmp.fontStyle = FontStyles.Bold;
-            spkTmp.text = "SYSTEM // SATURDAY NIGHT 23:45";
+            spkTmp.text = "<color=#94A3B8>[ SATURDAY NIGHT 23:45 ]</color>";
             spkTmp.color = new Color(0.95f, 0.65f, 0.15f, 1f);
             spkTmp.raycastTarget = false;
 
@@ -347,7 +347,7 @@ namespace SundayLastBreath.Editor
             TextMeshProUGUI chTmp = chObj.AddComponent<TextMeshProUGUI>();
             chTmp.fontSize = 12f;
             chTmp.alignment = TextAlignmentOptions.MidlineRight;
-            chTmp.text = "<color=#94A3B8>TACTICAL TERMINAL</color>  |  <color=#38BDF8>M.O.R.T.A.L. DOCK</color>";
+            chTmp.text = "";
             chTmp.color = new Color(0.60f, 0.70f, 0.85f);
             chTmp.raycastTarget = false;
 
