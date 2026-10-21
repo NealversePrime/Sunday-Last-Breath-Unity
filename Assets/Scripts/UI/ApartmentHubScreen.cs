@@ -15,15 +15,9 @@ namespace SundayLastBreath.UI
 {
     /// <summary>
     /// Master Controller for the Apartment Hub (Unit 404 - Prologue).
-    /// Follows authentic Twine design from Prologue.twee, Prologue_Menu.twee,
-    /// Prologue_Phone.twee, Prologue_Radio.twee, and Prologue_Hacking.twee.
-    /// 
-    /// Adheres to the Nintendo 3DS 60/40 screen layout:
-    /// - Top Stage (60%): Centered framed Living Room Viewport (1152x610), tactical telemetry wings,
-    ///   vitals HUD, real-time clock, and dynamic objective tracker pill.
-    /// - Bottom Dock (40%): Narrative awakening sequence (Beats 1-3) with dedicated containers
-    ///   followed by the interactive apartment hub menu and modal sub-views (Phone, Radio, Hacking).
-    /// Includes mouse double-click debounce protection and multi-input advancement (Space, Enter, Click).
+    /// Combines the 60/40 Top Stage + Bottom VN Dock in the center with
+    /// persistent Left & Right Survivor PDA panels (Status, Skills, Traits, Map, Lore,
+    /// Active Loadout, Backpack Grid, and Floor Items) filling the widescreen side wings.
     /// </summary>
     public class ApartmentHubScreen : ScreenBase, IPointerClickHandler
     {
@@ -41,6 +35,52 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI clockDayText;
         [SerializeField] private Button floorItemsButton;
         [SerializeField] private TextMeshProUGUI floorItemsCountText;
+
+        [Header("Left Wing: Embedded Survivor PDA")]
+        [SerializeField] private Button pdaTabStatusBtn;
+        [SerializeField] private Button pdaTabSkillsBtn;
+        [SerializeField] private Button pdaTabTraitsBtn;
+        [SerializeField] private Button pdaTabMapBtn;
+        [SerializeField] private Button pdaTabLoreBtn;
+        [SerializeField] private GameObject pdaPanelStatus;
+        [SerializeField] private GameObject pdaPanelSkills;
+        [SerializeField] private GameObject pdaPanelTraits;
+        [SerializeField] private GameObject pdaPanelMap;
+        [SerializeField] private GameObject pdaPanelLore;
+
+        [Header("Left PDA - Status Tab")]
+        [SerializeField] private TextMeshProUGUI pdaCharNameText;
+        [SerializeField] private TextMeshProUGUI pdaCharSubText;
+        [SerializeField] private TextMeshProUGUI pdaActiveLogsText;
+        [SerializeField] private TextMeshProUGUI pdaLevelText;
+        [SerializeField] private TextMeshProUGUI pdaXpText;
+        [SerializeField] private Image pdaXpBarFill;
+        [SerializeField] private Image pdaHumanityBarFill;
+        [SerializeField] private TextMeshProUGUI pdaHumanityValueText;
+
+        [Header("Left PDA - Skills, Traits & Lore Tabs")]
+        [SerializeField] private TextMeshProUGUI pdaAttributesText;
+        [SerializeField] private TextMeshProUGUI pdaSkillsText;
+        [SerializeField] private Transform pdaTraitsListRoot;
+        [SerializeField] private TextMeshProUGUI pdaLoreText;
+        [SerializeField] private Slider pdaVolumeSlider;
+        [SerializeField] private Button pdaSaveSettingsBtn;
+
+        [Header("Right Wing: Active Loadout, Backpack & Floor Items")]
+        [SerializeField] private Image equipHeadIcon;
+        [SerializeField] private TextMeshProUGUI equipHeadLabel;
+        [SerializeField] private Image equipBodyIcon;
+        [SerializeField] private TextMeshProUGUI equipBodyLabel;
+        [SerializeField] private Image equipWpnIcon;
+        [SerializeField] private TextMeshProUGUI equipWpnLabel;
+        [SerializeField] private Image equipLegsIcon;
+        [SerializeField] private TextMeshProUGUI equipLegsLabel;
+        [SerializeField] private Image equipFeetIcon;
+        [SerializeField] private TextMeshProUGUI equipFeetLabel;
+        [SerializeField] private TextMeshProUGUI pdaBackpackCountText;
+        [SerializeField] private Transform pdaBackpackGrid;
+        [SerializeField] private Transform pdaFloorItemsGrid;
+        [SerializeField] private TextMeshProUGUI pdaFloorEmptyText;
 
         [Header("Stage Visuals (Top 60%)")]
         [SerializeField] private Image stageBackdropImage;
@@ -132,6 +172,12 @@ namespace SundayLastBreath.UI
         private LoreSystem loreSystem;
 
         private List<InventoryEntry> tableStash = new List<InventoryEntry>();
+        private string equippedHead = "";
+        private string equippedBody = "";
+        private string equippedWpn = "";
+        private string equippedLegs = "";
+        private string equippedFeet = "";
+
         private bool hasPacked = false;
         private bool phoneVisited = false;
         private bool radioVisited = false;
@@ -189,9 +235,14 @@ namespace SundayLastBreath.UI
             gameClock.OnTimeAdvanced += (c) => UpdateClockUI();
 
             objectiveSystem = new ObjectiveSystem();
-            objectiveSystem.OnObjectiveUpdated += (o) => UpdateObjectiveUI();
+            objectiveSystem.OnObjectiveUpdated += (o) =>
+            {
+                UpdateObjectiveUI();
+                RefreshPDAStatusTab();
+            };
 
             loreSystem = new LoreSystem();
+            loreSystem.OnLoreAdded += (l) => RefreshPDALoreTab();
         }
 
         private void HookUIButtons()
@@ -250,13 +301,46 @@ namespace SundayLastBreath.UI
                 closeHackingButton.onClick.AddListener(OnCloseHackingClicked);
             }
 
-            if (pdaMenuButton != null)
+            // Left PDA Tab Buttons
+            if (pdaTabStatusBtn != null)
             {
-                pdaMenuButton.onClick.RemoveAllListeners();
-                pdaMenuButton.onClick.AddListener(() =>
+                pdaTabStatusBtn.onClick.RemoveAllListeners();
+                pdaTabStatusBtn.onClick.AddListener(() => SwitchPDATab("STATUS"));
+            }
+            if (pdaTabSkillsBtn != null)
+            {
+                pdaTabSkillsBtn.onClick.RemoveAllListeners();
+                pdaTabSkillsBtn.onClick.AddListener(() => SwitchPDATab("SKILLS"));
+            }
+            if (pdaTabTraitsBtn != null)
+            {
+                pdaTabTraitsBtn.onClick.RemoveAllListeners();
+                pdaTabTraitsBtn.onClick.AddListener(() => SwitchPDATab("TRAITS"));
+            }
+            if (pdaTabMapBtn != null)
+            {
+                pdaTabMapBtn.onClick.RemoveAllListeners();
+                pdaTabMapBtn.onClick.AddListener(() => SwitchPDATab("MAP"));
+            }
+            if (pdaTabLoreBtn != null)
+            {
+                pdaTabLoreBtn.onClick.RemoveAllListeners();
+                pdaTabLoreBtn.onClick.AddListener(() => SwitchPDATab("LORE"));
+            }
+
+            if (pdaVolumeSlider != null)
+            {
+                pdaVolumeSlider.onValueChanged.RemoveAllListeners();
+                pdaVolumeSlider.onValueChanged.AddListener((val) =>
                 {
-                    PlayClickSFX();
+                    AudioListener.volume = Mathf.Clamp01(val);
                 });
+            }
+
+            if (pdaSaveSettingsBtn != null)
+            {
+                pdaSaveSettingsBtn.onClick.RemoveAllListeners();
+                pdaSaveSettingsBtn.onClick.AddListener(PlayClickSFX);
             }
 
             if (floorItemsButton != null)
@@ -264,7 +348,14 @@ namespace SundayLastBreath.UI
                 floorItemsButton.onClick.RemoveAllListeners();
                 floorItemsButton.onClick.AddListener(() =>
                 {
-                    PlayClickSFX();
+                    if (!hasPacked && introSeen)
+                    {
+                        OnPackGearClicked();
+                    }
+                    else
+                    {
+                        PlayClickSFX();
+                    }
                 });
             }
         }
@@ -276,6 +367,12 @@ namespace SundayLastBreath.UI
             // In accordance with Twine design:
             // Items accumulated during creation are dropped on the tablestash prior to packing!
             tableStash.Clear();
+            equippedHead = "";
+            equippedBody = "";
+            equippedWpn = "";
+            equippedLegs = "";
+            equippedFeet = "";
+
             if (currentPlayer != null && currentPlayer.inventory != null)
             {
                 foreach (var item in currentPlayer.inventory)
@@ -293,6 +390,8 @@ namespace SundayLastBreath.UI
             UpdateVitalsUI();
             UpdateObjectiveUI();
             PopulateTableStashUI();
+            RefreshAllPDAPanels();
+            SwitchPDATab("STATUS", playSound: false);
             EvaluateHubButtonStates();
 
             // Load player avatar frames
@@ -302,6 +401,45 @@ namespace SundayLastBreath.UI
         protected override void OnScreenOpened()
         {
             base.OnScreenOpened();
+
+            if (currentPlayer == null)
+            {
+                // Fallback default Police Officer character if tested directly in Editor
+                CharacterData fallback = new CharacterData
+                {
+                    firstName = "James",
+                    lastName = "Smith",
+                    gender = "Male",
+                    job = "Police Officer",
+                    hp = 100,
+                    hpMax = 100,
+                    stamina = 80,
+                    staminaMax = 80,
+                    hunger = 100,
+                    thirst = 100,
+                    humanity = 35,
+                    str = 6,
+                    per = 8,
+                    agi = 6,
+                    intl = 5,
+                    cha = 3,
+                    lck = 4,
+                    shooting = 3,
+                    melee = 2,
+                    tech = 2
+                };
+                fallback.AddTrait("HUNTER", "Spot ambushes early.");
+                fallback.AddTrait("STEADY HANDS", "+15 Accuracy bonus.");
+                fallback.AddTrait("PYRO", "Fire weapons deal +50% DMG.", null, true);
+                fallback.AddTrait("MECHANIC", "Start cars without keys.");
+                fallback.AddItem("Glock 19", 1);
+                fallback.AddItem("9mm Ammo", 24);
+                fallback.AddItem("Multi-Tool", 1);
+                fallback.AddItem("Binoculars", 1);
+                fallback.AddItem("Lighter", 1);
+                fallback.AddItem("Jerry Can", 1);
+                InitializeWithCharacter(fallback);
+            }
 
             // Play background atmosphere drone
             if (atmosphereSource != null && atmosphereClip != null)
@@ -399,6 +537,465 @@ namespace SundayLastBreath.UI
                 ShowAwakeningStep(awakeningStep);
             }
         }
+
+        #region Left & Right Embedded Survivor PDA Logic
+        private void SwitchPDATab(string tabName, bool playSound = true)
+        {
+            if (playSound) PlayClickSFX();
+
+            if (pdaPanelStatus != null) pdaPanelStatus.SetActive(tabName == "STATUS");
+            if (pdaPanelSkills != null) pdaPanelSkills.SetActive(tabName == "SKILLS");
+            if (pdaPanelTraits != null) pdaPanelTraits.SetActive(tabName == "TRAITS");
+            if (pdaPanelMap != null) pdaPanelMap.SetActive(tabName == "MAP");
+            if (pdaPanelLore != null) pdaPanelLore.SetActive(tabName == "LORE");
+
+            UpdateTabButtonVisual(pdaTabStatusBtn, tabName == "STATUS");
+            UpdateTabButtonVisual(pdaTabSkillsBtn, tabName == "SKILLS");
+            UpdateTabButtonVisual(pdaTabTraitsBtn, tabName == "TRAITS");
+            UpdateTabButtonVisual(pdaTabMapBtn, tabName == "MAP");
+            UpdateTabButtonVisual(pdaTabLoreBtn, tabName == "LORE");
+        }
+
+        private void UpdateTabButtonVisual(Button btn, bool isActive)
+        {
+            if (btn == null) return;
+            Image bg = btn.GetComponent<Image>();
+            if (bg != null)
+            {
+                bg.color = isActive
+                    ? new Color(0.18f, 0.20f, 0.23f, 1f)
+                    : new Color(0.08f, 0.09f, 0.11f, 0.95f);
+            }
+
+            Transform accent = btn.transform.Find("BottomAccent");
+            if (accent != null) accent.gameObject.SetActive(isActive);
+
+            TextMeshProUGUI label = btn.GetComponentInChildren<TextMeshProUGUI>();
+            if (label != null)
+            {
+                label.color = isActive
+                    ? new Color(0.95f, 0.48f, 0.12f, 1f) // Twine PDA orange #f39c12 / #e67e22
+                    : new Color(0.55f, 0.58f, 0.62f, 1f);
+            }
+        }
+
+        private void RefreshAllPDAPanels()
+        {
+            RefreshPDAStatusTab();
+            RefreshPDASkillsTab();
+            RefreshPDATraitsTab();
+            RefreshPDALoreTab();
+            RefreshRightGearPanel();
+        }
+
+        private void RefreshPDAStatusTab()
+        {
+            if (currentPlayer != null)
+            {
+                if (pdaCharNameText != null) pdaCharNameText.text = currentPlayer.FullName;
+                if (pdaCharSubText != null) pdaCharSubText.text = $"{currentPlayer.gender}  |  {currentPlayer.job}";
+
+                int hum = Mathf.Clamp(currentPlayer.humanity, 0, 100);
+                if (pdaHumanityBarFill != null) pdaHumanityBarFill.fillAmount = hum / 100f;
+                if (pdaHumanityValueText != null) pdaHumanityValueText.text = $"{hum}/100";
+            }
+
+            if (pdaLevelText != null) pdaLevelText.text = "LVL 1";
+            if (pdaXpText != null) pdaXpText.text = "0/100 XP";
+            if (pdaXpBarFill != null) pdaXpBarFill.fillAmount = 0f;
+
+            if (pdaActiveLogsText != null && objectiveSystem != null)
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                foreach (var obj in objectiveSystem.Objectives)
+                {
+                    if (obj.status == ObjectiveStatus.Completed)
+                    {
+                        sb.AppendLine($"<color=#546e7a>[v] <s>{obj.description}</s></color>");
+                    }
+                    else if (obj.status == ObjectiveStatus.Active)
+                    {
+                        sb.AppendLine($"<color=#e67e22>[ ]</color> <color=#e8eaed>{obj.description}</color>");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"<color=#e67e22>[ ]</color> <color=#90a4ae>{obj.description}</color>");
+                    }
+                }
+                pdaActiveLogsText.text = sb.ToString().TrimEnd();
+            }
+        }
+
+        private void RefreshPDASkillsTab()
+        {
+            if (currentPlayer == null) return;
+
+            if (pdaAttributesText != null)
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                sb.AppendLine(FormatStatBarRow("STR", currentPlayer.str, 10, "#2ecc71"));
+                sb.AppendLine(FormatStatBarRow("PER", currentPlayer.per, 10, "#2ecc71"));
+                sb.AppendLine(FormatStatBarRow("AGI", currentPlayer.agi, 10, "#2ecc71"));
+                sb.AppendLine(FormatStatBarRow("INT", currentPlayer.intl, 10, "#2ecc71"));
+                sb.AppendLine(FormatStatBarRow("CHA", currentPlayer.cha, 10, "#2ecc71"));
+                sb.AppendLine(FormatStatBarRow("LCK", currentPlayer.lck, 10, "#2ecc71"));
+                pdaAttributesText.text = sb.ToString().TrimEnd();
+            }
+
+            if (pdaSkillsText != null)
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                sb.AppendLine(FormatStatBarRow("SHOOTING", currentPlayer.shooting, 5, "#f39c12"));
+                sb.AppendLine(FormatStatBarRow("MELEE", currentPlayer.melee, 5, "#f39c12"));
+                sb.AppendLine(FormatStatBarRow("STEALTH", currentPlayer.stealth, 5, "#f39c12"));
+                sb.AppendLine(FormatStatBarRow("TECH", currentPlayer.tech, 5, "#f39c12"));
+                sb.AppendLine(FormatStatBarRow("MEDICINE", currentPlayer.medicine, 5, "#f39c12"));
+                sb.AppendLine(FormatStatBarRow("SCAVENGE", currentPlayer.scavenging, 5, "#f39c12"));
+                pdaSkillsText.text = sb.ToString().TrimEnd();
+            }
+        }
+
+        private string FormatStatBarRow(string label, int val, int max, string hexColor)
+        {
+            int clamped = Mathf.Clamp(val, 0, max);
+            string filled = new string('■', clamped);
+            string empty = new string('■', Mathf.Max(0, max - clamped));
+            return $"<b>{label.PadRight(9)}</b> <color={hexColor}>{filled}</color><color=#22262c>{empty}</color>  <color=#ffffff>[ {val} ]</color>";
+        }
+
+        private void RefreshPDATraitsTab()
+        {
+            if (pdaTraitsListRoot == null) return;
+
+            for (int i = pdaTraitsListRoot.childCount - 1; i >= 0; i--)
+            {
+                Destroy(pdaTraitsListRoot.GetChild(i).gameObject);
+            }
+
+            if (currentPlayer == null || currentPlayer.traits == null || currentPlayer.traits.Count == 0)
+            {
+                GameObject emptyObj = new GameObject("EmptyTraits");
+                emptyObj.transform.SetParent(pdaTraitsListRoot, false);
+                TextMeshProUGUI tmp = emptyObj.AddComponent<TextMeshProUGUI>();
+                tmp.fontSize = 11.5f;
+                tmp.color = new Color(0.55f, 0.58f, 0.62f);
+                tmp.text = "No specialized traits or perks recorded.";
+                RectTransform rt = emptyObj.GetComponent<RectTransform>();
+                rt.sizeDelta = new Vector2(0f, 36f);
+                return;
+            }
+
+            foreach (var trait in currentPlayer.traits)
+            {
+                CreateTraitCardUI(pdaTraitsListRoot, trait);
+            }
+        }
+
+        private void CreateTraitCardUI(Transform parent, TraitEntry trait)
+        {
+            GameObject card = new GameObject("Trait_" + trait.name);
+            card.transform.SetParent(parent, false);
+            RectTransform rt = card.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(0f, 64f);
+
+            LayoutElement le = card.AddComponent<LayoutElement>();
+            le.preferredHeight = 64f;
+            le.flexibleWidth = 1f;
+
+            Image bg = card.AddComponent<Image>();
+            bg.color = trait.isWeakness
+                ? new Color(0.12f, 0.04f, 0.04f, 0.95f)
+                : new Color(0.04f, 0.10f, 0.05f, 0.95f);
+
+            Outline ol = card.AddComponent<Outline>();
+            ol.effectColor = trait.isWeakness
+                ? new Color(0.55f, 0.16f, 0.16f, 0.85f)
+                : new Color(0.16f, 0.45f, 0.22f, 0.85f);
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            // Icon (Left 44x44)
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(card.transform, false);
+            RectTransform ir = iconObj.AddComponent<RectTransform>();
+            ir.anchorMin = new Vector2(0f, 0.5f);
+            ir.anchorMax = new Vector2(0f, 0.5f);
+            ir.pivot = new Vector2(0f, 0.5f);
+            ir.anchoredPosition = new Vector2(10f, 0f);
+            ir.sizeDelta = new Vector2(44f, 44f);
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            Sprite s = trait.icon != null ? trait.icon : ItemDatabase.GetTraitIcon(trait.name);
+            if (s != null)
+            {
+                iconImg.sprite = s;
+                iconImg.color = Color.white;
+            }
+            else
+            {
+                iconImg.color = new Color(0.2f, 0.25f, 0.2f, 0.6f);
+            }
+
+            // Title
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(card.transform, false);
+            TextMeshProUGUI titleTmp = titleObj.AddComponent<TextMeshProUGUI>();
+            titleTmp.fontSize = 12.5f;
+            titleTmp.fontStyle = FontStyles.Bold;
+            titleTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            titleTmp.color = trait.isWeakness
+                ? new Color(0.95f, 0.35f, 0.35f)
+                : new Color(0.28f, 0.88f, 0.45f);
+            titleTmp.text = trait.name.ToUpperInvariant();
+            titleTmp.textWrappingMode = TextWrappingModes.NoWrap;
+            RectTransform tr = titleObj.GetComponent<RectTransform>();
+            tr.anchorMin = new Vector2(0f, 0.5f);
+            tr.anchorMax = new Vector2(1f, 1f);
+            tr.offsetMin = new Vector2(64f, 0f);
+            tr.offsetMax = new Vector2(-10f, -4f);
+
+            // Description
+            GameObject descObj = new GameObject("Desc");
+            descObj.transform.SetParent(card.transform, false);
+            TextMeshProUGUI descTmp = descObj.AddComponent<TextMeshProUGUI>();
+            descTmp.fontSize = 10.5f;
+            descTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            descTmp.color = new Color(0.78f, 0.80f, 0.84f);
+            descTmp.text = trait.description;
+            descTmp.textWrappingMode = TextWrappingModes.Normal;
+            RectTransform dr = descObj.GetComponent<RectTransform>();
+            dr.anchorMin = new Vector2(0f, 0f);
+            dr.anchorMax = new Vector2(1f, 0.5f);
+            dr.offsetMin = new Vector2(64f, 4f);
+            dr.offsetMax = new Vector2(-10f, 0f);
+        }
+
+        private void RefreshPDALoreTab()
+        {
+            if (pdaLoreText == null) return;
+
+            if (loreSystem == null || loreSystem.Entries.Count == 0)
+            {
+                pdaLoreText.text = "<color=#6c7a89><i>No intelligence logs recorded yet.\n\nUse your Phone, Emergency Radio, or Laptop in the apartment to gather outbreak intel.</i></color>";
+                return;
+            }
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            foreach (var entry in loreSystem.Entries)
+            {
+                sb.AppendLine($"<color=#f39c12><b>■ {entry.title.ToUpperInvariant()}</b></color> <color=#6c7a89>[{entry.timestamp}]</color>");
+                sb.AppendLine($"<color=#d0d6dc>{entry.content}</color>\n");
+            }
+            pdaLoreText.text = sb.ToString().TrimEnd();
+        }
+
+        private void AutoEquipFromInventory()
+        {
+            if (currentPlayer == null || currentPlayer.inventory == null) return;
+
+            foreach (var entry in currentPlayer.inventory)
+            {
+                string slot = ItemDatabase.GetEquipSlot(entry.itemId);
+                if (slot == "HEAD" && string.IsNullOrEmpty(equippedHead)) equippedHead = entry.itemId;
+                else if (slot == "BODY" && string.IsNullOrEmpty(equippedBody)) equippedBody = entry.itemId;
+                else if (slot == "WPN" && string.IsNullOrEmpty(equippedWpn)) equippedWpn = entry.itemId;
+                else if (slot == "LEGS" && string.IsNullOrEmpty(equippedLegs)) equippedLegs = entry.itemId;
+                else if (slot == "FEET" && string.IsNullOrEmpty(equippedFeet)) equippedFeet = entry.itemId;
+            }
+        }
+
+        private void RefreshRightGearPanel()
+        {
+            // 1. Update Active Loadout Slots on Body Wireframe
+            UpdateEquipSlotVisual(equipHeadIcon, equipHeadLabel, equippedHead, "HEAD");
+            UpdateEquipSlotVisual(equipBodyIcon, equipBodyLabel, equippedBody, "BODY");
+            UpdateEquipSlotVisual(equipWpnIcon, equipWpnLabel, equippedWpn, "WPN");
+            UpdateEquipSlotVisual(equipLegsIcon, equipLegsLabel, equippedLegs, "LEGS");
+            UpdateEquipSlotVisual(equipFeetIcon, equipFeetLabel, equippedFeet, "FEET");
+
+            // 2. Update Backpack 12-Slot Grid (Exact Twine replica)
+            if (pdaBackpackGrid != null)
+            {
+                for (int i = pdaBackpackGrid.childCount - 1; i >= 0; i--)
+                {
+                    Destroy(pdaBackpackGrid.GetChild(i).gameObject);
+                }
+
+                List<InventoryEntry> inv = currentPlayer != null && currentPlayer.inventory != null
+                    ? currentPlayer.inventory
+                    : new List<InventoryEntry>();
+
+                int maxSlots = currentPlayer != null ? Mathf.Max(10, currentPlayer.bagLimit) : 12;
+                if (pdaBackpackCountText != null)
+                {
+                    pdaBackpackCountText.text = $"{inv.Count}/{maxSlots}";
+                }
+
+                int totalCells = Mathf.Max(12, maxSlots);
+                for (int i = 0; i < totalCells; i++)
+                {
+                    if (i < inv.Count)
+                    {
+                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true);
+                    }
+                    else
+                    {
+                        CreateInventorySlotCell(pdaBackpackGrid, null, 0, false);
+                    }
+                }
+            }
+
+            // 3. Update Floor / Room Items (Table Stash) in Right Wing
+            if (pdaFloorItemsGrid != null)
+            {
+                for (int i = pdaFloorItemsGrid.childCount - 1; i >= 0; i--)
+                {
+                    Destroy(pdaFloorItemsGrid.GetChild(i).gameObject);
+                }
+
+                if (pdaFloorEmptyText != null)
+                {
+                    pdaFloorEmptyText.gameObject.SetActive(tableStash.Count == 0);
+                }
+
+                foreach (var item in tableStash)
+                {
+                    CreateInventorySlotCell(pdaFloorItemsGrid, item.itemId, item.quantity, false);
+                }
+            }
+        }
+
+        private void UpdateEquipSlotVisual(Image iconImg, TextMeshProUGUI slotLabel, string equippedItemId, string defaultSlotName)
+        {
+            if (iconImg == null || slotLabel == null) return;
+
+            if (!string.IsNullOrEmpty(equippedItemId))
+            {
+                Sprite s = ItemDatabase.GetItemIcon(equippedItemId);
+                if (s != null)
+                {
+                    iconImg.gameObject.SetActive(true);
+                    iconImg.sprite = s;
+                    iconImg.color = Color.white;
+                    slotLabel.text = "";
+                    return;
+                }
+            }
+
+            iconImg.gameObject.SetActive(false);
+            slotLabel.text = defaultSlotName;
+        }
+
+        private void CreateInventorySlotCell(Transform parent, string itemId, int quantity, bool allowEquipClick)
+        {
+            GameObject cell = new GameObject(string.IsNullOrEmpty(itemId) ? "EmptySlot" : "Slot_" + itemId);
+            cell.transform.SetParent(parent, false);
+            RectTransform rt = cell.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(66f, 66f);
+
+            Image bg = cell.AddComponent<Image>();
+            bg.color = new Color(0.08f, 0.09f, 0.11f, 0.95f);
+
+            Outline ol = cell.AddComponent<Outline>();
+            ol.effectColor = string.IsNullOrEmpty(itemId)
+                ? new Color(0.18f, 0.20f, 0.24f, 0.75f)
+                : new Color(0.28f, 0.32f, 0.38f, 0.95f);
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            if (string.IsNullOrEmpty(itemId)) return;
+
+            // Item Icon
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(cell.transform, false);
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+            RectTransform ir = iconObj.GetComponent<RectTransform>();
+            ir.anchorMin = Vector2.zero;
+            ir.anchorMax = Vector2.one;
+            ir.offsetMin = new Vector2(6f, 14f);
+            ir.offsetMax = new Vector2(-6f, -4f);
+
+            Sprite s = ItemDatabase.GetItemIcon(itemId);
+            if (s != null)
+            {
+                iconImg.sprite = s;
+                iconImg.color = Color.white;
+            }
+            else
+            {
+                iconImg.color = new Color(0.35f, 0.4f, 0.45f, 0.5f);
+            }
+
+            // Short Item Name at bottom
+            GameObject nameObj = new GameObject("ItemName");
+            nameObj.transform.SetParent(cell.transform, false);
+            TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
+            nameTmp.fontSize = 8.5f;
+            nameTmp.alignment = TextAlignmentOptions.Center;
+            nameTmp.color = new Color(0.78f, 0.82f, 0.86f);
+            nameTmp.text = itemId.Length > 10 ? itemId.Substring(0, 9) + "." : itemId;
+            nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
+            nameTmp.raycastTarget = false;
+            RectTransform nr = nameObj.GetComponent<RectTransform>();
+            nr.anchorMin = new Vector2(0f, 0f);
+            nr.anchorMax = new Vector2(1f, 0f);
+            nr.pivot = new Vector2(0.5f, 0f);
+            nr.sizeDelta = new Vector2(0f, 14f);
+            nr.anchoredPosition = new Vector2(0f, 1f);
+
+            // Quantity badge (Twine style: bottom-right dark box with green x24 text)
+            if (quantity > 1)
+            {
+                GameObject qBadge = new GameObject("QtyBadge");
+                qBadge.transform.SetParent(cell.transform, false);
+                RectTransform qr = qBadge.AddComponent<RectTransform>();
+                qr.anchorMin = new Vector2(1f, 0f);
+                qr.anchorMax = new Vector2(1f, 0f);
+                qr.pivot = new Vector2(1f, 0f);
+                qr.anchoredPosition = new Vector2(-2f, 13f);
+                qr.sizeDelta = new Vector2(26f, 14f);
+                Image qBg = qBadge.AddComponent<Image>();
+                qBg.color = new Color(0.04f, 0.06f, 0.04f, 0.92f);
+                qBg.raycastTarget = false;
+
+                GameObject qtObj = new GameObject("Text");
+                qtObj.transform.SetParent(qBadge.transform, false);
+                TextMeshProUGUI qTmp = qtObj.AddComponent<TextMeshProUGUI>();
+                qTmp.fontSize = 9f;
+                qTmp.fontStyle = FontStyles.Bold;
+                qTmp.alignment = TextAlignmentOptions.Center;
+                qTmp.color = new Color(0.35f, 0.95f, 0.45f);
+                qTmp.text = $"x{quantity}";
+                qTmp.raycastTarget = false;
+                RectTransform qtr = qtObj.GetComponent<RectTransform>();
+                qtr.anchorMin = Vector2.zero;
+                qtr.anchorMax = Vector2.one;
+                qtr.offsetMin = Vector2.zero;
+                qtr.offsetMax = Vector2.zero;
+            }
+
+            if (allowEquipClick)
+            {
+                Button btn = cell.AddComponent<Button>();
+                btn.targetGraphic = bg;
+                string capturedItem = itemId;
+                btn.onClick.AddListener(() =>
+                {
+                    string slot = ItemDatabase.GetEquipSlot(capturedItem);
+                    if (!string.IsNullOrEmpty(slot))
+                    {
+                        PlayClickSFX();
+                        if (slot == "HEAD") equippedHead = capturedItem;
+                        else if (slot == "BODY") equippedBody = capturedItem;
+                        else if (slot == "WPN") equippedWpn = capturedItem;
+                        else if (slot == "LEGS") equippedLegs = capturedItem;
+                        else if (slot == "FEET") equippedFeet = capturedItem;
+                        RefreshRightGearPanel();
+                    }
+                });
+            }
+        }
+        #endregion
 
         #region Awakening Sequence (Beats 1 - 3)
         private void ShowAwakeningStep(int step)
@@ -693,6 +1290,7 @@ namespace SundayLastBreath.UI
             }
 
             hasPacked = true;
+            AutoEquipFromInventory();
 
             // Objectives
             objectiveSystem.CompleteObjective("pack_gear");
@@ -700,6 +1298,7 @@ namespace SundayLastBreath.UI
 
             EvaluateHubButtonStates();
             PopulateTableStashUI();
+            RefreshAllPDAPanels();
         }
 
         private void OnCheckPhoneClicked()
@@ -859,6 +1458,7 @@ namespace SundayLastBreath.UI
             );
 
             EvaluateHubButtonStates();
+            RefreshAllPDAPanels();
         }
 
         private void OnLeaveApartmentClicked()
@@ -945,10 +1545,8 @@ namespace SundayLastBreath.UI
             {
                 floorItemsCountText.text = $"■ Floor Items ({tableStash.Count})";
             }
-            if (floorItemsButton != null)
-            {
-                floorItemsButton.gameObject.SetActive(tableStash.Count > 0);
-            }
+
+            RefreshRightGearPanel();
 
             if (tableStashGrid == null) return;
 
@@ -976,10 +1574,12 @@ namespace SundayLastBreath.UI
         {
             GameObject card = new GameObject("ItemCard_" + itemId);
             card.transform.SetParent(parent, false);
+            RectTransform rt = card.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(86f, 88f);
 
             LayoutElement le = card.AddComponent<LayoutElement>();
-            le.preferredWidth = 92f;
-            le.preferredHeight = 96f;
+            le.preferredWidth = 86f;
+            le.preferredHeight = 88f;
 
             Image cardBg = card.AddComponent<Image>();
             cardBg.color = new Color(0.08f, 0.10f, 0.14f, 0.90f);
@@ -989,22 +1589,18 @@ namespace SundayLastBreath.UI
             cardOl.effectColor = new Color(0.25f, 0.35f, 0.45f, 0.6f);
             cardOl.effectDistance = new Vector2(1f, -1f);
 
-            VerticalLayoutGroup vlg = card.AddComponent<VerticalLayoutGroup>();
-            vlg.childAlignment = TextAnchor.MiddleCenter;
-            vlg.spacing = 4f;
-            vlg.padding = new RectOffset(6, 6, 6, 6);
-            vlg.childControlWidth = true;
-            vlg.childControlHeight = false;
-
             // Icon
             GameObject iconObj = new GameObject("Icon");
             iconObj.transform.SetParent(card.transform, false);
-            LayoutElement iconLe = iconObj.AddComponent<LayoutElement>();
-            iconLe.preferredWidth = 44f;
-            iconLe.preferredHeight = 44f;
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
+            RectTransform ir = iconObj.GetComponent<RectTransform>();
+            ir.anchorMin = new Vector2(0.5f, 1f);
+            ir.anchorMax = new Vector2(0.5f, 1f);
+            ir.pivot = new Vector2(0.5f, 1f);
+            ir.anchoredPosition = new Vector2(0f, -8f);
+            ir.sizeDelta = new Vector2(42f, 42f);
 
             Sprite iconSprite = ItemDatabase.GetItemIcon(itemId);
             if (iconSprite != null)
@@ -1021,11 +1617,18 @@ namespace SundayLastBreath.UI
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(card.transform, false);
             TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-            label.fontSize = 10.5f;
+            label.fontSize = 9.5f;
             label.alignment = TextAlignmentOptions.Center;
             label.color = new Color(0.85f, 0.88f, 0.92f);
             label.text = quantity > 1 ? $"{itemId} (x{quantity})" : itemId;
+            label.textWrappingMode = TextWrappingModes.Normal;
             label.raycastTarget = false;
+            RectTransform lr = labelObj.GetComponent<RectTransform>();
+            lr.anchorMin = new Vector2(0f, 0f);
+            lr.anchorMax = new Vector2(1f, 0f);
+            lr.pivot = new Vector2(0.5f, 0f);
+            lr.sizeDelta = new Vector2(-8f, 30f);
+            lr.anchoredPosition = new Vector2(0f, 4f);
         }
 
         private void PlayClickSFX()
