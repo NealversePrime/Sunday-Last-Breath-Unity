@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v22_auto.flag";
+                string flagPath = "Temp/scene_v23_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -456,7 +456,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("tvStaticAnimPlayer").objectReferenceValue = staticAnim;
             so.FindProperty("speakerLabel").objectReferenceValue = spkTmp;
             so.FindProperty("narrativeBodyText").objectReferenceValue = bodyTmp;
-            so.FindProperty("continuePrompt").objectReferenceValue = promptObj;
+            so.FindProperty("continuePrompt").objectReferenceValue = prTmp.gameObject;
             so.FindProperty("focusReflectionButton").objectReferenceValue = focusBtn;
             so.FindProperty("fullScreenClickCatcher").objectReferenceValue = ccBtn;
             so.FindProperty("staticClip").objectReferenceValue = staticClip;
@@ -516,10 +516,8 @@ namespace SundayLastBreath.Editor
             thbImg.raycastTarget = false;
 
             // LEFT: Tactical Location Badge
-            GameObject locBadgeObj = new GameObject("LocationBadge");
-            locBadgeObj.transform.SetParent(topHeader.transform, false);
-            TextMeshProUGUI locBadgeTmp = CreateTMPText(locBadgeObj.transform, "Text", "■ UNIT 404 // THE ASCOTT RESIDENCY [4TH FLOOR]", 12f, new Color(0.72f, 0.82f, 0.94f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform lbr = locBadgeObj.GetComponent<RectTransform>();
+            TextMeshProUGUI locBadgeTmp = CreateTMPText(topHeader.transform, "LocationBadge", "■ UNIT 404 // THE ASCOTT RESIDENCY [4TH FLOOR]", 12f, new Color(0.72f, 0.82f, 0.94f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform lbr = locBadgeTmp.rectTransform;
             lbr.anchorMin = new Vector2(0f, 0.5f);
             lbr.anchorMax = new Vector2(0f, 0.5f);
             lbr.pivot = new Vector2(0f, 0.5f);
@@ -569,19 +567,15 @@ namespace SundayLastBreath.Editor
             cbRect.anchoredPosition = new Vector2(-24f, 0f);
             cbRect.sizeDelta = new Vector2(130f, 44f);
 
-            GameObject ctObj = new GameObject("ClockTime");
-            ctObj.transform.SetParent(clockBlock.transform, false);
-            TextMeshProUGUI clockTimeTmp = CreateTMPText(ctObj.transform, "TMP", "23:45", 20f, new Color(0.72f, 0.86f, 0.98f), TextAlignmentOptions.Right, FontStyles.Bold);
-            RectTransform ctRect = ctObj.GetComponent<RectTransform>();
+            TextMeshProUGUI clockTimeTmp = CreateTMPText(clockBlock.transform, "ClockTime", "23:45", 20f, new Color(0.72f, 0.86f, 0.98f), TextAlignmentOptions.Right, FontStyles.Bold);
+            RectTransform ctRect = clockTimeTmp.rectTransform;
             ctRect.anchorMin = new Vector2(0f, 0.4f);
             ctRect.anchorMax = new Vector2(1f, 1f);
             ctRect.offsetMin = Vector2.zero;
             ctRect.offsetMax = Vector2.zero;
 
-            GameObject cdObj = new GameObject("ClockDay");
-            cdObj.transform.SetParent(clockBlock.transform, false);
-            TextMeshProUGUI clockDayTmp = CreateTMPText(cdObj.transform, "TMP", "DAY 0", 10f, new Color(0.55f, 0.55f, 0.55f), TextAlignmentOptions.Right, FontStyles.Bold);
-            RectTransform cdRect = cdObj.GetComponent<RectTransform>();
+            TextMeshProUGUI clockDayTmp = CreateTMPText(clockBlock.transform, "ClockDay", "DAY 0", 10f, new Color(0.55f, 0.55f, 0.55f), TextAlignmentOptions.Right, FontStyles.Bold);
+            RectTransform cdRect = clockDayTmp.rectTransform;
             cdRect.anchorMin = new Vector2(0f, 0f);
             cdRect.anchorMax = new Vector2(1f, 0.4f);
             cdRect.offsetMin = Vector2.zero;
@@ -616,7 +610,7 @@ namespace SundayLastBreath.Editor
             phRect.anchoredPosition = Vector2.zero;
 
             TextMeshProUGUI pdaTitleTmp = CreateTMPText(pdaHeaderObj.transform, "Title", "SURVIVOR PDA", 16f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform ptRect = pdaTitleTmp.GetComponent<RectTransform>();
+            RectTransform ptRect = pdaTitleTmp.rectTransform;
             StretchFull(ptRect);
 
             // 5 PDA Tabs in 2 Rows (Twine PDA_Overlay.twee exact replica)
@@ -688,13 +682,13 @@ namespace SundayLastBreath.Editor
             LayoutElement chLe = cHeadObj.AddComponent<LayoutElement>();
             chLe.preferredHeight = 54f;
             TextMeshProUGUI pdaCharNameTmp = CreateTMPText(cHeadObj.transform, "Name", "James Smith", 17f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform cnr = pdaCharNameTmp.GetComponent<RectTransform>();
+            RectTransform cnr = pdaCharNameTmp.rectTransform;
             cnr.anchorMin = new Vector2(0f, 0.45f);
             cnr.anchorMax = new Vector2(1f, 1f);
             cnr.offsetMin = Vector2.zero; cnr.offsetMax = Vector2.zero;
 
             TextMeshProUGUI pdaCharSubTmp = CreateTMPText(cHeadObj.transform, "Sub", "Male | Police Officer", 11.5f, new Color(0.65f, 0.68f, 0.72f), TextAlignmentOptions.Center);
-            RectTransform csr = pdaCharSubTmp.GetComponent<RectTransform>();
+            RectTransform csr = pdaCharSubTmp.rectTransform;
             csr.anchorMin = new Vector2(0f, 0f);
             csr.anchorMax = new Vector2(1f, 0.45f);
             csr.offsetMin = Vector2.zero; csr.offsetMax = Vector2.zero;
@@ -721,21 +715,17 @@ namespace SundayLastBreath.Editor
             Image lbImg = logBar.AddComponent<Image>();
             lbImg.color = new Color(0.22f, 0.74f, 0.97f);
 
-            GameObject logHeadObj = new GameObject("Header");
-            logHeadObj.transform.SetParent(logsCard.transform, false);
-            TextMeshProUGUI logHeadTmp = CreateTMPText(logHeadObj.transform, "TMP", "ACTIVE LOGS", 11f, new Color(0.22f, 0.74f, 0.97f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
-            RectTransform lhr = logHeadObj.GetComponent<RectTransform>();
+            TextMeshProUGUI logHeadTmp = CreateTMPText(logsCard.transform, "Header", "ACTIVE LOGS", 11f, new Color(0.22f, 0.74f, 0.97f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
+            RectTransform lhr = logHeadTmp.rectTransform;
             lhr.anchorMin = new Vector2(0f, 1f);
             lhr.anchorMax = new Vector2(1f, 1f);
             lhr.pivot = new Vector2(0f, 1f);
             lhr.anchoredPosition = new Vector2(12f, -8f);
             lhr.sizeDelta = new Vector2(0f, 20f);
 
-            GameObject logBodyObj = new GameObject("Body");
-            logBodyObj.transform.SetParent(logsCard.transform, false);
-            TextMeshProUGUI pdaActiveLogsTmp = CreateTMPText(logBodyObj.transform, "TMP", "[ ] Gather your starter gear from the table\n[ ] Leave your apartment and head outside", 11.5f, new Color(0.85f, 0.88f, 0.92f), TextAlignmentOptions.TopLeft);
+            TextMeshProUGUI pdaActiveLogsTmp = CreateTMPText(logsCard.transform, "Body", "[ ] Gather your starter gear from the table\n[ ] Leave your apartment and head outside", 11.5f, new Color(0.85f, 0.88f, 0.92f), TextAlignmentOptions.TopLeft);
             pdaActiveLogsTmp.lineSpacing = 6f;
-            RectTransform lbrct = logBodyObj.GetComponent<RectTransform>();
+            RectTransform lbrct = pdaActiveLogsTmp.rectTransform;
             StretchFull(lbrct);
             lbrct.offsetMin = new Vector2(12f, 8f);
             lbrct.offsetMax = new Vector2(-10f, -28f);
@@ -748,20 +738,16 @@ namespace SundayLastBreath.Editor
             Image lvlBg = lvlCard.AddComponent<Image>();
             lvlBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
 
-            GameObject lvlLbl = new GameObject("LvlLbl");
-            lvlLbl.transform.SetParent(lvlCard.transform, false);
-            TextMeshProUGUI pdaLevelTmp = CreateTMPText(lvlLbl.transform, "TMP", "LVL 1", 14f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform llr = lvlLbl.GetComponent<RectTransform>();
+            TextMeshProUGUI pdaLevelTmp = CreateTMPText(lvlCard.transform, "LvlLbl", "LVL 1", 14f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform llr = pdaLevelTmp.rectTransform;
             llr.anchorMin = new Vector2(0f, 0.5f);
             llr.anchorMax = new Vector2(0f, 0.5f);
             llr.pivot = new Vector2(0f, 0.5f);
             llr.anchoredPosition = new Vector2(10f, 6f);
             llr.sizeDelta = new Vector2(100f, 20f);
 
-            GameObject xpLbl = new GameObject("XpLbl");
-            xpLbl.transform.SetParent(lvlCard.transform, false);
-            TextMeshProUGUI pdaXpTmp = CreateTMPText(xpLbl.transform, "TMP", "0/100 XP", 10.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.MidlineRight);
-            RectTransform xlr = xpLbl.GetComponent<RectTransform>();
+            TextMeshProUGUI pdaXpTmp = CreateTMPText(lvlCard.transform, "XpLbl", "0/100 XP", 10.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.MidlineRight);
+            RectTransform xlr = pdaXpTmp.rectTransform;
             xlr.anchorMin = new Vector2(1f, 0.5f);
             xlr.anchorMax = new Vector2(1f, 0.5f);
             xlr.pivot = new Vector2(1f, 0.5f);
@@ -817,17 +803,13 @@ namespace SundayLastBreath.Editor
             pdaHumFillImg.fillMethod = Image.FillMethod.Horizontal;
             pdaHumFillImg.fillAmount = 0.35f;
 
-            GameObject humLbl = new GameObject("Label");
-            humLbl.transform.SetParent(humTrack.transform, false);
-            TextMeshProUGUI humLblTmp = CreateTMPText(humLbl.transform, "TMP", "HUMANITY", 10.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform hlr = humLbl.GetComponent<RectTransform>();
+            TextMeshProUGUI humLblTmp = CreateTMPText(humTrack.transform, "Label", "HUMANITY", 10.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform hlr = humLblTmp.rectTransform;
             hlr.anchorMin = new Vector2(0f, 0f); hlr.anchorMax = new Vector2(0.5f, 1f);
             hlr.offsetMin = new Vector2(8f, 0f); hlr.offsetMax = Vector2.zero;
 
-            GameObject humVal = new GameObject("Value");
-            humVal.transform.SetParent(humTrack.transform, false);
-            TextMeshProUGUI pdaHumValTmp = CreateTMPText(humVal.transform, "TMP", "35/100", 10.5f, Color.white, TextAlignmentOptions.MidlineRight, FontStyles.Bold);
-            RectTransform hvr = humVal.GetComponent<RectTransform>();
+            TextMeshProUGUI pdaHumValTmp = CreateTMPText(humTrack.transform, "Value", "35/100", 10.5f, Color.white, TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            RectTransform hvr = pdaHumValTmp.rectTransform;
             hvr.anchorMin = new Vector2(0.5f, 0f); hvr.anchorMax = new Vector2(1f, 1f);
             hvr.offsetMin = Vector2.zero; hvr.offsetMax = new Vector2(-8f, 0f);
 
@@ -842,16 +824,14 @@ namespace SundayLastBreath.Editor
             ccOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.85f);
             ccOl.effectDistance = new Vector2(1f, -1f);
 
-            GameObject condTextObj = new GameObject("Text");
-            condTextObj.transform.SetParent(condCard.transform, false);
-            TextMeshProUGUI condTmp = CreateTMPText(condTextObj.transform, "TMP",
+            TextMeshProUGUI condTmp = CreateTMPText(condCard.transform, "Text",
                 "<color=#f39c12><b>TACTICAL CONDITION:</b></color>\n" +
                 "• Shelter: Unit 404 (Living Room)\n" +
                 "• Status: Unprepared / In Pajamas\n" +
                 "• Threat: Civil Danger Warning (Category 5)\n" +
                 "• Time to Sector Purge: 06:15 remaining", 11f, new Color(0.75f, 0.78f, 0.84f));
             condTmp.lineSpacing = 6f;
-            RectTransform ctr = condTextObj.GetComponent<RectTransform>();
+            RectTransform ctr = condTmp.rectTransform;
             StretchFull(ctr);
             ctr.offsetMin = new Vector2(12f, 8f);
             ctr.offsetMax = new Vector2(-12f, -8f);
@@ -868,24 +848,16 @@ namespace SundayLastBreath.Editor
             pSkillsObj.SetActive(false);
 
             CreateSectionBadge(pSkillsObj.transform, "CORE ATTRIBUTES (M.O.R.T.A.L.)");
-            GameObject attrTextObj = new GameObject("AttributesText");
-            attrTextObj.transform.SetParent(pSkillsObj.transform, false);
-            LayoutElement atLe = attrTextObj.AddComponent<LayoutElement>();
-            atLe.preferredHeight = 150f;
-            TextMeshProUGUI pdaAttributesTmp = CreateTMPText(attrTextObj.transform, "TMP", "", 11.5f, Color.white);
+            TextMeshProUGUI pdaAttributesTmp = CreateTMPText(pSkillsObj.transform, "AttributesText", "", 11.5f, Color.white);
             pdaAttributesTmp.lineSpacing = 4f;
-            RectTransform atr = attrTextObj.GetComponent<RectTransform>();
-            StretchFull(atr);
+            LayoutElement atLe = pdaAttributesTmp.gameObject.AddComponent<LayoutElement>();
+            atLe.preferredHeight = 150f;
 
             CreateSectionBadge(pSkillsObj.transform, "COMBAT & SURVIVAL SKILLS");
-            GameObject skTextObj = new GameObject("SkillsText");
-            skTextObj.transform.SetParent(pSkillsObj.transform, false);
-            LayoutElement skLe = skTextObj.AddComponent<LayoutElement>();
-            skLe.preferredHeight = 150f;
-            TextMeshProUGUI pdaSkillsTmp = CreateTMPText(skTextObj.transform, "TMP", "", 11.5f, Color.white);
+            TextMeshProUGUI pdaSkillsTmp = CreateTMPText(pSkillsObj.transform, "SkillsText", "", 11.5f, Color.white);
             pdaSkillsTmp.lineSpacing = 4f;
-            RectTransform skr = skTextObj.GetComponent<RectTransform>();
-            StretchFull(skr);
+            LayoutElement skLe = pdaSkillsTmp.gameObject.AddComponent<LayoutElement>();
+            skLe.preferredHeight = 150f;
 
             // TAB 3: TRAITS PANEL (Matches Image 5)
             GameObject pTraitsObj = new GameObject("Panel_Traits");
@@ -937,9 +909,7 @@ namespace SundayLastBreath.Editor
             mcOl.effectColor = new Color(0.20f, 0.25f, 0.32f, 0.85f);
             mcOl.effectDistance = new Vector2(1f, -1f);
 
-            GameObject mapTextObj = new GameObject("MapText");
-            mapTextObj.transform.SetParent(mapCard.transform, false);
-            TextMeshProUGUI mapTmp = CreateTMPText(mapTextObj.transform, "TMP",
+            TextMeshProUGUI mapTmp = CreateTMPText(mapCard.transform, "MapText",
                 "<color=#f39c12><b>THE ASCOTT RESIDENCY — 4TH FLOOR</b></color>\n\n" +
                 "  ┌───────────┬───────────┐\n" +
                 "  │ UNIT 408  │ UNIT 407  │  [NORTH END]\n" +
@@ -958,7 +928,7 @@ namespace SundayLastBreath.Editor
                 "<color=#6c7a89><i>Exit your door to enter the Hallway.</i></color>",
                 11f, new Color(0.72f, 0.86f, 0.98f));
             mapTmp.lineSpacing = 4f;
-            RectTransform mtr = mapTextObj.GetComponent<RectTransform>();
+            RectTransform mtr = mapTmp.rectTransform;
             StretchFull(mtr);
             mtr.offsetMin = new Vector2(14f, 10f);
             mtr.offsetMax = new Vector2(-14f, -10f);
@@ -984,11 +954,9 @@ namespace SundayLastBreath.Editor
             lc2Ol.effectColor = new Color(0.20f, 0.25f, 0.32f, 0.85f);
             lc2Ol.effectDistance = new Vector2(1f, -1f);
 
-            GameObject loreTextObj = new GameObject("LoreText");
-            loreTextObj.transform.SetParent(loreCard.transform, false);
-            TextMeshProUGUI pdaLoreTmp = CreateTMPText(loreTextObj.transform, "TMP", "", 11.5f, new Color(0.85f, 0.88f, 0.92f));
+            TextMeshProUGUI pdaLoreTmp = CreateTMPText(loreCard.transform, "LoreText", "", 11.5f, new Color(0.85f, 0.88f, 0.92f));
             pdaLoreTmp.lineSpacing = 6f;
-            RectTransform ltr = loreTextObj.GetComponent<RectTransform>();
+            RectTransform ltr = pdaLoreTmp.rectTransform;
             StretchFull(ltr);
             ltr.offsetMin = new Vector2(14f, 10f);
             ltr.offsetMax = new Vector2(-14f, -10f);
@@ -1013,10 +981,8 @@ namespace SundayLastBreath.Editor
             Image vrBg = volRow.AddComponent<Image>();
             vrBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
 
-            GameObject volLbl = new GameObject("Label");
-            volLbl.transform.SetParent(volRow.transform, false);
-            TextMeshProUGUI volTmp = CreateTMPText(volLbl.transform, "TMP", "VOL", 11f, new Color(0.75f, 0.78f, 0.82f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform vlr = volLbl.GetComponent<RectTransform>();
+            TextMeshProUGUI volTmp = CreateTMPText(volRow.transform, "Label", "VOL", 11f, new Color(0.75f, 0.78f, 0.82f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform vlr = volTmp.rectTransform;
             vlr.anchorMin = new Vector2(0f, 0f); vlr.anchorMax = new Vector2(0f, 1f);
             vlr.pivot = new Vector2(0f, 0.5f);
             vlr.anchoredPosition = new Vector2(10f, 0f);
@@ -1072,10 +1038,8 @@ namespace SundayLastBreath.Editor
             sbOl.effectColor = new Color(0.22f, 0.25f, 0.32f, 0.85f);
             sbOl.effectDistance = new Vector2(1f, -1f);
 
-            GameObject sbTextObj = new GameObject("Text");
-            sbTextObj.transform.SetParent(setBtnObj.transform, false);
-            TextMeshProUGUI sbTmp = CreateTMPText(sbTextObj.transform, "TMP", "SAVE / LOAD / SETTINGS", 11.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform sbtr = sbTextObj.GetComponent<RectTransform>();
+            TextMeshProUGUI sbTmp = CreateTMPText(setBtnObj.transform, "Text", "SAVE / LOAD / SETTINGS", 11.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform sbtr = sbTmp.rectTransform;
             StretchFull(sbtr);
 
             // =========================================================================
@@ -1111,10 +1075,8 @@ namespace SundayLastBreath.Editor
             lcCardOl.effectColor = new Color(0.95f, 0.48f, 0.12f, 0.55f);
             lcCardOl.effectDistance = new Vector2(1f, -1f);
 
-            GameObject loadoutHead = new GameObject("Header");
-            loadoutHead.transform.SetParent(loadoutCard.transform, false);
-            TextMeshProUGUI lheadTmp = CreateTMPText(loadoutHead.transform, "TMP", "ACTIVE LOADOUT", 12.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform lhr2 = loadoutHead.GetComponent<RectTransform>();
+            TextMeshProUGUI lheadTmp = CreateTMPText(loadoutCard.transform, "Header", "ACTIVE LOADOUT", 12.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform lhr2 = lheadTmp.rectTransform;
             lhr2.anchorMin = new Vector2(0f, 1f); lhr2.anchorMax = new Vector2(1f, 1f);
             lhr2.pivot = new Vector2(0f, 1f);
             lhr2.anchoredPosition = new Vector2(12f, -8f);
@@ -1158,19 +1120,15 @@ namespace SundayLastBreath.Editor
             bcOl.effectColor = new Color(0.95f, 0.48f, 0.12f, 0.55f);
             bcOl.effectDistance = new Vector2(1f, -1f);
 
-            GameObject bagHead = new GameObject("Header");
-            bagHead.transform.SetParent(bagCard.transform, false);
-            TextMeshProUGUI bheadTmp = CreateTMPText(bagHead.transform, "TMP", "BACKPACK", 12.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform bhr = bagHead.GetComponent<RectTransform>();
+            TextMeshProUGUI bheadTmp = CreateTMPText(bagCard.transform, "Header", "BACKPACK", 12.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform bhr = bheadTmp.rectTransform;
             bhr.anchorMin = new Vector2(0f, 1f); bhr.anchorMax = new Vector2(0.5f, 1f);
             bhr.pivot = new Vector2(0f, 1f);
             bhr.anchoredPosition = new Vector2(12f, -8f);
             bhr.sizeDelta = new Vector2(0f, 22f);
 
-            GameObject bagCountObj = new GameObject("Count");
-            bagCountObj.transform.SetParent(bagCard.transform, false);
-            TextMeshProUGUI pdaBackpackCountTmp = CreateTMPText(bagCountObj.transform, "TMP", "0/12", 11.5f, new Color(0.65f, 0.68f, 0.72f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
-            RectTransform bcr = bagCountObj.GetComponent<RectTransform>();
+            TextMeshProUGUI pdaBackpackCountTmp = CreateTMPText(bagCard.transform, "Count", "0/12", 11.5f, new Color(0.65f, 0.68f, 0.72f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            RectTransform bcr = pdaBackpackCountTmp.rectTransform;
             bcr.anchorMin = new Vector2(0.5f, 1f); bcr.anchorMax = new Vector2(1f, 1f);
             bcr.pivot = new Vector2(1f, 1f);
             bcr.anchoredPosition = new Vector2(-12f, -8f);
@@ -1203,19 +1161,17 @@ namespace SundayLastBreath.Editor
             fcOl.effectColor = new Color(0.20f, 0.24f, 0.30f, 0.85f);
             fcOl.effectDistance = new Vector2(1f, -1f);
 
-            GameObject floorHead = new GameObject("Header");
-            floorHead.transform.SetParent(floorCard.transform, false);
-            TextMeshProUGUI fheadTmp = CreateTMPText(floorHead.transform, "TMP", "ROOM / TABLE ITEMS", 12f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform fhr = floorHead.GetComponent<RectTransform>();
+            TextMeshProUGUI fheadTmp = CreateTMPText(floorCard.transform, "Header", "ROOM / TABLE ITEMS", 12f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform fhr = fheadTmp.rectTransform;
             fhr.anchorMin = new Vector2(0f, 1f); fhr.anchorMax = new Vector2(0.5f, 1f);
             fhr.pivot = new Vector2(0f, 1f);
             fhr.anchoredPosition = new Vector2(12f, -6f);
             fhr.sizeDelta = new Vector2(0f, 22f);
 
             // Gather All / Floor Items Button
-            GameObject fBtnObj = new GameObject("Btn_GatherFloor");
+            GameObject fBtnObj = new GameObject("Btn_GatherFloor", typeof(RectTransform));
             fBtnObj.transform.SetParent(floorCard.transform, false);
-            RectTransform fbr = fBtnObj.AddComponent<RectTransform>();
+            RectTransform fbr = fBtnObj.GetComponent<RectTransform>();
             fbr.anchorMin = new Vector2(1f, 1f); fbr.anchorMax = new Vector2(1f, 1f);
             fbr.pivot = new Vector2(1f, 1f);
             fbr.anchoredPosition = new Vector2(-8f, -6f);
@@ -1225,15 +1181,13 @@ namespace SundayLastBreath.Editor
             Button btnFloorGather = fBtnObj.AddComponent<Button>();
             btnFloorGather.targetGraphic = fbImg;
 
-            GameObject fBtnText = new GameObject("Text");
-            fBtnText.transform.SetParent(fBtnObj.transform, false);
-            TextMeshProUGUI floorCountTmp = CreateTMPText(fBtnText.transform, "TMP", "■ Floor Items (3)", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform fbtRect = fBtnText.GetComponent<RectTransform>();
+            TextMeshProUGUI floorCountTmp = CreateTMPText(fBtnObj.transform, "Text", "■ Floor Items (3)", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform fbtRect = floorCountTmp.rectTransform;
             StretchFull(fbtRect);
 
-            GameObject floorGridObj = new GameObject("FloorGrid");
+            GameObject floorGridObj = new GameObject("FloorGrid", typeof(RectTransform));
             floorGridObj.transform.SetParent(floorCard.transform, false);
-            RectTransform fgr = floorGridObj.AddComponent<RectTransform>();
+            RectTransform fgr = floorGridObj.GetComponent<RectTransform>();
             StretchFull(fgr);
             fgr.offsetMin = new Vector2(10f, 8f);
             fgr.offsetMax = new Vector2(-10f, -32f);
@@ -1243,10 +1197,8 @@ namespace SundayLastBreath.Editor
             fgHlg.childControlWidth = false;
             fgHlg.childControlHeight = false;
 
-            GameObject floorEmptyObj = new GameObject("EmptyNotice");
-            floorEmptyObj.transform.SetParent(floorCard.transform, false);
-            TextMeshProUGUI pdaFloorEmptyTmp = CreateTMPText(floorEmptyObj.transform, "TMP", "(Table is empty)", 11.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.Center, FontStyles.Italic);
-            RectTransform fer = floorEmptyObj.GetComponent<RectTransform>();
+            TextMeshProUGUI pdaFloorEmptyTmp = CreateTMPText(floorCard.transform, "EmptyNotice", "(Table is empty)", 11.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.Center, FontStyles.Italic);
+            RectTransform fer = pdaFloorEmptyTmp.rectTransform;
             StretchFull(fer);
             fer.offsetMin = new Vector2(10f, 8f);
             fer.offsetMax = new Vector2(-10f, -32f);
@@ -1362,13 +1314,11 @@ namespace SundayLastBreath.Editor
             RectTransform b1Rect = b1Obj.AddComponent<RectTransform>();
             StretchFull(b1Rect);
 
-            GameObject b1TextObj = new GameObject("Beat1IntroText");
-            b1TextObj.transform.SetParent(b1Obj.transform, false);
-            TextMeshProUGUI b1Tmp = CreateTMPText(b1TextObj.transform, "TMP",
+            TextMeshProUGUI b1Tmp = CreateTMPText(b1Obj.transform, "Beat1IntroText",
                 "You turn away from the glass. The silence in your apartment breaks—not with a scream, but with an electronic tone pulsing from the television.",
                 14f, new Color(0.90f, 0.90f, 0.92f));
             b1Tmp.lineSpacing = 8f;
-            RectTransform b1tr = b1TextObj.GetComponent<RectTransform>();
+            RectTransform b1tr = b1Tmp.rectTransform;
             b1tr.anchorMin = new Vector2(0f, 1f); b1tr.anchorMax = new Vector2(1f, 1f);
             b1tr.pivot = new Vector2(0.5f, 1f);
             b1tr.sizeDelta = new Vector2(0f, 48f);
@@ -1387,12 +1337,10 @@ namespace SundayLastBreath.Editor
             easOl.effectColor = new Color(0.54f, 0.11f, 0.11f, 0.95f); // #8a1c1c
             easOl.effectDistance = new Vector2(2f, -2f);
 
-            GameObject easHeaderObj = new GameObject("EASHeader");
-            easHeaderObj.transform.SetParent(easBox.transform, false);
-            TextMeshProUGUI ehTmp = CreateTMPText(easHeaderObj.transform, "TMP",
+            TextMeshProUGUI ehTmp = CreateTMPText(easBox.transform, "EASHeader",
                 "EMERGENCY ALERT SYSTEM\n<size=80%><color=#ffffff>CIVIL DANGER WARNING</color></size>",
                 13.5f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform ehRect = easHeaderObj.GetComponent<RectTransform>();
+            RectTransform ehRect = ehTmp.rectTransform;
             ehRect.anchorMin = new Vector2(0f, 1f); ehRect.anchorMax = new Vector2(1f, 1f);
             ehRect.pivot = new Vector2(0.5f, 1f);
             ehRect.sizeDelta = new Vector2(0f, 44f);
@@ -1408,15 +1356,13 @@ namespace SundayLastBreath.Editor
             Image edImg = easDivObj.AddComponent<Image>();
             edImg.color = new Color(0.54f, 0.11f, 0.11f, 0.8f);
 
-            GameObject easTextObj = new GameObject("EASText");
-            easTextObj.transform.SetParent(easBox.transform, false);
-            TextMeshProUGUI easTmp = CreateTMPText(easTextObj.transform, "TMP",
+            TextMeshProUGUI easTmp = CreateTMPText(easBox.transform, "EASText",
                 "\"The following message is transmitted at the request of the King County Sheriff's Office. This is not a test.\n\n" +
                 "A Civil Danger Warning is in effect for the Seattle metropolitan area. Authorities reported a rapidly spreading biological hazard. Affected individuals exhibit extreme, unprovoked violence. The pathogen is highly contagious through fluid contact.\n\n" +
                 "Shelter in place immediately. Major interstates are closed. Lock all doors, turn off lights, and remain completely silent. The National Guard has been deployed. Lethal force is authorized.\"",
                 11.5f, new Color(1f, 0.80f, 0.80f));
             easTmp.lineSpacing = 7f;
-            RectTransform easTextRect = easTextObj.GetComponent<RectTransform>();
+            RectTransform easTextRect = easTmp.rectTransform;
             StretchFull(easTextRect);
             easTextRect.offsetMin = new Vector2(20f, 12f);
             easTextRect.offsetMax = new Vector2(-20f, -58f);
@@ -1428,12 +1374,10 @@ namespace SundayLastBreath.Editor
             StretchFull(b2Rect);
             b2Obj.SetActive(false);
 
-            GameObject b2TextObj = new GameObject("Beat2IntroText");
-            b2TextObj.transform.SetParent(b2Obj.transform, false);
-            TextMeshProUGUI b2Tmp = CreateTMPText(b2TextObj.transform, "TMP",
+            TextMeshProUGUI b2Tmp = CreateTMPText(b2Obj.transform, "Beat2IntroText",
                 "The robotic voice cuts out. Cold static returns to the TV.",
                 14f, new Color(0.90f, 0.90f, 0.92f));
-            RectTransform b2tr = b2TextObj.GetComponent<RectTransform>();
+            RectTransform b2tr = b2Tmp.rectTransform;
             b2tr.anchorMin = new Vector2(0f, 1f); b2tr.anchorMax = new Vector2(1f, 1f);
             b2tr.pivot = new Vector2(0.5f, 1f);
             b2tr.sizeDelta = new Vector2(0f, 32f);
@@ -1492,33 +1436,27 @@ namespace SundayLastBreath.Editor
             scRect.offsetMin = new Vector2(110f, 12f);
             scRect.offsetMax = new Vector2(-18f, -12f);
 
-            GameObject mSpkObj = new GameObject("Speaker");
-            mSpkObj.transform.SetParent(speechContainer.transform, false);
-            TextMeshProUGUI mSpkTmp = CreateTMPText(mSpkObj.transform, "TMP", "YOU", 12.5f, new Color(0.95f, 0.75f, 0.35f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
-            RectTransform spkRect = mSpkObj.GetComponent<RectTransform>();
+            TextMeshProUGUI mSpkTmp = CreateTMPText(speechContainer.transform, "Speaker", "YOU", 12.5f, new Color(0.95f, 0.75f, 0.35f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
+            RectTransform spkRect = mSpkTmp.rectTransform;
             spkRect.anchorMin = new Vector2(0f, 1f); spkRect.anchorMax = new Vector2(1f, 1f);
             spkRect.pivot = new Vector2(0f, 1f);
             spkRect.sizeDelta = new Vector2(0f, 22f);
             spkRect.anchoredPosition = Vector2.zero;
 
-            GameObject mTextObj = new GameObject("Speech");
-            mTextObj.transform.SetParent(speechContainer.transform, false);
-            TextMeshProUGUI mTextTmp = CreateTMPText(mTextObj.transform, "TMP",
+            TextMeshProUGUI mTextTmp = CreateTMPText(speechContainer.transform, "Speech",
                 "\"Lethal force authorized... They don't lock down the whole city for mass hysteria. And this front door isn't heavy enough to keep a panicked mob out.\"",
                 13.5f, new Color(0.92f, 0.94f, 0.98f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
             mTextTmp.lineSpacing = 5f;
-            RectTransform stRect = mTextObj.GetComponent<RectTransform>();
+            RectTransform stRect = mTextTmp.rectTransform;
             StretchFull(stRect);
             stRect.offsetMin = Vector2.zero;
             stRect.offsetMax = new Vector2(0f, -24f);
 
-            GameObject b2FootObj = new GameObject("Beat2FootnoteText");
-            b2FootObj.transform.SetParent(b2Obj.transform, false);
-            TextMeshProUGUI b2fTmp = CreateTMPText(b2FootObj.transform, "TMP",
+            TextMeshProUGUI b2fTmp = CreateTMPText(b2Obj.transform, "Beat2FootnoteText",
                 "Through the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens. And closer... the muffled sound of heavy, frantic footsteps pounding down the hallway outside your door.",
                 13.5f, new Color(0.70f, 0.75f, 0.82f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
             b2fTmp.lineSpacing = 5f;
-            RectTransform b2fRect = b2FootObj.GetComponent<RectTransform>();
+            RectTransform b2fRect = b2fTmp.rectTransform;
             b2fRect.anchorMin = new Vector2(0f, 0f); b2fRect.anchorMax = new Vector2(1f, 0f);
             b2fRect.pivot = new Vector2(0.5f, 0f);
             b2fRect.sizeDelta = new Vector2(0f, 55f);
@@ -1541,20 +1479,16 @@ namespace SundayLastBreath.Editor
             Image tbBg = tagBadge.AddComponent<Image>();
             tbBg.color = new Color(0.91f, 0.30f, 0.24f, 0.15f);
 
-            GameObject tagBadgeTextObj = new GameObject("Text");
-            tagBadgeTextObj.transform.SetParent(tagBadge.transform, false);
-            TextMeshProUGUI tbTmp = CreateTMPText(tagBadgeTextObj.transform, "TMP", "LIVING ROOM", 11f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform tbtRect = tagBadgeTextObj.GetComponent<RectTransform>();
+            TextMeshProUGUI tbTmp = CreateTMPText(tagBadge.transform, "Text", "LIVING ROOM", 11f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform tbtRect = tbTmp.rectTransform;
             StretchFull(tbtRect);
 
-            GameObject b3TextObj = new GameObject("Beat3NarrativeText");
-            b3TextObj.transform.SetParent(b3Obj.transform, false);
-            TextMeshProUGUI b3Tmp = CreateTMPText(b3TextObj.transform, "TMP",
+            TextMeshProUGUI b3Tmp = CreateTMPText(b3Obj.transform, "Beat3NarrativeText",
                 "You are standing in the middle of your living room in your pajamas. You feel naked. Vulnerable.\n\n" +
                 "You glance around the dim room, illuminated only by the harsh red glow of the TV. Your everyday carry sits on the cramped desk. But your heavier equipment rests by the front door, exactly where you dropped it after yesterday's shift.",
                 13.5f, new Color(0.88f, 0.88f, 0.92f));
             b3Tmp.lineSpacing = 6f;
-            RectTransform b3tRect = b3TextObj.GetComponent<RectTransform>();
+            RectTransform b3tRect = b3Tmp.rectTransform;
             b3tRect.anchorMin = new Vector2(0f, 1f); b3tRect.anchorMax = new Vector2(1f, 1f);
             b3tRect.pivot = new Vector2(0.5f, 1f);
             b3tRect.sizeDelta = new Vector2(0f, 95f);
@@ -1590,10 +1524,8 @@ namespace SundayLastBreath.Editor
             sVlg.spacing = 8f;
             sVlg.childControlWidth = true; sVlg.childControlHeight = false;
 
-            GameObject stashHeader = new GameObject("Header");
-            stashHeader.transform.SetParent(stashObj.transform, false);
-            TextMeshProUGUI shTmp = CreateTMPText(stashHeader.transform, "TMP", "TABLE STASH // CURRENT WORK GEAR & WEAPONS", 11.5f, new Color(0.95f, 0.75f, 0.35f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
-            RectTransform shRect = stashHeader.GetComponent<RectTransform>();
+            TextMeshProUGUI shTmp = CreateTMPText(stashObj.transform, "Header", "TABLE STASH // CURRENT WORK GEAR & WEAPONS", 11.5f, new Color(0.95f, 0.75f, 0.35f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
+            RectTransform shRect = shTmp.rectTransform;
             shRect.sizeDelta = new Vector2(0f, 20f);
 
             GameObject sGridObj = new GameObject("Grid");
@@ -1605,22 +1537,18 @@ namespace SundayLastBreath.Editor
             sgHlg.childAlignment = TextAnchor.MiddleLeft;
             sgHlg.childControlWidth = false; sgHlg.childControlHeight = false;
 
-            GameObject sEmptyObj = new GameObject("EmptyNotice");
-            sEmptyObj.transform.SetParent(stashObj.transform, false);
-            TextMeshProUGUI seTmp = CreateTMPText(sEmptyObj.transform, "TMP", "(Table is empty)", 12.5f, new Color(0.6f, 0.6f, 0.6f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
-            RectTransform seRect = sEmptyObj.GetComponent<RectTransform>();
+            TextMeshProUGUI seTmp = CreateTMPText(stashObj.transform, "EmptyNotice", "(Table is empty)", 12.5f, new Color(0.6f, 0.6f, 0.6f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
+            RectTransform seRect = seTmp.rectTransform;
             seRect.sizeDelta = new Vector2(0f, 22f);
 
             // Continue Prompt
-            GameObject promptObj = new GameObject("ContinuePrompt");
-            promptObj.transform.SetParent(awakeObj.transform, false);
-            TextMeshProUGUI prTmp = CreateTMPText(promptObj.transform, "TMP", "CLICK TO CONTINUE <color=#FFA726>▶</color>", 12.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
-            RectTransform prRect = promptObj.GetComponent<RectTransform>();
+            TextMeshProUGUI prTmp = CreateTMPText(awakeObj.transform, "ContinuePrompt", "CLICK TO CONTINUE <color=#FFA726>▶</color>", 12.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            RectTransform prRect = prTmp.rectTransform;
             prRect.anchorMin = new Vector2(1f, 0f); prRect.anchorMax = new Vector2(1f, 0f);
             prRect.pivot = new Vector2(1f, 0f);
             prRect.anchoredPosition = new Vector2(0f, -4f);
             prRect.sizeDelta = new Vector2(220f, 26f);
-            promptObj.AddComponent<PulsingText>();
+            prTmp.gameObject.AddComponent<PulsingText>();
 
             // MODE B: INTERACTIVE HUB MENU CONTAINER
             GameObject menuObj = new GameObject("HubMenuContainer");
@@ -1652,12 +1580,10 @@ namespace SundayLastBreath.Editor
             Image pbgImg = pBannerGreenBar.AddComponent<Image>();
             pbgImg.color = new Color(0.18f, 0.80f, 0.44f);
 
-            GameObject pbTextObj = new GameObject("Text");
-            pbTextObj.transform.SetParent(pBanner.transform, false);
-            TextMeshProUGUI pbTmp = CreateTMPText(pbTextObj.transform, "TMP",
+            TextMeshProUGUI pbTmp = CreateTMPText(pBanner.transform, "Text",
                 "[+] You geared up. You strapped on your heavy equipment, shoved the smaller items into your pockets, and pulled a Kitchen Knife from the block.",
                 11.5f, new Color(0.35f, 0.95f, 0.55f), TextAlignmentOptions.MidlineLeft);
-            RectTransform pbTextRect = pbTextObj.GetComponent<RectTransform>();
+            RectTransform pbTextRect = pbTmp.rectTransform;
             StretchFull(pbTextRect);
             pbTextRect.offsetMin = new Vector2(14f, 0f);
             pbTextRect.offsetMax = new Vector2(-14f, 0f);
@@ -1795,9 +1721,9 @@ namespace SundayLastBreath.Editor
             so.FindProperty("beat3NarrativeText").objectReferenceValue = b3Tmp;
             so.FindProperty("tableStashDisplay").objectReferenceValue = stashObj;
             so.FindProperty("tableStashGrid").objectReferenceValue = sGridObj.transform;
-            so.FindProperty("tableEmptyNotice").objectReferenceValue = sEmptyObj;
+            so.FindProperty("tableEmptyNotice").objectReferenceValue = seTmp.gameObject;
 
-            so.FindProperty("continuePrompt").objectReferenceValue = promptObj;
+            so.FindProperty("continuePrompt").objectReferenceValue = prTmp.gameObject;
             so.FindProperty("fullScreenClickCatcher").objectReferenceValue = ccBtn;
 
             so.FindProperty("hubMenuContainer").objectReferenceValue = menuObj;
@@ -1838,7 +1764,7 @@ namespace SundayLastBreath.Editor
         private static TextMeshProUGUI CreateTMPText(Transform parent, string name, string text, float fontSize, Color color,
             TextAlignmentOptions alignment = TextAlignmentOptions.TopLeft, FontStyles style = FontStyles.Normal, bool wrap = true)
         {
-            GameObject go = new GameObject(name);
+            GameObject go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
             TextMeshProUGUI tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.text = text;
@@ -1869,10 +1795,8 @@ namespace SundayLastBreath.Editor
             ol.effectColor = new Color(0.20f, 0.22f, 0.26f, 0.75f);
             ol.effectDistance = new Vector2(1f, -1f);
 
-            GameObject textObj = new GameObject("Text");
-            textObj.transform.SetParent(btnObj.transform, false);
-            TextMeshProUGUI tmp = CreateTMPText(textObj.transform, "TMP", label, 10.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform tr = textObj.GetComponent<RectTransform>();
+            TextMeshProUGUI tmp = CreateTMPText(btnObj.transform, "Text", label, 10.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform tr = tmp.rectTransform;
             StretchFull(tr);
 
             GameObject accent = new GameObject("BottomAccent");
@@ -1896,10 +1820,8 @@ namespace SundayLastBreath.Editor
             Image bg = badge.AddComponent<Image>();
             bg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
 
-            GameObject textObj = new GameObject("Text");
-            textObj.transform.SetParent(badge.transform, false);
-            TextMeshProUGUI tmp = CreateTMPText(textObj.transform, "TMP", title, 10.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
-            RectTransform tr = textObj.GetComponent<RectTransform>();
+            TextMeshProUGUI tmp = CreateTMPText(badge.transform, "Text", title, 10.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform tr = tmp.rectTransform;
             StretchFull(tr);
             tr.offsetMin = new Vector2(10f, 0f);
             tr.offsetMax = new Vector2(-10f, 0f);
@@ -1932,10 +1854,8 @@ namespace SundayLastBreath.Editor
             ir.offsetMax = new Vector2(-4f, -4f);
             iconObj.SetActive(false);
 
-            GameObject labelObj = new GameObject("SlotLabel");
-            labelObj.transform.SetParent(slotObj.transform, false);
-            slotLabel = CreateTMPText(labelObj.transform, "TMP", slotName, 9.5f, new Color(0.45f, 0.65f, 0.85f), TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform lr = labelObj.GetComponent<RectTransform>();
+            slotLabel = CreateTMPText(slotObj.transform, "SlotLabel", slotName, 9.5f, new Color(0.45f, 0.65f, 0.85f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform lr = slotLabel.rectTransform;
             StretchFull(lr);
         }
 
