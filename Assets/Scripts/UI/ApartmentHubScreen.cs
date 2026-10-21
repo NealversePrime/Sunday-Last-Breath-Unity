@@ -27,6 +27,21 @@ namespace SundayLastBreath.UI
     /// </summary>
     public class ApartmentHubScreen : ScreenBase, IPointerClickHandler
     {
+        [Header("Top HUD (Twine Style)")]
+        [SerializeField] private Button pdaMenuButton;
+        [SerializeField] private Image hpBarFill;
+        [SerializeField] private TextMeshProUGUI hpValueText;
+        [SerializeField] private Image staminaBarFill;
+        [SerializeField] private TextMeshProUGUI staminaValueText;
+        [SerializeField] private Image hungerBarFill;
+        [SerializeField] private TextMeshProUGUI hungerValueText;
+        [SerializeField] private Image thirstBarFill;
+        [SerializeField] private TextMeshProUGUI thirstValueText;
+        [SerializeField] private TextMeshProUGUI clockTimeText;
+        [SerializeField] private TextMeshProUGUI clockDayText;
+        [SerializeField] private Button floorItemsButton;
+        [SerializeField] private TextMeshProUGUI floorItemsCountText;
+
         [Header("Stage Visuals (Top 60%)")]
         [SerializeField] private Image stageBackdropImage;
         [SerializeField] private FrameAnimationPlayer livingRoomAnimPlayer;
@@ -233,6 +248,24 @@ namespace SundayLastBreath.UI
             {
                 closeHackingButton.onClick.RemoveAllListeners();
                 closeHackingButton.onClick.AddListener(OnCloseHackingClicked);
+            }
+
+            if (pdaMenuButton != null)
+            {
+                pdaMenuButton.onClick.RemoveAllListeners();
+                pdaMenuButton.onClick.AddListener(() =>
+                {
+                    PlayClickSFX();
+                });
+            }
+
+            if (floorItemsButton != null)
+            {
+                floorItemsButton.onClick.RemoveAllListeners();
+                floorItemsButton.onClick.AddListener(() =>
+                {
+                    PlayClickSFX();
+                });
             }
         }
 
@@ -866,19 +899,33 @@ namespace SundayLastBreath.UI
         #region UI Display Helpers
         private void UpdateClockUI()
         {
-            if (clockText != null && gameClock != null)
-            {
-                clockText.text = $"<color=#FFA726>{gameClock.DayName} NIGHT</color>  |  {gameClock.GetTimeString()}";
-            }
+            if (gameClock == null) return;
+
+            if (clockTimeText != null) clockTimeText.text = gameClock.GetTimeString();
+            if (clockDayText != null) clockDayText.text = $"DAY {gameClock.DayCount}";
+            if (clockText != null) clockText.text = $"<color=#FFA726>{gameClock.DayName} NIGHT</color>  |  {gameClock.GetTimeString()}";
         }
 
         private void UpdateVitalsUI()
         {
-            if (currentPlayer != null)
-            {
-                if (vitalsHpText != null) vitalsHpText.text = $"<color=#FF5555><b>HP</b></color> {currentPlayer.hp}/{currentPlayer.hpMax}";
-                if (vitalsStaminaText != null) vitalsStaminaText.text = $"<color=#55FF88><b>STM</b></color> {currentPlayer.stamina}/{currentPlayer.staminaMax}";
-            }
+            if (currentPlayer == null) return;
+
+            // Twine Style 4 Vital Bars
+            if (hpValueText != null) hpValueText.text = currentPlayer.hp.ToString();
+            if (hpBarFill != null) hpBarFill.fillAmount = Mathf.Clamp01((float)currentPlayer.hp / Mathf.Max(1, currentPlayer.hpMax));
+
+            if (staminaValueText != null) staminaValueText.text = currentPlayer.stamina.ToString();
+            if (staminaBarFill != null) staminaBarFill.fillAmount = Mathf.Clamp01((float)currentPlayer.stamina / Mathf.Max(1, currentPlayer.staminaMax));
+
+            if (hungerValueText != null) hungerValueText.text = currentPlayer.hunger.ToString();
+            if (hungerBarFill != null) hungerBarFill.fillAmount = Mathf.Clamp01((float)currentPlayer.hunger / 100f);
+
+            if (thirstValueText != null) thirstValueText.text = currentPlayer.thirst.ToString();
+            if (thirstBarFill != null) thirstBarFill.fillAmount = Mathf.Clamp01((float)currentPlayer.thirst / 100f);
+
+            // Legacy HUD fields
+            if (vitalsHpText != null) vitalsHpText.text = $"<color=#FF5555><b>HP</b></color> {currentPlayer.hp}/{currentPlayer.hpMax}";
+            if (vitalsStaminaText != null) vitalsStaminaText.text = $"<color=#55FF88><b>STM</b></color> {currentPlayer.stamina}/{currentPlayer.staminaMax}";
         }
 
         private void UpdateObjectiveUI()
