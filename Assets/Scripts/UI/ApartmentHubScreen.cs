@@ -903,7 +903,10 @@ namespace SundayLastBreath.UI
 
             if (clockTimeText != null) clockTimeText.text = gameClock.GetTimeString();
             if (clockDayText != null) clockDayText.text = $"DAY {gameClock.DayCount}";
-            if (clockText != null) clockText.text = $"<color=#FFA726>{gameClock.DayName} NIGHT</color>  |  {gameClock.GetTimeString()}";
+            if (clockText != null && clockText != clockTimeText)
+            {
+                clockText.text = $"<color=#FFA726>{gameClock.DayName} NIGHT</color>  |  {gameClock.GetTimeString()}";
+            }
         }
 
         private void UpdateVitalsUI()
@@ -938,6 +941,15 @@ namespace SundayLastBreath.UI
 
         private void PopulateTableStashUI()
         {
+            if (floorItemsCountText != null)
+            {
+                floorItemsCountText.text = $"■ Floor Items ({tableStash.Count})";
+            }
+            if (floorItemsButton != null)
+            {
+                floorItemsButton.gameObject.SetActive(tableStash.Count > 0);
+            }
+
             if (tableStashGrid == null) return;
 
             // Clear old children

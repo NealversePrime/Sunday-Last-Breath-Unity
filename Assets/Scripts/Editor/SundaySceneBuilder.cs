@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v20_auto.flag";
+                string flagPath = "Temp/scene_v21_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -726,7 +726,7 @@ namespace SundayLastBreath.Editor
             floorCountTmp.fontStyle = FontStyles.Bold;
             floorCountTmp.alignment = TextAlignmentOptions.Center;
             floorCountTmp.color = Color.white;
-            floorCountTmp.text = "📦 Floor Items (3)";
+            floorCountTmp.text = "■ Floor Items (3)";
             floorCountTmp.raycastTarget = false;
 
             // =========================================================================
@@ -770,16 +770,15 @@ namespace SundayLastBreath.Editor
             Button ccBtn = ccObj.AddComponent<Button>();
             ccBtn.targetGraphic = ccImg;
 
-            // Centered VN Column (Twine .vn-dialogue-box replica: max-width 760px)
+            // Centered VN Column (Twine .vn-dialogue-box replica: 860px wide)
             GameObject vnColObj = new GameObject("VNDialogueColumn");
             vnColObj.transform.SetParent(botScreenObj.transform, false);
             RectTransform vnColRect = vnColObj.AddComponent<RectTransform>();
             vnColRect.anchorMin = new Vector2(0.5f, 0f);
             vnColRect.anchorMax = new Vector2(0.5f, 1f);
             vnColRect.pivot = new Vector2(0.5f, 0.5f);
-            vnColRect.sizeDelta = new Vector2(760f, 0f);
-            vnColRect.offsetMin = new Vector2(0f, 14f);
-            vnColRect.offsetMax = new Vector2(0f, -14f);
+            vnColRect.offsetMin = new Vector2(-430f, 14f);
+            vnColRect.offsetMax = new Vector2(430f, -14f);
 
             // -------------------------------------------------------------------------
             // Mode A: Awakening Sequence Container (Beats 1 to 3)
@@ -1025,12 +1024,19 @@ namespace SundayLastBreath.Editor
             tbRect.sizeDelta = new Vector2(110f, 22f);
             Image tbBg = tagBadge.AddComponent<Image>();
             tbBg.color = new Color(0.91f, 0.30f, 0.24f, 0.15f);
-            TextMeshProUGUI tbTmp = tagBadge.AddComponent<TextMeshProUGUI>();
+            tbBg.raycastTarget = false;
+
+            GameObject tagBadgeTextObj = new GameObject("Text");
+            tagBadgeTextObj.transform.SetParent(tagBadge.transform, false);
+            RectTransform tbtRect = tagBadgeTextObj.AddComponent<RectTransform>();
+            StretchFull(tbtRect);
+            TextMeshProUGUI tbTmp = tagBadgeTextObj.AddComponent<TextMeshProUGUI>();
             tbTmp.fontSize = 11f;
             tbTmp.fontStyle = FontStyles.Bold;
             tbTmp.alignment = TextAlignmentOptions.Center;
             tbTmp.color = new Color(0.91f, 0.30f, 0.24f);
             tbTmp.text = "LIVING ROOM";
+            tbTmp.raycastTarget = false;
 
             GameObject b3TextObj = new GameObject("Beat3NarrativeText");
             b3TextObj.transform.SetParent(b3Obj.transform, false);
@@ -1076,13 +1082,21 @@ namespace SundayLastBreath.Editor
             Image saImg = stashAccent.AddComponent<Image>();
             saImg.color = new Color(0.95f, 0.75f, 0.35f);
             saImg.raycastTarget = false;
+            LayoutElement saIgnore = stashAccent.AddComponent<LayoutElement>();
+            saIgnore.ignoreLayout = true;
 
             VerticalLayoutGroup sVlg = stashObj.AddComponent<VerticalLayoutGroup>();
             sVlg.padding = new RectOffset(18, 18, 12, 12);
             sVlg.spacing = 8f;
+            sVlg.childControlWidth = true;
+            sVlg.childControlHeight = false;
+            sVlg.childForceExpandWidth = true;
+            sVlg.childForceExpandHeight = false;
 
             GameObject stashHeader = new GameObject("Header");
             stashHeader.transform.SetParent(stashObj.transform, false);
+            RectTransform shRect = stashHeader.AddComponent<RectTransform>();
+            shRect.sizeDelta = new Vector2(0f, 20f);
             TextMeshProUGUI shTmp = stashHeader.AddComponent<TextMeshProUGUI>();
             shTmp.fontSize = 11.5f;
             shTmp.fontStyle = FontStyles.Bold;
@@ -1091,12 +1105,20 @@ namespace SundayLastBreath.Editor
 
             GameObject sGridObj = new GameObject("Grid");
             sGridObj.transform.SetParent(stashObj.transform, false);
+            RectTransform sgRect = sGridObj.AddComponent<RectTransform>();
+            sgRect.sizeDelta = new Vector2(0f, 98f);
             HorizontalLayoutGroup sgHlg = sGridObj.AddComponent<HorizontalLayoutGroup>();
             sgHlg.spacing = 14f;
             sgHlg.childAlignment = TextAnchor.MiddleLeft;
+            sgHlg.childControlWidth = false;
+            sgHlg.childControlHeight = false;
+            sgHlg.childForceExpandWidth = false;
+            sgHlg.childForceExpandHeight = false;
 
             GameObject sEmptyObj = new GameObject("EmptyNotice");
             sEmptyObj.transform.SetParent(stashObj.transform, false);
+            RectTransform seRect = sEmptyObj.AddComponent<RectTransform>();
+            seRect.sizeDelta = new Vector2(0f, 22f);
             TextMeshProUGUI seTmp = sEmptyObj.AddComponent<TextMeshProUGUI>();
             seTmp.fontSize = 12.5f;
             seTmp.fontStyle = FontStyles.Italic;
@@ -1166,7 +1188,7 @@ namespace SundayLastBreath.Editor
             pbTmp.fontSize = 11.5f;
             pbTmp.alignment = TextAlignmentOptions.MidlineLeft;
             pbTmp.color = new Color(0.35f, 0.95f, 0.55f);
-            pbTmp.text = "✓ You geared up. You strapped on your heavy equipment, shoved the smaller items into your pockets, and pulled a Kitchen Knife from the block.";
+            pbTmp.text = "[+] You geared up. You strapped on your heavy equipment, shoved the smaller items into your pockets, and pulled a Kitchen Knife from the block.";
             pBanner.SetActive(false);
 
             // Pack Gear Button
@@ -1244,7 +1266,6 @@ namespace SundayLastBreath.Editor
             // Stage Visuals
             so.FindProperty("stageBackdropImage").objectReferenceValue = roomImg;
             so.FindProperty("livingRoomAnimPlayer").objectReferenceValue = roomAnim;
-            so.FindProperty("clockText").objectReferenceValue = clockTimeTmp;
 
             so.FindProperty("awakeningContainer").objectReferenceValue = awakeObj;
 
@@ -1425,25 +1446,31 @@ namespace SundayLastBreath.Editor
             tcRect.offsetMin = new Vector2(18f, 6f);
             tcRect.offsetMax = new Vector2(-16f, -6f);
 
-            VerticalLayoutGroup vlg = textCont.AddComponent<VerticalLayoutGroup>();
-            vlg.childAlignment = TextAnchor.MiddleLeft;
-            vlg.spacing = 2f;
-            vlg.childControlWidth = true;
-            vlg.childControlHeight = false;
-
             GameObject mLblObj = new GameObject("MainLabel");
             mLblObj.transform.SetParent(textCont.transform, false);
+            RectTransform mlRect = mLblObj.AddComponent<RectTransform>();
+            mlRect.anchorMin = new Vector2(0f, 0.45f);
+            mlRect.anchorMax = new Vector2(1f, 1f);
+            mlRect.offsetMin = Vector2.zero;
+            mlRect.offsetMax = Vector2.zero;
             mainLabel = mLblObj.AddComponent<TextMeshProUGUI>();
             mainLabel.fontSize = 13.5f;
             mainLabel.fontStyle = FontStyles.Bold;
+            mainLabel.alignment = TextAlignmentOptions.MidlineLeft;
             mainLabel.color = Color.white;
             mainLabel.text = mainText;
             mainLabel.raycastTarget = false;
 
             GameObject sLblObj = new GameObject("SubLabel");
             sLblObj.transform.SetParent(textCont.transform, false);
+            RectTransform slRect = sLblObj.AddComponent<RectTransform>();
+            slRect.anchorMin = new Vector2(0f, 0f);
+            slRect.anchorMax = new Vector2(1f, 0.45f);
+            slRect.offsetMin = Vector2.zero;
+            slRect.offsetMax = Vector2.zero;
             subLabel = sLblObj.AddComponent<TextMeshProUGUI>();
             subLabel.fontSize = 10.5f;
+            subLabel.alignment = TextAlignmentOptions.MidlineLeft;
             subLabel.color = new Color(0.68f, 0.70f, 0.74f);
             subLabel.text = subText;
             subLabel.raycastTarget = false;
@@ -1477,7 +1504,7 @@ namespace SundayLastBreath.Editor
             sbObj.transform.SetParent(phonePanel.transform, false);
             TextMeshProUGUI sbTmp = sbObj.AddComponent<TextMeshProUGUI>();
             sbTmp.fontSize = 11f;
-            sbTmp.text = "<color=#ff4444>⚠ NO SIGNAL</color>                       <color=#ff4444>12%</color> 🔋";
+            sbTmp.text = "<color=#ff4444>[!] NO SIGNAL</color>                       <color=#ff4444>12%</color> [BAT]";
             sbTmp.alignment = TextAlignmentOptions.Center;
 
             // Header
@@ -1500,7 +1527,7 @@ namespace SundayLastBreath.Editor
             fTmp.lineSpacing = 12f;
             fTmp.text = "<b>CityScanner</b> @CityScanner_WA • 2m\n" +
                         "Does anyone know what's happening at the 5th St Hospital? Seeing police in gas masks and riot gear. They aren't letting ambulances through. Stay away!!\n\n" +
-                        "<color=#5dade2><b>NewsWire Breaking ☑</b></color> @NewsWire_Alerts • 4m\n" +
+                        "<color=#5dade2><b>NewsWire Breaking [VERIFIED]</b></color> @NewsWire_Alerts • 4m\n" +
                         "EMERGENCY: CDC reporting 'unprecedented neuro-aggressive pathogen' causing extreme psychosis and unprovoked violence. Authorities urge citizens to avoid public spaces.\n\n" +
                         "<b>User_9921</b> @anon_9921 • 11m\n" +
                         "<color=#ff5555>[ATTACHED VIDEO: BLURRY]</color>\n" +
