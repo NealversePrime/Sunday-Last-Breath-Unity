@@ -92,6 +92,7 @@ namespace SundayLastBreath.UI
         [SerializeField] private Transform pdaBackpackGrid;
         [SerializeField] private Transform pdaFloorItemsGrid;
         [SerializeField] private TextMeshProUGUI pdaFloorEmptyText;
+        [SerializeField] private GameObject floorItemsCard;
 
         [Header("Stage Visuals (Top 60%)")]
         [SerializeField] private Image stageBackdropImage;
@@ -130,6 +131,7 @@ namespace SundayLastBreath.UI
         [SerializeField] private GameObject tableStashDisplay;
         [SerializeField] private Transform tableStashGrid;
         [SerializeField] private GameObject tableEmptyNotice;
+        [SerializeField] private Button beat3GatherButton;
 
         [Header("Prompts & Click Catchers")]
         [SerializeField] private GameObject continuePrompt;
@@ -139,6 +141,10 @@ namespace SundayLastBreath.UI
         [SerializeField] private GameObject hubMenuContainer;
         [SerializeField] private Button packGearButton;
         [SerializeField] private GameObject packedSuccessBanner;
+        [SerializeField] private TextMeshProUGUI packedSuccessText;
+        [SerializeField] private Button takeFloorItemsButton;
+        [SerializeField] private TextMeshProUGUI takeFloorItemsLabel;
+        [SerializeField] private TextMeshProUGUI takeFloorItemsSub;
         [SerializeField] private Button checkPhoneButton;
         [SerializeField] private Button listenRadioButton;
         [SerializeField] private TextMeshProUGUI listenRadioLabel;
@@ -192,6 +198,7 @@ namespace SundayLastBreath.UI
         private LoreSystem loreSystem;
 
         private List<InventoryEntry> tableStash = new List<InventoryEntry>();
+        private List<InventoryEntry> floorItems = new List<InventoryEntry>();
         private string equippedHead = "";
         private string equippedBody = "";
         private string equippedWpn = "";
@@ -413,20 +420,22 @@ namespace SundayLastBreath.UI
                 pdaSaveSettingsBtn.onClick.AddListener(PlayClickSFX);
             }
 
+            if (beat3GatherButton != null)
+            {
+                beat3GatherButton.onClick.RemoveAllListeners();
+                beat3GatherButton.onClick.AddListener(OnPackGearClicked);
+            }
+
+            if (takeFloorItemsButton != null)
+            {
+                takeFloorItemsButton.onClick.RemoveAllListeners();
+                takeFloorItemsButton.onClick.AddListener(OnTakeAllFloorItemsClicked);
+            }
+
             if (floorItemsButton != null)
             {
                 floorItemsButton.onClick.RemoveAllListeners();
-                floorItemsButton.onClick.AddListener(() =>
-                {
-                    if (!hasPacked && introSeen)
-                    {
-                        OnPackGearClicked();
-                    }
-                    else
-                    {
-                        PlayClickSFX();
-                    }
-                });
+                floorItemsButton.onClick.AddListener(OnTakeAllFloorItemsClicked);
             }
         }
 
@@ -437,6 +446,7 @@ namespace SundayLastBreath.UI
             // In accordance with Twine design:
             // Items accumulated during creation are dropped on the tablestash prior to packing!
             tableStash.Clear();
+            floorItems.Clear();
             equippedHead = "";
             equippedBody = "";
             equippedWpn = "";
@@ -455,6 +465,10 @@ namespace SundayLastBreath.UI
             hasPacked = false;
             introSeen = false;
             awakeningStep = 1;
+
+            if (floorItemsCard != null) floorItemsCard.SetActive(false);
+            if (takeFloorItemsButton != null) takeFloorItemsButton.gameObject.SetActive(false);
+            if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(false);
 
             UpdateClockUI();
             UpdateVitalsUI();
@@ -659,6 +673,13 @@ namespace SundayLastBreath.UI
             PlayClickSFX();
 
             // Advance to next awakening beat
+            if (awakeningStep == 3)
+            {
+                // In Beat 3, clicking the screen or gather button gears up
+                OnPackGearClicked();
+                return;
+            }
+
             awakeningStep++;
             if (awakeningStep > 3)
             {
@@ -977,7 +998,23 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 3. Update Floor / Room Items (Table Stash) in Right Wing
+            // 3. Update Floor / Room Items in Right Wing
+            bool hasFloorLoot = floorItems != null && floorItems.Count > 0;
+            if (floorItemsCard != null)
+            {
+                floorItemsCard.SetActive(hasFloorLoot);
+            }
+
+            if (floorItemsButton != null)
+            {
+                floorItemsButton.gameObject.SetActive(hasFloorLoot);
+            }
+
+            if (floorItemsCountText != null)
+            {
+                floorItemsCountText.text = hasFloorLoot ? $"TAKE ALL ({floorItems.Count})" : "■ Floor Items (0)";
+            }
+
             if (pdaFloorItemsGrid != null)
             {
                 for (int i = pdaFloorItemsGrid.childCount - 1; i >= 0; i--)
@@ -987,12 +1024,15 @@ namespace SundayLastBreath.UI
 
                 if (pdaFloorEmptyText != null)
                 {
-                    pdaFloorEmptyText.gameObject.SetActive(tableStash.Count == 0);
+                    pdaFloorEmptyText.gameObject.SetActive(!hasFloorLoot);
                 }
 
-                foreach (var item in tableStash)
+                if (hasFloorLoot)
                 {
-                    CreateInventorySlotCell(pdaFloorItemsGrid, item.itemId, item.quantity, false);
+                    foreach (var item in floorItems)
+                    {
+                        CreateFloorItemCell(pdaFloorItemsGrid, item.itemId, item.quantity);
+                    }
                 }
             }
         }
@@ -1128,6 +1168,100 @@ namespace SundayLastBreath.UI
                 });
             }
         }
+
+        private void CreateFloorItemCell(Transform parent, string itemId, int quantity)
+        {
+            GameObject cell = new GameObject(string.IsNullOrEmpty(itemId) ? "EmptySlot" : "FloorSlot_" + itemId);
+            cell.transform.SetParent(parent, false);
+            RectTransform rt = cell.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(66f, 66f);
+
+            Image bg = cell.AddComponent<Image>();
+            bg.color = new Color(0.14f, 0.08f, 0.08f, 0.95f);
+
+            Outline ol = cell.AddComponent<Outline>();
+            ol.effectColor = new Color(0.91f, 0.30f, 0.24f, 0.85f);
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            if (string.IsNullOrEmpty(itemId)) return;
+
+            // Item Icon
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(cell.transform, false);
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+            RectTransform ir = iconObj.GetComponent<RectTransform>();
+            ir.anchorMin = Vector2.zero;
+            ir.anchorMax = Vector2.one;
+            ir.offsetMin = new Vector2(6f, 14f);
+            ir.offsetMax = new Vector2(-6f, -4f);
+
+            Sprite s = ItemDatabase.GetItemIcon(itemId);
+            if (s != null)
+            {
+                iconImg.sprite = s;
+                iconImg.color = Color.white;
+            }
+            else
+            {
+                iconImg.color = new Color(0.35f, 0.4f, 0.45f, 0.5f);
+            }
+
+            // Short Item Name
+            GameObject nameObj = new GameObject("ItemName");
+            nameObj.transform.SetParent(cell.transform, false);
+            TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
+            nameTmp.fontSize = 8.5f;
+            nameTmp.alignment = TextAlignmentOptions.Center;
+            nameTmp.color = new Color(0.95f, 0.85f, 0.85f);
+            nameTmp.text = itemId.Length > 10 ? itemId.Substring(0, 9) + "." : itemId;
+            nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
+            nameTmp.raycastTarget = false;
+            RectTransform nr = nameObj.GetComponent<RectTransform>();
+            nr.anchorMin = new Vector2(0f, 0f);
+            nr.anchorMax = new Vector2(1f, 0f);
+            nr.pivot = new Vector2(0.5f, 0f);
+            nr.sizeDelta = new Vector2(0f, 14f);
+            nr.anchoredPosition = new Vector2(0f, 1f);
+
+            // Quantity badge
+            if (quantity > 1)
+            {
+                GameObject qBadge = new GameObject("QtyBadge");
+                qBadge.transform.SetParent(cell.transform, false);
+                RectTransform qr = qBadge.AddComponent<RectTransform>();
+                qr.anchorMin = new Vector2(1f, 0f);
+                qr.anchorMax = new Vector2(1f, 0f);
+                qr.pivot = new Vector2(1f, 0f);
+                qr.anchoredPosition = new Vector2(-2f, 13f);
+                qr.sizeDelta = new Vector2(26f, 14f);
+                Image qBg = qBadge.AddComponent<Image>();
+                qBg.color = new Color(0.04f, 0.06f, 0.04f, 0.92f);
+                qBg.raycastTarget = false;
+
+                GameObject qtObj = new GameObject("Text");
+                qtObj.transform.SetParent(qBadge.transform, false);
+                TextMeshProUGUI qTmp = qtObj.AddComponent<TextMeshProUGUI>();
+                qTmp.fontSize = 9f;
+                qTmp.fontStyle = FontStyles.Bold;
+                qTmp.alignment = TextAlignmentOptions.Center;
+                qTmp.color = new Color(0.35f, 0.95f, 0.45f);
+                qTmp.text = $"x{quantity}";
+                qTmp.raycastTarget = false;
+                RectTransform qtr = qtObj.GetComponent<RectTransform>();
+                qtr.anchorMin = Vector2.zero; qtr.anchorMax = Vector2.one; qtr.offsetMin = Vector2.zero; qtr.offsetMax = Vector2.zero;
+            }
+
+            // Click button to take this specific item
+            Button btn = cell.AddComponent<Button>();
+            btn.targetGraphic = bg;
+            string capturedId = itemId;
+            btn.onClick.AddListener(() =>
+            {
+                OnTakeSingleFloorItemClicked(capturedId);
+            });
+        }
         #endregion
 
         #region Awakening Sequence (Beats 1 - 3)
@@ -1145,6 +1279,8 @@ namespace SundayLastBreath.UI
             {
                 case 1:
                     // Beat 1: Civil Danger Warning (EAS Broadcast)
+                    if (continuePrompt != null) continuePrompt.SetActive(true);
+                    if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(false);
                     if (beat1Container != null) beat1Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#EF4444>CHANNEL: EMERGENCY BROADCAST SYSTEM</color>";
@@ -1165,6 +1301,8 @@ namespace SundayLastBreath.UI
 
                 case 2:
                     // Beat 2: The Reaction
+                    if (continuePrompt != null) continuePrompt.SetActive(true);
+                    if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(false);
                     if (beat2Container != null) beat2Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // INTERNAL MONOLOGUE ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#60A5FA>CHANNEL: NEURAL APPRAISAL</color>";
@@ -1212,6 +1350,8 @@ namespace SundayLastBreath.UI
 
                 case 3:
                     // Beat 3: Table Stash
+                    if (continuePrompt != null) continuePrompt.SetActive(false);
+                    if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(true);
                     if (staticSource != null) staticSource.Stop();
                     if (beat3Container != null) beat3Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
@@ -1401,7 +1541,19 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 5. Leave Apartment (unlocked only after packing!)
+            // 5. Take Floor Items Button (Hub Menu)
+            if (takeFloorItemsButton != null)
+            {
+                bool hasFloorLoot = floorItems != null && floorItems.Count > 0;
+                takeFloorItemsButton.gameObject.SetActive(hasPacked && hasFloorLoot);
+                if (hasFloorLoot)
+                {
+                    if (takeFloorItemsLabel != null) takeFloorItemsLabel.text = $"COLLECT ROOM SUPPLIES [FLOOR ITEMS ({floorItems.Count})]";
+                    if (takeFloorItemsSub != null) takeFloorItemsSub.text = $"Gather extra supplies into your backpack.";
+                }
+            }
+
+            // 6. Leave Apartment (unlocked only after packing!)
             if (leaveApartmentButton != null)
             {
                 leaveApartmentButton.gameObject.SetActive(hasPacked);
@@ -1411,6 +1563,9 @@ namespace SundayLastBreath.UI
         private void OnPackGearClicked()
         {
             PlayClickSFX();
+
+            introSeen = true;
+            awakeningStep = 4;
 
             // Advance time +4 minutes
             gameClock.AddTime(4);
@@ -1423,30 +1578,82 @@ namespace SundayLastBreath.UI
                     currentPlayer.AddItem(item.itemId, item.quantity);
                 }
                 tableStash.Clear();
-
-                // Add apartment kitchen loot (as in Twine Prologue_Menu.twee)
-                currentPlayer.AddItem("Stale Coffee", 1);
-                currentPlayer.AddItem("Kitchen Knife", 1);
-                currentPlayer.AddItem("T-Shirt", 1);
             }
 
             hasPacked = true;
             AutoEquipFromInventory();
 
+            // Spawn extra apartment loot on the floor/kitchen counter (Twine Prologue_Menu houseLootSpawned)
+            floorItems.Clear();
+            floorItems.Add(new InventoryEntry("Stale Coffee", 1));
+            floorItems.Add(new InventoryEntry("Kitchen Knife", 1));
+            floorItems.Add(new InventoryEntry("T-Shirt", 1));
+
             AppendStoryLog("23:49", "ACTION // WORK EQUIPMENT SECURED",
-                "You geared up. You strapped on your heavy equipment, shoved smaller supplies into pockets, and pulled a kitchen knife from the block. The table is now clear.");
+                "You geared up. You strapped on your heavy equipment and weapons. Rummaging through your kitchen, you uncovered extra supplies: Stale Coffee, Kitchen Knife, and a spare T-Shirt.");
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"Your gear is strapped tight and weapons loaded. Footsteps and muffled shrieks echo from the 4th floor corridor outside. There is nothing left for you in Unit 404.\"";
+                situationBoxText.text = "\"Your gear is strapped tight and weapons loaded. Footsteps and muffled shrieks echo from the 4th floor corridor outside. Extra supplies sit on the kitchen counter.\"";
+            }
+
+            if (packedSuccessBanner != null)
+            {
+                packedSuccessBanner.SetActive(true);
+            }
+            if (packedSuccessText != null)
+            {
+                packedSuccessText.text = "<color=#10B981>✓ You geared up. You strapped on your heavy equipment and weapons.\n<color=#F5BF42>[!] Extra supplies uncovered on the kitchen counter. Collect them below or in Tactical Gear [I].</color></color>";
             }
 
             // Objectives
             objectiveSystem.CompleteObjective("pack_gear");
             objectiveSystem.ActivateObjective("leave_apt");
 
-            EvaluateHubButtonStates();
+            ShowHubMenu();
             PopulateTableStashUI();
+            RefreshRightGearPanel();
             RefreshAllPDAPanels();
+            EvaluateHubButtonStates();
+        }
+
+        private void OnTakeAllFloorItemsClicked()
+        {
+            PlayClickSFX();
+            if (currentPlayer == null || floorItems.Count == 0) return;
+
+            foreach (var item in floorItems)
+            {
+                currentPlayer.AddItem(item.itemId, item.quantity);
+            }
+            floorItems.Clear();
+
+            AppendStoryLog(gameClock.GetTimeString(), "LOOT // ROOM ITEMS SECURED",
+                "You scooped up all remaining supplies from the room into your backpack.");
+
+            RefreshRightGearPanel();
+            RefreshAllPDAPanels();
+            EvaluateHubButtonStates();
+        }
+
+        private void OnTakeSingleFloorItemClicked(string itemId)
+        {
+            PlayClickSFX();
+            if (currentPlayer == null) return;
+
+            int idx = floorItems.FindIndex(i => i.itemId == itemId);
+            if (idx >= 0)
+            {
+                var item = floorItems[idx];
+                currentPlayer.AddItem(item.itemId, item.quantity);
+                floorItems.RemoveAt(idx);
+
+                AppendStoryLog(gameClock.GetTimeString(), "LOOT // ITEM SECURED",
+                    $"You picked up {item.itemId} (x{item.quantity}) from the room.");
+
+                RefreshRightGearPanel();
+                RefreshAllPDAPanels();
+                EvaluateHubButtonStates();
+            }
         }
 
         private void OnCheckPhoneClicked()

@@ -23,18 +23,28 @@ namespace SundayLastBreath.Editor
         [InitializeOnLoadMethod]
         private static void AutoInit()
         {
-            EditorApplication.delayCall += () =>
-            {
-                if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+            EditorApplication.update += CheckAutoBuild;
+        }
 
-                string flagPath = "Temp/scene_v35_auto.flag";
-                if (!File.Exists(flagPath))
-                {
-                    Directory.CreateDirectory("Temp");
-                    File.WriteAllText(flagPath, "done");
-                    BuildScene();
-                }
-            };
+        private static void CheckAutoBuild()
+        {
+            string flagPath = "Temp/scene_v36_auto.flag";
+            if (File.Exists(flagPath))
+            {
+                EditorApplication.update -= CheckAutoBuild;
+                return;
+            }
+
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                EditorApplication.isPlaying = false;
+                return;
+            }
+
+            Directory.CreateDirectory("Temp");
+            File.WriteAllText(flagPath, "done");
+            EditorApplication.update -= CheckAutoBuild;
+            BuildScene();
         }
 
         [MenuItem("Tools/Sunday's Last Breath/Build Main Menu Scene", false, 0)]
@@ -983,6 +993,27 @@ namespace SundayLastBreath.Editor
             RectTransform seRect = seTmp.rectTransform;
             seRect.sizeDelta = new Vector2(0f, 22f);
 
+            // Dedicated Gather Button on Beat 3
+            GameObject b3GatherBtnObj = new GameObject("Btn_Beat3Gather", typeof(RectTransform));
+            b3GatherBtnObj.transform.SetParent(b3Obj.transform, false);
+            RectTransform b3gbRect = b3GatherBtnObj.GetComponent<RectTransform>();
+            b3gbRect.anchorMin = new Vector2(1f, 0f); b3gbRect.anchorMax = new Vector2(1f, 0f);
+            b3gbRect.pivot = new Vector2(1f, 0f);
+            b3gbRect.anchoredPosition = new Vector2(0f, -4f);
+            b3gbRect.sizeDelta = new Vector2(360f, 32f);
+            Image b3gbBg = b3GatherBtnObj.AddComponent<Image>();
+            b3gbBg.color = new Color(0.12f, 0.14f, 0.18f, 0.95f);
+            Outline b3gbOl = b3GatherBtnObj.AddComponent<Outline>();
+            b3gbOl.effectColor = new Color(0.95f, 0.75f, 0.35f, 0.95f);
+            b3gbOl.effectDistance = new Vector2(1.5f, -1.5f);
+            Button btnBeat3Gather = b3GatherBtnObj.AddComponent<Button>();
+            btnBeat3Gather.targetGraphic = b3gbBg;
+
+            TextMeshProUGUI b3gbTmp = CreateTMPText(b3GatherBtnObj.transform, "Text", "GATHER YOUR GEAR & SUPPLIES <color=#FFA726>>></color>", 12f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform b3gbtRect = b3gbTmp.rectTransform;
+            StretchFull(b3gbtRect);
+            b3gbTmp.gameObject.AddComponent<PulsingText>();
+
             // Continue Prompt
             TextMeshProUGUI prTmp = CreateTMPText(awakeObj.transform, "ContinuePrompt", "CLICK TO CONTINUE <color=#FFA726>>></color>", 13.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
             RectTransform prRect = prTmp.rectTransform;
@@ -1115,6 +1146,10 @@ namespace SundayLastBreath.Editor
             CreateApartmentMenuButton(menuObj.transform, "Btn_PackGear", "GATHER YOUR GEAR & SUPPLIES",
                 "4 Minutes | Gear up. Grab your work equipment by the door and raid the kitchen for anything useful.",
                 new Color(0.95f, 0.75f, 0.35f), out Button btnPack, out TextMeshProUGUI _, out TextMeshProUGUI _);
+
+            CreateApartmentMenuButton(menuObj.transform, "Btn_TakeFloorItems", "COLLECT ROOM SUPPLIES [FLOOR ITEMS]",
+                "Gather extra supplies discovered in Unit 404 into your backpack.",
+                new Color(0.95f, 0.65f, 0.25f), out Button btnTakeFloor, out TextMeshProUGUI takeFloorLbl, out TextMeshProUGUI takeFloorSub);
 
             CreateApartmentMenuButton(menuObj.transform, "Btn_CheckPhone", "CHECK NEWS FEED",
                 "1 Minute | See what the internet knows before the grid goes down.",
@@ -1692,7 +1727,7 @@ namespace SundayLastBreath.Editor
             Button btnFloorGather = fBtnObj.AddComponent<Button>();
             btnFloorGather.targetGraphic = fbImg;
 
-            TextMeshProUGUI floorCountTmp = CreateTMPText(fBtnObj.transform, "Text", "■ Floor Items (3)", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            TextMeshProUGUI floorCountTmp = CreateTMPText(fBtnObj.transform, "Text", "TAKE ALL", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
             RectTransform fbtRect = floorCountTmp.rectTransform;
             StretchFull(fbtRect);
 
@@ -1764,6 +1799,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("thirstValueText").objectReferenceValue = thrValTmp;
             so.FindProperty("clockTimeText").objectReferenceValue = clockTimeTmp;
             so.FindProperty("clockDayText").objectReferenceValue = clockDayTmp;
+            so.FindProperty("floorItemsCard").objectReferenceValue = floorCard;
             so.FindProperty("floorItemsButton").objectReferenceValue = btnFloorGather;
             so.FindProperty("floorItemsCountText").objectReferenceValue = floorCountTmp;
 
@@ -1838,6 +1874,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("tableStashDisplay").objectReferenceValue = stashObj;
             so.FindProperty("tableStashGrid").objectReferenceValue = sGridObj.transform;
             so.FindProperty("tableEmptyNotice").objectReferenceValue = seTmp.gameObject;
+            so.FindProperty("beat3GatherButton").objectReferenceValue = btnBeat3Gather;
 
             so.FindProperty("continuePrompt").objectReferenceValue = prTmp.gameObject;
             so.FindProperty("fullScreenClickCatcher").objectReferenceValue = ccBtn;
@@ -1845,6 +1882,10 @@ namespace SundayLastBreath.Editor
             so.FindProperty("hubMenuContainer").objectReferenceValue = menuObj;
             so.FindProperty("packGearButton").objectReferenceValue = btnPack;
             so.FindProperty("packedSuccessBanner").objectReferenceValue = pBanner;
+            so.FindProperty("packedSuccessText").objectReferenceValue = pbTmp;
+            so.FindProperty("takeFloorItemsButton").objectReferenceValue = btnTakeFloor;
+            so.FindProperty("takeFloorItemsLabel").objectReferenceValue = takeFloorLbl;
+            so.FindProperty("takeFloorItemsSub").objectReferenceValue = takeFloorSub;
             so.FindProperty("checkPhoneButton").objectReferenceValue = btnPhone;
             so.FindProperty("listenRadioButton").objectReferenceValue = btnRadio;
             so.FindProperty("listenRadioLabel").objectReferenceValue = radioLbl;
