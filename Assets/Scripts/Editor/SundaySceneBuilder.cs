@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v30_auto.flag";
+                string flagPath = "Temp/scene_v31_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -758,12 +758,12 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI b1Tmp = CreateTMPText(b1Obj.transform, "Beat1IntroText",
                 "You turn away from the glass. The silence in your apartment breaks—not with a scream, but with an electronic tone pulsing from the television.",
-                14f, new Color(0.90f, 0.90f, 0.92f));
+                16f, new Color(0.92f, 0.92f, 0.95f));
             b1Tmp.lineSpacing = 8f;
             RectTransform b1tr = b1Tmp.rectTransform;
             b1tr.anchorMin = new Vector2(0f, 1f); b1tr.anchorMax = new Vector2(1f, 1f);
             b1tr.pivot = new Vector2(0.5f, 1f);
-            b1tr.sizeDelta = new Vector2(0f, 48f);
+            b1tr.sizeDelta = new Vector2(0f, 54f);
             b1tr.anchoredPosition = Vector2.zero;
 
             GameObject easBox = new GameObject("EASAlertBox", typeof(RectTransform));
@@ -771,43 +771,43 @@ namespace SundayLastBreath.Editor
             RectTransform easRect = easBox.GetComponent<RectTransform>();
             easRect.anchorMin = new Vector2(0f, 0f); easRect.anchorMax = new Vector2(1f, 0f);
             easRect.pivot = new Vector2(0.5f, 0f);
-            easRect.sizeDelta = new Vector2(0f, 245f);
-            easRect.anchoredPosition = new Vector2(0f, 16f);
+            easRect.sizeDelta = new Vector2(0f, 290f);
+            easRect.anchoredPosition = new Vector2(0f, 20f);
             Image easImg = easBox.AddComponent<Image>();
-            easImg.color = new Color(0.18f, 0.02f, 0.02f, 0.85f);
+            easImg.color = new Color(0.18f, 0.02f, 0.02f, 0.88f);
             Outline easOl = easBox.AddComponent<Outline>();
-            easOl.effectColor = new Color(0.54f, 0.11f, 0.11f, 0.95f); // #8a1c1c
+            easOl.effectColor = new Color(0.68f, 0.14f, 0.14f, 0.95f); // #ae2424
             easOl.effectDistance = new Vector2(2f, -2f);
 
             TextMeshProUGUI ehTmp = CreateTMPText(easBox.transform, "EASHeader",
-                "EMERGENCY ALERT SYSTEM\n<size=80%><color=#ffffff>CIVIL DANGER WARNING</color></size>",
-                13.5f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.Center, FontStyles.Bold);
+                "EMERGENCY ALERT SYSTEM\n<size=82%><color=#ffffff>CIVIL DANGER WARNING</color></size>",
+                15.5f, new Color(0.94f, 0.32f, 0.26f), TextAlignmentOptions.Center, FontStyles.Bold);
             RectTransform ehRect = ehTmp.rectTransform;
             ehRect.anchorMin = new Vector2(0f, 1f); ehRect.anchorMax = new Vector2(1f, 1f);
             ehRect.pivot = new Vector2(0.5f, 1f);
-            ehRect.sizeDelta = new Vector2(0f, 44f);
+            ehRect.sizeDelta = new Vector2(0f, 48f);
             ehRect.anchoredPosition = new Vector2(0f, -8f);
 
             GameObject easDivObj = new GameObject("HeaderDiv", typeof(RectTransform));
             easDivObj.transform.SetParent(easBox.transform, false);
             RectTransform edRect = easDivObj.GetComponent<RectTransform>();
-            edRect.anchorMin = new Vector2(0.1f, 1f); edRect.anchorMax = new Vector2(0.9f, 1f);
+            edRect.anchorMin = new Vector2(0.06f, 1f); edRect.anchorMax = new Vector2(0.94f, 1f);
             edRect.pivot = new Vector2(0.5f, 1f);
-            edRect.sizeDelta = new Vector2(0f, 1f);
-            edRect.anchoredPosition = new Vector2(0f, -54f);
+            edRect.sizeDelta = new Vector2(0f, 1.5f);
+            edRect.anchoredPosition = new Vector2(0f, -60f);
             Image edImg = easDivObj.AddComponent<Image>();
-            edImg.color = new Color(0.54f, 0.11f, 0.11f, 0.8f);
+            edImg.color = new Color(0.64f, 0.15f, 0.15f, 0.85f);
 
             TextMeshProUGUI easTmp = CreateTMPText(easBox.transform, "EASText",
                 "\"The following message is transmitted at the request of the King County Sheriff's Office. This is not a test.\n\n" +
                 "A Civil Danger Warning is in effect for the Seattle metropolitan area. Authorities reported a rapidly spreading biological hazard. Affected individuals exhibit extreme, unprovoked violence. The pathogen is highly contagious through fluid contact.\n\n" +
                 "Shelter in place immediately. Major interstates are closed. Lock all doors, turn off lights, and remain completely silent. The National Guard has been deployed. Lethal force is authorized.\"",
-                11.5f, new Color(1f, 0.80f, 0.80f));
-            easTmp.lineSpacing = 7f;
+                14f, new Color(1f, 0.86f, 0.86f));
+            easTmp.lineSpacing = 7.5f;
             RectTransform easTextRect = easTmp.rectTransform;
             StretchFull(easTextRect);
-            easTextRect.offsetMin = new Vector2(20f, 12f);
-            easTextRect.offsetMax = new Vector2(-20f, -58f);
+            easTextRect.offsetMin = new Vector2(24f, 14f);
+            easTextRect.offsetMax = new Vector2(-24f, -68f);
 
             // --- BEAT 2: REACTION MONOLOGUE (Twine .chat-block replica) ---
             GameObject b2Obj = new GameObject("Beat2Container", typeof(RectTransform));
@@ -818,7 +818,7 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI b2Tmp = CreateTMPText(b2Obj.transform, "Beat2IntroText",
                 "The robotic voice cuts out. Cold static returns to the TV.",
-                14f, new Color(0.90f, 0.90f, 0.92f));
+                16f, new Color(0.92f, 0.92f, 0.95f));
             RectTransform b2tr = b2Tmp.rectTransform;
             b2tr.anchorMin = new Vector2(0f, 1f); b2tr.anchorMax = new Vector2(1f, 1f);
             b2tr.pivot = new Vector2(0.5f, 1f);
@@ -887,8 +887,8 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI mTextTmp = CreateTMPText(speechContainer.transform, "Speech",
                 "\"Lethal force authorized... They don't lock down the whole city for mass hysteria. And this front door isn't heavy enough to keep a panicked mob out.\"",
-                13.5f, new Color(0.92f, 0.94f, 0.98f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
-            mTextTmp.lineSpacing = 5f;
+                15f, new Color(0.92f, 0.94f, 0.98f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
+            mTextTmp.lineSpacing = 6f;
             RectTransform stRect = mTextTmp.rectTransform;
             StretchFull(stRect);
             stRect.offsetMin = Vector2.zero;
@@ -896,12 +896,12 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI b2fTmp = CreateTMPText(b2Obj.transform, "Beat2FootnoteText",
                 "Through the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens. And closer... the muffled sound of heavy, frantic footsteps pounding down the hallway outside your door.",
-                13.5f, new Color(0.70f, 0.75f, 0.82f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
-            b2fTmp.lineSpacing = 5f;
+                15f, new Color(0.74f, 0.78f, 0.85f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
+            b2fTmp.lineSpacing = 6f;
             RectTransform b2fRect = b2fTmp.rectTransform;
             b2fRect.anchorMin = new Vector2(0f, 0f); b2fRect.anchorMax = new Vector2(1f, 0f);
             b2fRect.pivot = new Vector2(0.5f, 0f);
-            b2fRect.sizeDelta = new Vector2(0f, 55f);
+            b2fRect.sizeDelta = new Vector2(0f, 65f);
             b2fRect.anchoredPosition = new Vector2(0f, 16f);
 
             // --- BEAT 3: TABLE STASH ---
@@ -917,31 +917,31 @@ namespace SundayLastBreath.Editor
             tbRect.anchorMin = new Vector2(0f, 1f); tbRect.anchorMax = new Vector2(0f, 1f);
             tbRect.pivot = new Vector2(0f, 1f);
             tbRect.anchoredPosition = Vector2.zero;
-            tbRect.sizeDelta = new Vector2(110f, 22f);
+            tbRect.sizeDelta = new Vector2(120f, 24f);
             Image tbBg = tagBadge.AddComponent<Image>();
             tbBg.color = new Color(0.91f, 0.30f, 0.24f, 0.15f);
 
-            TextMeshProUGUI tbTmp = CreateTMPText(tagBadge.transform, "Text", "LIVING ROOM", 11f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.Center, FontStyles.Bold);
+            TextMeshProUGUI tbTmp = CreateTMPText(tagBadge.transform, "Text", "LIVING ROOM", 12f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.Center, FontStyles.Bold);
             RectTransform tbtRect = tbTmp.rectTransform;
             StretchFull(tbtRect);
 
             TextMeshProUGUI b3Tmp = CreateTMPText(b3Obj.transform, "Beat3NarrativeText",
                 "You are standing in the middle of your living room in your pajamas. You feel naked. Vulnerable.\n\n" +
                 "You glance around the dim room, illuminated only by the harsh red glow of the TV. Your everyday carry sits on the cramped desk. But your heavier equipment rests by the front door, exactly where you dropped it after yesterday's shift.",
-                13.5f, new Color(0.88f, 0.88f, 0.92f));
-            b3Tmp.lineSpacing = 6f;
+                15.5f, new Color(0.90f, 0.90f, 0.94f));
+            b3Tmp.lineSpacing = 7f;
             RectTransform b3tRect = b3Tmp.rectTransform;
             b3tRect.anchorMin = new Vector2(0f, 1f); b3tRect.anchorMax = new Vector2(1f, 1f);
             b3tRect.pivot = new Vector2(0.5f, 1f);
-            b3tRect.sizeDelta = new Vector2(0f, 95f);
-            b3tRect.anchoredPosition = new Vector2(0f, -28f);
+            b3tRect.sizeDelta = new Vector2(0f, 140f);
+            b3tRect.anchoredPosition = new Vector2(0f, -32f);
 
             GameObject stashObj = new GameObject("TableStashDisplay", typeof(RectTransform));
             stashObj.transform.SetParent(b3Obj.transform, false);
             RectTransform stashRect = stashObj.GetComponent<RectTransform>();
             stashRect.anchorMin = new Vector2(0f, 0f); stashRect.anchorMax = new Vector2(1f, 0f);
             stashRect.pivot = new Vector2(0.5f, 0f);
-            stashRect.sizeDelta = new Vector2(0f, 145f);
+            stashRect.sizeDelta = new Vector2(0f, 155f);
             stashRect.anchoredPosition = new Vector2(0f, 16f);
             Image stashBg = stashObj.AddComponent<Image>();
             stashBg.color = new Color(0.05f, 0.07f, 0.10f, 0.90f);
@@ -966,14 +966,14 @@ namespace SundayLastBreath.Editor
             sVlg.spacing = 8f;
             sVlg.childControlWidth = true; sVlg.childControlHeight = false;
 
-            TextMeshProUGUI shTmp = CreateTMPText(stashObj.transform, "Header", "TABLE STASH // CURRENT WORK GEAR & WEAPONS", 11.5f, new Color(0.95f, 0.75f, 0.35f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
+            TextMeshProUGUI shTmp = CreateTMPText(stashObj.transform, "Header", "TABLE STASH // CURRENT WORK GEAR & WEAPONS", 12.5f, new Color(0.95f, 0.75f, 0.35f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
             RectTransform shRect = shTmp.rectTransform;
-            shRect.sizeDelta = new Vector2(0f, 20f);
+            shRect.sizeDelta = new Vector2(0f, 22f);
 
             GameObject sGridObj = new GameObject("Grid", typeof(RectTransform));
             sGridObj.transform.SetParent(stashObj.transform, false);
             RectTransform sgRect = sGridObj.GetComponent<RectTransform>();
-            sgRect.sizeDelta = new Vector2(0f, 98f);
+            sgRect.sizeDelta = new Vector2(0f, 106f);
             HorizontalLayoutGroup sgHlg = sGridObj.AddComponent<HorizontalLayoutGroup>();
             sgHlg.spacing = 14f;
             sgHlg.childAlignment = TextAnchor.MiddleLeft;
@@ -984,7 +984,7 @@ namespace SundayLastBreath.Editor
             seRect.sizeDelta = new Vector2(0f, 22f);
 
             // Continue Prompt
-            TextMeshProUGUI prTmp = CreateTMPText(awakeObj.transform, "ContinuePrompt", "CLICK TO CONTINUE <color=#FFA726>>></color>", 12.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            TextMeshProUGUI prTmp = CreateTMPText(awakeObj.transform, "ContinuePrompt", "CLICK TO CONTINUE <color=#FFA726>>></color>", 13.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
             RectTransform prRect = prTmp.rectTransform;
             prRect.anchorMin = new Vector2(1f, 0f); prRect.anchorMax = new Vector2(1f, 0f);
             prRect.pivot = new Vector2(1f, 0f);

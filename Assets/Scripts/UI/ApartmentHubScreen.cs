@@ -1687,11 +1687,11 @@ namespace SundayLastBreath.UI
             GameObject card = new GameObject("ItemCard_" + itemId);
             card.transform.SetParent(parent, false);
             RectTransform rt = card.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(86f, 88f);
+            rt.sizeDelta = new Vector2(98f, 96f);
 
             LayoutElement le = card.AddComponent<LayoutElement>();
-            le.preferredWidth = 86f;
-            le.preferredHeight = 88f;
+            le.preferredWidth = 98f;
+            le.preferredHeight = 96f;
 
             Image cardBg = card.AddComponent<Image>();
             cardBg.color = new Color(0.08f, 0.10f, 0.14f, 0.90f);
@@ -1711,8 +1711,8 @@ namespace SundayLastBreath.UI
             ir.anchorMin = new Vector2(0.5f, 1f);
             ir.anchorMax = new Vector2(0.5f, 1f);
             ir.pivot = new Vector2(0.5f, 1f);
-            ir.anchoredPosition = new Vector2(0f, -8f);
-            ir.sizeDelta = new Vector2(42f, 42f);
+            ir.anchoredPosition = new Vector2(0f, -6f);
+            ir.sizeDelta = new Vector2(46f, 46f);
 
             Sprite iconSprite = ItemDatabase.GetItemIcon(itemId);
             if (iconSprite != null)
@@ -1729,9 +1729,10 @@ namespace SundayLastBreath.UI
             GameObject labelObj = new GameObject("Label");
             labelObj.transform.SetParent(card.transform, false);
             TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-            label.fontSize = 9.5f;
+            label.fontSize = 11.5f;
+            label.fontStyle = FontStyles.Bold;
             label.alignment = TextAlignmentOptions.Center;
-            label.color = new Color(0.85f, 0.88f, 0.92f);
+            label.color = new Color(0.88f, 0.91f, 0.95f);
             label.text = quantity > 1 ? $"{itemId} (x{quantity})" : itemId;
             label.textWrappingMode = TextWrappingModes.Normal;
             label.raycastTarget = false;
@@ -1739,7 +1740,7 @@ namespace SundayLastBreath.UI
             lr.anchorMin = new Vector2(0f, 0f);
             lr.anchorMax = new Vector2(1f, 0f);
             lr.pivot = new Vector2(0.5f, 0f);
-            lr.sizeDelta = new Vector2(-8f, 30f);
+            lr.sizeDelta = new Vector2(-6f, 36f);
             lr.anchoredPosition = new Vector2(0f, 4f);
         }
 
