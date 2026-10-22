@@ -19,9 +19,6 @@ namespace SundayLastBreath.UI
     /// </summary>
     public class TacticalMapViewController : MonoBehaviour
     {
-        // Backward-compatible alias for existing callers
-        public static TacticalRoomIconType RoomIconType => TacticalRoomIconType.Home;
-
         [System.Serializable]
         public class NodeModel
         {
