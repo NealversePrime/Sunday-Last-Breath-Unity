@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v50_auto.flag";
+            string flagPath = "Temp/scene_v51_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -1772,7 +1772,7 @@ namespace SundayLastBreath.Editor
             Image rcCardBg = rightCard.AddComponent<Image>();
             rcCardBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
             Outline rcOl = rightCard.AddComponent<Outline>();
-            rcOl.effectColor = new Color(0.20f, 0.24f, 0.30f, 0.85f);
+            rcOl.effectColor = new Color(0.95f, 0.48f, 0.12f, 0.55f);
             rcOl.effectDistance = new Vector2(1f, -1f);
 
             // Top Dual Tabs
@@ -2111,7 +2111,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("thirstValueText").objectReferenceValue = thrValTmp;
             so.FindProperty("clockTimeText").objectReferenceValue = clockTimeTmp;
             so.FindProperty("clockDayText").objectReferenceValue = clockDayTmp;
-            so.FindProperty("floorItemsCard").objectReferenceValue = rightCard;
+            so.FindProperty("floorItemsCard").objectReferenceValue = null;
             so.FindProperty("floorItemsButton").objectReferenceValue = btnFloorGather;
             so.FindProperty("floorItemsCountText").objectReferenceValue = floorCountTmp;
 

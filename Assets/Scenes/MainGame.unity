@@ -3267,7 +3267,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.2, g: 0.24, b: 0.3, a: 0.85}
+  m_EffectColor: {r: 0.95, g: 0.48, b: 0.12, a: 0.55}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
 --- !u!114 &29193037
@@ -36311,7 +36311,7 @@ MonoBehaviour:
   pdaBackpackGrid: {fileID: 1184039537}
   pdaFloorItemsGrid: {fileID: 1924151704}
   pdaFloorEmptyText: {fileID: 1194978420}
-  floorItemsCard: {fileID: 29193034}
+  floorItemsCard: {fileID: 0}
   stageBackdropImage: {fileID: 656499784}
   livingRoomAnimPlayer: {fileID: 656499783}
   clockText: {fileID: 0}

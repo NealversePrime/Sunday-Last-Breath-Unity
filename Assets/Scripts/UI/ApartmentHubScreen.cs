@@ -481,7 +481,7 @@ namespace SundayLastBreath.UI
             introSeen = false;
             awakeningStep = 1;
 
-            if (floorItemsCard != null) floorItemsCard.SetActive(false);
+            if (floorItemsCard != null && tacticalGearController == null) floorItemsCard.SetActive(false);
             if (takeFloorItemsButton != null) takeFloorItemsButton.gameObject.SetActive(false);
             UpdateFloorItemsNotification();
 

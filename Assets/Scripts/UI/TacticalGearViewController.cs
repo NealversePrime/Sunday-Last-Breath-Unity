@@ -190,6 +190,30 @@ namespace SundayLastBreath.UI
             _player = player;
             _floorItems = roomFloorItems;
 
+            // Ensure the right inspector card container is active and styled
+            if (dossierPanel != null && dossierPanel.transform.parent != null)
+            {
+                GameObject parentCard = dossierPanel.transform.parent.gameObject;
+                parentCard.SetActive(true);
+
+                var cardOl = parentCard.GetComponent<Outline>();
+                if (cardOl != null)
+                {
+                    cardOl.effectColor = new Color(0.95f, 0.48f, 0.12f, 0.55f); // Matching Tactical Orange outline
+                }
+            }
+
+            // If room has floor loot and player hasn't inspected a specific item yet,
+            // default to showing the Room Items tab so floor stash is immediately visible!
+            if (_floorItems != null && _floorItems.Count > 0 && string.IsNullOrEmpty(_selectedItemId))
+            {
+                SwitchRightTab(false);
+            }
+            else
+            {
+                SwitchRightTab(true);
+            }
+
             RefreshAll();
         }
 
@@ -358,19 +382,45 @@ namespace SundayLastBreath.UI
             RectTransform rt = cell.AddComponent<RectTransform>();
             rt.sizeDelta = new Vector2(74f, 74f);
 
+            bool isSelected = _selectedSource == SelectedSource.Backpack && _selectedBackpackIndex == index;
+
             Image bg = cell.AddComponent<Image>();
-            bg.color = new Color(0.06f, 0.08f, 0.11f, 0.95f);
+            bg.color = isSelected 
+                ? new Color(0.14f, 0.18f, 0.24f, 0.98f) 
+                : new Color(0.06f, 0.08f, 0.11f, 0.95f);
 
             var def = ItemDatabase.GetDefinition(itemId);
             Color catColor = def != null ? ItemDatabase.GetCategoryBorderColor(def.category) : new Color(0.28f, 0.32f, 0.38f);
 
-            bool isSelected = _selectedSource == SelectedSource.Backpack && _selectedBackpackIndex == index;
-
             Outline ol = cell.AddComponent<Outline>();
-            ol.effectColor = isSelected
-                ? new Color(0.95f, 0.75f, 0.20f, 1f) // Bright selection gold
-                : (matchesFilter ? catColor : new Color(0.18f, 0.20f, 0.24f, 0.4f));
-            ol.effectDistance = isSelected ? new Vector2(2f, -2f) : new Vector2(1f, -1f);
+            if (isSelected)
+            {
+                ol.effectColor = new Color(0.95f, 0.75f, 0.20f, 1f); // Bright Gold selection highlight ONLY for selected item
+                ol.effectDistance = new Vector2(2f, -2f);
+            }
+            else
+            {
+                // Clean, crisp tactical steel border - NEVER yellow when unselected!
+                ol.effectColor = matchesFilter 
+                    ? new Color(0.22f, 0.27f, 0.34f, 0.85f) 
+                    : new Color(0.12f, 0.14f, 0.18f, 0.40f);
+                ol.effectDistance = new Vector2(1f, -1f);
+            }
+
+            // Category Pip: Sleek 3x12 indicator on top-left of slot so category is clear without whole cell being yellow
+            if (def != null && matchesFilter)
+            {
+                GameObject pipObj = new GameObject("CatPip");
+                pipObj.transform.SetParent(cell.transform, false);
+                Image pipImg = pipObj.AddComponent<Image>();
+                pipImg.color = catColor;
+                pipImg.raycastTarget = false;
+                RectTransform prt = pipObj.GetComponent<RectTransform>();
+                prt.anchorMin = new Vector2(0f, 1f); prt.anchorMax = new Vector2(0f, 1f);
+                prt.pivot = new Vector2(0f, 1f);
+                prt.anchoredPosition = new Vector2(4f, -4f);
+                prt.sizeDelta = new Vector2(3f, 12f);
+            }
 
             // Icon
             GameObject iconObj = new GameObject("Icon");
@@ -395,7 +445,7 @@ namespace SundayLastBreath.UI
             TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
             nameTmp.fontSize = 8.5f;
             nameTmp.alignment = TextAlignmentOptions.Center;
-            nameTmp.color = matchesFilter ? new Color(0.85f, 0.88f, 0.92f) : new Color(0.4f, 0.4f, 0.4f);
+            nameTmp.color = matchesFilter ? (isSelected ? Color.white : new Color(0.85f, 0.88f, 0.92f)) : new Color(0.4f, 0.4f, 0.4f);
             nameTmp.text = itemId.Length > 11 ? itemId.Substring(0, 10) + "." : itemId;
             nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
             nameTmp.raycastTarget = false;
@@ -667,20 +717,27 @@ namespace SundayLastBreath.UI
 
         private void UpdateTabButtonVisuals(bool showingDossier)
         {
-            UpdateTabBtnVisual(tabBtnDossier, showingDossier);
-            UpdateTabBtnVisual(tabBtnFloor, !showingDossier);
+            bool hasFloorItems = _floorItems != null && _floorItems.Count > 0;
+            UpdateTabBtnVisual(tabBtnDossier, showingDossier, false);
+            UpdateTabBtnVisual(tabBtnFloor, !showingDossier, hasFloorItems && showingDossier);
         }
 
-        private void UpdateTabBtnVisual(Button btn, bool isActive)
+        private void UpdateTabBtnVisual(Button btn, bool isActive, bool hasAlert)
         {
             if (btn == null) return;
             Image bg = btn.GetComponent<Image>();
             Outline ol = btn.GetComponent<Outline>();
             TextMeshProUGUI tmp = btn.GetComponentInChildren<TextMeshProUGUI>();
 
-            if (bg != null) bg.color = isActive ? new Color(0.18f, 0.24f, 0.34f, 1f) : new Color(0.08f, 0.10f, 0.14f, 0.95f);
-            if (ol != null) ol.effectColor = isActive ? new Color(0.95f, 0.75f, 0.20f, 1f) : new Color(0.20f, 0.24f, 0.30f, 0.65f);
-            if (tmp != null) tmp.color = isActive ? Color.white : new Color(0.65f, 0.70f, 0.75f);
+            if (bg != null) bg.color = isActive 
+                ? new Color(0.18f, 0.24f, 0.34f, 1f) 
+                : (hasAlert ? new Color(0.16f, 0.12f, 0.08f, 0.95f) : new Color(0.08f, 0.10f, 0.14f, 0.95f));
+            if (ol != null) ol.effectColor = isActive 
+                ? new Color(0.95f, 0.75f, 0.20f, 1f) // Bright selection gold
+                : (hasAlert ? new Color(0.96f, 0.62f, 0.04f, 0.90f) : new Color(0.20f, 0.24f, 0.30f, 0.65f)); // Amber alert for floor loot
+            if (tmp != null) tmp.color = isActive 
+                ? Color.white 
+                : (hasAlert ? new Color(0.96f, 0.75f, 0.35f) : new Color(0.65f, 0.70f, 0.75f));
         }
 
         private void RefreshDossier()
@@ -689,7 +746,18 @@ namespace SundayLastBreath.UI
 
             bool hasSelection = _selectedSource != SelectedSource.None && !string.IsNullOrEmpty(_selectedItemId);
 
-            if (dossierEmptyState != null) dossierEmptyState.SetActive(!hasSelection);
+            if (dossierEmptyState != null)
+            {
+                dossierEmptyState.SetActive(!hasSelection);
+                if (!hasSelection)
+                {
+                    var emptyTmp = dossierEmptyState.GetComponentInChildren<TextMeshProUGUI>();
+                    if (emptyTmp != null)
+                    {
+                        emptyTmp.text = "<color=#38BDF8><b>[ TACTICAL ITEM INSPECTOR ]</b></color>\n\n<color=#94A3B8>Select any weapon, gear, ammo, or consumable in your Active Loadout, Backpack, or Room Stash to inspect tactical intel, ballistic specs, and survival properties.</color>";
+                    }
+                }
+            }
             if (dossierDetailContent != null) dossierDetailContent.SetActive(hasSelection);
 
             if (!hasSelection) return;
