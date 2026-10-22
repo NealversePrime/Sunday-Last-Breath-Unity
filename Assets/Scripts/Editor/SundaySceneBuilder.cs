@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v45_auto.flag";
+            string flagPath = "Temp/scene_v46_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -205,7 +205,7 @@ namespace SundayLastBreath.Editor
             TextMeshProUGUI thTmp = thTitle.AddComponent<TextMeshProUGUI>();
             thTmp.fontSize = 12f;
             thTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            thTmp.text = "<b>â–  UNIT 404 // LIVING ROOM INTERIOR</b>";
+            thTmp.text = "<b>■ UNIT 404 // LIVING ROOM INTERIOR</b>";
             thTmp.color = new Color(0.65f, 0.75f, 0.88f);
             thTmp.raycastTarget = false;
 
@@ -522,7 +522,7 @@ namespace SundayLastBreath.Editor
             thbImg.raycastTarget = false;
 
             // LEFT: Tactical Location Badge
-            TextMeshProUGUI locBadgeTmp = CreateTMPText(topHeader.transform, "LocationBadge", "â–  UNIT 404 // THE ASCOTT RESIDENCY [4TH FLOOR]", 12f, new Color(0.72f, 0.82f, 0.94f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            TextMeshProUGUI locBadgeTmp = CreateTMPText(topHeader.transform, "LocationBadge", "■ UNIT 404 // THE ASCOTT RESIDENCY [4TH FLOOR]", 12f, new Color(0.72f, 0.82f, 0.94f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform lbr = locBadgeTmp.rectTransform;
             lbr.anchorMin = new Vector2(0f, 0.5f);
             lbr.anchorMax = new Vector2(0f, 0.5f);
@@ -834,7 +834,7 @@ namespace SundayLastBreath.Editor
             StretchFull(b1Rect);
 
             TextMeshProUGUI b1Tmp = CreateTMPText(b1Obj.transform, "Beat1IntroText",
-                "You turn away from the glass. The silence in your apartment breaksâ€”not with a scream, but with an electronic tone pulsing from the television.",
+                "You turn away from the glass. The silence in your apartment breaks—not with a scream, but with an electronic tone pulsing from the television.",
                 16f, new Color(0.92f, 0.92f, 0.95f));
             b1Tmp.lineSpacing = 8f;
             RectTransform b1tr = b1Tmp.rectTransform;
@@ -1118,7 +1118,7 @@ namespace SundayLastBreath.Editor
             strRect.anchoredPosition = new Vector2(0f, -6f);
 
             TextMeshProUGUI sitTitleTmp = CreateTMPText(sitTopRow.transform, "Title",
-                "<b><color=#F5A623>â— CURRENT SITUATION</color></b>  <color=#78909C>// LIVING ROOM (23:45 DAY 0)</color>",
+                "<b><color=#F5A623>● CURRENT SITUATION</color></b>  <color=#78909C>// LIVING ROOM (23:45 DAY 0)</color>",
                 12.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform sttRect = sitTitleTmp.rectTransform;
             sttRect.anchorMin = new Vector2(0f, 0f); sttRect.anchorMax = new Vector2(0.75f, 1f);
@@ -1433,7 +1433,8 @@ namespace SundayLastBreath.Editor
 
             VerticalLayoutGroup rscVlg = rightStatusCol.AddComponent<VerticalLayoutGroup>();
             rscVlg.spacing = 10f;
-            rscVlg.childControlWidth = true; rscVlg.childControlHeight = false;
+            rscVlg.childControlWidth = true; rscVlg.childControlHeight = true;
+            rscVlg.childForceExpandWidth = true; rscVlg.childForceExpandHeight = false;
 
             // LVL 1 & XP Card
             GameObject lvlCard = new GameObject("LvlCard", typeof(RectTransform));
@@ -1526,10 +1527,10 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI condTmp = CreateTMPText(condCard.transform, "Text",
                 "<color=#f39c12><b>TACTICAL CONDITION:</b></color>\n" +
-                "â€¢ Shelter: Unit 404 (Living Room)\n" +
-                "â€¢ Status: Unprepared / In Pajamas\n" +
-                "â€¢ Threat: Civil Danger Warning (Category 5)\n" +
-                "â€¢ Time to Sector Purge: 06:15 remaining", 11f, new Color(0.75f, 0.78f, 0.84f));
+                "• Shelter: Unit 404 (Living Room)\n" +
+                "• Status: Unprepared / In Pajamas\n" +
+                "• Threat: Civil Danger Warning (Category 5)\n" +
+                "• Time to Sector Purge: 06:15 remaining", 11f, new Color(0.75f, 0.78f, 0.84f));
             condTmp.lineSpacing = 6f;
             RectTransform ctr = condTmp.rectTransform;
             StretchFull(ctr);
@@ -1544,7 +1545,8 @@ namespace SundayLastBreath.Editor
             pskRect.offsetMin = new Vector2(16f, 14f); pskRect.offsetMax = new Vector2(-16f, -14f);
             VerticalLayoutGroup pskVlg = pSkillsObj.AddComponent<VerticalLayoutGroup>();
             pskVlg.spacing = 8f;
-            pskVlg.childControlWidth = true; pskVlg.childControlHeight = false;
+            pskVlg.childControlWidth = true; pskVlg.childControlHeight = true;
+            pskVlg.childForceExpandWidth = true; pskVlg.childForceExpandHeight = false;
             pSkillsObj.SetActive(false);
 
             TacticalSkillsViewController skillsCtrl = BuildTacticalSkillsHUD(pSkillsObj, out TextMeshProUGUI pdaAttributesTmp, out TextMeshProUGUI pdaSkillsTmp);
@@ -1557,7 +1559,7 @@ namespace SundayLastBreath.Editor
             ptrRect.offsetMin = new Vector2(16f, 14f); ptrRect.offsetMax = new Vector2(-16f, -14f);
             VerticalLayoutGroup ptrVlg = pTraitsObj.AddComponent<VerticalLayoutGroup>();
             ptrVlg.spacing = 8f;
-            ptrVlg.childControlWidth = true; ptrVlg.childControlHeight = false;
+            ptrVlg.childControlWidth = true; ptrVlg.childControlHeight = true;
             ptrVlg.childForceExpandWidth = true; ptrVlg.childForceExpandHeight = false;
             pTraitsObj.SetActive(false);
 
@@ -1582,16 +1584,12 @@ namespace SundayLastBreath.Editor
             ContentSizeFitter tcCsf = traitsContent.AddComponent<ContentSizeFitter>();
             tcCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            // TAB 4: MAP PANEL (Connected Tactical Floorplan & Recon Scanner)
+            // TAB 4: MAP PANEL (Architectural Blueprint & Bio-Radar Scanner)
             GameObject pMapObj = new GameObject("Panel_Map", typeof(RectTransform));
             pMapObj.transform.SetParent(pdaContentObj.transform, false);
             RectTransform pmRect = pMapObj.GetComponent<RectTransform>();
             StretchFull(pmRect);
             pmRect.offsetMin = new Vector2(16f, 14f); pmRect.offsetMax = new Vector2(-16f, -14f);
-            VerticalLayoutGroup pmVlg = pMapObj.AddComponent<VerticalLayoutGroup>();
-            pmVlg.spacing = 8f;
-            pmVlg.childControlWidth = true; pmVlg.childControlHeight = false;
-            pmVlg.childForceExpandWidth = true; pmVlg.childForceExpandHeight = false;
             pMapObj.SetActive(false);
 
             TacticalMapViewController mapCtrl = BuildTacticalConnectedMap(pMapObj);
@@ -2039,9 +2037,16 @@ namespace SundayLastBreath.Editor
 
         private static void CreateSectionBadge(Transform parent, string title)
         {
-            GameObject badge = new GameObject("SectionBadge");
+            GameObject badge = new GameObject("SectionBadge", typeof(RectTransform));
             badge.transform.SetParent(parent, false);
+            RectTransform br = badge.GetComponent<RectTransform>();
+            br.anchorMin = new Vector2(0f, 1f);
+            br.anchorMax = new Vector2(1f, 1f);
+            br.pivot = new Vector2(0.5f, 1f);
+            br.anchoredPosition = Vector2.zero;
+            br.sizeDelta = new Vector2(0f, 24f);
             LayoutElement le = badge.AddComponent<LayoutElement>();
+            le.minHeight = 24f;
             le.preferredHeight = 24f;
             Image bg = badge.AddComponent<Image>();
             bg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
@@ -2308,7 +2313,7 @@ namespace SundayLastBreath.Editor
             cOl.effectColor = new Color(0.85f, 0.25f, 0.25f, 0.8f);
             closeBtn = closeObj.AddComponent<Button>();
             closeBtn.targetGraphic = cBg;
-            TextMeshProUGUI cTmp = CreateTMPText(closeObj.transform, "Label", "âœ•", 18f, new Color(0.95f, 0.4f, 0.4f), TextAlignmentOptions.Center, FontStyles.Bold);
+            TextMeshProUGUI cTmp = CreateTMPText(closeObj.transform, "Label", "✕", 18f, new Color(0.95f, 0.4f, 0.4f), TextAlignmentOptions.Center, FontStyles.Bold);
             RectTransform ctRect = cTmp.rectTransform;
             StretchFull(ctRect);
 
@@ -2413,13 +2418,13 @@ namespace SundayLastBreath.Editor
             fTmp.fontSize = 12f;
             fTmp.color = new Color(0.85f, 0.85f, 0.9f);
             fTmp.lineSpacing = 12f;
-            fTmp.text = "<b>CityScanner</b> @CityScanner_WA â€¢ 2m\n" +
+            fTmp.text = "<b>CityScanner</b> @CityScanner_WA • 2m\n" +
                         "Does anyone know what's happening at the 5th St Hospital? Seeing police in gas masks and riot gear. They aren't letting ambulances through. Stay away!!\n\n" +
-                        "<color=#5dade2><b>NewsWire Breaking [VERIFIED]</b></color> @NewsWire_Alerts â€¢ 4m\n" +
+                        "<color=#5dade2><b>NewsWire Breaking [VERIFIED]</b></color> @NewsWire_Alerts • 4m\n" +
                         "EMERGENCY: CDC reporting 'unprecedented neuro-aggressive pathogen' causing extreme psychosis and unprovoked violence. Authorities urge citizens to avoid public spaces.\n\n" +
-                        "<b>User_9921</b> @anon_9921 â€¢ 11m\n" +
+                        "<b>User_9921</b> @anon_9921 • 11m\n" +
                         "<color=#ff5555>[ATTACHED VIDEO: BLURRY]</color>\n" +
-                        "Look at his face! That's not rabies! The cops shot him three times in the chest and he kept running! Oh my god, he'sâ€” <i>[VIDEO ENDS]</i>\n\n" +
+                        "Look at his face! That's not rabies! The cops shot him three times in the chest and he kept running! Oh my god, he's— <i>[VIDEO ENDS]</i>\n\n" +
                         "<color=#666666><i>Connection lost. Tap to retry.</i></color>";
 
             // Outro note
@@ -2467,7 +2472,7 @@ namespace SundayLastBreath.Editor
             hTmp.fontSize = 13f;
             hTmp.fontStyle = FontStyles.Bold;
             hTmp.color = new Color(0.95f, 0.75f, 0.35f);
-            hTmp.text = "FREQ: 154.790 MHz                     <color=#ff4444>â— REC</color>";
+            hTmp.text = "FREQ: 154.790 MHz                     <color=#ff4444>● REC</color>";
 
             // Transcript Body
             GameObject tObj = new GameObject("Transcript");
@@ -2825,7 +2830,7 @@ namespace SundayLastBreath.Editor
             vRect.anchoredPosition = new Vector2(30, 25);
 
             TextMeshProUGUI verTmp = verObj.AddComponent<TextMeshProUGUI>();
-            verTmp.text = "EARLY ACCESS v1.0.0 | BUILD 2026\nCOPYRIGHT Â© 2026 NEALVERSE STUDIO";
+            verTmp.text = "EARLY ACCESS v1.0.0 | BUILD 2026\nCOPYRIGHT © 2026 NEALVERSE STUDIO";
             verTmp.fontSize = 14;
             verTmp.lineSpacing = 8;
             verTmp.color = new Color(0.45f, 0.45f, 0.45f, 0.8f);
@@ -3587,9 +3592,9 @@ namespace SundayLastBreath.Editor
             imRect.offsetMax = new Vector2(-14, -10);
             TextMeshProUGUI imTmp = inspImpactObj.AddComponent<TextMeshProUGUI>();
             imTmp.text = "<color=#E67E22><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
-                "â€¢ <color=#FFFFFF><b>Melee Combat:</b></color> +15% damage with blunt and edged weapons\n" +
-                "â€¢ <color=#FFFFFF><b>Carrying Capacity:</b></color> +8 kg maximum inventory encumbrance\n" +
-                "â€¢ <color=#FFFFFF><b>Breaching:</b></color> Force open jammed doors and barricades without tools";
+                "• <color=#FFFFFF><b>Melee Combat:</b></color> +15% damage with blunt and edged weapons\n" +
+                "• <color=#FFFFFF><b>Carrying Capacity:</b></color> +8 kg maximum inventory encumbrance\n" +
+                "• <color=#FFFFFF><b>Breaching:</b></color> Force open jammed doors and barricades without tools";
             imTmp.fontSize = 12.5f;
             imTmp.lineSpacing = 5f;
             imTmp.alignment = TextAlignmentOptions.TopLeft;
@@ -4044,7 +4049,7 @@ namespace SundayLastBreath.Editor
             RectTransform pttRect = physTxtObj.AddComponent<RectTransform>();
             StretchFull(pttRect);
             TextMeshProUGUI physTmp = physTxtObj.AddComponent<TextMeshProUGUI>();
-            physTmp.text = "<b>â— COMBAT, FIELD & STEALTH (8)</b>";
+            physTmp.text = "<b>● COMBAT, FIELD & STEALTH (8)</b>";
             physTmp.fontSize = 13f;
             physTmp.fontStyle = FontStyles.Bold;
             physTmp.characterSpacing = 2f;
@@ -4068,7 +4073,7 @@ namespace SundayLastBreath.Editor
             RectTransform mttRect = mentalTxtObj.AddComponent<RectTransform>();
             StretchFull(mttRect);
             TextMeshProUGUI mentalTmp = mentalTxtObj.AddComponent<TextMeshProUGUI>();
-            mentalTmp.text = "<b>â—‹ MIND, TECH & SUPPORT (7)</b>";
+            mentalTmp.text = "<b>○ MIND, TECH & SUPPORT (7)</b>";
             mentalTmp.fontSize = 13f;
             mentalTmp.fontStyle = FontStyles.Bold;
             mentalTmp.characterSpacing = 2f;
@@ -4213,7 +4218,7 @@ namespace SundayLastBreath.Editor
             LayoutElement t2Le = t2Obj.AddComponent<LayoutElement>();
             t2Le.preferredHeight = 18;
             TextMeshProUGUI t2 = t2Obj.AddComponent<TextMeshProUGUI>();
-            t2.text = "CDC â€¢ FEMA JOINT OUTBREAK RESPONSE TASKFORCE   |   EMERGENCY REGISTER PROTOCOL 2026";
+            t2.text = "CDC • FEMA JOINT OUTBREAK RESPONSE TASKFORCE   |   EMERGENCY REGISTER PROTOCOL 2026";
             t2.fontSize = 11.5f;
             t2.color = new Color(0.55f, 0.68f, 0.82f); // Slate cyan
 
@@ -4287,12 +4292,12 @@ namespace SundayLastBreath.Editor
             TextMeshProUGUI screeningText = CreateDossierRow(col1.transform, 11f, FontStyles.Normal, new Color(0.70f, 0.78f, 0.85f));
             screeningText.lineSpacing = 2f;
             screeningText.text = 
-                "â€¢ CHECKPOINT: <color=#FFE082>SECTOR-04 // METRO DECONTAM GATE</color>\n" +
-                "â€¢ BODY TEMP: <color=#66BB6A>36.8Â°C [NORMAL / AFEBRILE]</color>\n" +
-                "â€¢ VIRAL ANTIGEN SWAB: <color=#66BB6A>NEGATIVE (NON-REACTIVE)</color>\n" +
-                "â€¢ RETINAL OCULAR SCAN: <color=#66BB6A>NORMAL (NO CAPILLARY RUPTURE)</color>\n" +
-                "â€¢ EPIDERMAL CHECK: <color=#66BB6A>NO INFECTED LACERATIONS / BITES</color>\n" +
-                "â€¢ STATUS: <color=#29B6F6><b>TIER-1 CONDITIONAL CLEARANCE</b></color>\n\n" +
+                "• CHECKPOINT: <color=#FFE082>SECTOR-04 // METRO DECONTAM GATE</color>\n" +
+                "• BODY TEMP: <color=#66BB6A>36.8°C [NORMAL / AFEBRILE]</color>\n" +
+                "• VIRAL ANTIGEN SWAB: <color=#66BB6A>NEGATIVE (NON-REACTIVE)</color>\n" +
+                "• RETINAL OCULAR SCAN: <color=#66BB6A>NORMAL (NO CAPILLARY RUPTURE)</color>\n" +
+                "• EPIDERMAL CHECK: <color=#66BB6A>NO INFECTED LACERATIONS / BITES</color>\n" +
+                "• STATUS: <color=#29B6F6><b>TIER-1 CONDITIONAL CLEARANCE</b></color>\n\n" +
                 "<mspace=0.45em><color=#556677>||| | |||| | ||| |||| | | |||| |||</color></mspace>  <color=#8899AA>#EAS-2026-US88204</color>";
 
             // Rubber stamp in Column 1 (Overlay inside Card 1)
@@ -4358,8 +4363,8 @@ namespace SundayLastBreath.Editor
             abTmp.textWrappingMode = TextWrappingModes.Normal;
             abTmp.text = 
                 "<color=#FFA726><b>\"Infected display hyper-kinesis, sensory frenzy, and loss of pain response due to rapid frontal necrosis.\"</b></color>\n" +
-                "<color=#45B7FF><b>â€¢ COMBAT DIRECTIVE:</b></color> <color=#CFD8DC>Cranial destruction is sole neutralization vector. Prioritize retreat.</color>\n" +
-                "<color=#45B7FF><b>â€¢ HYDRATION SAFETY:</b></color> <color=#CFD8DC>Boil tap water min. 10 minutes. Dehydration accelerates susceptibility.</color>";
+                "<color=#45B7FF><b>• COMBAT DIRECTIVE:</b></color> <color=#CFD8DC>Cranial destruction is sole neutralization vector. Prioritize retreat.</color>\n" +
+                "<color=#45B7FF><b>• HYDRATION SAFETY:</b></color> <color=#CFD8DC>Boil tap water min. 10 minutes. Dehydration accelerates susceptibility.</color>";
 
             // --- COLUMN 3: TRAITS & FIELD MANIFEST ---
             GameObject col3 = CreateDossierCard(colsObj.transform, "Col3_Manifest", 460);
@@ -4399,9 +4404,9 @@ namespace SundayLastBreath.Editor
             ebTmp.color = new Color(0.72f, 0.78f, 0.84f);
             ebTmp.textWrappingMode = TextWrappingModes.Normal;
             ebTmp.text = 
-                "<color=#EF5350><b>â€¢ DISARMAMENT EXEMPTION:</b></color> <color=#CFD8DC>Declared defensive sidearms licensed under Martial Edict 2026-09.</color>\n" +
-                "<color=#EF5350><b>â€¢ EVACUATION CORRIDOR:</b></color> <color=#CFD8DC>Proceed along I-80 North checkpoints. Mandatory curfew 19:00 - 06:00.</color>\n" +
-                "<color=#EF5350><b>â€¢ CONCEALMENT PENALTY:</b></color> <color=#CFD8DC>Concealing bite wounds is high treason punishable by internment.</color>\n" +
+                "<color=#EF5350><b>• DISARMAMENT EXEMPTION:</b></color> <color=#CFD8DC>Declared defensive sidearms licensed under Martial Edict 2026-09.</color>\n" +
+                "<color=#EF5350><b>• EVACUATION CORRIDOR:</b></color> <color=#CFD8DC>Proceed along I-80 North checkpoints. Mandatory curfew 19:00 - 06:00.</color>\n" +
+                "<color=#EF5350><b>• CONCEALMENT PENALTY:</b></color> <color=#CFD8DC>Concealing bite wounds is high treason punishable by internment.</color>\n" +
                 "<color=#78909C>FIELD EXAMINER: [Agent M. Vance // #8841-B]</color>    <color=#66BB6A><b>STAMP: VERIFIED</b></color>";
 
             // ==========================================
@@ -5269,7 +5274,7 @@ namespace SundayLastBreath.Editor
             tRect.offsetMin = new Vector2(180, 0);
             tRect.offsetMax = new Vector2(-48, 0);
             TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
-            tmp.text = "<color=#2A2A2A>â–  â–  â–  â–  â–  â–  â–  â–  â–  â– </color>   <b>2</b>";
+            tmp.text = "<color=#2A2A2A>■ ■ ■ ■ ■ ■ ■ ■ ■ ■</color>   <b>2</b>";
             tmp.fontSize = 14;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.white;
@@ -5422,418 +5427,561 @@ namespace SundayLastBreath.Editor
             return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
-        #region Tactical Floorplan Map Builder (Phase 2)
+        #region Tactical Floorplan Map Builder (Phase 2 — Architectural Blueprint & Bio-Radar Scanner)
         private static TacticalMapViewController BuildTacticalConnectedMap(GameObject pMapObj)
         {
             TacticalMapViewController mapCtrl = pMapObj.AddComponent<TacticalMapViewController>();
 
-            CreateSectionBadge(pMapObj.transform, "LOCATION MAP // ASCOTT RESIDENCY 4TH FLOOR (TACTICAL MINIMAP)");
+            // =========================================================================
+            // 1. TOP COMMAND TELEMETRY BAR (Explicit RectTransform: 24px tall)
+            // =========================================================================
+            GameObject topBar = new GameObject("TopTelemetryBar", typeof(RectTransform));
+            topBar.transform.SetParent(pMapObj.transform, false);
+            RectTransform tbRect = topBar.GetComponent<RectTransform>();
+            tbRect.anchorMin = new Vector2(0f, 1f);
+            tbRect.anchorMax = new Vector2(1f, 1f);
+            tbRect.pivot = new Vector2(0.5f, 1f);
+            tbRect.offsetMin = new Vector2(0f, -24f);
+            tbRect.offsetMax = new Vector2(0f, 0f);
 
-            GameObject mapContainer = new GameObject("MapContainer", typeof(RectTransform));
-            mapContainer.transform.SetParent(pMapObj.transform, false);
-            LayoutElement mcLe = mapContainer.AddComponent<LayoutElement>();
-            mcLe.flexibleWidth = 1f;
-            mcLe.flexibleHeight = 1f;
+            Image tbBg = topBar.AddComponent<Image>();
+            tbBg.color = new Color(0.05f, 0.08f, 0.13f, 0.96f);
+            Outline tbOl = topBar.AddComponent<Outline>();
+            tbOl.effectColor = new Color(0.16f, 0.30f, 0.45f, 0.85f);
+            tbOl.effectDistance = new Vector2(1f, -1f);
 
-            HorizontalLayoutGroup mcHlg = mapContainer.AddComponent<HorizontalLayoutGroup>();
-            mcHlg.spacing = 16f;
-            mcHlg.childControlWidth = true;
-            mcHlg.childControlHeight = true;
-            mcHlg.childForceExpandWidth = false;
-            mcHlg.childForceExpandHeight = true;
+            TextMeshProUGUI tbTitle = CreateTMPText(topBar.transform, "BlueprintTitle",
+                "ARCHITECTURAL BLUEPRINT // ASCOTT RESIDENCY — 4TH FLOOR WEST WING",
+                10f, new Color(0.0f, 0.90f, 1.0f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            StretchFull(tbTitle.rectTransform);
+            tbTitle.rectTransform.offsetMin = new Vector2(10f, 0f);
+            tbTitle.rectTransform.offsetMax = new Vector2(-340f, 0f);
+
+            TextMeshProUGUI coordBannerTmp = CreateTMPText(topBar.transform, "CoordTelemetry",
+                "GRID [W-01:R-01] // BIO-RADAR: ACTIVE",
+                9.5f, new Color(0.52f, 0.72f, 0.88f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            StretchFull(coordBannerTmp.rectTransform);
+            coordBannerTmp.rectTransform.offsetMin = new Vector2(560f, 0f);
+            coordBannerTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
 
             // =========================================================================
-            // LEFT COLUMN: TITS-STYLE TACTICAL MINIMAP WINDOW (440px wide)
+            // 2. LEFT COLUMN: ARCHITECTURAL BLUEPRINT VIEWPORT (648px wide x 342px tall)
             // =========================================================================
-            GameObject minimapCard = new GameObject("MinimapCard", typeof(RectTransform));
-            minimapCard.transform.SetParent(mapContainer.transform, false);
-            LayoutElement gcLe = minimapCard.AddComponent<LayoutElement>();
-            gcLe.preferredWidth = 440f;
-            gcLe.flexibleHeight = 1f;
+            GameObject bpViewport = new GameObject("BlueprintViewport", typeof(RectTransform));
+            bpViewport.transform.SetParent(pMapObj.transform, false);
+            RectTransform bpRect = bpViewport.GetComponent<RectTransform>();
+            bpRect.anchorMin = new Vector2(0f, 0f);
+            bpRect.anchorMax = new Vector2(0f, 1f);
+            bpRect.pivot = new Vector2(0f, 0.5f);
+            bpRect.offsetMin = new Vector2(0f, 0f);
+            bpRect.offsetMax = new Vector2(648f, -30f);
 
-            Image gcBg = minimapCard.AddComponent<Image>();
-            gcBg.color = new Color(0.05f, 0.07f, 0.10f, 0.98f);
-            Outline gcOl = minimapCard.AddComponent<Outline>();
-            gcOl.effectColor = new Color(0.20f, 0.26f, 0.35f, 0.90f);
-            gcOl.effectDistance = new Vector2(1.5f, -1.5f);
+            Image bpBg = bpViewport.AddComponent<Image>();
+            bpBg.color = new Color(0.025f, 0.04f, 0.07f, 0.98f);
+            Outline bpOl = bpViewport.AddComponent<Outline>();
+            bpOl.effectColor = new Color(0.16f, 0.30f, 0.45f, 0.90f);
+            bpOl.effectDistance = new Vector2(1f, -1f);
 
-            VerticalLayoutGroup gcVlg = minimapCard.AddComponent<VerticalLayoutGroup>();
-            gcVlg.spacing = 0f;
-            gcVlg.padding = new RectOffset(0, 0, 0, 0);
-            gcVlg.childControlWidth = true;
-            gcVlg.childControlHeight = false;
+            // Procedural CAD Blueprint Grid Overlay
+            GameObject gridOverlayObj = new GameObject("BlueprintGridOverlay", typeof(RectTransform));
+            gridOverlayObj.transform.SetParent(bpViewport.transform, false);
+            StretchFull(gridOverlayObj.GetComponent<RectTransform>());
+            Image gridOverlayImg = gridOverlayObj.AddComponent<Image>();
+            gridOverlayImg.sprite = TacticalMapViewController.GetBlueprintGridSprite();
+            gridOverlayImg.type = Image.Type.Tiled;
+            gridOverlayImg.color = new Color(1f, 1f, 1f, 0.90f);
+            gridOverlayImg.raycastTarget = false;
 
-            // --- HEADER BANNER: Sector & Floor (TiTS Solid Purple Banner) ---
-            GameObject headerBanner = new GameObject("HeaderBanner", typeof(RectTransform));
-            headerBanner.transform.SetParent(minimapCard.transform, false);
-            LayoutElement hbLe = headerBanner.AddComponent<LayoutElement>();
-            hbLe.preferredHeight = 36f;
+            // Blueprint Sub-Header Bar (Top 22px inside viewport)
+            GameObject bpSubBar = new GameObject("BlueprintSubHeader", typeof(RectTransform));
+            bpSubBar.transform.SetParent(bpViewport.transform, false);
+            RectTransform bsbRect = bpSubBar.GetComponent<RectTransform>();
+            bsbRect.anchorMin = new Vector2(0f, 1f);
+            bsbRect.anchorMax = new Vector2(1f, 1f);
+            bsbRect.pivot = new Vector2(0.5f, 1f);
+            bsbRect.offsetMin = new Vector2(10f, -22f);
+            bsbRect.offsetMax = new Vector2(-10f, -2f);
 
-            Image hbBg = headerBanner.AddComponent<Image>();
-            hbBg.color = new Color(0.45f, 0.12f, 0.75f, 0.98f);
-            Outline hbOl = headerBanner.AddComponent<Outline>();
-            hbOl.effectColor = new Color(0.70f, 0.30f, 0.95f, 0.85f);
-            hbOl.effectDistance = new Vector2(0f, -1f);
+            TextMeshProUGUI scaleTmp = CreateTMPText(bpSubBar.transform, "ScaleLabel",
+                "SCHEMATIC SCALE 1:100 // CONTIGUOUS FLOORPLAN",
+                8f, new Color(0.38f, 0.56f, 0.72f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            StretchFull(scaleTmp.rectTransform);
+            scaleTmp.rectTransform.offsetMax = new Vector2(-340f, 0f);
 
-            VerticalLayoutGroup hbVlg = headerBanner.AddComponent<VerticalLayoutGroup>();
-            hbVlg.spacing = 0f;
-            hbVlg.padding = new RectOffset(6, 6, 2, 2);
-            hbVlg.childAlignment = TextAnchor.MiddleCenter;
-            hbVlg.childControlWidth = true;
-            hbVlg.childControlHeight = false;
-
-            TextMeshProUGUI headerSectorTmp = CreateTMPText(headerBanner.transform, "SectorTitle",
-                "<b>THE ASCOTT RESIDENCY</b>", 11.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-
-            TextMeshProUGUI headerFloorTmp = CreateTMPText(headerBanner.transform, "FloorSubtitle",
-                "<color=#f3e8ff>4TH FLOOR // RESIDENTIAL WING</color>", 9f, new Color(0.92f, 0.85f, 1.0f), TextAlignmentOptions.Center);
-
-            // --- MAP CANVAS VIEWPORT: 5x3 Square Grid & Compass ---
-            GameObject mapCanvas = new GameObject("MapCanvas", typeof(RectTransform));
-            mapCanvas.transform.SetParent(minimapCard.transform, false);
-            LayoutElement canvasLe = mapCanvas.AddComponent<LayoutElement>();
-            canvasLe.preferredHeight = 246f;
-            canvasLe.flexibleHeight = 1f;
-
-            Image canvasBg = mapCanvas.AddComponent<Image>();
-            canvasBg.color = new Color(0.04f, 0.05f, 0.08f, 0.98f);
-
-            // Compass Rose Overlay (Bottom-Right corner)
-            GameObject compassObj = new GameObject("CompassRose", typeof(RectTransform));
-            compassObj.transform.SetParent(mapCanvas.transform, false);
-            RectTransform compRect = compassObj.GetComponent<RectTransform>();
-            compRect.anchorMin = new Vector2(1f, 0f);
-            compRect.anchorMax = new Vector2(1f, 0f);
-            compRect.pivot = new Vector2(1f, 0f);
-            compRect.sizeDelta = new Vector2(56f, 56f);
-            compRect.anchoredPosition = new Vector2(-10f, 10f);
-
-            TextMeshProUGUI compTmp = CreateTMPText(compassObj.transform, "CompassText",
-                "  <color=#00e5ff><b>N ▲</b></color>\n<color=#64748b><b>W ◄  ► E</b></color>\n  <color=#64748b><b>S ▼</b></color>",
-                8.5f, new Color(0.60f, 0.70f, 0.82f), TextAlignmentOptions.Center, FontStyles.Bold);
-            compTmp.lineSpacing = -15f;
-            StretchFull(compTmp.rectTransform);
-
-            // Mode Toggle Overlay (Top-Right corner)
-            GameObject zoomObj = new GameObject("MapToggle", typeof(RectTransform));
-            zoomObj.transform.SetParent(mapCanvas.transform, false);
-            RectTransform zoomRect = zoomObj.GetComponent<RectTransform>();
-            zoomRect.anchorMin = new Vector2(1f, 1f);
-            zoomRect.anchorMax = new Vector2(1f, 1f);
-            zoomRect.pivot = new Vector2(1f, 1f);
-            zoomRect.sizeDelta = new Vector2(32f, 22f);
-            zoomRect.anchoredPosition = new Vector2(-10f, -8f);
-
-            Image zoomBg = zoomObj.AddComponent<Image>();
-            zoomBg.color = new Color(0.12f, 0.16f, 0.24f, 0.90f);
-            Outline zoomOl = zoomObj.AddComponent<Outline>();
-            zoomOl.effectColor = new Color(0.55f, 0.25f, 0.85f, 0.80f);
-            zoomOl.effectDistance = new Vector2(1f, -1f);
-
-            TextMeshProUGUI zoomTmp = CreateTMPText(zoomObj.transform, "ToggleText",
-                "<b>🔍 M</b>", 8f, new Color(0.85f, 0.75f, 1.0f), TextAlignmentOptions.Center);
-            StretchFull(zoomTmp.rectTransform);
-
-            // Central Floorplan Grid Root
-            GameObject rowsRoot = new GameObject("RowsRoot", typeof(RectTransform));
-            rowsRoot.transform.SetParent(mapCanvas.transform, false);
-            RectTransform rrRect = rowsRoot.GetComponent<RectTransform>();
-            StretchFull(rrRect);
-            rrRect.offsetMin = new Vector2(10f, 6f);
-            rrRect.offsetMax = new Vector2(-10f, -6f);
-
-            VerticalLayoutGroup rrVlg = rowsRoot.AddComponent<VerticalLayoutGroup>();
-            rrVlg.spacing = 0f;
-            rrVlg.childAlignment = TextAnchor.MiddleCenter;
-            rrVlg.childControlWidth = false;
-            rrVlg.childControlHeight = false;
-
-            float tileSize = 42f;
-            float hConnW = 18f;
-            float hConnH = 3f;
-            float vConnH = 9f;
-            float vConnW = 3f;
-
-            // Row 0: Unit 407 (Home) <==> Hall 1 <==> Unit 406 (Professor Locked)
-            CreateMapGridRowTiTS(mapCtrl, rowsRoot.transform,
-                "unit_407", "407", "RESIDENCE", tileSize,
-                "hallway_1", "H1", "NORTH", tileSize,
-                "unit_406", "406", "PROF", tileSize, hConnW, hConnH);
-            CreateVerticalHallwayConnectorTiTS(rowsRoot.transform, tileSize, hConnW, vConnW, vConnH);
-
-            // Row 1: Unit 405 (Hunter Locked) <==> Hall 2 <==> Unit 404 (Neighbor Barricaded)
-            CreateMapGridRowTiTS(mapCtrl, rowsRoot.transform,
-                "unit_405", "405", "HUNTER", tileSize,
-                "hallway_2", "H2", "MID-N", tileSize,
-                "unit_404", "404", "NEIGHB", tileSize, hConnW, hConnH);
-            CreateVerticalHallwayConnectorTiTS(rowsRoot.transform, tileSize, hConnW, vConnW, vConnH);
-
-            // Row 2: Unit 403 (Danger Smear) <==> Hall 3 <==> Unit 402 (Door Ajar)
-            CreateMapGridRowTiTS(mapCtrl, rowsRoot.transform,
-                "unit_403", "403", "HAZARD", tileSize,
-                "hallway_3", "H3", "MID-S", tileSize,
-                "unit_402", "402", "ENTRY", tileSize, hConnW, hConnH);
-            CreateVerticalHallwayConnectorTiTS(rowsRoot.transform, tileSize, hConnW, vConnW, vConnH);
-
-            // Row 3: Unit 401 (Apartment) <==> Hall 4 <==> Utility (Breaker Box)
-            CreateMapGridRowTiTS(mapCtrl, rowsRoot.transform,
-                "unit_401", "401", "APT 401", tileSize,
-                "hallway_4", "H4", "SOUTH", tileSize,
-                "utility", "UTIL", "MAINT", tileSize, hConnW, hConnH);
-            CreateVerticalHallwayConnectorTiTS(rowsRoot.transform, tileSize, hConnW, vConnW, vConnH);
-
-            // Row 4: Stairs (To 2nd Fl) <==> Hall End <==> East Wing (Collapsed Blocked)
-            CreateMapGridRowTiTS(mapCtrl, rowsRoot.transform,
-                "stairs", "STAIRS", "ESCAPE", tileSize,
-                "hallway_end", "EXIT", "FOYER", tileSize,
-                "empty_bot", "EAST", "BLOCK", tileSize, hConnW, hConnH,
-                isLeftStairs: true, isRightBlocked: true);
-
-            // --- FOOTER BANNER: Location Name (TiTS Solid Purple Banner) ---
-            GameObject footerBanner = new GameObject("FooterBanner", typeof(RectTransform));
-            footerBanner.transform.SetParent(minimapCard.transform, false);
-            LayoutElement fbLe = footerBanner.AddComponent<LayoutElement>();
-            fbLe.preferredHeight = 30f;
-
-            Image fbBg = footerBanner.AddComponent<Image>();
-            fbBg.color = new Color(0.45f, 0.12f, 0.75f, 0.98f);
-            Outline fbOl = footerBanner.AddComponent<Outline>();
-            fbOl.effectColor = new Color(0.70f, 0.30f, 0.95f, 0.85f);
-            fbOl.effectDistance = new Vector2(0f, 1f);
-
-            TextMeshProUGUI footerLocTmp = CreateTMPText(footerBanner.transform, "FooterLocation",
-                "<b>CURRENT LOCATION: UNIT 407 (YOUR RESIDENCE)</b>", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            TextMeshProUGUI footerLocTmp = CreateTMPText(bpSubBar.transform, "ActivePosBanner",
+                "<color=#00e5ff><b>PLAYER POS:</b> UNIT 407</color>",
+                8.5f, new Color(0.75f, 0.88f, 0.96f), TextAlignmentOptions.MidlineRight);
             StretchFull(footerLocTmp.rectTransform);
+            footerLocTmp.rectTransform.offsetMin = new Vector2(240f, 0f);
 
-            // --- SUB-FOOTER: Solar Days & Time Curfew ---
-            GameObject subFooterObj = new GameObject("SubFooter", typeof(RectTransform));
-            subFooterObj.transform.SetParent(minimapCard.transform, false);
-            LayoutElement sfLe = subFooterObj.AddComponent<LayoutElement>();
-            sfLe.preferredHeight = 20f;
-
-            TextMeshProUGUI subFooterTmp = CreateTMPText(subFooterObj.transform, "SubFooterText",
-                "<color=#64748b>SOLAR DAY 0 | TIME 23:49 | STATUS: EMERGENCY CURFEW</color>", 8.5f, new Color(0.55f, 0.65f, 0.75f), TextAlignmentOptions.Center);
-            StretchFull(subFooterTmp.rectTransform);
-
-            mapCtrl.BindMinimapBanners(headerSectorTmp, headerFloorTmp, footerLocTmp, subFooterTmp);
+            mapCtrl.BindBlueprintBanners(coordBannerTmp, footerLocTmp, gridOverlayImg);
 
             // =========================================================================
-            // RIGHT COLUMN: TACTICAL RECON INTEL & SECTOR SCANNER DOSSIER (720px)
+            // 3. CONTIGUOUS FLOORPLAN CANVAS (616x274 centered inside BlueprintViewport)
+            // =========================================================================
+            GameObject fpCanvas = new GameObject("FloorplanCanvas", typeof(RectTransform));
+            fpCanvas.transform.SetParent(bpViewport.transform, false);
+            RectTransform fpRect = fpCanvas.GetComponent<RectTransform>();
+            fpRect.anchorMin = new Vector2(0.5f, 0.5f);
+            fpRect.anchorMax = new Vector2(0.5f, 0.5f);
+            fpRect.pivot = new Vector2(0.5f, 0.5f);
+            fpRect.anchoredPosition = new Vector2(0f, 2f);
+            fpRect.sizeDelta = new Vector2(616f, 274f);
+
+            // Outer Structural Wing Perimeter Wall
+            GameObject perimeterObj = new GameObject("StructuralPerimeter", typeof(RectTransform));
+            perimeterObj.transform.SetParent(fpCanvas.transform, false);
+            RectTransform perimRect = perimeterObj.GetComponent<RectTransform>();
+            perimRect.anchorMin = new Vector2(0.5f, 0.5f);
+            perimRect.anchorMax = new Vector2(0.5f, 0.5f);
+            perimRect.pivot = new Vector2(0.5f, 0.5f);
+            perimRect.anchoredPosition = Vector2.zero;
+            perimRect.sizeDelta = new Vector2(604f, 266f);
+            Image perimBg = perimeterObj.AddComponent<Image>();
+            perimBg.color = new Color(0.02f, 0.035f, 0.06f, 0.94f);
+            perimBg.raycastTarget = false;
+            Outline perimOl = perimeterObj.AddComponent<Outline>();
+            perimOl.effectColor = new Color(0.22f, 0.40f, 0.58f, 0.90f);
+            perimOl.effectDistance = new Vector2(1.5f, -1.5f);
+
+            // Central Spine Corridor Continuous Structural Shaft
+            GameObject spineShaft = new GameObject("CentralCorridorShaft", typeof(RectTransform));
+            spineShaft.transform.SetParent(fpCanvas.transform, false);
+            RectTransform ssRect = spineShaft.GetComponent<RectTransform>();
+            ssRect.anchorMin = new Vector2(0.5f, 0.5f);
+            ssRect.anchorMax = new Vector2(0.5f, 0.5f);
+            ssRect.pivot = new Vector2(0.5f, 0.5f);
+            ssRect.anchoredPosition = Vector2.zero;
+            ssRect.sizeDelta = new Vector2(132f, 258f);
+            Image ssBg = spineShaft.AddComponent<Image>();
+            ssBg.color = new Color(0.035f, 0.055f, 0.09f, 0.96f);
+            ssBg.raycastTarget = false;
+            Outline ssOl = spineShaft.AddComponent<Outline>();
+            ssOl.effectColor = new Color(0.18f, 0.32f, 0.46f, 0.75f);
+            ssOl.effectDistance = new Vector2(1f, -1f);
+
+            // 5 Contiguous Floorplan Rows (y = +104, +52, 0, -52, -104)
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 104f,
+                "unit_407", "UNIT 407", "SAFEHOUSE",
+                "hallway_1", "CORRIDOR N", "NORTH SPINE",
+                "unit_406", "UNIT 406", "PROFESSOR",
+                hasSouthCorridorLink: true);
+
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 52f,
+                "unit_405", "UNIT 405", "HUNTER'S APT",
+                "hallway_2", "CORRIDOR MN", "MID-NORTH",
+                "unit_404", "UNIT 404", "BARRICADED",
+                hasSouthCorridorLink: true);
+
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 0f,
+                "unit_403", "UNIT 403", "BIOHAZARD",
+                "hallway_3", "CORRIDOR MS", "MID-SOUTH",
+                "unit_402", "UNIT 402", "DOOR AJAR",
+                hasSouthCorridorLink: true);
+
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -52f,
+                "unit_401", "UNIT 401", "RESIDENCE",
+                "hallway_4", "CORRIDOR S", "SOUTH SPINE",
+                "utility", "UTILITY BAY", "MAINTENANCE",
+                hasSouthCorridorLink: true);
+
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -104f,
+                "stairs", "STAIRWELL W", "DESCEND 2F",
+                "hallway_end", "STAIR FOYER", "SOUTH END",
+                "empty_bot", "EAST WING", "COLLAPSED",
+                hasSouthCorridorLink: false);
+
+            // Bottom Clearance Legend Strip (Bottom 22px inside BlueprintViewport)
+            GameObject legendBar = new GameObject("LegendBar", typeof(RectTransform));
+            legendBar.transform.SetParent(bpViewport.transform, false);
+            RectTransform lbRect = legendBar.GetComponent<RectTransform>();
+            lbRect.anchorMin = new Vector2(0f, 0f);
+            lbRect.anchorMax = new Vector2(1f, 0f);
+            lbRect.pivot = new Vector2(0.5f, 0f);
+            lbRect.offsetMin = new Vector2(10f, 3f);
+            lbRect.offsetMax = new Vector2(-10f, 23f);
+
+            TextMeshProUGUI legendTmp = CreateTMPText(legendBar.transform, "LegendText",
+                "<color=#00e5ff>■</color> CURRENT SECTOR     <color=#14b87a>■</color> CLEARED / OPEN     <color=#f59e0b>■</color> LOCKED     <color=#f43f5e>■</color> BIOHAZARD / BLOCKED     <color=#64748b>■</color> COLLAPSED",
+                8f, new Color(0.65f, 0.76f, 0.86f), TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(legendTmp.rectTransform);
+
+            // =========================================================================
+            // 4. RIGHT COLUMN: BIO-RADAR & RECON DOSSIER (533px wide x 342px tall)
             // =========================================================================
             GameObject intelCard = new GameObject("IntelCard", typeof(RectTransform));
-            intelCard.transform.SetParent(mapContainer.transform, false);
-            LayoutElement icLe = intelCard.AddComponent<LayoutElement>();
-            icLe.flexibleWidth = 1f;
-            icLe.flexibleHeight = 1f;
+            intelCard.transform.SetParent(pMapObj.transform, false);
+            RectTransform icRect = intelCard.GetComponent<RectTransform>();
+            icRect.anchorMin = new Vector2(0f, 0f);
+            icRect.anchorMax = new Vector2(1f, 1f);
+            icRect.pivot = new Vector2(1f, 0.5f);
+            icRect.offsetMin = new Vector2(660f, 0f);
+            icRect.offsetMax = new Vector2(0f, -30f);
 
             Image icBg = intelCard.AddComponent<Image>();
-            icBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
+            icBg.color = new Color(0.03f, 0.05f, 0.09f, 0.98f);
             Outline icOl = intelCard.AddComponent<Outline>();
-            icOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.85f);
+            icOl.effectColor = new Color(0.16f, 0.30f, 0.45f, 0.90f);
             icOl.effectDistance = new Vector2(1f, -1f);
 
-            VerticalLayoutGroup icVlg = intelCard.AddComponent<VerticalLayoutGroup>();
-            icVlg.spacing = 6f;
-            icVlg.padding = new RectOffset(16, 16, 12, 12);
-            icVlg.childControlWidth = true;
-            icVlg.childControlHeight = false;
+            // Dossier Top Badge (y: -6 to -28)
+            GameObject dosBadge = new GameObject("DossierHeader", typeof(RectTransform));
+            dosBadge.transform.SetParent(intelCard.transform, false);
+            RectTransform dbRect = dosBadge.GetComponent<RectTransform>();
+            dbRect.anchorMin = new Vector2(0f, 1f);
+            dbRect.anchorMax = new Vector2(1f, 1f);
+            dbRect.pivot = new Vector2(0.5f, 1f);
+            dbRect.offsetMin = new Vector2(12f, -28f);
+            dbRect.offsetMax = new Vector2(-12f, -6f);
+            Image dbBg = dosBadge.AddComponent<Image>();
+            dbBg.color = new Color(0.06f, 0.10f, 0.16f, 0.96f);
+            TextMeshProUGUI dbTxt = CreateTMPText(dosBadge.transform, "Text",
+                "BIO-RADAR & RECON DOSSIER // SECTOR TELEMETRY",
+                9.5f, new Color(0.95f, 0.55f, 0.15f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            StretchFull(dbTxt.rectTransform);
+            dbTxt.rectTransform.offsetMin = new Vector2(10f, 0f);
+            dbTxt.rectTransform.offsetMax = new Vector2(-10f, 0f);
 
-            CreateSectionBadge(intelCard.transform, "TACTICAL RECON // SECTOR SCANNER");
+            // Sector Title & Procedural Icon Row (y: -34 to -58)
+            GameObject titleRow = new GameObject("SectorTitleRow", typeof(RectTransform));
+            titleRow.transform.SetParent(intelCard.transform, false);
+            RectTransform trRect = titleRow.GetComponent<RectTransform>();
+            trRect.anchorMin = new Vector2(0f, 1f);
+            trRect.anchorMax = new Vector2(1f, 1f);
+            trRect.pivot = new Vector2(0.5f, 1f);
+            trRect.offsetMin = new Vector2(14f, -58f);
+            trRect.offsetMax = new Vector2(-14f, -34f);
 
-            TextMeshProUGUI intelTitleTmp = CreateTMPText(intelCard.transform, "IntelSectorTitle",
-                "■ <b>UNIT 407 // YOUR RESIDENCE</b>", 13.5f, new Color(0.0f, 0.90f, 1.0f), TextAlignmentOptions.Left, FontStyles.Bold);
+            GameObject hdrIconObj = new GameObject("HeaderIcon", typeof(RectTransform));
+            hdrIconObj.transform.SetParent(titleRow.transform, false);
+            RectTransform hiRect = hdrIconObj.GetComponent<RectTransform>();
+            hiRect.anchorMin = new Vector2(0f, 0.5f);
+            hiRect.anchorMax = new Vector2(0f, 0.5f);
+            hiRect.pivot = new Vector2(0f, 0.5f);
+            hiRect.anchoredPosition = Vector2.zero;
+            hiRect.sizeDelta = new Vector2(20f, 20f);
+            Image hdrIconImg = hdrIconObj.AddComponent<Image>();
+            hdrIconImg.sprite = TacticalMapViewController.GetRoomIconSprite(TacticalMapViewController.RoomIconType.Home);
+            hdrIconImg.color = new Color(0.0f, 0.90f, 1.0f);
+            hdrIconImg.preserveAspect = true;
 
-            GameObject statusRow = new GameObject("StatusRow", typeof(RectTransform));
-            statusRow.transform.SetParent(intelCard.transform, false);
-            HorizontalLayoutGroup srHlg = statusRow.AddComponent<HorizontalLayoutGroup>();
-            srHlg.spacing = 16f;
-            srHlg.childControlWidth = false;
-            srHlg.childControlHeight = false;
+            TextMeshProUGUI intelTitleTmp = CreateTMPText(titleRow.transform, "IntelSectorTitle",
+                "<b>UNIT 407 // YOUR RESIDENCE</b>",
+                13f, new Color(0.0f, 0.90f, 1.0f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            StretchFull(intelTitleTmp.rectTransform);
+            intelTitleTmp.rectTransform.offsetMin = new Vector2(28f, 0f);
 
-            TextMeshProUGUI intelStatusTmp = CreateTMPText(statusRow.transform, "StatusTag",
-                "<color=#00e5ff><b>[ CURRENT LOCATION ]</b></color>", 11f, Color.white);
-            intelStatusTmp.rectTransform.sizeDelta = new Vector2(180f, 20f);
+            // Clearance Status Pill (y: -60 to -78)
+            TextMeshProUGUI intelStatusTmp = CreateTMPText(intelCard.transform, "StatusTag",
+                "<color=#00e5ff><b>[ CURRENT SECTOR ]</b></color>",
+                9.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform stRect = intelStatusTmp.rectTransform;
+            stRect.anchorMin = new Vector2(0f, 1f);
+            stRect.anchorMax = new Vector2(1f, 1f);
+            stRect.pivot = new Vector2(0.5f, 1f);
+            stRect.offsetMin = new Vector2(14f, -78f);
+            stRect.offsetMax = new Vector2(-14f, -60f);
 
-            TextMeshProUGUI intelThreatTmp = CreateTMPText(statusRow.transform, "ThreatLevel",
-                "THREAT LEVEL: <color=#2ecc71><b>MINIMAL</b></color>", 11f, new Color(0.75f, 0.78f, 0.84f));
-            intelThreatTmp.rectTransform.sizeDelta = new Vector2(180f, 20f);
+            // 3-Metric Telemetry Grid Card (y: -82 to -152, height: 70px)
+            GameObject metricsCard = new GameObject("TelemetryMetricsCard", typeof(RectTransform));
+            metricsCard.transform.SetParent(intelCard.transform, false);
+            RectTransform mcRect = metricsCard.GetComponent<RectTransform>();
+            mcRect.anchorMin = new Vector2(0f, 1f);
+            mcRect.anchorMax = new Vector2(1f, 1f);
+            mcRect.pivot = new Vector2(0.5f, 1f);
+            mcRect.offsetMin = new Vector2(14f, -152f);
+            mcRect.offsetMax = new Vector2(-14f, -82f);
+            Image mcBg = metricsCard.AddComponent<Image>();
+            mcBg.color = new Color(0.02f, 0.032f, 0.055f, 0.96f);
+            Outline mcOl = metricsCard.AddComponent<Outline>();
+            mcOl.effectColor = new Color(0.14f, 0.24f, 0.36f, 0.85f);
+            mcOl.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI intelScavengeTmp = CreateTMPText(intelCard.transform, "ScavengeTarget",
-                "RECON TARGET: <color=#f39c12><b>LOOTED / SECURED</b></color>", 11f, new Color(0.75f, 0.78f, 0.84f));
+            TextMeshProUGUI intelThreatTmp = CreateTMPText(metricsCard.transform, "ThreatMetric",
+                "<color=#64748b>THREAT:</color> <color=#2ecc71><b>ZERO</b></color>",
+                9.5f, new Color(0.82f, 0.88f, 0.95f), TextAlignmentOptions.MidlineLeft);
+            intelThreatTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
+            intelThreatTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
+            intelThreatTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
+            intelThreatTmp.rectTransform.offsetMin = new Vector2(10f, -24f);
+            intelThreatTmp.rectTransform.offsetMax = new Vector2(-10f, -4f);
 
-            CreateDivider(intelCard.transform);
+            TextMeshProUGUI intelScavengeTmp = CreateTMPText(metricsCard.transform, "ScavengeMetric",
+                "<color=#64748b>SALVAGE:</color> <color=#f39c12><b>DEPLETED / SECURED</b></color>",
+                9.5f, new Color(0.82f, 0.88f, 0.95f), TextAlignmentOptions.MidlineLeft);
+            intelScavengeTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
+            intelScavengeTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
+            intelScavengeTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
+            intelScavengeTmp.rectTransform.offsetMin = new Vector2(10f, -45f);
+            intelScavengeTmp.rectTransform.offsetMax = new Vector2(-10f, -25f);
 
-            CreateTMPText(intelCard.transform, "NotesHeader",
-                "SURVIVOR RECON INTEL & SENSORY OBSERVATIONS:", 9f, new Color(0.55f, 0.60f, 0.68f), TextAlignmentOptions.Left, FontStyles.Bold);
+            TextMeshProUGUI intelAcousticTmp = CreateTMPText(metricsCard.transform, "AcousticMetric",
+                "<color=#64748b>AUDIO:</color> <color=#38bdf8><b>60Hz TV STATIC HUM</b></color>",
+                9.5f, new Color(0.82f, 0.88f, 0.95f), TextAlignmentOptions.MidlineLeft);
+            intelAcousticTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
+            intelAcousticTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
+            intelAcousticTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
+            intelAcousticTmp.rectTransform.offsetMin = new Vector2(10f, -66f);
+            intelAcousticTmp.rectTransform.offsetMax = new Vector2(-10f, -46f);
 
-            TextMeshProUGUI intelDescTmp = CreateTMPText(intelCard.transform, "IntelDescription",
-                "Your residential unit. Living room television flickers with emergency static. The heavy deadbolt held during the initial breach. Hallway corridor exit door is directly ahead.",
-                11.5f, new Color(0.78f, 0.86f, 0.95f));
-            intelDescTmp.lineSpacing = 4f;
-            LayoutElement idLe = intelDescTmp.gameObject.AddComponent<LayoutElement>();
-            idLe.preferredHeight = 75f;
+            // Architectural & Recon Notes Header (y: -156 to -172)
+            TextMeshProUGUI notesHdrTmp = CreateTMPText(intelCard.transform, "NotesHeader",
+                "ARCHITECTURAL & RECON NOTES:",
+                8.5f, new Color(0.45f, 0.58f, 0.72f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            notesHdrTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
+            notesHdrTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
+            notesHdrTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
+            notesHdrTmp.rectTransform.offsetMin = new Vector2(14f, -172f);
+            notesHdrTmp.rectTransform.offsetMax = new Vector2(-14f, -156f);
 
-            GameObject exitBar = new GameObject("ExitDoorPrompt", typeof(RectTransform));
-            exitBar.transform.SetParent(intelCard.transform, false);
-            Image ebBg = exitBar.AddComponent<Image>();
-            ebBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
-            Outline ebOl = exitBar.AddComponent<Outline>();
-            ebOl.effectColor = new Color(0.95f, 0.48f, 0.12f, 0.75f);
-            ebOl.effectDistance = new Vector2(1f, -1f);
-            LayoutElement ebLe = exitBar.AddComponent<LayoutElement>();
-            ebLe.preferredHeight = 36f;
+            // Recon Description Card (y: -174 to -252, height: 78px)
+            GameObject descBox = new GameObject("ReconDescriptionBox", typeof(RectTransform));
+            descBox.transform.SetParent(intelCard.transform, false);
+            RectTransform dbxRect = descBox.GetComponent<RectTransform>();
+            dbxRect.anchorMin = new Vector2(0f, 1f);
+            dbxRect.anchorMax = new Vector2(1f, 1f);
+            dbxRect.pivot = new Vector2(0.5f, 1f);
+            dbxRect.offsetMin = new Vector2(14f, -252f);
+            dbxRect.offsetMax = new Vector2(-14f, -174f);
+            Image dbxBg = descBox.AddComponent<Image>();
+            dbxBg.color = new Color(0.02f, 0.032f, 0.055f, 0.96f);
+            Outline dbxOl = descBox.AddComponent<Outline>();
+            dbxOl.effectColor = new Color(0.14f, 0.24f, 0.36f, 0.85f);
+            dbxOl.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI ebTmp = CreateTMPText(exitBar.transform, "PromptText",
-                "<color=#00e5ff>▶</color> <color=#ffffff><b>YOU ARE HERE.</b> Use [W/A/S/D] or click adjacent highlighted rooms to navigate.</color>",
-                10.5f, new Color(0.85f, 0.88f, 0.95f), TextAlignmentOptions.Center);
-            StretchFull(ebTmp.rectTransform);
-            ebTmp.rectTransform.offsetMin = new Vector2(10f, 0f);
-            ebTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
+            TextMeshProUGUI intelDescTmp = CreateTMPText(descBox.transform, "IntelDescription",
+                "Your 4th-floor studio apartment. The heavy steel deadbolt held through the initial wave of sirens.",
+                10f, new Color(0.78f, 0.86f, 0.95f), TextAlignmentOptions.TopLeft);
+            intelDescTmp.lineSpacing = 3f;
+            StretchFull(intelDescTmp.rectTransform);
+            intelDescTmp.rectTransform.offsetMin = new Vector2(10f, 6f);
+            intelDescTmp.rectTransform.offsetMax = new Vector2(-10f, -6f);
 
-            mapCtrl.BindIntelReferences(intelTitleTmp, intelStatusTmp, intelThreatTmp, intelScavengeTmp, intelDescTmp, ebTmp);
+            // Interactive Transit Action Button (y: -258 to -296, height: 38px)
+            GameObject transitBtnObj = new GameObject("TransitActionButton", typeof(RectTransform));
+            transitBtnObj.transform.SetParent(intelCard.transform, false);
+            RectTransform tboRect = transitBtnObj.GetComponent<RectTransform>();
+            tboRect.anchorMin = new Vector2(0f, 1f);
+            tboRect.anchorMax = new Vector2(1f, 1f);
+            tboRect.pivot = new Vector2(0.5f, 1f);
+            tboRect.offsetMin = new Vector2(14f, -296f);
+            tboRect.offsetMax = new Vector2(-14f, -258f);
+
+            Image transitBg = transitBtnObj.AddComponent<Image>();
+            transitBg.color = new Color(0.06f, 0.14f, 0.18f, 0.95f);
+            Outline transitOl = transitBtnObj.AddComponent<Outline>();
+            transitOl.effectColor = new Color(0.0f, 0.78f, 0.95f, 0.85f);
+            transitOl.effectDistance = new Vector2(1f, -1f);
+
+            Button transitBtn = transitBtnObj.AddComponent<Button>();
+            transitBtn.targetGraphic = transitBg;
+
+            TextMeshProUGUI transitTxt = CreateTMPText(transitBtnObj.transform, "ButtonText",
+                "<color=#00e5ff><b>[ CURRENTLY OCCUPYING SAFEHOUSE 407 ]</b></color>",
+                10f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(transitTxt.rectTransform);
+
+            // Quick-Nav Telemetry Footer (y: -302 to -334, height: 32px)
+            GameObject navFooter = new GameObject("QuickNavFooter", typeof(RectTransform));
+            navFooter.transform.SetParent(intelCard.transform, false);
+            RectTransform nfRect = navFooter.GetComponent<RectTransform>();
+            nfRect.anchorMin = new Vector2(0f, 1f);
+            nfRect.anchorMax = new Vector2(1f, 1f);
+            nfRect.pivot = new Vector2(0.5f, 1f);
+            nfRect.offsetMin = new Vector2(14f, -334f);
+            nfRect.offsetMax = new Vector2(-14f, -302f);
+            Image nfBg = navFooter.AddComponent<Image>();
+            nfBg.color = new Color(0.04f, 0.06f, 0.10f, 0.95f);
+
+            TextMeshProUGUI quickNavTmp = CreateTMPText(navFooter.transform, "PromptText",
+                "<color=#00e5ff><b>[RADAR LOCK]</b></color> Occupying this sector. Use <b>[W/A/S/D]</b> or click adjacent sectors to move.",
+                8.5f, new Color(0.75f, 0.84f, 0.92f), TextAlignmentOptions.Center);
+            StretchFull(quickNavTmp.rectTransform);
+            quickNavTmp.rectTransform.offsetMin = new Vector2(8f, 0f);
+            quickNavTmp.rectTransform.offsetMax = new Vector2(-8f, 0f);
+
+            mapCtrl.BindIntelReferences(hdrIconImg, intelTitleTmp, intelStatusTmp,
+                intelThreatTmp, intelScavengeTmp, intelAcousticTmp, intelDescTmp,
+                quickNavTmp, transitBtn, transitBg, transitTxt);
+
             return mapCtrl;
         }
 
-        private static void CreateMapGridRowTiTS(TacticalMapViewController mapCtrl, Transform parent,
-            string leftId, string leftCode, string leftLabel, float tileSize,
-            string hallId, string hallCode, string hallLabel, float hallSize,
-            string rightId, string rightCode, string rightLabel, float rightSize,
-            float connW, float connH,
-            bool isLeftStairs = false, bool isRightBlocked = false)
+        private static void CreateBlueprintFloorRow(TacticalMapViewController mapCtrl, Transform canvasParent, float yPos,
+            string leftId, string leftCode, string leftSub,
+            string hallId, string hallCode, string hallSub,
+            string rightId, string rightCode, string rightSub,
+            bool hasSouthCorridorLink)
         {
-            GameObject rowObj = new GameObject("Row_" + leftId + "_" + rightId, typeof(RectTransform));
-            rowObj.transform.SetParent(parent, false);
-            HorizontalLayoutGroup hlg = rowObj.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 0f;
-            hlg.childAlignment = TextAnchor.MiddleCenter;
-            hlg.childControlWidth = false;
-            hlg.childControlHeight = false;
+            // Left Wing Doorway Threshold Tick (at x = -74, y = yPos)
+            Image leftDoorTick = CreateDoorwayThreshold(canvasParent, "Door_" + leftId, new Vector2(-74f, yPos), new Vector2(24f, 5f));
 
-            CreateMapNodeTiTS(mapCtrl, rowObj.transform, leftId, leftCode, leftLabel, tileSize, isStairs: isLeftStairs);
-            CreateConnectorLineTiTS(rowObj.transform, connW, connH);
-            CreateMapNodeTiTS(mapCtrl, rowObj.transform, hallId, hallCode, hallLabel, hallSize, isHallway: true);
-            CreateConnectorLineTiTS(rowObj.transform, connW, connH);
-            CreateMapNodeTiTS(mapCtrl, rowObj.transform, rightId, rightCode, rightLabel, rightSize, isBlocked: isRightBlocked);
+            // Right Wing Doorway Threshold Tick (at x = +74, y = yPos)
+            Image rightDoorTick = CreateDoorwayThreshold(canvasParent, "Door_" + rightId, new Vector2(74f, yPos), new Vector2(24f, 5f));
+
+            // Corridor South Archway Tick (at x = 0, y = yPos - 26)
+            Image hallDoorTick = null;
+            if (hasSouthCorridorLink)
+            {
+                hallDoorTick = CreateDoorwayThreshold(canvasParent, "Arch_" + hallId, new Vector2(0f, yPos - 26f), new Vector2(28f, 4f));
+            }
+
+            // Left Wing Room Module (x = -196, size = 220 x 48)
+            CreateBlueprintRoomNode(mapCtrl, canvasParent, leftId, leftCode, leftSub,
+                new Vector2(-196f, yPos), new Vector2(220f, 48f), isHallway: false, doorTickImg: leftDoorTick);
+
+            // Central Spine Corridor Module (x = 0, size = 124 x 48)
+            CreateBlueprintRoomNode(mapCtrl, canvasParent, hallId, hallCode, hallSub,
+                new Vector2(0f, yPos), new Vector2(124f, 48f), isHallway: true, doorTickImg: hallDoorTick);
+
+            // Right Wing Room Module (x = +196, size = 220 x 48)
+            CreateBlueprintRoomNode(mapCtrl, canvasParent, rightId, rightCode, rightSub,
+                new Vector2(196f, yPos), new Vector2(220f, 48f), isHallway: false, doorTickImg: rightDoorTick);
         }
 
-        private static void CreateMapNodeTiTS(TacticalMapViewController mapCtrl, Transform parent,
-            string id, string code, string label, float size,
-            bool isHallway = false, bool isStairs = false, bool isBlocked = false)
+        private static Image CreateDoorwayThreshold(Transform parent, string name, Vector2 pos, Vector2 size)
+        {
+            GameObject frameObj = new GameObject(name, typeof(RectTransform));
+            frameObj.transform.SetParent(parent, false);
+            RectTransform fRect = frameObj.GetComponent<RectTransform>();
+            fRect.anchorMin = new Vector2(0.5f, 0.5f);
+            fRect.anchorMax = new Vector2(0.5f, 0.5f);
+            fRect.pivot = new Vector2(0.5f, 0.5f);
+            fRect.anchoredPosition = pos;
+            fRect.sizeDelta = new Vector2(size.x, size.y + 4f);
+
+            Image frameBg = frameObj.AddComponent<Image>();
+            frameBg.color = new Color(0.02f, 0.03f, 0.05f, 0.95f);
+            frameBg.raycastTarget = false;
+
+            GameObject tickObj = new GameObject("Tick", typeof(RectTransform));
+            tickObj.transform.SetParent(frameObj.transform, false);
+            RectTransform tRect = tickObj.GetComponent<RectTransform>();
+            tRect.anchorMin = new Vector2(0.5f, 0.5f);
+            tRect.anchorMax = new Vector2(0.5f, 0.5f);
+            tRect.pivot = new Vector2(0.5f, 0.5f);
+            tRect.anchoredPosition = Vector2.zero;
+            tRect.sizeDelta = size;
+
+            Image tickImg = tickObj.AddComponent<Image>();
+            tickImg.color = new Color(0.24f, 0.42f, 0.58f, 0.90f);
+            tickImg.raycastTarget = false;
+            return tickImg;
+        }
+
+        private static void CreateBlueprintRoomNode(TacticalMapViewController mapCtrl, Transform parent,
+            string id, string code, string subLabel, Vector2 pos, Vector2 size,
+            bool isHallway, Image doorTickImg)
         {
             GameObject nodeObj = new GameObject("Node_" + id, typeof(RectTransform));
             nodeObj.transform.SetParent(parent, false);
             RectTransform nRect = nodeObj.GetComponent<RectTransform>();
-            nRect.sizeDelta = new Vector2(size, size);
+            nRect.anchorMin = new Vector2(0.5f, 0.5f);
+            nRect.anchorMax = new Vector2(0.5f, 0.5f);
+            nRect.pivot = new Vector2(0.5f, 0.5f);
+            nRect.anchoredPosition = pos;
+            nRect.sizeDelta = size;
 
             Image bg = nodeObj.AddComponent<Image>();
-            bg.color = new Color(0.08f, 0.11f, 0.16f, 0.95f);
-
-            // Diagonal Hatched Overlay (For blocked or locked rooms)
-            GameObject hatchObj = new GameObject("HatchedOverlay", typeof(RectTransform));
-            hatchObj.transform.SetParent(nodeObj.transform, false);
-            RectTransform hRect = hatchObj.GetComponent<RectTransform>();
-            StretchFull(hRect);
-            Image hatchImg = hatchObj.AddComponent<Image>();
-            hatchImg.color = new Color(1f, 1f, 1f, 0.85f);
-            hatchImg.raycastTarget = false;
-            hatchObj.SetActive(false);
+            bg.color = new Color(0.05f, 0.08f, 0.12f, 0.96f);
 
             Outline ol = nodeObj.AddComponent<Outline>();
-            ol.effectColor = new Color(0.20f, 0.25f, 0.35f, 0.85f);
+            ol.effectColor = new Color(0.20f, 0.34f, 0.48f, 0.85f);
             ol.effectDistance = new Vector2(1f, -1f);
 
             Button btn = nodeObj.AddComponent<Button>();
             btn.targetGraphic = bg;
 
-            // Content Container
-            GameObject content = new GameObject("Content", typeof(RectTransform));
-            content.transform.SetParent(nodeObj.transform, false);
-            RectTransform cRect = content.GetComponent<RectTransform>();
-            StretchFull(cRect);
-            VerticalLayoutGroup vlg = content.AddComponent<VerticalLayoutGroup>();
-            vlg.spacing = 0f;
-            vlg.padding = new RectOffset(1, 1, 3, 2);
-            vlg.childAlignment = TextAnchor.MiddleCenter;
-            vlg.childControlWidth = true;
-            vlg.childControlHeight = false;
+            // Procedural Pattern Overlay (Hatched locked/hazard stripes or stair treads)
+            GameObject patObj = new GameObject("PatternOverlay", typeof(RectTransform));
+            patObj.transform.SetParent(nodeObj.transform, false);
+            StretchFull(patObj.GetComponent<RectTransform>());
+            Image patImg = patObj.AddComponent<Image>();
+            patImg.type = Image.Type.Tiled;
+            patImg.color = new Color(1f, 1f, 1f, 0.25f);
+            patImg.raycastTarget = false;
+            patObj.SetActive(false);
 
-            TextMeshProUGUI codeTmp = CreateTMPText(content.transform, "Code", code,
-                isHallway ? 8.5f : 9.5f, new Color(0.75f, 0.86f, 0.95f), TextAlignmentOptions.Center, FontStyles.Bold);
+            // Procedural Vector Room Icon (15x15 on left)
+            GameObject iconObj = new GameObject("Icon", typeof(RectTransform));
+            iconObj.transform.SetParent(nodeObj.transform, false);
+            RectTransform icRect = iconObj.GetComponent<RectTransform>();
+            icRect.anchorMin = new Vector2(0f, 0.5f);
+            icRect.anchorMax = new Vector2(0f, 0.5f);
+            icRect.pivot = new Vector2(0f, 0.5f);
+            icRect.anchoredPosition = new Vector2(isHallway ? 6f : 8f, isHallway ? 6f : 0f);
+            icRect.sizeDelta = isHallway ? new Vector2(12f, 12f) : new Vector2(16f, 16f);
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
 
-            TextMeshProUGUI lblTmp = CreateTMPText(content.transform, "Label", label,
-                7f, new Color(0.50f, 0.60f, 0.70f), TextAlignmentOptions.Center);
+            // Room Code Label (Top Line)
+            TextMeshProUGUI codeTmp = CreateTMPText(nodeObj.transform, "Code", code,
+                isHallway ? 8.5f : 10f,
+                new Color(0.82f, 0.92f, 0.98f),
+                isHallway ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft,
+                FontStyles.Bold);
+            RectTransform cRect = codeTmp.rectTransform;
+            cRect.anchorMin = new Vector2(0f, 0.5f);
+            cRect.anchorMax = new Vector2(1f, 1f);
+            cRect.offsetMin = new Vector2(isHallway ? 4f : 28f, -1f);
+            cRect.offsetMax = new Vector2(isHallway ? -4f : -48f, -3f);
 
-            // Directional Nav Badge [W], [A], [S], [D] (TiTS Style)
-            GameObject badgeObj = new GameObject("NavBadge", typeof(RectTransform));
-            badgeObj.transform.SetParent(nodeObj.transform, false);
-            RectTransform bRect = badgeObj.GetComponent<RectTransform>();
-            bRect.anchorMin = new Vector2(0.5f, 1f);
-            bRect.anchorMax = new Vector2(0.5f, 1f);
-            bRect.pivot = new Vector2(0.5f, 0.5f);
-            bRect.sizeDelta = new Vector2(18f, 14f);
-            bRect.anchoredPosition = new Vector2(0f, 2f);
+            // Sub-Label / Clearance Readout (Bottom Line)
+            TextMeshProUGUI subTmp = CreateTMPText(nodeObj.transform, "SubLabel", subLabel,
+                isHallway ? 7f : 8f,
+                new Color(0.52f, 0.68f, 0.78f),
+                isHallway ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft);
+            RectTransform sRect = subTmp.rectTransform;
+            sRect.anchorMin = new Vector2(0f, 0f);
+            sRect.anchorMax = new Vector2(1f, 0.5f);
+            sRect.offsetMin = new Vector2(isHallway ? 4f : 28f, 3f);
+            sRect.offsetMax = new Vector2(isHallway ? -4f : -48f, 1f);
 
-            Image bBg = badgeObj.AddComponent<Image>();
-            bBg.color = new Color(0.55f, 0.14f, 0.75f, 0.98f);
-            Outline bOl = badgeObj.AddComponent<Outline>();
-            bOl.effectColor = new Color(0.85f, 0.45f, 1.0f, 0.95f);
-            bOl.effectDistance = new Vector2(1f, -1f);
+            // Navigation Keybind Pill Badge (Top-Right Corner, e.g. [D], [W], [S])
+            GameObject navBadge = new GameObject("NavBadge", typeof(RectTransform));
+            navBadge.transform.SetParent(nodeObj.transform, false);
+            RectTransform nbRect = navBadge.GetComponent<RectTransform>();
+            nbRect.anchorMin = new Vector2(1f, 1f);
+            nbRect.anchorMax = new Vector2(1f, 1f);
+            nbRect.pivot = new Vector2(1f, 1f);
+            nbRect.anchoredPosition = new Vector2(-4f, -4f);
+            nbRect.sizeDelta = new Vector2(36f, 14f);
+            Image nbBg = navBadge.AddComponent<Image>();
+            nbBg.color = new Color(0.04f, 0.14f, 0.18f, 0.95f);
+            nbBg.raycastTarget = false;
+            Outline nbOl = navBadge.AddComponent<Outline>();
+            nbOl.effectColor = new Color(0.18f, 0.85f, 0.55f, 0.80f);
+            nbOl.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI bTxt = CreateTMPText(badgeObj.transform, "KeyText", "W", 8.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-            StretchFull(bTxt.rectTransform);
-            badgeObj.SetActive(false);
+            TextMeshProUGUI navTmp = CreateTMPText(navBadge.transform, "NavText", "[D]",
+                7.5f, new Color(0.25f, 0.95f, 0.65f), TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(navTmp.rectTransform);
+            navBadge.SetActive(false);
 
-            // Beacon Halo for Player
+            // Player Bio-Signal Beacon (Bottom-Right Corner on Current Room)
             GameObject beacon = new GameObject("Beacon", typeof(RectTransform));
             beacon.transform.SetParent(nodeObj.transform, false);
-            RectTransform beaconRect = beacon.GetComponent<RectTransform>();
-            beaconRect.anchorMin = new Vector2(0.5f, 0f);
-            beaconRect.anchorMax = new Vector2(0.5f, 0f);
-            beaconRect.pivot = new Vector2(0.5f, 0.5f);
-            beaconRect.sizeDelta = new Vector2(36f, 10f);
-            beaconRect.anchoredPosition = new Vector2(0f, -2f);
+            RectTransform bRect = beacon.GetComponent<RectTransform>();
+            bRect.anchorMin = new Vector2(1f, 0f);
+            bRect.anchorMax = new Vector2(1f, 0f);
+            bRect.pivot = new Vector2(1f, 0f);
+            bRect.anchoredPosition = new Vector2(-4f, 4f);
+            bRect.sizeDelta = new Vector2(44f, 14f);
+            Image bBg = beacon.AddComponent<Image>();
+            bBg.color = new Color(0.0f, 0.75f, 0.95f, 0.25f);
+            bBg.raycastTarget = false;
+            Outline bOl = beacon.AddComponent<Outline>();
+            bOl.effectColor = new Color(0.0f, 0.92f, 1.0f, 0.90f);
+            bOl.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI beaconTmp = CreateTMPText(beacon.transform, "BeaconText", "YOU",
-                7f, new Color(0.95f, 0.85f, 1.0f), TextAlignmentOptions.Center, FontStyles.Bold);
+            TextMeshProUGUI bTmp = CreateTMPText(beacon.transform, "BeaconText", "HERE",
+                7.5f, new Color(0.0f, 0.96f, 1.0f), TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(bTmp.rectTransform);
             beacon.AddComponent<PulsingBadge>();
             beacon.SetActive(false);
 
-            mapCtrl.BindUIHolder(id, nodeObj, bg, hatchImg, ol, codeTmp, lblTmp, badgeObj, bTxt, beacon, btn);
-        }
-
-        private static void CreateConnectorLineTiTS(Transform parent, float width, float height)
-        {
-            GameObject lineObj = new GameObject("Connector_H", typeof(RectTransform));
-            lineObj.transform.SetParent(parent, false);
-            RectTransform rect = lineObj.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(width, height);
-            Image img = lineObj.AddComponent<Image>();
-            img.color = new Color(0.35f, 0.45f, 0.58f, 0.85f);
-        }
-
-        private static void CreateVerticalHallwayConnectorTiTS(Transform parent, float tileSize, float connW, float lineW, float height)
-        {
-            GameObject vRow = new GameObject("Connector_V_Row", typeof(RectTransform));
-            vRow.transform.SetParent(parent, false);
-            HorizontalLayoutGroup hlg = vRow.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 0f;
-            hlg.childAlignment = TextAnchor.MiddleCenter;
-            hlg.childControlWidth = false;
-            hlg.childControlHeight = false;
-
-            GameObject sp1 = new GameObject("SpacerL", typeof(RectTransform));
-            sp1.transform.SetParent(vRow.transform, false);
-            sp1.GetComponent<RectTransform>().sizeDelta = new Vector2(tileSize + connW, height);
-
-            GameObject vBar = new GameObject("VBar", typeof(RectTransform));
-            vBar.transform.SetParent(vRow.transform, false);
-            vBar.GetComponent<RectTransform>().sizeDelta = new Vector2(lineW, height);
-            Image img = vBar.AddComponent<Image>();
-            img.color = new Color(0.35f, 0.45f, 0.58f, 0.85f);
-
-            GameObject sp2 = new GameObject("SpacerR", typeof(RectTransform));
-            sp2.transform.SetParent(vRow.transform, false);
-            sp2.GetComponent<RectTransform>().sizeDelta = new Vector2(tileSize + connW, height);
+            mapCtrl.BindUIHolder(id, nodeObj, bg, patImg, ol, iconImg, codeTmp, subTmp, navBadge, navTmp, beacon, doorTickImg, btn);
         }
         #endregion
 
@@ -5884,14 +6032,16 @@ namespace SundayLastBreath.Editor
         {
             GameObject rowObj = new GameObject(name, typeof(RectTransform));
             rowObj.transform.SetParent(parent, false);
+            rowObj.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 64f);
             HorizontalLayoutGroup hlg = rowObj.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 8f;
+            hlg.spacing = 10f;
             hlg.childControlWidth = true;
             hlg.childControlHeight = true;
             hlg.childForceExpandWidth = true;
-            hlg.childForceExpandHeight = false;
+            hlg.childForceExpandHeight = true;
             LayoutElement le = rowObj.AddComponent<LayoutElement>();
-            le.preferredHeight = 58f;
+            le.minHeight = 64f;
+            le.preferredHeight = 64f;
             return rowObj;
         }
 
@@ -5906,35 +6056,39 @@ namespace SundayLastBreath.Editor
             ol.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.85f);
             ol.effectDistance = new Vector2(1f, -1f);
 
-            VerticalLayoutGroup vlg = card.AddComponent<VerticalLayoutGroup>();
-            vlg.spacing = 3f;
-            vlg.padding = new RectOffset(8, 8, 6, 6);
-            vlg.childControlWidth = true;
-            vlg.childControlHeight = false;
+            TextMeshProUGUI titleTmp = CreateTMPText(card.transform, "Title",
+                $"<color=#00e5ff><b>{title}</b></color>", 11f, Color.white, TextAlignmentOptions.MidlineLeft);
+            RectTransform tRect = titleTmp.rectTransform;
+            tRect.anchorMin = new Vector2(0f, 1f);
+            tRect.anchorMax = new Vector2(0.72f, 1f);
+            tRect.pivot = new Vector2(0f, 1f);
+            tRect.offsetMin = new Vector2(10f, -22f);
+            tRect.offsetMax = new Vector2(0f, -4f);
 
-            GameObject top = new GameObject("TopLine", typeof(RectTransform));
-            top.transform.SetParent(card.transform, false);
-            HorizontalLayoutGroup thlg = top.AddComponent<HorizontalLayoutGroup>();
-            thlg.childControlWidth = false;
-            thlg.childControlHeight = false;
-            thlg.childForceExpandWidth = false;
-
-            TextMeshProUGUI titleTmp = CreateTMPText(top.transform, "Title",
-                $"<color=#00e5ff><b>{title}</b></color>", 11f, Color.white);
-            titleTmp.rectTransform.sizeDelta = new Vector2(140f, 18f);
-
-            TextMeshProUGUI valTmp = CreateTMPText(top.transform, "Value",
-                "<b>0</b> <color=#55606e>/ 10</color>", 11f, Color.white, TextAlignmentOptions.Right);
-            valTmp.rectTransform.sizeDelta = new Vector2(80f, 18f);
+            TextMeshProUGUI valTmp = CreateTMPText(card.transform, "Value",
+                "<b>0</b> <color=#55606e>/ 10</color>", 11f, Color.white, TextAlignmentOptions.MidlineRight);
+            RectTransform vRect = valTmp.rectTransform;
+            vRect.anchorMin = new Vector2(0.72f, 1f);
+            vRect.anchorMax = new Vector2(1f, 1f);
+            vRect.pivot = new Vector2(1f, 1f);
+            vRect.offsetMin = new Vector2(0f, -22f);
+            vRect.offsetMax = new Vector2(-10f, -4f);
 
             GameObject pipsBar = new GameObject("PipsBar", typeof(RectTransform));
             pipsBar.transform.SetParent(card.transform, false);
+            RectTransform pbRect = pipsBar.GetComponent<RectTransform>();
+            pbRect.anchorMin = new Vector2(0f, 1f);
+            pbRect.anchorMax = new Vector2(1f, 1f);
+            pbRect.pivot = new Vector2(0.5f, 1f);
+            pbRect.offsetMin = new Vector2(10f, -33f);
+            pbRect.offsetMax = new Vector2(-10f, -26f);
+
             HorizontalLayoutGroup phlg = pipsBar.AddComponent<HorizontalLayoutGroup>();
             phlg.spacing = 3f;
             phlg.childControlWidth = true;
-            phlg.childControlHeight = false;
-            LayoutElement pbLe = pipsBar.AddComponent<LayoutElement>();
-            pbLe.preferredHeight = 6f;
+            phlg.childControlHeight = true;
+            phlg.childForceExpandWidth = true;
+            phlg.childForceExpandHeight = true;
 
             Color emptyCol = new Color(0.12f, 0.15f, 0.20f, 1f);
             List<Image> pips = new List<Image>();
@@ -5947,7 +6101,12 @@ namespace SundayLastBreath.Editor
                 pips.Add(pipImg);
             }
 
-            CreateTMPText(card.transform, "Desc", subDesc, 8f, new Color(0.55f, 0.60f, 0.68f));
+            TextMeshProUGUI descTmp = CreateTMPText(card.transform, "Desc", subDesc, 8.5f, new Color(0.55f, 0.60f, 0.68f), TextAlignmentOptions.MidlineLeft);
+            RectTransform dRect = descTmp.rectTransform;
+            dRect.anchorMin = new Vector2(0f, 0f);
+            dRect.anchorMax = new Vector2(1f, 1f);
+            dRect.offsetMin = new Vector2(10f, 4f);
+            dRect.offsetMax = new Vector2(-10f, -35f);
 
             skillsCtrl.BindAttributeRow(key, key, title, valTmp, pips, filledCol, emptyCol);
         }
@@ -5963,39 +6122,45 @@ namespace SundayLastBreath.Editor
             ol.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.85f);
             ol.effectDistance = new Vector2(1f, -1f);
 
-            VerticalLayoutGroup vlg = card.AddComponent<VerticalLayoutGroup>();
-            vlg.spacing = 3f;
-            vlg.padding = new RectOffset(8, 8, 6, 6);
-            vlg.childControlWidth = true;
-            vlg.childControlHeight = false;
+            TextMeshProUGUI titleTmp = CreateTMPText(card.transform, "Title",
+                $"<color=#f39c12><b>{key}</b></color>", 11f, Color.white, TextAlignmentOptions.MidlineLeft);
+            RectTransform tRect = titleTmp.rectTransform;
+            tRect.anchorMin = new Vector2(0f, 1f);
+            tRect.anchorMax = new Vector2(0.42f, 1f);
+            tRect.offsetMin = new Vector2(10f, -22f);
+            tRect.offsetMax = new Vector2(0f, -4f);
 
-            GameObject top = new GameObject("TopLine", typeof(RectTransform));
-            top.transform.SetParent(card.transform, false);
-            HorizontalLayoutGroup thlg = top.AddComponent<HorizontalLayoutGroup>();
-            thlg.childControlWidth = false;
-            thlg.childControlHeight = false;
-            thlg.childForceExpandWidth = false;
-
-            TextMeshProUGUI titleTmp = CreateTMPText(top.transform, "Title",
-                $"<color=#f39c12><b>{key}</b></color>", 11f, Color.white);
-            titleTmp.rectTransform.sizeDelta = new Vector2(100f, 18f);
-
-            TextMeshProUGUI tierTmp = CreateTMPText(top.transform, "Tier",
+            TextMeshProUGUI tierTmp = CreateTMPText(card.transform, "Tier",
                 "<color=#7f8c8d><b>UNTRAINED</b></color>", 9.5f, Color.white, TextAlignmentOptions.Center);
-            tierTmp.rectTransform.sizeDelta = new Vector2(80f, 18f);
+            RectTransform trRect = tierTmp.rectTransform;
+            trRect.anchorMin = new Vector2(0.42f, 1f);
+            trRect.anchorMax = new Vector2(0.76f, 1f);
+            trRect.offsetMin = new Vector2(0f, -22f);
+            trRect.offsetMax = new Vector2(0f, -4f);
 
-            TextMeshProUGUI valTmp = CreateTMPText(top.transform, "Value",
-                "<b>0</b> <color=#55606e>/ 5</color>", 11f, Color.white, TextAlignmentOptions.Right);
-            valTmp.rectTransform.sizeDelta = new Vector2(50f, 18f);
+            TextMeshProUGUI valTmp = CreateTMPText(card.transform, "Value",
+                "<b>0</b> <color=#55606e>/ 5</color>", 11f, Color.white, TextAlignmentOptions.MidlineRight);
+            RectTransform vRect = valTmp.rectTransform;
+            vRect.anchorMin = new Vector2(0.76f, 1f);
+            vRect.anchorMax = new Vector2(1f, 1f);
+            vRect.offsetMin = new Vector2(0f, -22f);
+            vRect.offsetMax = new Vector2(-10f, -4f);
 
             GameObject pipsBar = new GameObject("PipsBar", typeof(RectTransform));
             pipsBar.transform.SetParent(card.transform, false);
+            RectTransform pbRect = pipsBar.GetComponent<RectTransform>();
+            pbRect.anchorMin = new Vector2(0f, 1f);
+            pbRect.anchorMax = new Vector2(1f, 1f);
+            pbRect.pivot = new Vector2(0.5f, 1f);
+            pbRect.offsetMin = new Vector2(10f, -33f);
+            pbRect.offsetMax = new Vector2(-10f, -26f);
+
             HorizontalLayoutGroup phlg = pipsBar.AddComponent<HorizontalLayoutGroup>();
             phlg.spacing = 4f;
             phlg.childControlWidth = true;
-            phlg.childControlHeight = false;
-            LayoutElement pbLe = pipsBar.AddComponent<LayoutElement>();
-            pbLe.preferredHeight = 6f;
+            phlg.childControlHeight = true;
+            phlg.childForceExpandWidth = true;
+            phlg.childForceExpandHeight = true;
 
             Color filledCol = new Color(0.95f, 0.55f, 0.12f, 1f);
             Color emptyCol = new Color(0.12f, 0.15f, 0.20f, 1f);
@@ -6009,7 +6174,12 @@ namespace SundayLastBreath.Editor
                 pips.Add(pipImg);
             }
 
-            CreateTMPText(card.transform, "Desc", subDesc, 8f, new Color(0.55f, 0.60f, 0.68f));
+            TextMeshProUGUI descTmp = CreateTMPText(card.transform, "Desc", subDesc, 8.5f, new Color(0.55f, 0.60f, 0.68f), TextAlignmentOptions.MidlineLeft);
+            RectTransform dRect = descTmp.rectTransform;
+            dRect.anchorMin = new Vector2(0f, 0f);
+            dRect.anchorMax = new Vector2(1f, 1f);
+            dRect.offsetMin = new Vector2(10f, 4f);
+            dRect.offsetMax = new Vector2(-10f, -35f);
 
             skillsCtrl.BindSkillRow(key, key, valTmp, tierTmp, pips, filledCol, emptyCol);
         }

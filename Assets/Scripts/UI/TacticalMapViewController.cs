@@ -3,35 +3,45 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 using SundayLastBreath.Core;
 
 namespace SundayLastBreath.UI
 {
     /// <summary>
-    /// Interactive Tactical Connected Floorplan Map View Controller for the Survivor PDA.
-    /// Recreates the iconic Trials in Tainted Space (TiTS) mini-map & sector scanner aesthetic,
-    /// faithfully integrated with the Twine 4th Floor Ascott Residency floorplan:
-    /// - Uniform 5-row x 3-column square grid tiles (44x44 px) with rounded corners
-    /// - Clean corridor connection links linking adjacent rooms horizontally and vertically
-    /// - Solid glowing purple tile fill for current player location
-    /// - Directional quick-nav indicators [W], [A], [S], [D] on reachable adjacent rooms
-    /// - Diagonal hatched / hazard-striped overlay on blocked and locked rooms
-    /// - Dedicated status icons (Lock, Stairs Descent, Lightning Bolt, Danger)
-    /// - Dual-banner framing: Sector/Floor header at top, dynamic Location footer at bottom
-    /// - Comprehensive Tactical Recon Dossier on the right panel
-    /// - Keyboard (W, A, S, D) and click-based interactive navigation
+    /// Architectural Blueprint & Bio-Radar Scanner for the Survivor PDA (4th Floor Ascott Residency).
+    /// Combines Resident Evil 2 Remake clearance color-coding, Signalis/Sevastolink CAD blueprint grids,
+    /// contiguous room-and-corridor schematic geometry, doorway threshold indicators, procedural pixel/vector
+    /// room icons (zero missing font glyph warnings), and interactive WASD / click sector navigation.
     /// </summary>
     public class TacticalMapViewController : MonoBehaviour
     {
+        public enum RoomIconType
+        {
+            Home,
+            Corridor,
+            Locked,
+            Hazard,
+            DoorAjar,
+            Apartment,
+            Utility,
+            Stairs,
+            Collapsed
+        }
+
         [System.Serializable]
         public class NodeModel
         {
             public string id;
             public string roomCode;
+            public string shortSub;
             public string title;
             public string statusTag;
             public string threatLevel;
             public string scavengeStatus;
+            public string acousticScan;
             [TextArea(2, 4)] public string reconIntel;
             public bool isAccessible;
             public bool isDiscovered;
@@ -39,49 +49,54 @@ namespace SundayLastBreath.UI
             public bool isHallway;
             public bool isBlocked;
             public bool isLocked;
-            public string iconSymbol;
+            public RoomIconType iconType;
             public int row;
             public int col;
             public List<string> connectedIds = new List<string>();
 
-            public NodeModel(string id, string roomCode, string title, string statusTag,
-                             string threatLevel, string scavengeStatus, string reconIntel,
-                             bool isAccessible, bool isDiscovered, int row, int col,
+            public NodeModel(string id, string roomCode, string shortSub, string title, string statusTag,
+                             string threatLevel, string scavengeStatus, string acousticScan, string reconIntel,
+                             bool isAccessible, bool isDiscovered, int row, int col, RoomIconType iconType,
                              bool isStairs = false, bool isHallway = false,
-                             bool isBlocked = false, bool isLocked = false,
-                             string iconSymbol = "")
+                             bool isBlocked = false, bool isLocked = false)
             {
                 this.id = id;
                 this.roomCode = roomCode;
+                this.shortSub = shortSub;
                 this.title = title;
                 this.statusTag = statusTag;
                 this.threatLevel = threatLevel;
                 this.scavengeStatus = scavengeStatus;
+                this.acousticScan = acousticScan;
                 this.reconIntel = reconIntel;
                 this.isAccessible = isAccessible;
                 this.isDiscovered = isDiscovered;
                 this.row = row;
                 this.col = col;
+                this.iconType = iconType;
                 this.isStairs = isStairs;
                 this.isHallway = isHallway;
                 this.isBlocked = isBlocked;
                 this.isLocked = isLocked;
-                this.iconSymbol = iconSymbol;
             }
         }
 
-        private class NodeUIHolder
+        [System.Serializable]
+        public class NodeUIHolder
         {
-            public NodeModel model;
+            public string nodeId;
+            [System.NonSerialized] public NodeModel model;
             public GameObject rootObj;
             public Image bgImage;
-            public Image hatchedOverlay;
+            public Image patternOverlay;
             public Outline outline;
-            public TextMeshProUGUI iconTextTmp;
+            public Image iconImage;
+            public TextMeshProUGUI roomCodeTmp;
             public TextMeshProUGUI subLabelTmp;
             public GameObject navBadgeObj;
             public TextMeshProUGUI navBadgeTmp;
             public GameObject beaconObj;
+            public Image doorTickImage;
             public Button button;
         }
 
@@ -89,186 +104,535 @@ namespace SundayLastBreath.UI
         [SerializeField] private string currentLocationId = "unit_407";
         [SerializeField] private string selectedNodeId = "unit_407";
 
-        [Header("Minimap Header & Footer Banners")]
-        [SerializeField] private TextMeshProUGUI minimapHeaderSectorTmp;
-        [SerializeField] private TextMeshProUGUI minimapHeaderFloorTmp;
-        [SerializeField] private TextMeshProUGUI minimapFooterLocationTmp;
-        [SerializeField] private TextMeshProUGUI minimapSubFooterTmp;
+        [Header("Serialized Blueprint Nodes & Grid")]
+        [SerializeField] private Image blueprintGridOverlayImage;
+        [SerializeField] private List<NodeUIHolder> serializedHolders = new List<NodeUIHolder>();
 
-        [Header("Recon Intel Panel UI References")]
+        [Header("Blueprint Header & Telemetry Banners")]
+        [SerializeField] private TextMeshProUGUI blueprintCoordTmp;
+        [SerializeField] private TextMeshProUGUI blueprintFooterLocationTmp;
+
+        [Header("Recon Intel Dossier References")]
+        [SerializeField] private Image intelHeaderIcon;
         [SerializeField] private TextMeshProUGUI intelSectorTitleText;
         [SerializeField] private TextMeshProUGUI intelStatusBadgeText;
         [SerializeField] private TextMeshProUGUI intelThreatText;
         [SerializeField] private TextMeshProUGUI intelScavengeText;
+        [SerializeField] private TextMeshProUGUI intelAcousticText;
         [SerializeField] private TextMeshProUGUI intelDescriptionText;
         [SerializeField] private TextMeshProUGUI quickNavPromptText;
+        [SerializeField] private Button transitActionButton;
+        [SerializeField] private Image transitActionBg;
+        [SerializeField] private TextMeshProUGUI transitActionBtnText;
 
         private readonly Dictionary<string, NodeModel> nodeRegistry = new Dictionary<string, NodeModel>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NodeUIHolder> uiHolders = new Dictionary<string, NodeUIHolder>(StringComparer.OrdinalIgnoreCase);
 
+        private static Sprite cachedBlueprintGridSprite;
         private static Sprite cachedHatchedSprite;
+        private static Sprite cachedStairTreadSprite;
+        private static readonly Dictionary<RoomIconType, Sprite> cachedIcons = new Dictionary<RoomIconType, Sprite>();
 
-        public static Sprite GetHatchedSprite()
+        // =========================================================================
+        // PROCEDURAL TEXTURE & ICON GENERATORS (Zero external assets or font emojis)
+        // =========================================================================
+
+        public static Sprite GetBlueprintGridSprite()
         {
-            if (cachedHatchedSprite != null) return cachedHatchedSprite;
+            if (cachedBlueprintGridSprite != null) return cachedBlueprintGridSprite;
 
-            int size = 32;
+            int size = 64;
             Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
             tex.filterMode = FilterMode.Point;
             tex.wrapMode = TextureWrapMode.Repeat;
 
-            Color cDark = new Color(0.10f, 0.12f, 0.16f, 0.85f);
-            Color cStripe = new Color(0.28f, 0.35f, 0.45f, 0.90f);
+            Color bg = new Color(0.025f, 0.038f, 0.058f, 1f);
+            Color minorLine = new Color(0.08f, 0.16f, 0.24f, 1f);
+            Color majorLine = new Color(0.12f, 0.24f, 0.36f, 1f);
+            Color crossTick = new Color(0.18f, 0.42f, 0.58f, 1f);
 
             for (int y = 0; y < size; y++)
             {
                 for (int x = 0; x < size; x++)
                 {
-                    bool isStripe = ((x + y) % 8) < 4;
-                    tex.SetPixel(x, y, isStripe ? cStripe : cDark);
+                    Color c = bg;
+                    if (x % 16 == 0 || y % 16 == 0) c = minorLine;
+                    if (x == 0 || y == 0) c = majorLine;
+                    if ((x == 0 && (y <= 2 || y >= size - 2)) || (y == 0 && (x <= 2 || x >= size - 2)))
+                        c = crossTick;
+                    tex.SetPixel(x, y, c);
                 }
             }
             tex.Apply();
+            cachedBlueprintGridSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+            return cachedBlueprintGridSprite;
+        }
 
+        public static Sprite GetHatchedSprite()
+        {
+            if (cachedHatchedSprite != null) return cachedHatchedSprite;
+
+            int size = 16;
+            Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Point;
+            tex.wrapMode = TextureWrapMode.Repeat;
+
+            Color cClear = new Color(0f, 0f, 0f, 0f);
+            Color cStripe = new Color(1f, 1f, 1f, 0.22f);
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    bool isStripe = ((x + y) % 8) < 3;
+                    tex.SetPixel(x, y, isStripe ? cStripe : cClear);
+                }
+            }
+            tex.Apply();
             cachedHatchedSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
             return cachedHatchedSprite;
         }
 
+        public static Sprite GetStairTreadSprite()
+        {
+            if (cachedStairTreadSprite != null) return cachedStairTreadSprite;
+
+            int size = 16;
+            Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Point;
+            tex.wrapMode = TextureWrapMode.Repeat;
+
+            Color cClear = new Color(0f, 0f, 0f, 0f);
+            Color cStep = new Color(0.85f, 0.65f, 0.25f, 0.18f);
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    bool isStep = (x % 4 == 0) && (y > 2 && y < size - 2);
+                    tex.SetPixel(x, y, isStep ? cStep : cClear);
+                }
+            }
+            tex.Apply();
+            cachedStairTreadSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+            return cachedStairTreadSprite;
+        }
+
+        public static Sprite GetRoomIconSprite(RoomIconType type)
+        {
+            if (cachedIcons.TryGetValue(type, out Sprite existing) && existing != null)
+                return existing;
+
+            int s = 16;
+            Texture2D tex = new Texture2D(s, s, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Point;
+            tex.wrapMode = TextureWrapMode.Clamp;
+
+            string[] pattern = GetPixelPattern(type);
+            for (int y = 0; y < s; y++)
+            {
+                string rowStr = pattern[s - 1 - y];
+                for (int x = 0; x < s; x++)
+                {
+                    char ch = x < rowStr.Length ? rowStr[x] : '.';
+                    tex.SetPixel(x, y, ch == '#' ? Color.white : Color.clear);
+                }
+            }
+            tex.Apply();
+            Sprite sp = Sprite.Create(tex, new Rect(0, 0, s, s), new Vector2(0.5f, 0.5f));
+            cachedIcons[type] = sp;
+            return sp;
+        }
+
+        private static string[] GetPixelPattern(RoomIconType type)
+        {
+            switch (type)
+            {
+                case RoomIconType.Home:
+                    return new[]
+                    {
+                        ".......##.......",
+                        "......####......",
+                        ".....######.....",
+                        "....########....",
+                        "...##########...",
+                        "..############..",
+                        ".##############.",
+                        "...##########...",
+                        "...###....###...",
+                        "...###....###...",
+                        "...###....###...",
+                        "...##########...",
+                        "...##########...",
+                        "................",
+                        "................",
+                        "................"
+                    };
+                case RoomIconType.Locked:
+                    return new[]
+                    {
+                        ".....######.....",
+                        "....########....",
+                        "...###....###...",
+                        "...##......##...",
+                        "...##......##...",
+                        "...##......##...",
+                        "..############..",
+                        "..############..",
+                        "..#####..#####..",
+                        "..#####..#####..",
+                        "..#####..#####..",
+                        "..############..",
+                        "..############..",
+                        "................",
+                        "................",
+                        "................"
+                    };
+                case RoomIconType.Hazard:
+                    return new[]
+                    {
+                        ".......##.......",
+                        "......####......",
+                        "......####......",
+                        ".....######.....",
+                        ".....##..##.....",
+                        "....###..###....",
+                        "....###..###....",
+                        "...####..####...",
+                        "...####..####...",
+                        "..#####..#####..",
+                        "..############..",
+                        ".#####....#####.",
+                        ".#####....#####.",
+                        ".##############.",
+                        "................",
+                        "................"
+                    };
+                case RoomIconType.DoorAjar:
+                    return new[]
+                    {
+                        "...##########...",
+                        "...##########...",
+                        "...###....###...",
+                        "...###..#####...",
+                        "...###.######...",
+                        "...##########...",
+                        "...#####..###...",
+                        "...##########...",
+                        "...###.######...",
+                        "...###..#####...",
+                        "...###....###...",
+                        "...##########...",
+                        ".##############.",
+                        "................",
+                        "................",
+                        "................"
+                    };
+                case RoomIconType.Utility:
+                    return new[]
+                    {
+                        "........#####...",
+                        ".......#####....",
+                        "......#####.....",
+                        ".....#####......",
+                        "....#########...",
+                        "...##########...",
+                        "......#####.....",
+                        ".....#####......",
+                        "....#####.......",
+                        "...#####........",
+                        "..####..........",
+                        ".###............",
+                        "................",
+                        "................",
+                        "................",
+                        "................"
+                    };
+                case RoomIconType.Stairs:
+                    return new[]
+                    {
+                        "............####",
+                        "............####",
+                        ".........#######",
+                        ".........#######",
+                        "......##########",
+                        "......##########",
+                        "...#############",
+                        "...#############",
+                        "################",
+                        "################",
+                        "..##............",
+                        ".####...........",
+                        "######..........",
+                        "..##............",
+                        "................",
+                        "................"
+                    };
+                case RoomIconType.Collapsed:
+                    return new[]
+                    {
+                        "..###......###..",
+                        ".#####....#####.",
+                        "..#####..#####..",
+                        "...##########...",
+                        "....########....",
+                        ".....######.....",
+                        "....########....",
+                        "...##########...",
+                        "..#####..#####..",
+                        ".#####....#####.",
+                        "..###......###..",
+                        "................",
+                        ".##############.",
+                        "................",
+                        "................",
+                        "................"
+                    };
+                case RoomIconType.Corridor:
+                    return new[]
+                    {
+                        "..##........##..",
+                        "..##...##...##..",
+                        "..##...##...##..",
+                        "..##........##..",
+                        "..##...##...##..",
+                        "..##...##...##..",
+                        "..##........##..",
+                        "..##...##...##..",
+                        "..##...##...##..",
+                        "..##........##..",
+                        "..##...##...##..",
+                        "..##...##...##..",
+                        "..##........##..",
+                        "................",
+                        "................",
+                        "................"
+                    };
+                default:
+                    return new[]
+                    {
+                        "..############..",
+                        "..############..",
+                        "..##........##..",
+                        "..##..####..##..",
+                        "..##..####..##..",
+                        "..##........##..",
+                        "..##..####..##..",
+                        "..##..####..##..",
+                        "..##........##..",
+                        "..############..",
+                        "..############..",
+                        "................",
+                        "................",
+                        "................",
+                        "................",
+                        "................"
+                    };
+            }
+        }
+
+        // =========================================================================
+        // LIFECYCLE & INPUT HANDLING
+        // =========================================================================
+
         private void Awake()
         {
-            InitializeDataModel();
+            EnsureRuntimeBindings();
         }
 
         private void Start()
         {
+            EnsureRuntimeBindings();
             RefreshAllNodes();
             SelectNode(currentLocationId);
         }
 
         private void OnEnable()
         {
+            EnsureRuntimeBindings();
             RefreshAllNodes();
-            SelectNode(selectedNodeId);
+            SelectNode(string.IsNullOrEmpty(selectedNodeId) ? currentLocationId : selectedNodeId);
+        }
+
+        private void EnsureRuntimeBindings()
+        {
+            if (nodeRegistry.Count == 0)
+            {
+                InitializeDataModel();
+            }
+
+            if (blueprintGridOverlayImage != null && blueprintGridOverlayImage.sprite == null)
+            {
+                blueprintGridOverlayImage.sprite = GetBlueprintGridSprite();
+                blueprintGridOverlayImage.type = Image.Type.Tiled;
+            }
+
+            if (serializedHolders != null && serializedHolders.Count > 0 && uiHolders.Count == 0)
+            {
+                foreach (var holder in serializedHolders)
+                {
+                    if (holder == null || string.IsNullOrEmpty(holder.nodeId)) continue;
+                    if (!nodeRegistry.TryGetValue(holder.nodeId, out NodeModel model)) continue;
+
+                    holder.model = model;
+                    if (holder.iconImage != null)
+                    {
+                        holder.iconImage.sprite = GetRoomIconSprite(model.iconType);
+                    }
+
+                    string capturedId = holder.nodeId;
+                    if (holder.button != null)
+                    {
+                        holder.button.onClick.RemoveAllListeners();
+                        holder.button.onClick.AddListener(() =>
+                        {
+                            AudioManager.Instance?.PlayButtonClick();
+                            OnNodeClicked(capturedId);
+                        });
+                    }
+
+                    uiHolders[holder.nodeId] = holder;
+                }
+            }
+
+            if (transitActionButton != null)
+            {
+                transitActionButton.onClick.RemoveAllListeners();
+                transitActionButton.onClick.AddListener(OnTransitButtonClicked);
+            }
         }
 
         private void Update()
         {
-            // Keyboard quick navigation in Trials in Tainted Space style (W, A, S, D / Arrow keys)
             if (!gameObject.activeInHierarchy) return;
 
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+            bool up = false, down = false, left = false, right = false;
+
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null)
             {
-                TryNavigateDirection("W");
+                up = Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame;
+                down = Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame;
+                left = Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame;
+                right = Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame;
             }
-            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                TryNavigateDirection("A");
-            }
-            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                TryNavigateDirection("S");
-            }
-            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                TryNavigateDirection("D");
-            }
+#else
+            up = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow);
+            down = Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow);
+            left = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow);
+            right = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow);
+#endif
+
+            if (up) TryNavigateDirection("W");
+            else if (left) TryNavigateDirection("A");
+            else if (down) TryNavigateDirection("S");
+            else if (right) TryNavigateDirection("D");
         }
+
+        // =========================================================================
+        // 4TH FLOOR ARCHITECTURAL DATA MODEL (Twine Canonical Rooms)
+        // =========================================================================
 
         private void InitializeDataModel()
         {
             if (nodeRegistry.Count > 0) return;
 
-            // =========================================================================
-            // ROW 0: NORTH CORRIDOR (Unit 407 <-> Hallway 1 <-> Unit 406)
-            // =========================================================================
+            // ROW 0: North Wing (Unit 407 <-> Hallway 1 <-> Unit 406/408)
             var u407 = new NodeModel(
-                "unit_407", "407", "YOUR RESIDENCE", "SECURED", "MINIMAL", "LOOTED",
-                "Your residential unit. Living room television flickers with emergency static. The heavy deadbolt held during the initial breach. Hallway corridor exit door is directly ahead.",
-                isAccessible: true, isDiscovered: true, row: 0, col: 0, iconSymbol: "⌂");
+                "unit_407", "UNIT 407", "SAFE ROOM", "YOUR RESIDENCE (SAFEHOUSE)", "SECURED",
+                "MINIMAL", "LOOTED / SECURE", "TV STATIC HUM",
+                "Your residential apartment. The television flickers with civil defense white noise. Heavy reinforced deadbolt held firm during the initial outbreak chaos. Direct exit to North Spine Corridor.",
+                isAccessible: true, isDiscovered: true, row: 0, col: 0, iconType: RoomIconType.Home);
 
             var h1 = new NodeModel(
-                "hallway_1", "H1", "NORTH CORRIDOR", "CLEAR", "LOW", "UNCHECKED",
-                "North corridor outside Units 407 and 406. Carpeted hallway, emergency exit lights faintly glowing red. Signs of hurried evacuation and scattered paperwork.",
-                isAccessible: true, isDiscovered: true, row: 0, col: 1, isHallway: true, iconSymbol: "║");
+                "hallway_1", "CORR-N1", "NORTH SPINE", "NORTH HALLWAY JUNCTION", "CLEAR",
+                "LOW", "UNSEARCHED", "FAINT DRAFT",
+                "North corridor segment outside Units 407 and 406. Commercial carpet muffled under emergency amber lighting. Scattered luggage suggests residents evacuated in a panic.",
+                isAccessible: true, isDiscovered: true, row: 0, col: 1, iconType: RoomIconType.Corridor, isHallway: true);
 
             var u406 = new NodeModel(
-                "unit_406", "406", "PROFESSOR", "LOCKED", "UNKNOWN", "HIGH INTEL",
-                "Belongs to Dr. Alistair, retired history professor. Walls lined with academic texts and historical artifacts. Heavy brass deadbolt is engaged from inside.",
-                isAccessible: false, isDiscovered: true, row: 0, col: 2, isLocked: true, iconSymbol: "🔒");
+                "unit_406", "UNIT 406", "PROFESSOR", "DR. ALISTAIR'S RESIDENCE", "DEADBOLT LOCKED",
+                "UNKNOWN", "HIGH INTEL / LORE", "DEAD SILENCE",
+                "Belongs to Dr. Alistair, retired university historian. Known to keep rare archival notes and emergency radio gear. Heavy brass keypad/deadbolt is engaged from within.",
+                isAccessible: false, isDiscovered: true, row: 0, col: 2, iconType: RoomIconType.Locked, isLocked: true);
 
-            // =========================================================================
-            // ROW 1: MID-NORTH (Unit 405 <-> Hallway 2 <-> Unit 404)
-            // =========================================================================
+            // ROW 1: Mid-North Wing (Unit 405 <-> Hallway 2 <-> Unit 404)
             var u405 = new NodeModel(
-                "unit_405", "405", "HUNTER'S UNIT", "LOCKED", "UNKNOWN", "WEAPONS / GEAR",
-                "Apartment of Marcus, an avid outdoorsman and hunter. Strong smell of gun oil and cured leather. High priority recon target for survival supplies.",
-                isAccessible: false, isDiscovered: true, row: 1, col: 0, isLocked: true, iconSymbol: "🔒");
+                "unit_405", "UNIT 405", "HUNTER'S APT", "MARCUS'S APARTMENT", "REINFORCED LOCK",
+                "UNKNOWN", "WEAPONS / AMMO", "METALLIC CLICK",
+                "Residence of Marcus, an experienced outdoorsman and big-game hunter. Faint scent of gun oil and cordite seeps beneath the steel-reinforced door frame. High-priority tactical cache.",
+                isAccessible: false, isDiscovered: true, row: 1, col: 0, iconType: RoomIconType.Locked, isLocked: true);
 
             var h2 = new NodeModel(
-                "hallway_2", "H2", "CENTRAL HALL", "SHADOWS", "MEDIUM", "DEBRIS",
-                "Central corridor section. Broken picture frames on the floor. Faint scratching heard from behind nearby apartment walls. Southern corridor continues.",
-                isAccessible: true, isDiscovered: true, row: 1, col: 1, isHallway: true, iconSymbol: "║");
+                "hallway_2", "CORR-N2", "UPPER-MID", "CENTRAL-NORTH CORRIDOR", "SHADOWED",
+                "MEDIUM", "SCATTERED DEBRIS", "WALL SCRATCHING",
+                "Upper-middle hallway corridor. Shattered wall sconces and overturned side tables partially narrow the path. Intermittent rasping echoes from behind the East wing drywall.",
+                isAccessible: true, isDiscovered: true, row: 1, col: 1, iconType: RoomIconType.Corridor, isHallway: true);
 
             var u404 = new NodeModel(
-                "unit_404", "404", "NEIGHBOR", "BARRICADED", "HIGH", "INACCESSIBLE",
-                "Door reinforced from within with nailed two-by-fours and heavy furniture. Deep violent claw marks score the outer wooden frame. Completely impenetrable.",
-                isAccessible: false, isDiscovered: true, row: 1, col: 2, isBlocked: true, iconSymbol: "⛔");
+                "unit_404", "UNIT 404", "BARRICADED", "QUARANTINED NEIGHBOR", "BARRICADED",
+                "HIGH", "INACCESSIBLE", "HEAVY THUMPING",
+                "Doorway violently nailed shut from the inside with timber planks and heavy furniture. Deep, frantic gouge marks score the outer mahogany veneer. Do not breach.",
+                isAccessible: false, isDiscovered: true, row: 1, col: 2, iconType: RoomIconType.Hazard, isBlocked: true);
 
-            // =========================================================================
-            // ROW 2: MID-SOUTH (Unit 403 <-> Hallway 3 <-> Unit 402)
-            // =========================================================================
+            // ROW 2: Mid-South Wing (Unit 403 <-> Hallway 3 <-> Unit 402)
             var u403 = new NodeModel(
-                "unit_403", "403", "RESIDENCE", "BLOOD SMEAR", "DANGER", "UNKNOWN",
-                "A dark smear of dried blood streaks down the brass handle. Dead silence inside. Entry without tactical preparation is strongly discouraged.",
-                isAccessible: false, isDiscovered: true, row: 2, col: 0, isBlocked: true, iconSymbol: "⛔");
+                "unit_403", "UNIT 403", "BIOHAZARD", "CONTAMINATED RESIDENCE", "BIOHAZARD",
+                "DANGER", "UNKNOWN", "FLIES / SILENCE",
+                "A dark coagulated smear of blood trails down the brass handle onto the threshold. The door frame is warped and jammed shut. Entering without bio-protective gear is lethal.",
+                isAccessible: false, isDiscovered: true, row: 2, col: 0, iconType: RoomIconType.Hazard, isBlocked: true);
 
             var h3 = new NodeModel(
-                "hallway_3", "H3", "SOUTH-MID", "DIM LIGHT", "MEDIUM", "UNCHECKED",
-                "Fluorescent ceiling bulb strobes erratically. Dark stains on the commercial carpet lead southward toward the fire stairwell.",
-                isAccessible: true, isDiscovered: true, row: 2, col: 1, isHallway: true, iconSymbol: "║");
+                "hallway_3", "CORR-S1", "LOWER-MID", "CENTRAL-SOUTH CORRIDOR", "FLICKERING",
+                "MEDIUM", "UNSEARCHED", "DISTANT MUSIC",
+                "Fluorescent ceiling tube strobes erratically, casting harsh staccato shadows. Dark footprints on the runner rug lead southward toward the fire exit stairwell.",
+                isAccessible: true, isDiscovered: true, row: 2, col: 1, iconType: RoomIconType.Corridor, isHallway: true);
 
             var u402 = new NodeModel(
-                "unit_402", "402", "APARTMENT 402", "DOOR AJAR", "LOW", "FOOD / MEDS",
-                "Apartment door cracked open two inches. Sounds of dripping water inside. High potential for salvageable medical supplies and canned goods.",
-                isAccessible: true, isDiscovered: true, row: 2, col: 2, iconSymbol: "🚪");
+                "unit_402", "UNIT 402", "DOOR AJAR", "ANDERSONS' RESIDENCE", "DOOR AJAR",
+                "LOW", "MEDICAL / RATIONS", "RUNNING WATER",
+                "The safety chain is snapped and the door hangs open two inches. Sound of an overflowing sink inside. High probability of salvageable first-aid supplies and canned provisions.",
+                isAccessible: true, isDiscovered: true, row: 2, col: 2, iconType: RoomIconType.DoorAjar);
 
-            // =========================================================================
-            // ROW 3: SOUTH WING (Unit 401 <-> Hallway 4 <-> Utility)
-            // =========================================================================
+            // ROW 3: South Wing (Unit 401 <-> Hallway 4 <-> Utility Closet)
             var u401 = new NodeModel(
-                "unit_401", "401", "APARTMENT 401", "UNCHECKED", "LOW", "SHELTER",
-                "Corner residential unit. Mail stacked on welcome mat. Appears undisturbed since before the citywide emergency curfew was enacted.",
-                isAccessible: true, isDiscovered: true, row: 3, col: 0, iconSymbol: "⌂");
+                "unit_401", "UNIT 401", "CORNER APT", "STUDENT RESIDENCE 401", "UNLOCKED",
+                "LOW", "KEYS / VALUABLES", "WIND THROUGH GLASS",
+                "South-west corner apartment. Unopened mail and flyers are piled on the welcome mat. Latch appears unlocked following the post-party evacuation.",
+                isAccessible: true, isDiscovered: true, row: 3, col: 0, iconType: RoomIconType.Apartment);
 
             var h4 = new NodeModel(
-                "hallway_4", "H4", "SOUTH CORRIDOR", "HAZARD", "ELEVATED", "UNCHECKED",
-                "Corridor junction right before the emergency stairwell and electrical utility room. Air smells faintly of ozone, smoke, and damp plaster.",
-                isAccessible: true, isDiscovered: true, row: 3, col: 1, isHallway: true, iconSymbol: "║");
+                "hallway_4", "CORR-S2", "SOUTH SPINE", "SOUTH SERVICE JUNCTION", "ELEVATED",
+                "MEDIUM", "UNSEARCHED", "OZONE & SMOKE",
+                "Southern corridor intersection bordering the electrical utility room and stairwell foyer. The air is thick with the acrid smell of blown transformers and damp concrete.",
+                isAccessible: true, isDiscovered: true, row: 3, col: 1, iconType: RoomIconType.Corridor, isHallway: true);
 
             var util = new NodeModel(
-                "utility", "UTIL", "MAINTENANCE", "BREAKER BOX", "LOW", "TOOLS / WIRE",
-                "Building maintenance and electrical room. Heavy industrial steel door with latch. Contains master fuse panels and janitorial tool cabinets.",
-                isAccessible: true, isDiscovered: true, row: 3, col: 2, iconSymbol: "⚡");
+                "utility", "UTILITY", "MAINTENANCE", "ELECTRICAL & SERVICE CLOSET", "SERVICE ACCESS",
+                "LOW", "TOOLS / FUSES", "TRANSFORMER HUM",
+                "Building maintenance alcove with a heavy steel louver door. Houses the 4th floor master breaker panel, backup fuses, and janitorial hardware lockers.",
+                isAccessible: true, isDiscovered: true, row: 3, col: 2, iconType: RoomIconType.Utility);
 
-            // =========================================================================
-            // ROW 4: STAIRWELL & EXIT (Stairs <-> Hall End <-> Sector East Blocked)
-            // =========================================================================
+            // ROW 4: Exit Foyer (Stairwell <-> Hallway End <-> Collapsed East Wing)
             var stairs = new NodeModel(
-                "stairs", "STAIRS", "FIRE STAIRWELL", "ESCAPE ROUTE", "ELEVATED", "TO 2ND FLOOR",
-                "Emergency concrete stairwell descending to Floor 2 and the Lobby. Heavy reinforced fire door. Descending past here enters contested building sectors.",
-                isAccessible: true, isDiscovered: true, row: 4, col: 0, isStairs: true, iconSymbol: "▼");
+                "stairs", "STAIRWELL", "TO FLOOR 2", "WEST EMERGENCY STAIRWELL", "ESCAPE ROUTE",
+                "MEDIUM", "PRIMARY EXIT", "ECHOING GROANS",
+                "Reinforced concrete fire stairwell descending to the 2nd Floor and Ground Lobby. Emergency push-bar door is operational. Descending past this point commits to leaving the 4th floor.",
+                isAccessible: true, isDiscovered: true, row: 4, col: 0, iconType: RoomIconType.Stairs, isStairs: true);
 
             var hEnd = new NodeModel(
-                "hallway_end", "EXIT", "STAIR FOYER", "EXIT FOYER", "ELEVATED", "CLEAR",
-                "Staircase access foyer. Discharged fire extinguisher on the floor. Muffled groans echo up from lower stair landings.",
-                isAccessible: true, isDiscovered: true, row: 4, col: 1, isHallway: true, iconSymbol: "║");
+                "hallway_end", "FOYER-4S", "EXIT FOYER", "STAIRWELL ACCESS FOYER", "CLEAR",
+                "MEDIUM", "EXTINGUISHER", "DRAFT FROM BELOW",
+                "Southern terminus of the 4th floor spine corridor. A discharged fire extinguisher lies rolling on the tiles. Direct access West to the Fire Stairwell.",
+                isAccessible: true, isDiscovered: true, row: 4, col: 1, iconType: RoomIconType.Corridor, isHallway: true);
 
             var blocked = new NodeModel(
-                "empty_bot", "EAST", "EAST WING", "COLLAPSED", "IMPASSABLE", "NONE",
-                "Ceiling drywall and structural concrete collapsed, completely sealing off the eastern wing. Impassable without demolition tools.",
-                isAccessible: false, isDiscovered: false, row: 4, col: 2, isBlocked: true, iconSymbol: "✖");
+                "empty_bot", "EAST WING", "COLLAPSED", "COLLAPSED EAST ALCOVE", "STRUCTURAL FAIL",
+                "IMPASSABLE", "NONE", "SETTLING CONCRETE",
+                "Load-bearing ceiling beams and concrete slabs have caved in, completely sealing the south-east service shaft. Impassable without heavy excavation equipment.",
+                isAccessible: false, isDiscovered: false, row: 4, col: 2, iconType: RoomIconType.Collapsed, isBlocked: true);
 
-            // Connect Topology
+            // Connect Orthogonal Floorplan Graph
             ConnectBi(u407, h1);
             ConnectBi(h1, u406);
             ConnectBi(h1, h2);
@@ -298,28 +662,47 @@ namespace SundayLastBreath.UI
             if (!b.connectedIds.Contains(a.id)) b.connectedIds.Add(a.id);
         }
 
-        public void BindUIHolder(string nodeId, GameObject rootObj, Image bgImage, Image hatchedOverlay,
-                                 Outline outline, TextMeshProUGUI iconTextTmp, TextMeshProUGUI subLabelTmp,
-                                 GameObject navBadgeObj, TextMeshProUGUI navBadgeTmp,
-                                 GameObject beaconObj, Button btn)
+        // =========================================================================
+        // UI BINDING & INTERACTION
+        // =========================================================================
+
+        public void BindUIHolder(string nodeId, GameObject rootObj, Image bgImage, Image patternOverlay,
+                                 Outline outline, Image iconImage, TextMeshProUGUI roomCodeTmp,
+                                 TextMeshProUGUI subLabelTmp, GameObject navBadgeObj, TextMeshProUGUI navBadgeTmp,
+                                 GameObject beaconObj, Image doorTickImage, Button btn)
         {
+            if (nodeRegistry.Count == 0)
+            {
+                InitializeDataModel();
+            }
+
             if (!nodeRegistry.TryGetValue(nodeId, out NodeModel model)) return;
 
             var holder = new NodeUIHolder
             {
+                nodeId = nodeId,
                 model = model,
                 rootObj = rootObj,
                 bgImage = bgImage,
-                hatchedOverlay = hatchedOverlay,
+                patternOverlay = patternOverlay,
                 outline = outline,
-                iconTextTmp = iconTextTmp,
+                iconImage = iconImage,
+                roomCodeTmp = roomCodeTmp,
                 subLabelTmp = subLabelTmp,
                 navBadgeObj = navBadgeObj,
                 navBadgeTmp = navBadgeTmp,
                 beaconObj = beaconObj,
+                doorTickImage = doorTickImage,
                 button = btn
             };
 
+            if (iconImage != null)
+            {
+                iconImage.sprite = GetRoomIconSprite(model.iconType);
+            }
+
+            serializedHolders.RemoveAll(h => h != null && string.Equals(h.nodeId, nodeId, StringComparison.OrdinalIgnoreCase));
+            serializedHolders.Add(holder);
             uiHolders[nodeId] = holder;
 
             if (btn != null)
@@ -335,25 +718,43 @@ namespace SundayLastBreath.UI
             ApplyVisualState(holder);
         }
 
-        public void BindIntelReferences(TextMeshProUGUI title, TextMeshProUGUI status,
-                                        TextMeshProUGUI threat, TextMeshProUGUI scavenge,
-                                        TextMeshProUGUI desc, TextMeshProUGUI quickNav)
+        public void BindBlueprintBanners(TextMeshProUGUI coordTmp, TextMeshProUGUI footerLocationTmp, Image gridOverlayImg = null)
         {
+            blueprintCoordTmp = coordTmp;
+            blueprintFooterLocationTmp = footerLocationTmp;
+            if (gridOverlayImg != null)
+            {
+                blueprintGridOverlayImage = gridOverlayImg;
+                blueprintGridOverlayImage.sprite = GetBlueprintGridSprite();
+                blueprintGridOverlayImage.type = Image.Type.Tiled;
+            }
+        }
+
+        public void BindIntelReferences(Image headerIcon, TextMeshProUGUI title, TextMeshProUGUI status,
+                                        TextMeshProUGUI threat, TextMeshProUGUI scavenge, TextMeshProUGUI acoustic,
+                                        TextMeshProUGUI desc, TextMeshProUGUI quickNav,
+                                        Button transitBtn, Image transitBg, TextMeshProUGUI transitTxt)
+        {
+            intelHeaderIcon = headerIcon;
             intelSectorTitleText = title;
             intelStatusBadgeText = status;
             intelThreatText = threat;
             intelScavengeText = scavenge;
+            intelAcousticText = acoustic;
             intelDescriptionText = desc;
             quickNavPromptText = quickNav;
-        }
+            transitActionButton = transitBtn;
+            transitActionBg = transitBg;
+            transitActionBtnText = transitTxt;
 
-        public void BindMinimapBanners(TextMeshProUGUI sectorTmp, TextMeshProUGUI floorTmp,
-                                      TextMeshProUGUI locationTmp, TextMeshProUGUI subFooterTmp)
-        {
-            minimapHeaderSectorTmp = sectorTmp;
-            minimapHeaderFloorTmp = floorTmp;
-            minimapFooterLocationTmp = locationTmp;
-            minimapSubFooterTmp = subFooterTmp;
+            if (transitActionButton != null)
+            {
+                transitActionButton.onClick.RemoveAllListeners();
+                transitActionButton.onClick.AddListener(OnTransitButtonClicked);
+            }
+
+            RefreshAllNodes();
+            SelectNode(currentLocationId);
         }
 
         public void SetCurrentLocation(string locationId)
@@ -366,18 +767,50 @@ namespace SundayLastBreath.UI
 
         private void OnNodeClicked(string nodeId)
         {
-            SelectNode(nodeId);
-
-            // If player clicked on an adjacent accessible room, move into it!
-            if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel curr))
+            // If clicking an already-selected adjacent accessible room, step into it; otherwise select it for recon
+            if (string.Equals(selectedNodeId, nodeId, StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(currentLocationId, nodeId, StringComparison.OrdinalIgnoreCase))
             {
-                if (curr.connectedIds.Contains(nodeId))
+                if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel curr) &&
+                    curr.connectedIds.Contains(nodeId) &&
+                    nodeRegistry.TryGetValue(nodeId, out NodeModel target) &&
+                    target.isAccessible)
                 {
-                    if (nodeRegistry.TryGetValue(nodeId, out NodeModel target) && target.isAccessible)
-                    {
-                        SetCurrentLocation(nodeId);
-                    }
+                    SetCurrentLocation(nodeId);
+                    return;
                 }
+            }
+
+            SelectNode(nodeId);
+        }
+
+        private void OnTransitButtonClicked()
+        {
+            AudioManager.Instance?.PlayButtonClick();
+
+            if (!nodeRegistry.TryGetValue(selectedNodeId, out NodeModel target)) return;
+
+            if (string.Equals(selectedNodeId, currentLocationId, StringComparison.OrdinalIgnoreCase))
+            {
+                // If already at current location and not in 407, allow quick reset to 407 safehouse
+                if (!string.Equals(currentLocationId, "unit_407", StringComparison.OrdinalIgnoreCase))
+                {
+                    SetCurrentLocation("unit_407");
+                }
+                return;
+            }
+
+            if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel curr) && curr.connectedIds.Contains(target.id))
+            {
+                if (target.isAccessible)
+                {
+                    SetCurrentLocation(target.id);
+                }
+            }
+            else if (target.isAccessible)
+            {
+                // Direct tactical simulation jump along cleared corridor spine
+                SetCurrentLocation(target.id);
             }
         }
 
@@ -386,30 +819,55 @@ namespace SundayLastBreath.UI
             if (!nodeRegistry.TryGetValue(nodeId, out NodeModel model)) return;
             selectedNodeId = nodeId;
 
-            // Update all visual node outlines and nav badges
             foreach (var kvp in uiHolders)
             {
                 ApplyVisualState(kvp.Value);
             }
 
-            // Update Minimap Footer Banner
-            if (minimapFooterLocationTmp != null)
+            bool isCurrent = string.Equals(model.id, currentLocationId, StringComparison.OrdinalIgnoreCase);
+            bool isAdjacent = false;
+            string dirLetter = "";
+            if (!isCurrent && nodeRegistry.TryGetValue(currentLocationId, out NodeModel curr))
             {
-                string marker = model.id == currentLocationId ? "CURRENT LOCATION: " : "INSPECTING: ";
-                minimapFooterLocationTmp.text = $"<b>{marker}{model.title.ToUpper()}</b>";
+                if (curr.connectedIds.Contains(model.id))
+                {
+                    isAdjacent = true;
+                    dirLetter = GetDirectionLetter(curr, model);
+                }
             }
 
-            // Update Recon Intel Panel
+            // Update Blueprint Coordinate & Footer Readout
+            if (blueprintCoordTmp != null)
+            {
+                string gridX = model.col == 0 ? "W-01" : (model.col == 1 ? "C-00" : "E-02");
+                string gridY = $"R-0{model.row + 1}";
+                blueprintCoordTmp.text = $"GRID [{gridX}:{gridY}] // BIO-RADAR: ACTIVE";
+            }
+
+            if (blueprintFooterLocationTmp != null && nodeRegistry.TryGetValue(currentLocationId, out NodeModel playerNode))
+            {
+                blueprintFooterLocationTmp.text =
+                    $"<color=#00e5ff><b>PLAYER POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>   <color=#475569>|</color>   <color=#f39c12><b>SELECTED:</b> {model.roomCode}</color>";
+            }
+
+            // Update Right Dossier Header & Icon
+            if (intelHeaderIcon != null)
+            {
+                intelHeaderIcon.sprite = GetRoomIconSprite(model.iconType);
+                intelHeaderIcon.color = isCurrent
+                    ? new Color(0.0f, 0.90f, 1.0f)
+                    : (model.isAccessible ? new Color(0.25f, 0.88f, 0.55f) : (model.isLocked ? new Color(0.95f, 0.65f, 0.15f) : new Color(0.92f, 0.30f, 0.30f)));
+            }
+
             if (intelSectorTitleText != null)
             {
-                string icon = model.isStairs ? "▼ " : (model.isHallway ? "║ " : (model.isLocked ? "🔒 " : "■ "));
-                intelSectorTitleText.text = $"{icon}<b>UNIT {model.roomCode} // {model.title}</b>";
+                intelSectorTitleText.text = $"<b>{model.roomCode} // {model.title}</b>";
             }
 
             if (intelStatusBadgeText != null)
             {
-                string colorHex = model.id == currentLocationId ? "#00e5ff" : (model.isAccessible ? "#2ecc71" : (model.isLocked ? "#f39c12" : "#e74c3c"));
-                string tag = model.id == currentLocationId ? "CURRENT LOCATION" : model.statusTag;
+                string colorHex = isCurrent ? "#00e5ff" : (model.isAccessible ? "#2ecc71" : (model.isLocked ? "#f39c12" : "#e74c3c"));
+                string tag = isCurrent ? "CURRENT SECTOR" : model.statusTag;
                 intelStatusBadgeText.text = $"<color={colorHex}><b>[ {tag} ]</b></color>";
             }
 
@@ -418,17 +876,22 @@ namespace SundayLastBreath.UI
                 string threatCol = model.threatLevel switch
                 {
                     "ZERO" or "MINIMAL" => "#2ecc71",
-                    "LOW" => "#4fc3f7",
+                    "LOW" => "#38bdf8",
                     "MEDIUM" => "#f39c12",
-                    "HIGH" or "DANGER" => "#e74c3c",
-                    _ => "#95a5a6"
+                    "HIGH" or "DANGER" or "IMPASSABLE" => "#e74c3c",
+                    _ => "#94a3b8"
                 };
-                intelThreatText.text = $"THREAT LEVEL: <color={threatCol}><b>{model.threatLevel}</b></color>";
+                intelThreatText.text = $"<color=#64748b>THREAT:</color> <color={threatCol}><b>{model.threatLevel}</b></color>";
             }
 
             if (intelScavengeText != null)
             {
-                intelScavengeText.text = $"RECON TARGET: <color=#f39c12><b>{model.scavengeStatus}</b></color>";
+                intelScavengeText.text = $"<color=#64748b>SALVAGE:</color> <color=#f39c12><b>{model.scavengeStatus}</b></color>";
+            }
+
+            if (intelAcousticText != null)
+            {
+                intelAcousticText.text = $"<color=#64748b>AUDIO:</color> <color=#38bdf8><b>{model.acousticScan}</b></color>";
             }
 
             if (intelDescriptionText != null)
@@ -436,26 +899,60 @@ namespace SundayLastBreath.UI
                 intelDescriptionText.text = model.reconIntel;
             }
 
+            // Update Action Prompt & Transit Button
             if (quickNavPromptText != null)
             {
-                if (model.id == currentLocationId)
+                if (isCurrent)
                 {
-                    quickNavPromptText.text = "<color=#00e5ff>▶</color> <color=#ffffff><b>YOU ARE HERE.</b> Use [W/A/S/D] or click adjacent highlighted rooms to navigate.</color>";
+                    quickNavPromptText.text = "<color=#00e5ff><b>[RADAR LOCK]</b></color> Occupying this sector. Use <b>[W/A/S/D]</b> or click adjacent sectors to move.";
                 }
-                else if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel curr) && curr.connectedIds.Contains(model.id))
+                else if (isAdjacent)
                 {
-                    string dir = GetDirectionLetter(curr, model);
-                    string keyPrompt = string.IsNullOrEmpty(dir) ? "" : $"Press <b>[{dir}]</b> or ";
                     if (model.isAccessible)
-                        quickNavPromptText.text = $"<color=#2ecc71>▶</color> <color=#ffffff><b>ADJACENT SECTOR:</b> {keyPrompt}click to step into {model.title}.</color>";
+                        quickNavPromptText.text = $"<color=#2ecc71><b>[DIRECT DOORWAY]</b></color> Press <b>[{dirLetter}]</b>, double-click tile, or click button to enter.";
                     else if (model.isLocked)
-                        quickNavPromptText.text = $"<color=#f39c12>▶</color> <color=#ffffff><b>DOOR LOCKED:</b> Heavy deadbolt engaged. Requires Lockpicking or Key.</color>";
+                        quickNavPromptText.text = "<color=#f39c12><b>[LOCKED THRESHOLD]</b></color> Heavy deadbolt engaged. Requires key or lockpick.";
                     else
-                        quickNavPromptText.text = $"<color=#e74c3c>▶</color> <color=#ffffff><b>SECTOR BLOCKED:</b> Completely impassable without demolition tools.</color>";
+                        quickNavPromptText.text = "<color=#e74c3c><b>[HAZARD BARRICADE]</b></color> Structural blockade or lethal biohazard.";
                 }
                 else
                 {
-                    quickNavPromptText.text = $"<color=#f39c12>▶</color> <color=#ffffff><b>RECON TARGET:</b> {model.title} ({model.statusTag}). Requires moving through hallway.</color>";
+                    quickNavPromptText.text = $"<color=#94a3b8><b>[REMOTE RECON]</b></color> {model.title} — navigate via Central Spine Corridor.";
+                }
+            }
+
+            if (transitActionButton != null && transitActionBg != null && transitActionBtnText != null)
+            {
+                if (isCurrent)
+                {
+                    if (string.Equals(currentLocationId, "unit_407", StringComparison.OrdinalIgnoreCase))
+                    {
+                        transitActionButton.interactable = false;
+                        transitActionBg.color = new Color(0.06f, 0.14f, 0.18f, 0.95f);
+                        transitActionBtnText.text = "<color=#00e5ff><b>[ CURRENTLY OCCUPYING SAFEHOUSE 407 ]</b></color>";
+                    }
+                    else
+                    {
+                        transitActionButton.interactable = true;
+                        transitActionBg.color = new Color(0.08f, 0.18f, 0.24f, 0.95f);
+                        transitActionBtnText.text = "<color=#00e5ff><b>[ << RETURN TO UNIT 407 SAFEHOUSE ]</b></color>";
+                    }
+                }
+                else if (model.isAccessible)
+                {
+                    transitActionButton.interactable = true;
+                    transitActionBg.color = isAdjacent
+                        ? new Color(0.10f, 0.24f, 0.16f, 0.98f)
+                        : new Color(0.12f, 0.18f, 0.26f, 0.98f);
+                    string keyTag = isAdjacent && !string.IsNullOrEmpty(dirLetter) ? $" [{dirLetter}]" : "";
+                    transitActionBtnText.text = $"<color=#2ecc71><b>[ >> TRANSIT TO {model.roomCode}{keyTag} ]</b></color>";
+                }
+                else
+                {
+                    transitActionButton.interactable = false;
+                    transitActionBg.color = new Color(0.18f, 0.08f, 0.08f, 0.95f);
+                    string reason = model.isLocked ? "DOOR LOCKED — KEY / LOCKPICK REQUIRED" : "SECTOR IMPASSABLE — BARRICADED";
+                    transitActionBtnText.text = $"<color=#e74c3c><b>[ X {reason} ]</b></color>";
                 }
             }
         }
@@ -486,10 +983,10 @@ namespace SundayLastBreath.UI
 
         private static string GetDirectionLetter(NodeModel fromNode, NodeModel toNode)
         {
-            if (toNode.row < fromNode.row) return "W"; // North
-            if (toNode.row > fromNode.row) return "S"; // South
-            if (toNode.col < fromNode.col) return "A"; // West
-            if (toNode.col > fromNode.col) return "D"; // East
+            if (toNode.row < fromNode.row) return "W";
+            if (toNode.row > fromNode.row) return "S";
+            if (toNode.col < fromNode.col) return "A";
+            if (toNode.col > fromNode.col) return "D";
             return "";
         }
 
@@ -499,15 +996,11 @@ namespace SundayLastBreath.UI
             {
                 ApplyVisualState(kvp.Value);
             }
-
-            if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel curr))
-            {
-                if (minimapFooterLocationTmp != null)
-                {
-                    minimapFooterLocationTmp.text = $"<b>CURRENT LOCATION: {curr.title.ToUpper()}</b>";
-                }
-            }
         }
+
+        // =========================================================================
+        // BLUEPRINT CLEARANCE & VISUAL STYLING (RE2 + Signalis + Sevastolink)
+        // =========================================================================
 
         private void ApplyVisualState(NodeUIHolder holder)
         {
@@ -516,7 +1009,6 @@ namespace SundayLastBreath.UI
             bool isCurrent = string.Equals(holder.model.id, currentLocationId, StringComparison.OrdinalIgnoreCase);
             bool isSelected = string.Equals(holder.model.id, selectedNodeId, StringComparison.OrdinalIgnoreCase);
 
-            // Check if adjacent to current position
             bool isAdjacent = false;
             string dirLetter = "";
             if (!isCurrent && nodeRegistry.TryGetValue(currentLocationId, out NodeModel curr))
@@ -528,13 +1020,13 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // Beacon Halo
+            // Player Radar Beacon
             if (holder.beaconObj != null)
             {
                 holder.beaconObj.SetActive(isCurrent);
             }
 
-            // Direction Navigation Badge [W], [A], [S], [D]
+            // Directional Hotkey Pill [W], [A], [S], [D]
             if (holder.navBadgeObj != null)
             {
                 holder.navBadgeObj.SetActive(isAdjacent && !string.IsNullOrEmpty(dirLetter));
@@ -544,198 +1036,181 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // Hatched Overlay for Blocked or Locked
-            bool showHatched = holder.model.isBlocked || holder.model.isLocked;
-            if (holder.hatchedOverlay != null)
+            // Procedural Pattern Overlay (Diagonal Hazard Stripes or Stair Treads)
+            if (holder.patternOverlay != null)
             {
-                holder.hatchedOverlay.gameObject.SetActive(showHatched);
-                if (showHatched && holder.hatchedOverlay.sprite == null)
+                if (holder.model.isBlocked || holder.model.isLocked)
                 {
-                    holder.hatchedOverlay.sprite = GetHatchedSprite();
-                    holder.hatchedOverlay.type = Image.Type.Tiled;
+                    holder.patternOverlay.gameObject.SetActive(true);
+                    holder.patternOverlay.sprite = GetHatchedSprite();
+                    holder.patternOverlay.type = Image.Type.Tiled;
+                    holder.patternOverlay.color = holder.model.isLocked
+                        ? new Color(0.95f, 0.65f, 0.15f, 0.30f)
+                        : new Color(0.90f, 0.25f, 0.25f, 0.38f);
+                }
+                else if (holder.model.isStairs)
+                {
+                    holder.patternOverlay.gameObject.SetActive(true);
+                    holder.patternOverlay.sprite = GetStairTreadSprite();
+                    holder.patternOverlay.type = Image.Type.Tiled;
+                    holder.patternOverlay.color = Color.white;
+                }
+                else
+                {
+                    holder.patternOverlay.gameObject.SetActive(false);
                 }
             }
 
-            // Colors based on Trials in Tainted Space aesthetic
+            // Doorway Threshold Tick Color
+            if (holder.doorTickImage != null)
+            {
+                if (isCurrent || (isAdjacent && holder.model.isAccessible))
+                    holder.doorTickImage.color = new Color(0.0f, 0.90f, 1.0f, 0.95f); // Glowing Cyan threshold
+                else if (holder.model.isAccessible)
+                    holder.doorTickImage.color = new Color(0.18f, 0.78f, 0.48f, 0.85f); // Accessible Emerald threshold
+                else if (holder.model.isLocked)
+                    holder.doorTickImage.color = new Color(0.95f, 0.60f, 0.12f, 0.90f); // Locked Amber threshold
+                else
+                    holder.doorTickImage.color = new Color(0.88f, 0.24f, 0.24f, 0.90f); // Barricaded Crimson threshold
+            }
+
+            // Room Footprint Fill, Wall Stroke & Typography
             if (isCurrent)
             {
-                // Active Player Room: Solid Vibrant Purple fill (#8e24aa / #9c27b0)
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.55f, 0.14f, 0.67f, 1.0f);
+                // Player Location: Glowing Phosphor Cyan Blueprint Module
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.04f, 0.22f, 0.30f, 0.98f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.92f, 0.48f, 0.98f, 0.95f);
+                    holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 1.0f);
                     holder.outline.effectDistance = new Vector2(2f, -2f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = $"<b>{holder.model.roomCode}</b>";
-                    holder.iconTextTmp.color = Color.white;
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.0f, 0.96f, 1.0f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = Color.white;
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = "YOU";
-                    holder.subLabelTmp.color = new Color(0.95f, 0.85f, 1.0f);
+                    holder.subLabelTmp.text = "LOCATED";
+                    holder.subLabelTmp.color = new Color(0.0f, 0.92f, 1.0f);
                 }
             }
             else if (isSelected)
             {
-                // Selected Room for Recon Intel: Gold Accent Outline
-                if (holder.bgImage != null)
-                {
-                    holder.bgImage.color = holder.model.isHallway ?
-                        new Color(0.08f, 0.11f, 0.16f, 0.95f) :
-                        new Color(0.12f, 0.16f, 0.22f, 0.98f);
-                }
+                // Active Scanner Target: Tactical Amber Selection Reticle
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.16f, 0.14f, 0.08f, 0.98f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.98f, 0.70f, 0.15f, 0.95f);
+                    holder.outline.effectColor = new Color(0.98f, 0.68f, 0.12f, 1.0f);
                     holder.outline.effectDistance = new Vector2(2f, -2f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = GetIconText(holder.model);
-                    holder.iconTextTmp.color = new Color(0.98f, 0.75f, 0.25f);
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.98f, 0.72f, 0.18f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(1.0f, 0.85f, 0.40f);
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = holder.model.roomCode;
+                    holder.subLabelTmp.text = holder.model.shortSub;
                     holder.subLabelTmp.color = Color.white;
                 }
             }
-            else if (isAdjacent)
+            else if (isAdjacent && holder.model.isAccessible)
             {
-                // Reachable Adjacent Room: Highlighted Purple Outline (#a855f7)
-                if (holder.bgImage != null)
-                {
-                    holder.bgImage.color = holder.model.isHallway ?
-                        new Color(0.09f, 0.12f, 0.17f, 0.95f) :
-                        new Color(0.13f, 0.18f, 0.25f, 0.98f);
-                }
+                // Directly Reachable Sector: Highlighted Emerald-Cyan Blueprint
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.06f, 0.16f, 0.18f, 0.96f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.68f, 0.35f, 0.95f, 0.90f);
+                    holder.outline.effectColor = new Color(0.20f, 0.85f, 0.65f, 0.90f);
                     holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = GetIconText(holder.model);
-                    holder.iconTextTmp.color = new Color(0.85f, 0.70f, 0.98f);
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.25f, 0.92f, 0.68f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(0.85f, 0.98f, 0.92f);
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = holder.model.roomCode;
-                    holder.subLabelTmp.color = new Color(0.80f, 0.85f, 0.92f);
+                    holder.subLabelTmp.text = holder.model.shortSub;
+                    holder.subLabelTmp.color = new Color(0.55f, 0.82f, 0.72f);
                 }
             }
             else if (holder.model.isStairs)
             {
-                // Stairs Room: Amber / Escape Theme
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.09f, 0.10f, 0.13f, 0.95f);
+                // Fire Stairwell Exit: Tactical Amber-Slate
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.11f, 0.09f, 0.06f, 0.96f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.90f, 0.50f, 0.12f, 0.80f);
-                    holder.outline.effectDistance = new Vector2(1f, -1f);
+                    holder.outline.effectColor = new Color(0.88f, 0.52f, 0.14f, 0.85f);
+                    holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = "▼";
-                    holder.iconTextTmp.color = new Color(0.95f, 0.55f, 0.15f);
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.95f, 0.60f, 0.18f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(0.95f, 0.70f, 0.30f);
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = "STAIRS";
-                    holder.subLabelTmp.color = new Color(0.75f, 0.75f, 0.80f);
+                    holder.subLabelTmp.text = holder.model.shortSub;
+                    holder.subLabelTmp.color = new Color(0.75f, 0.60f, 0.42f);
                 }
             }
             else if (holder.model.isHallway)
             {
-                // Central Corridor Hallway: Steel Blue-Grey Tile
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
+                // Spine Corridor Segment: Recessed Blueprint Slate
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.05f, 0.08f, 0.12f, 0.95f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.24f, 0.32f, 0.42f, 0.80f);
+                    holder.outline.effectColor = new Color(0.20f, 0.32f, 0.44f, 0.85f);
                     holder.outline.effectDistance = new Vector2(1f, -1f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = holder.model.roomCode;
-                    holder.iconTextTmp.color = new Color(0.60f, 0.72f, 0.85f);
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.42f, 0.62f, 0.78f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(0.68f, 0.82f, 0.94f);
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = "CORR";
-                    holder.subLabelTmp.color = new Color(0.45f, 0.55f, 0.65f);
+                    holder.subLabelTmp.text = holder.model.shortSub;
+                    holder.subLabelTmp.color = new Color(0.45f, 0.58f, 0.70f);
                 }
             }
             else if (holder.model.isLocked)
             {
-                // Locked Room: Dark Slate with Padlock icon
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.08f, 0.08f, 0.10f, 0.95f);
+                // Locked Unit: Amber Security Tint
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.10f, 0.08f, 0.05f, 0.96f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.55f, 0.40f, 0.20f, 0.70f);
+                    holder.outline.effectColor = new Color(0.65f, 0.44f, 0.14f, 0.80f);
                     holder.outline.effectDistance = new Vector2(1f, -1f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = "🔒";
-                    holder.iconTextTmp.color = new Color(0.95f, 0.70f, 0.20f);
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.92f, 0.65f, 0.20f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(0.92f, 0.76f, 0.45f);
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = holder.model.roomCode;
-                    holder.subLabelTmp.color = new Color(0.65f, 0.65f, 0.70f);
+                    holder.subLabelTmp.text = "LOCKED";
+                    holder.subLabelTmp.color = new Color(0.75f, 0.55f, 0.25f);
                 }
             }
             else if (holder.model.isBlocked)
             {
-                // Blocked / Impassable: Hatched Dark Slate with Hazard Red Outline
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.07f, 0.07f, 0.09f, 0.95f);
+                // Barricaded / Biohazard / Collapsed: Crimson Alert Tint (RE2 Danger Style)
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.14f, 0.05f, 0.06f, 0.96f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.55f, 0.20f, 0.20f, 0.70f);
+                    holder.outline.effectColor = new Color(0.72f, 0.20f, 0.22f, 0.85f);
                     holder.outline.effectDistance = new Vector2(1f, -1f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = "⛔";
-                    holder.iconTextTmp.color = new Color(0.85f, 0.35f, 0.35f);
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.92f, 0.30f, 0.30f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(0.95f, 0.48f, 0.48f);
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = holder.model.roomCode;
-                    holder.subLabelTmp.color = new Color(0.55f, 0.50f, 0.50f);
+                    holder.subLabelTmp.text = holder.model.shortSub;
+                    holder.subLabelTmp.color = new Color(0.75f, 0.36f, 0.36f);
                 }
             }
             else
             {
-                // Standard Discovered Room: Dark Navy Slate (#1e293b)
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.10f, 0.14f, 0.20f, 0.95f);
+                // Accessible / Cleared Residential Unit: Blueprint Steel-Emerald
+                if (holder.bgImage != null) holder.bgImage.color = new Color(0.06f, 0.11f, 0.16f, 0.96f);
                 if (holder.outline != null)
                 {
-                    holder.outline.effectColor = new Color(0.24f, 0.30f, 0.40f, 0.85f);
+                    holder.outline.effectColor = new Color(0.22f, 0.44f, 0.56f, 0.85f);
                     holder.outline.effectDistance = new Vector2(1f, -1f);
                 }
-                if (holder.iconTextTmp != null)
-                {
-                    holder.iconTextTmp.text = GetIconText(holder.model);
-                    holder.iconTextTmp.color = new Color(0.75f, 0.86f, 0.95f);
-                }
+                if (holder.iconImage != null) holder.iconImage.color = new Color(0.35f, 0.82f, 0.65f);
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(0.82f, 0.92f, 0.98f);
                 if (holder.subLabelTmp != null)
                 {
-                    holder.subLabelTmp.text = holder.model.roomCode;
-                    holder.subLabelTmp.color = new Color(0.55f, 0.65f, 0.75f);
+                    holder.subLabelTmp.text = holder.model.shortSub;
+                    holder.subLabelTmp.color = new Color(0.52f, 0.68f, 0.78f);
                 }
             }
-        }
-
-        private static string GetIconText(NodeModel model)
-        {
-            if (model.isStairs) return "▼";
-            if (model.isLocked) return "🔒";
-            if (model.isBlocked) return "⛔";
-            if (model.id.Equals("utility", StringComparison.OrdinalIgnoreCase)) return "⚡";
-            return model.roomCode;
         }
     }
 }
