@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v46_auto.flag";
+            string flagPath = "Temp/scene_v47_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -5661,7 +5661,7 @@ namespace SundayLastBreath.Editor
             hiRect.anchoredPosition = Vector2.zero;
             hiRect.sizeDelta = new Vector2(20f, 20f);
             Image hdrIconImg = hdrIconObj.AddComponent<Image>();
-            hdrIconImg.sprite = TacticalMapViewController.GetRoomIconSprite(TacticalMapViewController.RoomIconType.Home);
+            hdrIconImg.sprite = TacticalMapViewController.GetRoomIconSprite(SundayLastBreath.Data.TacticalRoomIconType.Home);
             hdrIconImg.color = new Color(0.0f, 0.90f, 1.0f);
             hdrIconImg.preserveAspect = true;
 
@@ -5698,7 +5698,7 @@ namespace SundayLastBreath.Editor
             mcOl.effectDistance = new Vector2(1f, -1f);
 
             TextMeshProUGUI intelThreatTmp = CreateTMPText(metricsCard.transform, "ThreatMetric",
-                "<color=#64748b>THREAT:</color> <color=#2ecc71><b>ZERO</b></color>",
+                "<color=#64748b>THREAT:</color> <color=#2ecc71><b>NONE</b></color>",
                 9.5f, new Color(0.82f, 0.88f, 0.95f), TextAlignmentOptions.MidlineLeft);
             intelThreatTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
             intelThreatTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
@@ -5750,14 +5750,14 @@ namespace SundayLastBreath.Editor
             dbxOl.effectDistance = new Vector2(1f, -1f);
 
             TextMeshProUGUI intelDescTmp = CreateTMPText(descBox.transform, "IntelDescription",
-                "Your 4th-floor studio apartment. The heavy steel deadbolt held through the initial wave of sirens.",
+                "Your residential apartment. The television flickers with civil defense emergency alert white noise. Heavy reinforced deadbolt held firm during the initial outbreak chaos. Direct exit to North Spine Corridor.",
                 10f, new Color(0.78f, 0.86f, 0.95f), TextAlignmentOptions.TopLeft);
             intelDescTmp.lineSpacing = 3f;
             StretchFull(intelDescTmp.rectTransform);
             intelDescTmp.rectTransform.offsetMin = new Vector2(10f, 6f);
             intelDescTmp.rectTransform.offsetMax = new Vector2(-10f, -6f);
 
-            // Interactive Transit Action Button (y: -258 to -296, height: 38px)
+            // Tactical Doorway & Sector Clearance Bar (Informational — pure reference map)
             GameObject transitBtnObj = new GameObject("TransitActionButton", typeof(RectTransform));
             transitBtnObj.transform.SetParent(intelCard.transform, false);
             RectTransform tboRect = transitBtnObj.GetComponent<RectTransform>();
@@ -5768,16 +5768,17 @@ namespace SundayLastBreath.Editor
             tboRect.offsetMax = new Vector2(-14f, -258f);
 
             Image transitBg = transitBtnObj.AddComponent<Image>();
-            transitBg.color = new Color(0.06f, 0.14f, 0.18f, 0.95f);
+            transitBg.color = new Color(0.04f, 0.14f, 0.18f, 0.95f);
             Outline transitOl = transitBtnObj.AddComponent<Outline>();
             transitOl.effectColor = new Color(0.0f, 0.78f, 0.95f, 0.85f);
             transitOl.effectDistance = new Vector2(1f, -1f);
 
             Button transitBtn = transitBtnObj.AddComponent<Button>();
             transitBtn.targetGraphic = transitBg;
+            transitBtn.interactable = false;
 
             TextMeshProUGUI transitTxt = CreateTMPText(transitBtnObj.transform, "ButtonText",
-                "<color=#00e5ff><b>[ CURRENTLY OCCUPYING SAFEHOUSE 407 ]</b></color>",
+                "<color=#00e5ff><b>[ CURRENT LOCATION // SAFEHOUSE 407 ]</b></color>",
                 10f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
             StretchFull(transitTxt.rectTransform);
 
@@ -5794,7 +5795,7 @@ namespace SundayLastBreath.Editor
             nfBg.color = new Color(0.04f, 0.06f, 0.10f, 0.95f);
 
             TextMeshProUGUI quickNavTmp = CreateTMPText(navFooter.transform, "PromptText",
-                "<color=#00e5ff><b>[RADAR LOCK]</b></color> Occupying this sector. Use <b>[W/A/S/D]</b> or click adjacent sectors to move.",
+                "<color=#94a3b8>Click any sector on the blueprint or use arrow keys to inspect recon telemetry & architectural notes.</color>",
                 8.5f, new Color(0.75f, 0.84f, 0.92f), TextAlignmentOptions.Center);
             StretchFull(quickNavTmp.rectTransform);
             quickNavTmp.rectTransform.offsetMin = new Vector2(8f, 0f);
@@ -5883,7 +5884,7 @@ namespace SundayLastBreath.Editor
             nRect.sizeDelta = size;
 
             Image bg = nodeObj.AddComponent<Image>();
-            bg.color = new Color(0.05f, 0.08f, 0.12f, 0.96f);
+            bg.color = new Color(0.035f, 0.055f, 0.085f, 0.96f);
 
             Outline ol = nodeObj.AddComponent<Outline>();
             ol.effectColor = new Color(0.20f, 0.34f, 0.48f, 0.85f);
@@ -5892,17 +5893,17 @@ namespace SundayLastBreath.Editor
             Button btn = nodeObj.AddComponent<Button>();
             btn.targetGraphic = bg;
 
-            // Procedural Pattern Overlay (Hatched locked/hazard stripes or stair treads)
+            // Procedural Pattern Overlay (Softened tactical wireframe hatch)
             GameObject patObj = new GameObject("PatternOverlay", typeof(RectTransform));
             patObj.transform.SetParent(nodeObj.transform, false);
             StretchFull(patObj.GetComponent<RectTransform>());
             Image patImg = patObj.AddComponent<Image>();
             patImg.type = Image.Type.Tiled;
-            patImg.color = new Color(1f, 1f, 1f, 0.25f);
+            patImg.color = new Color(1f, 1f, 1f, 0.12f);
             patImg.raycastTarget = false;
             patObj.SetActive(false);
 
-            // Procedural Vector Room Icon (15x15 on left)
+            // Procedural Vector Room Icon (16x16 on left)
             GameObject iconObj = new GameObject("Icon", typeof(RectTransform));
             iconObj.transform.SetParent(nodeObj.transform, false);
             RectTransform icRect = iconObj.GetComponent<RectTransform>();
@@ -5915,10 +5916,10 @@ namespace SundayLastBreath.Editor
             iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
 
-            // Room Code Label (Top Line)
+            // Room Code Label (Top Line) — Pure crisp white for 16:1 contrast
             TextMeshProUGUI codeTmp = CreateTMPText(nodeObj.transform, "Code", code,
                 isHallway ? 8.5f : 10f,
-                new Color(0.82f, 0.92f, 0.98f),
+                Color.white,
                 isHallway ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft,
                 FontStyles.Bold);
             RectTransform cRect = codeTmp.rectTransform;
@@ -5930,7 +5931,7 @@ namespace SundayLastBreath.Editor
             // Sub-Label / Clearance Readout (Bottom Line)
             TextMeshProUGUI subTmp = CreateTMPText(nodeObj.transform, "SubLabel", subLabel,
                 isHallway ? 7f : 8f,
-                new Color(0.52f, 0.68f, 0.78f),
+                new Color(0.65f, 0.78f, 0.88f),
                 isHallway ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft);
             RectTransform sRect = subTmp.rectTransform;
             sRect.anchorMin = new Vector2(0f, 0f);
@@ -5938,7 +5939,7 @@ namespace SundayLastBreath.Editor
             sRect.offsetMin = new Vector2(isHallway ? 4f : 28f, 3f);
             sRect.offsetMax = new Vector2(isHallway ? -4f : -48f, 1f);
 
-            // Navigation Keybind Pill Badge (Top-Right Corner, e.g. [D], [W], [S])
+            // Tactical Status Pill Badge (Top-Right Corner, e.g. [LOCK], [HERE], [EXIT])
             GameObject navBadge = new GameObject("NavBadge", typeof(RectTransform));
             navBadge.transform.SetParent(nodeObj.transform, false);
             RectTransform nbRect = navBadge.GetComponent<RectTransform>();
@@ -5954,7 +5955,7 @@ namespace SundayLastBreath.Editor
             nbOl.effectColor = new Color(0.18f, 0.85f, 0.55f, 0.80f);
             nbOl.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI navTmp = CreateTMPText(navBadge.transform, "NavText", "[D]",
+            TextMeshProUGUI navTmp = CreateTMPText(navBadge.transform, "NavText", "[INFO]",
                 7.5f, new Color(0.25f, 0.95f, 0.65f), TextAlignmentOptions.Center, FontStyles.Bold);
             StretchFull(navTmp.rectTransform);
             navBadge.SetActive(false);
