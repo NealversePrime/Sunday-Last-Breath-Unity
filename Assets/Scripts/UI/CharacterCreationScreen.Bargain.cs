@@ -188,7 +188,15 @@ namespace SundayLastBreath.UI
         public void OnBackFromBargainClicked()
         {
             PlayClick();
+            // When returning from drawbacks to edit hobbies:
+            // Remove secondary hobby so player can pick a new secondary hobby!
+            if (pickedHobbyIds.Count >= 2)
+            {
+                pickedHobbyIds.RemoveAt(pickedHobbyIds.Count - 1);
+            }
             hobbyStep = 2;
+            activeWeaknessTab = 0;
+            RebuildCharacterFromSelections();
             ShowHobbySelectionPanel();
         }
 
@@ -212,7 +220,7 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            if (bargainPanel != null && bargainPanel.transform.Find("BargainBuiltMarker_V2") != null)
+            if (bargainPanel != null && bargainPanel.transform.Find("BargainBuiltMarker_V3") != null)
             {
                 BindBargainReferences();
                 // Panel was built in the editor and saved into the scene. Runtime (non-persistent)
@@ -245,7 +253,7 @@ namespace SundayLastBreath.UI
             }
 
             // Build Marker
-            GameObject marker = new GameObject("BargainBuiltMarker_V2");
+            GameObject marker = new GameObject("BargainBuiltMarker_V3");
             marker.transform.SetParent(bargainPanel.transform, false);
 
             // Dark Atmosphere Background
@@ -259,8 +267,8 @@ namespace SundayLastBreath.UI
             hRect.anchorMin = new Vector2(0.5f, 1f);
             hRect.anchorMax = new Vector2(0.5f, 1f);
             hRect.pivot = new Vector2(0.5f, 1f);
-            hRect.sizeDelta = new Vector2(1120f, 95f);
-            hRect.anchoredPosition = new Vector2(0f, -18f);
+            hRect.sizeDelta = new Vector2(1560f, 98f);
+            hRect.anchoredPosition = new Vector2(0f, -16f);
 
             CreateUIText(headerObj.transform, "Badge",
                 "<b><color=#EF5350>[ STEP 04 // PROTOCOL: SURVIVAL BARGAIN ]</color></b>",
@@ -269,12 +277,12 @@ namespace SundayLastBreath.UI
 
             CreateUIText(headerObj.transform, "Title",
                 "THE SURVIVAL BARGAIN",
-                30f, TextAlignmentOptions.Center, new Color(0.95f, 0.85f, 0.40f), FontRole.Display,
+                32f, TextAlignmentOptions.Center, new Color(0.95f, 0.85f, 0.40f), FontRole.Display,
                 new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -56f), new Vector2(0f, -16f));
 
             CreateUIText(headerObj.transform, "Subtitle",
                 "VOLUNTARILY ACCEPT PHYSICAL OR PSYCHOLOGICAL FLAWS TO ACQUIRE EXTRA M.O.R.T.A.L. ATTRIBUTE POINTS (MAX 2).",
-                12f, TextAlignmentOptions.Center, new Color(0.70f, 0.78f, 0.86f), FontRole.Body,
+                13f, TextAlignmentOptions.Center, new Color(0.70f, 0.78f, 0.86f), FontRole.Body,
                 new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 22f));
 
             // 2. Status Banner (Pill Bar)
@@ -284,7 +292,7 @@ namespace SundayLastBreath.UI
             bRect.anchorMin = new Vector2(0.5f, 1f);
             bRect.anchorMax = new Vector2(0.5f, 1f);
             bRect.pivot = new Vector2(0.5f, 1f);
-            bRect.sizeDelta = new Vector2(1120f, 34f);
+            bRect.sizeDelta = new Vector2(1560f, 42f);
             bRect.anchoredPosition = new Vector2(0f, -118f);
 
             Image bBg = bannerObj.AddComponent<Image>();
@@ -295,7 +303,7 @@ namespace SundayLastBreath.UI
 
             _bargainBannerText = CreateUIText(bannerObj.transform, "BannerText",
                 "DRAWBACKS ACCEPTED: <b>[ 0 / 2 ]</b>    |    UNALLOCATED ATTRIBUTE POINTS: <b>[ +0 ]</b>",
-                12.5f, TextAlignmentOptions.Center, new Color(0.90f, 0.94f, 0.98f), FontRole.Mono,
+                14f, TextAlignmentOptions.Center, new Color(0.90f, 0.94f, 0.98f), FontRole.Mono,
                 Vector2.zero, Vector2.one, new Vector2(12f, 0f), new Vector2(-12f, 0f));
 
             // 3. Main Split Container (Left = Drawbacks, Right = M.O.R.T.A.L. Allocator)
@@ -305,8 +313,8 @@ namespace SundayLastBreath.UI
             sRect.anchorMin = new Vector2(0.5f, 0.5f);
             sRect.anchorMax = new Vector2(0.5f, 0.5f);
             sRect.pivot = new Vector2(0.5f, 0.5f);
-            sRect.sizeDelta = new Vector2(1120f, 490f);
-            sRect.anchoredPosition = new Vector2(0f, -22f);
+            sRect.sizeDelta = new Vector2(1560f, 670f);
+            sRect.anchoredPosition = new Vector2(0f, -16f);
 
             BuildDrawbacksColumn(splitObj.transform);
             BuildMortalAllocatorColumn(splitObj.transform);
@@ -331,7 +339,7 @@ namespace SundayLastBreath.UI
             // Column Header
             CreateUIText(colObj.transform, "ColHeader",
                 "<b><color=#EF5350>■ AVAILABLE SURVIVAL DRAWBACKS</color></b>  <color=#90A4AE>(MAX 2)</color>",
-                13.5f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
+                15f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
                 new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, -26f), new Vector2(-4f, 0f));
 
             // Scroll Area
@@ -400,8 +408,8 @@ namespace SundayLastBreath.UI
             card.transform.SetParent(parent, false);
 
             LayoutElement le = card.AddComponent<LayoutElement>();
-            le.minHeight = 88f;
-            le.preferredHeight = 88f;
+            le.minHeight = 122f;
+            le.preferredHeight = 122f;
 
             Image bg = card.AddComponent<Image>();
             bg.color = new Color(0.07f, 0.10f, 0.14f, 0.94f);
@@ -433,8 +441,8 @@ namespace SundayLastBreath.UI
             ibRect.anchorMin = new Vector2(0f, 0.5f);
             ibRect.anchorMax = new Vector2(0f, 0.5f);
             ibRect.pivot = new Vector2(0f, 0.5f);
-            ibRect.sizeDelta = new Vector2(56f, 56f);
-            ibRect.anchoredPosition = new Vector2(14f, 0f);
+            ibRect.sizeDelta = new Vector2(80f, 80f);
+            ibRect.anchoredPosition = new Vector2(16f, 0f);
 
             Image ibBg = iconBox.AddComponent<Image>();
             ibBg.color = new Color(0.04f, 0.06f, 0.09f, 0.95f);
@@ -470,14 +478,14 @@ namespace SundayLastBreath.UI
             string catTag = $"[{db.category.ToString().ToUpper()}]";
             CreateUIText(card.transform, "TitleLine",
                 $"<b><color=#FFFFFF>{db.title}</color></b>   <color=#4FC3F7><size=11>{catTag}</size></color>   <color=#66BB6A><b>[+2 PTS]</b></color>",
-                13.5f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
-                new Vector2(0f, 0.5f), new Vector2(1f, 1f), new Vector2(80f, 0f), new Vector2(-116f, -6f));
+                15.5f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
+                new Vector2(0f, 0.5f), new Vector2(1f, 1f), new Vector2(110f, 0f), new Vector2(-124f, -8f));
 
             // Penalty Description (Shifted right of IconBox: x = 80px)
             TextMeshProUGUI penTmp = CreateUIText(card.transform, "PenaltyText",
                 $"<color=#EF5350><b>FLAW:</b></color> <color=#CFD8DC>{db.penaltySummary}</color>",
-                11f, TextAlignmentOptions.Left, new Color(0.85f, 0.90f, 0.95f), FontRole.Body,
-                new Vector2(0f, 0f), new Vector2(1f, 0.5f), new Vector2(80f, 6f), new Vector2(-116f, 0f));
+                12.5f, TextAlignmentOptions.Left, new Color(0.85f, 0.90f, 0.95f), FontRole.Body,
+                new Vector2(0f, 0f), new Vector2(1f, 0.5f), new Vector2(110f, 8f), new Vector2(-124f, 0f));
             if (penTmp != null)
             {
                 penTmp.textWrappingMode = TextWrappingModes.Normal;
@@ -490,15 +498,15 @@ namespace SundayLastBreath.UI
             pRect.anchorMin = new Vector2(1f, 0.5f);
             pRect.anchorMax = new Vector2(1f, 0.5f);
             pRect.pivot = new Vector2(1f, 0.5f);
-            pRect.sizeDelta = new Vector2(98f, 32f);
-            pRect.anchoredPosition = new Vector2(-12f, 0f);
+            pRect.sizeDelta = new Vector2(106f, 42f);
+            pRect.anchoredPosition = new Vector2(-16f, 0f);
 
             Image pBg = pillObj.AddComponent<Image>();
             pBg.color = new Color(0.12f, 0.16f, 0.22f, 0.9f);
 
             CreateUIText(pillObj.transform, "Label",
                 "SELECT",
-                11f, TextAlignmentOptions.Center, Color.white, FontRole.Mono,
+                13f, TextAlignmentOptions.Center, Color.white, FontRole.Mono,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         }
 
@@ -515,7 +523,7 @@ namespace SundayLastBreath.UI
             // Column Header
             CreateUIText(colObj.transform, "ColHeader",
                 "<b><color=#F5BF42>■ M.O.R.T.A.L. ATTRIBUTES ALLOCATION</color></b>",
-                13.5f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
+                15f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
                 new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, -26f), new Vector2(-4f, 0f));
 
             // Rows Container
@@ -528,7 +536,7 @@ namespace SundayLastBreath.UI
             rRect.offsetMax = new Vector2(0f, -32f);
 
             VerticalLayoutGroup vlg = rowsObj.AddComponent<VerticalLayoutGroup>();
-            vlg.spacing = 6f;
+            vlg.spacing = 8f;
             vlg.childControlWidth = true;
             vlg.childControlHeight = true;
             vlg.childForceExpandWidth = true;
@@ -562,8 +570,8 @@ namespace SundayLastBreath.UI
             RectTransform letRect = letBox.AddComponent<RectTransform>();
             letRect.anchorMin = new Vector2(0f, 0f);
             letRect.anchorMax = new Vector2(0f, 1f);
-            letRect.sizeDelta = new Vector2(36f, 0f);
-            letRect.anchoredPosition = new Vector2(18f, 0f);
+            letRect.sizeDelta = new Vector2(54f, 0f);
+            letRect.anchoredPosition = new Vector2(16f, 0f);
 
             Image letBg = letBox.AddComponent<Image>();
             letBg.color = new Color(accentColor.r * 0.25f, accentColor.g * 0.25f, accentColor.b * 0.25f, 0.8f);
@@ -576,13 +584,13 @@ namespace SundayLastBreath.UI
             // Name + Summary
             CreateUIText(row.transform, "NameLine",
                 $"<color=#{ColorUtility.ToHtmlStringRGB(accentColor)}><b>{desc.name}</b></color> <color=#90A4AE>({desc.code})</color>",
-                13.5f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
-                new Vector2(0f, 0.5f), new Vector2(0.6f, 1f), new Vector2(44f, 0f), new Vector2(0f, -4f));
+                16f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
+                new Vector2(0f, 0.5f), new Vector2(0.6f, 1f), new Vector2(80f, 0f), new Vector2(0f, -6f));
 
             CreateUIText(row.transform, "SummaryLine",
                 $"<color=#90A4AE>{desc.summary}</color>",
-                10.5f, TextAlignmentOptions.Left, new Color(0.70f, 0.78f, 0.86f), FontRole.Body,
-                new Vector2(0f, 0f), new Vector2(0.65f, 0.5f), new Vector2(44f, 4f), new Vector2(0f, 0f));
+                12f, TextAlignmentOptions.Left, new Color(0.70f, 0.78f, 0.86f), FontRole.Body,
+                new Vector2(0f, 0f), new Vector2(0.65f, 0.5f), new Vector2(80f, 8f), new Vector2(0f, 0f));
 
             // Controls on Right: [ - ] [ Value ] [ + ]
             GameObject ctrlObj = new GameObject("Controls");
@@ -591,8 +599,8 @@ namespace SundayLastBreath.UI
             cRect.anchorMin = new Vector2(1f, 0.5f);
             cRect.anchorMax = new Vector2(1f, 0.5f);
             cRect.pivot = new Vector2(1f, 0.5f);
-            cRect.sizeDelta = new Vector2(160f, 36f);
-            cRect.anchoredPosition = new Vector2(-10f, 0f);
+            cRect.sizeDelta = new Vector2(185f, 42f);
+            cRect.anchoredPosition = new Vector2(-14f, 0f);
 
             // Minus Button
             GameObject minusBtnObj = new GameObject("Btn_Minus");
@@ -601,7 +609,7 @@ namespace SundayLastBreath.UI
             mRect.anchorMin = new Vector2(0f, 0.5f);
             mRect.anchorMax = new Vector2(0f, 0.5f);
             mRect.pivot = new Vector2(0f, 0.5f);
-            mRect.sizeDelta = new Vector2(34f, 32f);
+            mRect.sizeDelta = new Vector2(42f, 38f);
             mRect.anchoredPosition = new Vector2(0f, 0f);
 
             Image mBg = minusBtnObj.AddComponent<Image>();
@@ -611,7 +619,7 @@ namespace SundayLastBreath.UI
             MortalStatType capturedType = desc.type;
             mBtn.onClick.AddListener(() => ModifyMortalStat(capturedType, -1));
 
-            CreateUIText(minusBtnObj.transform, "Text", "<b>-</b>", 16f, TextAlignmentOptions.Center, Color.white, FontRole.Display,
+            CreateUIText(minusBtnObj.transform, "Text", "<b>-</b>", 18f, TextAlignmentOptions.Center, Color.white, FontRole.Display,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             // Value Display
@@ -621,9 +629,9 @@ namespace SundayLastBreath.UI
             vRect.anchorMin = new Vector2(0.5f, 0.5f);
             vRect.anchorMax = new Vector2(0.5f, 0.5f);
             vRect.pivot = new Vector2(0.5f, 0.5f);
-            vRect.sizeDelta = new Vector2(80f, 32f);
+            vRect.sizeDelta = new Vector2(90f, 38f);
 
-            CreateUIText(valObj.transform, "Text", "<mspace=0.6em><b>03</b></mspace>", 15f, TextAlignmentOptions.Center, Color.white, FontRole.Mono,
+            CreateUIText(valObj.transform, "Text", "<mspace=0.6em><b>03</b></mspace>", 18f, TextAlignmentOptions.Center, Color.white, FontRole.Mono,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             // Plus Button
@@ -633,7 +641,7 @@ namespace SundayLastBreath.UI
             pRect.anchorMin = new Vector2(1f, 0.5f);
             pRect.anchorMax = new Vector2(1f, 0.5f);
             pRect.pivot = new Vector2(1f, 0.5f);
-            pRect.sizeDelta = new Vector2(34f, 32f);
+            pRect.sizeDelta = new Vector2(42f, 38f);
             pRect.anchoredPosition = new Vector2(0f, 0f);
 
             Image pBg = plusBtnObj.AddComponent<Image>();
@@ -642,7 +650,7 @@ namespace SundayLastBreath.UI
             pBtn.targetGraphic = pBg;
             pBtn.onClick.AddListener(() => ModifyMortalStat(capturedType, 1));
 
-            CreateUIText(plusBtnObj.transform, "Text", "<b>+</b>", 16f, TextAlignmentOptions.Center, Color.white, FontRole.Display,
+            CreateUIText(plusBtnObj.transform, "Text", "<b>+</b>", 18f, TextAlignmentOptions.Center, Color.white, FontRole.Display,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         }
 
@@ -654,8 +662,8 @@ namespace SundayLastBreath.UI
             fRect.anchorMin = new Vector2(0.5f, 0f);
             fRect.anchorMax = new Vector2(0.5f, 0f);
             fRect.pivot = new Vector2(0.5f, 0f);
-            fRect.sizeDelta = new Vector2(1120f, 52f);
-            fRect.anchoredPosition = new Vector2(0f, 16f);
+            fRect.sizeDelta = new Vector2(1560f, 54f);
+            fRect.anchoredPosition = new Vector2(0f, 18f);
 
             // Back Button
             GameObject backObj = new GameObject("Btn_BackToHobbies");
@@ -664,7 +672,7 @@ namespace SundayLastBreath.UI
             bRect.anchorMin = new Vector2(0f, 0.5f);
             bRect.anchorMax = new Vector2(0f, 0.5f);
             bRect.pivot = new Vector2(0f, 0.5f);
-            bRect.sizeDelta = new Vector2(210f, 44f);
+            bRect.sizeDelta = new Vector2(240f, 48f);
             bRect.anchoredPosition = new Vector2(0f, 0f);
 
             Image bBg = backObj.AddComponent<Image>();
@@ -673,7 +681,7 @@ namespace SundayLastBreath.UI
             bBtn.targetGraphic = bBg;
             bBtn.onClick.AddListener(OnBackFromBargainClicked);
 
-            CreateUIText(backObj.transform, "Label", "<b><< EDIT HOBBIES</b>", 12.5f, TextAlignmentOptions.Center, new Color(0.80f, 0.88f, 0.95f), FontRole.Display,
+            CreateUIText(backObj.transform, "Label", "<b><< EDIT HOBBIES</b>", 13.5f, TextAlignmentOptions.Center, new Color(0.80f, 0.88f, 0.95f), FontRole.Display,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
 
             // Proceed Button
@@ -683,7 +691,7 @@ namespace SundayLastBreath.UI
             fwdRect.anchorMin = new Vector2(1f, 0.5f);
             fwdRect.anchorMax = new Vector2(1f, 0.5f);
             fwdRect.pivot = new Vector2(1f, 0.5f);
-            fwdRect.sizeDelta = new Vector2(250f, 44f);
+            fwdRect.sizeDelta = new Vector2(280f, 48f);
             fwdRect.anchoredPosition = new Vector2(0f, 0f);
 
             Image fwdBg = fwdObj.AddComponent<Image>();
@@ -692,7 +700,7 @@ namespace SundayLastBreath.UI
             _bargainProceedButton.targetGraphic = fwdBg;
             _bargainProceedButton.onClick.AddListener(OnProceedFromBargainClicked);
 
-            _bargainProceedButtonText = CreateUIText(fwdObj.transform, "Label", "<b>PROCEED TO DOSSIER >></b>", 13f, TextAlignmentOptions.Center, Color.black, FontRole.Display,
+            _bargainProceedButtonText = CreateUIText(fwdObj.transform, "Label", "<b>PROCEED TO DOSSIER >></b>", 14f, TextAlignmentOptions.Center, Color.black, FontRole.Display,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         }
 

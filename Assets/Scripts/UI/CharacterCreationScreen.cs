@@ -2159,13 +2159,17 @@ namespace SundayLastBreath.UI
                 if (pickedHobbyIds.Count >= 2) pickedHobbyIds.RemoveAt(pickedHobbyIds.Count - 1);
                 hobbyStep = 2;
                 activeWeaknessTab = 0;
+                RebuildCharacterFromSelections();
                 ShowHobbySelectionPanel();
             }
             else if (hobbyStep == 2)
             {
-                if (pickedHobbyIds.Count >= 1) pickedHobbyIds.RemoveAt(pickedHobbyIds.Count - 1);
+                // Going back from Secondary Hobby to Primary Hobby:
+                // Clear all picked hobbies so player can cleanly re-pick Primary Hobby!
+                pickedHobbyIds.Clear();
                 hobbyStep = 1;
                 activeWeaknessTab = 0;
+                RebuildCharacterFromSelections();
                 ShowHobbySelectionPanel();
             }
             else
@@ -2277,7 +2281,15 @@ namespace SundayLastBreath.UI
 
                 foreach (var hobby in sortedHobbies)
                 {
-                    bool isAlreadyEquipped = pickedHobbyIds.Contains(hobby.id);
+                    HobbyCardView.EquippedHobbyStatus status = HobbyCardView.EquippedHobbyStatus.None;
+                    if (pickedHobbyIds.Count > 0 && string.Equals(pickedHobbyIds[0], hobby.id, System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        status = HobbyCardView.EquippedHobbyStatus.Primary;
+                    }
+                    else if (pickedHobbyIds.Count > 1 && string.Equals(pickedHobbyIds[1], hobby.id, System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        status = HobbyCardView.EquippedHobbyStatus.Secondary;
+                    }
 
                     GameObject cardObj = Instantiate(hobbyCardPrefab, hobbyCardsContainer);
                     cardObj.SetActive(true);
@@ -2286,7 +2298,7 @@ namespace SundayLastBreath.UI
                     if (cardView != null)
                     {
                         HobbyData captured = hobby;
-                        cardView.Setup(captured, () => OnHobbySelected(captured), isEquippedPrimary: isAlreadyEquipped);
+                        cardView.Setup(captured, () => OnHobbySelected(captured), status);
                     }
                 }
             }

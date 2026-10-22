@@ -33,10 +33,22 @@ namespace SundayLastBreath.UI
         private Color _accentColor;
         private Image _btnBgImage;
 
-        public void Setup(HobbyData data, Action onSelect, bool isEquippedPrimary = false)
+        public enum EquippedHobbyStatus
+        {
+            None,
+            Primary,
+            Secondary
+        }
+
+        public void Setup(HobbyData data, Action onSelect, bool isEquippedPrimary)
+        {
+            Setup(data, onSelect, isEquippedPrimary ? EquippedHobbyStatus.Primary : EquippedHobbyStatus.None);
+        }
+
+        public void Setup(HobbyData data, Action onSelect, EquippedHobbyStatus equippedStatus = EquippedHobbyStatus.None)
         {
             _onSelect = onSelect;
-            _isLocked = isEquippedPrimary;
+            _isLocked = equippedStatus != EquippedHobbyStatus.None;
             _isHovered = false;
             transform.localScale = Vector3.one;
 
@@ -73,7 +85,7 @@ namespace SundayLastBreath.UI
 
             string categoryLabel = GetCategoryInfo(data, out _accentColor);
 
-            if (isEquippedPrimary)
+            if (equippedStatus == EquippedHobbyStatus.Primary)
             {
                 Color equippedColor = new Color(0.18f, 0.80f, 0.44f, 1f); // Emerald #2ECC71
                 _accentColor = equippedColor;
@@ -100,6 +112,36 @@ namespace SundayLastBreath.UI
                 {
                     buttonText.text = "[ EQUIPPED: PRIMARY ]";
                     buttonText.color = equippedColor;
+                }
+                if (selectButton != null) selectButton.interactable = false;
+            }
+            else if (equippedStatus == EquippedHobbyStatus.Secondary)
+            {
+                Color secondaryColor = new Color(0.20f, 0.65f, 0.95f, 1f); // Sky Blue #3498DB
+                _accentColor = secondaryColor;
+                _baseBorderColor = new Color(0.12f, 0.38f, 0.60f, 0.95f);
+                _hoverBorderColor = secondaryColor;
+                _baseBtnBgColor = new Color(0.06f, 0.20f, 0.35f, 0.98f);
+                _hoverBtnBgColor = _baseBtnBgColor;
+
+                if (cardBorder != null) cardBorder.color = _baseBorderColor;
+                if (topAccentBar != null) topAccentBar.color = secondaryColor;
+                if (titleText != null) titleText.color = secondaryColor;
+                if (statsPreviewText != null) statsPreviewText.color = secondaryColor;
+                if (statsBg != null) statsBg.color = new Color(0.04f, 0.14f, 0.24f, 0.75f);
+
+                if (categoryBadgeBg != null) categoryBadgeBg.color = new Color(0.06f, 0.24f, 0.42f, 0.95f);
+                if (categoryBadgeText != null)
+                {
+                    categoryBadgeText.text = "SECONDARY";
+                    categoryBadgeText.color = secondaryColor;
+                }
+
+                if (_btnBgImage != null) _btnBgImage.color = _baseBtnBgColor;
+                if (buttonText != null)
+                {
+                    buttonText.text = "[ EQUIPPED: SECONDARY ]";
+                    buttonText.color = secondaryColor;
                 }
                 if (selectButton != null) selectButton.interactable = false;
             }
@@ -170,7 +212,7 @@ namespace SundayLastBreath.UI
             if (s != null && iconImage != null)
             {
                 iconImage.sprite = s;
-                iconImage.color = isEquippedPrimary
+                iconImage.color = (equippedStatus != EquippedHobbyStatus.None)
                     ? new Color(0.65f, 1f, 0.80f, 0.95f)
                     : (data.isWeakness ? new Color(1f, 0.86f, 0.86f, 0.94f) : new Color(0.94f, 0.94f, 0.94f, 0.95f));
                 iconImage.gameObject.SetActive(true);
@@ -184,7 +226,7 @@ namespace SundayLastBreath.UI
             if (selectButton != null)
             {
                 selectButton.onClick.RemoveAllListeners();
-                if (!isEquippedPrimary)
+                if (equippedStatus == EquippedHobbyStatus.None)
                 {
                     selectButton.onClick.AddListener(TriggerSelect);
                 }
