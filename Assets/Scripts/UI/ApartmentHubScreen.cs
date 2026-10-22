@@ -71,6 +71,10 @@ namespace SundayLastBreath.UI
         [SerializeField] private Image pdaHumanityBarFill;
         [SerializeField] private TextMeshProUGUI pdaHumanityValueText;
 
+        [Header("Tactical Map & Skills View Controllers")]
+        [SerializeField] private TacticalMapViewController tacticalMapController;
+        [SerializeField] private TacticalSkillsViewController tacticalSkillsController;
+
         [Header("Left PDA - Skills, Traits & Lore Tabs")]
         [SerializeField] private TextMeshProUGUI pdaAttributesText;
         [SerializeField] private TextMeshProUGUI pdaSkillsText;
@@ -693,6 +697,15 @@ namespace SundayLastBreath.UI
             if (pdaPanelMap != null) pdaPanelMap.SetActive(tabName == "MAP");
             if (pdaPanelLore != null) pdaPanelLore.SetActive(tabName == "LORE");
 
+            if (tabName == "MAP" && tacticalMapController != null)
+            {
+                tacticalMapController.RefreshAllNodes();
+            }
+            if (tabName == "SKILLS" && tacticalSkillsController != null && currentPlayer != null)
+            {
+                tacticalSkillsController.Refresh(currentPlayer);
+            }
+
             UpdateTabButtonVisual(pdaTabStatusBtn, tabName == "STATUS");
             UpdateTabButtonVisual(pdaTabSkillsBtn, tabName == "SKILLS");
             UpdateTabButtonVisual(pdaTabTraitsBtn, tabName == "TRAITS");
@@ -773,6 +786,11 @@ namespace SundayLastBreath.UI
         private void RefreshPDASkillsTab()
         {
             if (currentPlayer == null) return;
+
+            if (tacticalSkillsController != null)
+            {
+                tacticalSkillsController.Refresh(currentPlayer);
+            }
 
             if (pdaAttributesText != null)
             {
