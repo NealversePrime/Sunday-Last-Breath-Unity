@@ -1102,11 +1102,53 @@ namespace SundayLastBreath.UI
             bool isSelected = string.Equals(holder.model.id, selectedNodeId, StringComparison.OrdinalIgnoreCase);
             bool isDiscovered = holder.model.isDiscovered || isCurrent;
 
-            // Player Radar Beacon (Only illuminates the sector where the player actually is)
+            // Player Radar Halo (Illuminates soft pulsing aura around current sector)
             if (holder.beaconObj != null)
             {
                 holder.beaconObj.SetActive(isCurrent);
             }
+
+            // Hallways: Clean, textless architectural connectors (like Twine)
+            if (holder.model.isHallway)
+            {
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.text = "";
+                if (holder.subLabelTmp != null) holder.subLabelTmp.text = "";
+                if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
+                if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
+                if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
+
+                if (isCurrent)
+                {
+                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.04f, 0.08f, 0.12f, 0.98f);
+                    if (holder.outline != null)
+                    {
+                        holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 1.0f);
+                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
+                    }
+                }
+                else if (isSelected)
+                {
+                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.05f, 0.06f, 0.08f, 0.98f);
+                    if (holder.outline != null)
+                    {
+                        holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 1.0f);
+                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
+                    }
+                }
+                else
+                {
+                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.022f, 0.035f, 0.052f, 0.95f);
+                    if (holder.outline != null)
+                    {
+                        holder.outline.effectColor = new Color(0.14f, 0.22f, 0.32f, 0.70f);
+                        holder.outline.effectDistance = new Vector2(1f, -1f);
+                    }
+                }
+                return;
+            }
+
+            // Ensure non-hallway nodes have icon enabled
+            if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(true);
 
             // Directional & Status Chip Badge (Top-Right of Sector)
             if (holder.navBadgeObj != null)
@@ -1115,9 +1157,8 @@ namespace SundayLastBreath.UI
                 {
                     if (isCurrent)
                     {
-                        holder.navBadgeObj.SetActive(true);
-                        holder.navBadgeTmp.text = "[HERE]";
-                        holder.navBadgeTmp.color = new Color(0.0f, 0.95f, 1.0f);
+                        // Clean: no clunky corner badge for current room because Halo Glow is active!
+                        holder.navBadgeObj.SetActive(false);
                     }
                     else if (!isDiscovered)
                     {

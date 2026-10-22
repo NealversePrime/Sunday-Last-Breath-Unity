@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v48_auto.flag";
+            string flagPath = "Temp/scene_v49_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -5536,7 +5536,7 @@ namespace SundayLastBreath.Editor
             perimRect.anchorMax = new Vector2(0.5f, 0.5f);
             perimRect.pivot = new Vector2(0.5f, 0.5f);
             perimRect.anchoredPosition = Vector2.zero;
-            perimRect.sizeDelta = new Vector2(604f, 266f);
+            perimRect.sizeDelta = new Vector2(560f, 260f);
             Image perimBg = perimeterObj.AddComponent<Image>();
             perimBg.color = new Color(0.02f, 0.035f, 0.06f, 0.94f);
             perimBg.raycastTarget = false;
@@ -5552,7 +5552,7 @@ namespace SundayLastBreath.Editor
             ssRect.anchorMax = new Vector2(0.5f, 0.5f);
             ssRect.pivot = new Vector2(0.5f, 0.5f);
             ssRect.anchoredPosition = Vector2.zero;
-            ssRect.sizeDelta = new Vector2(132f, 258f);
+            ssRect.sizeDelta = new Vector2(64f, 248f);
             Image ssBg = spineShaft.AddComponent<Image>();
             ssBg.color = new Color(0.035f, 0.055f, 0.09f, 0.96f);
             ssBg.raycastTarget = false;
@@ -5561,13 +5561,13 @@ namespace SundayLastBreath.Editor
             ssOl.effectDistance = new Vector2(1f, -1f);
 
             // 5 Contiguous Floorplan Rows (y = +104, +52, 0, -52, -104)
-            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 104f,
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 100f,
                 "unit_407", "UNIT 407", "SAFEHOUSE",
                 "hallway_1", "CORRIDOR N", "NORTH SPINE",
                 "unit_406", "UNIT 406", "RESIDENTIAL",
                 hasSouthCorridorLink: true);
 
-            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 52f,
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 50f,
                 "unit_405", "UNIT 405", "RESIDENTIAL",
                 "hallway_2", "CORRIDOR MN", "MID-NORTH",
                 "unit_404", "UNIT 404", "RESIDENTIAL",
@@ -5579,13 +5579,13 @@ namespace SundayLastBreath.Editor
                 "unit_402", "UNIT 402", "RESIDENTIAL",
                 hasSouthCorridorLink: true);
 
-            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -52f,
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -50f,
                 "unit_401", "UNIT 401", "RESIDENCE",
                 "hallway_4", "CORRIDOR S", "SOUTH SPINE",
                 "utility", "UTILITY BAY", "SERVICE ROOM",
                 hasSouthCorridorLink: true);
 
-            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -104f,
+            CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -100f,
                 "stairs", "STAIRWELL W", "FIRE EXIT",
                 "hallway_end", "STAIR FOYER", "SOUTH FOYER",
                 "empty_bot", "EAST WING", "EAST WING",
@@ -5815,29 +5815,29 @@ namespace SundayLastBreath.Editor
             bool hasSouthCorridorLink)
         {
             // Left Wing Doorway Threshold Tick (at x = -74, y = yPos)
-            Image leftDoorTick = CreateDoorwayThreshold(canvasParent, "Door_" + leftId, new Vector2(-74f, yPos), new Vector2(24f, 5f));
+            Image leftDoorTick = CreateDoorwayThreshold(canvasParent, "Door_" + leftId, new Vector2(-54f, yPos), new Vector2(44f, 4f));
 
             // Right Wing Doorway Threshold Tick (at x = +74, y = yPos)
-            Image rightDoorTick = CreateDoorwayThreshold(canvasParent, "Door_" + rightId, new Vector2(74f, yPos), new Vector2(24f, 5f));
+            Image rightDoorTick = CreateDoorwayThreshold(canvasParent, "Door_" + rightId, new Vector2(54f, yPos), new Vector2(44f, 4f));
 
             // Corridor South Archway Tick (at x = 0, y = yPos - 26)
             Image hallDoorTick = null;
             if (hasSouthCorridorLink)
             {
-                hallDoorTick = CreateDoorwayThreshold(canvasParent, "Arch_" + hallId, new Vector2(0f, yPos - 26f), new Vector2(28f, 4f));
+                hallDoorTick = CreateDoorwayThreshold(canvasParent, "Arch_" + hallId, new Vector2(0f, yPos - 25f), new Vector2(28f, 3f));
             }
 
             // Left Wing Room Module (x = -196, size = 220 x 48)
             CreateBlueprintRoomNode(mapCtrl, canvasParent, leftId, leftCode, leftSub,
-                new Vector2(-196f, yPos), new Vector2(220f, 48f), isHallway: false, doorTickImg: leftDoorTick);
+                new Vector2(-160f, yPos), new Vector2(168f, 44f), isHallway: false, doorTickImg: leftDoorTick);
 
             // Central Spine Corridor Module (x = 0, size = 124 x 48)
             CreateBlueprintRoomNode(mapCtrl, canvasParent, hallId, hallCode, hallSub,
-                new Vector2(0f, yPos), new Vector2(124f, 48f), isHallway: true, doorTickImg: hallDoorTick);
+                new Vector2(0f, yPos), new Vector2(64f, 44f), isHallway: true, doorTickImg: hallDoorTick);
 
             // Right Wing Room Module (x = +196, size = 220 x 48)
             CreateBlueprintRoomNode(mapCtrl, canvasParent, rightId, rightCode, rightSub,
-                new Vector2(196f, yPos), new Vector2(220f, 48f), isHallway: false, doorTickImg: rightDoorTick);
+                new Vector2(160f, yPos), new Vector2(168f, 44f), isHallway: false, doorTickImg: rightDoorTick);
         }
 
         private static Image CreateDoorwayThreshold(Transform parent, string name, Vector2 pos, Vector2 size)
@@ -5961,28 +5961,38 @@ namespace SundayLastBreath.Editor
             navBadge.SetActive(false);
 
             // Player Bio-Signal Beacon (Bottom-Right Corner on Current Room)
-            GameObject beacon = new GameObject("Beacon", typeof(RectTransform));
-            beacon.transform.SetParent(nodeObj.transform, false);
-            RectTransform bRect = beacon.GetComponent<RectTransform>();
-            bRect.anchorMin = new Vector2(1f, 0f);
-            bRect.anchorMax = new Vector2(1f, 0f);
-            bRect.pivot = new Vector2(1f, 0f);
-            bRect.anchoredPosition = new Vector2(-4f, 4f);
-            bRect.sizeDelta = new Vector2(44f, 14f);
-            Image bBg = beacon.AddComponent<Image>();
-            bBg.color = new Color(0.0f, 0.75f, 0.95f, 0.25f);
-            bBg.raycastTarget = false;
-            Outline bOl = beacon.AddComponent<Outline>();
-            bOl.effectColor = new Color(0.0f, 0.92f, 1.0f, 0.90f);
-            bOl.effectDistance = new Vector2(1f, -1f);
+            GameObject haloGlow = new GameObject("PlayerHaloGlow", typeof(RectTransform));
+            haloGlow.transform.SetParent(nodeObj.transform, false);
+            haloGlow.transform.SetAsFirstSibling();
+            RectTransform hgRect = haloGlow.GetComponent<RectTransform>();
+            StretchFull(hgRect);
+            hgRect.offsetMin = new Vector2(-5f, -5f);
+            hgRect.offsetMax = new Vector2(5f, 5f);
 
-            TextMeshProUGUI bTmp = CreateTMPText(beacon.transform, "BeaconText", "HERE",
-                7.5f, new Color(0.0f, 0.96f, 1.0f), TextAlignmentOptions.Center, FontStyles.Bold);
-            StretchFull(bTmp.rectTransform);
-            beacon.AddComponent<PulsingBadge>();
-            beacon.SetActive(false);
 
-            mapCtrl.BindUIHolder(id, nodeObj, bg, patImg, ol, iconImg, codeTmp, subTmp, navBadge, navTmp, beacon, doorTickImg, btn);
+
+
+            Image hgBg = haloGlow.AddComponent<Image>();
+            hgBg.color = new Color(0.0f, 0.85f, 1.0f, 0.16f);
+            hgBg.raycastTarget = false;
+            Outline hgOl = haloGlow.AddComponent<Outline>();
+            hgOl.effectColor = new Color(0.0f, 0.95f, 1.0f, 0.85f);
+            hgOl.effectDistance = new Vector2(1.5f, -1.5f);
+
+
+
+
+            haloGlow.AddComponent<PulsingBadge>();
+            haloGlow.SetActive(false);
+
+            if (isHallway)
+            {
+                iconObj.SetActive(false);
+                codeTmp.text = "";
+                subTmp.text = "";
+            }
+
+            mapCtrl.BindUIHolder(id, nodeObj, bg, patImg, ol, iconImg, codeTmp, subTmp, navBadge, navTmp, haloGlow, doorTickImg, btn);
         }
         #endregion
 

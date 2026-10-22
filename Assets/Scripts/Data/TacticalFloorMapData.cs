@@ -27,8 +27,8 @@ namespace SundayLastBreath.Data
         public string fullTitle = "YOUR RESIDENCE (SAFEHOUSE)";
 
         [Header("Canvas Placement")]
-        public Vector2 position = new Vector2(-196f, 104f);
-        public Vector2 size = new Vector2(220f, 48f);
+        public Vector2 position = new Vector2(-160f, 100f);
+        public Vector2 size = new Vector2(168f, 44f);
 
         [Header("Room Category & Icon")]
         public TacticalRoomIconType iconType = TacticalRoomIconType.Home;
@@ -58,8 +58,8 @@ namespace SundayLastBreath.Data
     {
         public string doorId = "door_unit_407";
         public string connectedRoomId = "unit_407";
-        public Vector2 position = new Vector2(-74f, 104f);
-        public Vector2 size = new Vector2(24f, 5f);
+        public Vector2 position = new Vector2(-54f, 100f);
+        public Vector2 size = new Vector2(44f, 4f);
     }
 
     /// <summary>
