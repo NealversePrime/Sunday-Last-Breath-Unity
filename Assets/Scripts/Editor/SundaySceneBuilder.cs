@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v34_auto.flag";
+                string flagPath = "Temp/scene_v35_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -823,16 +823,16 @@ namespace SundayLastBreath.Editor
             b2tr.anchorMin = new Vector2(0f, 1f); b2tr.anchorMax = new Vector2(1f, 1f);
             b2tr.pivot = new Vector2(0.5f, 1f);
             b2tr.sizeDelta = new Vector2(0f, 32f);
-            b2tr.anchoredPosition = Vector2.zero;
+            b2tr.anchoredPosition = new Vector2(0f, -44f);
 
             // Chat Block Card
             GameObject monoBox = new GameObject("MonologueBox", typeof(RectTransform));
             monoBox.transform.SetParent(b2Obj.transform, false);
             RectTransform monoRect = monoBox.GetComponent<RectTransform>();
-            monoRect.anchorMin = new Vector2(0f, 0.5f); monoRect.anchorMax = new Vector2(1f, 0.5f);
-            monoRect.pivot = new Vector2(0.5f, 0.5f);
-            monoRect.sizeDelta = new Vector2(0f, 115f);
-            monoRect.anchoredPosition = new Vector2(0f, 10f);
+            monoRect.anchorMin = new Vector2(0f, 1f); monoRect.anchorMax = new Vector2(1f, 1f);
+            monoRect.pivot = new Vector2(0.5f, 1f);
+            monoRect.sizeDelta = new Vector2(0f, 120f);
+            monoRect.anchoredPosition = new Vector2(0f, -96f);
             Image monoBg = monoBox.AddComponent<Image>();
             monoBg.color = new Color(0.08f, 0.10f, 0.14f, 0.92f);
             Outline monoOl = monoBox.AddComponent<Outline>();
@@ -899,10 +899,10 @@ namespace SundayLastBreath.Editor
                 15f, new Color(0.74f, 0.78f, 0.85f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
             b2fTmp.lineSpacing = 6f;
             RectTransform b2fRect = b2fTmp.rectTransform;
-            b2fRect.anchorMin = new Vector2(0f, 0f); b2fRect.anchorMax = new Vector2(1f, 0f);
-            b2fRect.pivot = new Vector2(0.5f, 0f);
-            b2fRect.sizeDelta = new Vector2(0f, 65f);
-            b2fRect.anchoredPosition = new Vector2(0f, 16f);
+            b2fRect.anchorMin = new Vector2(0f, 1f); b2fRect.anchorMax = new Vector2(1f, 1f);
+            b2fRect.pivot = new Vector2(0.5f, 1f);
+            b2fRect.sizeDelta = new Vector2(0f, 75f);
+            b2fRect.anchoredPosition = new Vector2(0f, -238f);
 
             // --- BEAT 3: TABLE STASH ---
             GameObject b3Obj = new GameObject("Beat3Container", typeof(RectTransform));
