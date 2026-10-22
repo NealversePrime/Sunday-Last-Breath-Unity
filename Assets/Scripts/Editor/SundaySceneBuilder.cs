@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v32_auto.flag";
+                string flagPath = "Temp/scene_v33_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -1032,7 +1032,7 @@ namespace SundayLastBreath.Editor
             // Header Row: Title & View Log Button
             GameObject sitTopRow = new GameObject("TopRow", typeof(RectTransform));
             sitTopRow.transform.SetParent(sitBox.transform, false);
-            RectTransform strRect = sitTopRow.AddComponent<RectTransform>();
+            RectTransform strRect = sitTopRow.GetComponent<RectTransform>();
             strRect.anchorMin = new Vector2(0f, 1f); strRect.anchorMax = new Vector2(1f, 1f);
             strRect.pivot = new Vector2(0.5f, 1f);
             strRect.sizeDelta = new Vector2(0f, 28f);
