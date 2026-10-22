@@ -42,7 +42,6 @@ namespace SundayLastBreath.UI
         [SerializeField] private Button btnModeGear;
         [SerializeField] private TextMeshProUGUI btnModeGearLabel;
         [SerializeField] private GameObject btnModeGearBadge;
-        [SerializeField] private TextMeshProUGUI btnModeGearBadgeText;
         [SerializeField] private Image modeIndicatorNarrative;
         [SerializeField] private Image modeIndicatorPDA;
         [SerializeField] private Image modeIndicatorGear;
@@ -956,18 +955,13 @@ namespace SundayLastBreath.UI
             if (btnModeGearLabel != null)
             {
                 btnModeGearLabel.text = hasLoot 
-                    ? $"[3] TACTICAL GEAR [I] <color=#EF4444><b>[!]</b></color>" 
+                    ? $"[3] TACTICAL GEAR [I] <color=#F59E0B><b>({count})</b></color>" 
                     : "[3] TACTICAL GEAR [I]";
             }
 
             if (btnModeGearBadge != null)
             {
                 btnModeGearBadge.SetActive(hasLoot);
-            }
-
-            if (btnModeGearBadgeText != null && hasLoot)
-            {
-                btnModeGearBadgeText.text = $"! {count}";
             }
 
             if (floorItemsButton != null)
