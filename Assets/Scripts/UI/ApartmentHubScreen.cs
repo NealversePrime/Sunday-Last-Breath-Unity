@@ -967,7 +967,7 @@ namespace SundayLastBreath.UI
 
             if (btnModeGearBadgeText != null && hasLoot)
             {
-                btnModeGearBadgeText.text = $"{count}";
+                btnModeGearBadgeText.text = $"! {count}";
             }
 
             if (floorItemsButton != null)

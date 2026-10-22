@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v37_auto.flag";
+            string flagPath = "Temp/scene_v38_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -710,26 +710,26 @@ namespace SundayLastBreath.Editor
             CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "[2] SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, out TextMeshProUGUI _, false);
             CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "[3] TACTICAL GEAR [I]", out Button btnGear, out Image indGear, out TextMeshProUGUI gearLabelTmp, false);
 
-            // Notification Badge on Tactical Gear Button (Red Pill with Exclamation)
+            // Notification Badge on Tactical Gear Button (High-Visibility Pulsing Alert Badge)
             GameObject gearBadgeObj = new GameObject("LootNotificationBadge", typeof(RectTransform));
             gearBadgeObj.transform.SetParent(btnGear.transform, false);
             RectTransform gbr = gearBadgeObj.GetComponent<RectTransform>();
             gbr.anchorMin = new Vector2(1f, 0.5f);
             gbr.anchorMax = new Vector2(1f, 0.5f);
             gbr.pivot = new Vector2(1f, 0.5f);
-            gbr.anchoredPosition = new Vector2(-12f, 0f);
-            gbr.sizeDelta = new Vector2(26f, 18f);
+            gbr.anchoredPosition = new Vector2(-10f, 0f);
+            gbr.sizeDelta = new Vector2(46f, 22f);
 
             Image gbImg = gearBadgeObj.AddComponent<Image>();
-            gbImg.color = new Color(0.92f, 0.20f, 0.15f, 0.95f); // Crimson red
+            gbImg.color = new Color(0.92f, 0.18f, 0.14f, 0.98f); // High-visibility Warning Crimson
             Outline gbOl = gearBadgeObj.AddComponent<Outline>();
-            gbOl.effectColor = new Color(0.35f, 0.05f, 0.05f, 1f);
-            gbOl.effectDistance = new Vector2(1f, -1f);
+            gbOl.effectColor = new Color(0.95f, 0.75f, 0.25f, 0.95f); // Glowing Gold/Amber outline
+            gbOl.effectDistance = new Vector2(1.5f, -1.5f);
 
-            TextMeshProUGUI gbText = CreateTMPText(gearBadgeObj.transform, "Text", "!", 10f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            TextMeshProUGUI gbText = CreateTMPText(gearBadgeObj.transform, "Text", "! LOOT", 9.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
             RectTransform gbt = gbText.rectTransform;
             StretchFull(gbt);
-            gearBadgeObj.AddComponent<PulsingText>();
+            gearBadgeObj.AddComponent<PulsingBadge>();
             gearBadgeObj.SetActive(false);
 
             // =========================================================================
@@ -1636,14 +1636,14 @@ namespace SundayLastBreath.Editor
             lhr2.anchoredPosition = new Vector2(14f, -10f);
             lhr2.sizeDelta = new Vector2(-28f, 22f);
 
-            // Wireframe Human Body Silhouette (cyan Image 3 replica)
+            // Wireframe Human Body Silhouette (Enlarged for proportional slot layout)
             GameObject silObj = new GameObject("BodySilhouette", typeof(RectTransform));
             silObj.transform.SetParent(loadoutCard.transform, false);
             RectTransform silRect = silObj.GetComponent<RectTransform>();
             silRect.anchorMin = new Vector2(0.5f, 0.5f); silRect.anchorMax = new Vector2(0.5f, 0.5f);
             silRect.pivot = new Vector2(0.5f, 0.5f);
             silRect.anchoredPosition = new Vector2(0f, -10f);
-            silRect.sizeDelta = new Vector2(220f, 310f);
+            silRect.sizeDelta = new Vector2(270f, 360f); // Enlarged from 220x310
             Image silImg = silObj.AddComponent<Image>();
             silImg.preserveAspect = true;
             silImg.color = new Color(0.22f, 0.74f, 0.97f, 0.75f);
@@ -1651,12 +1651,12 @@ namespace SundayLastBreath.Editor
             Sprite silSprite = LoadSpriteSafe("Assets/Sprites/UI/silhouette.png");
             if (silSprite != null) silImg.sprite = silSprite;
 
-            // 5 Equipment Slots overlaid on body
-            CreateEquipSlot(silObj.transform, "Slot_HEAD", new Vector2(0f, 105f), "HEAD", out Image headIcon, out TextMeshProUGUI headLbl);
-            CreateEquipSlot(silObj.transform, "Slot_BODY", new Vector2(0f, 35f), "BODY", out Image bodyIcon, out TextMeshProUGUI bodyLbl);
-            CreateEquipSlot(silObj.transform, "Slot_WPN", new Vector2(-95f, -10f), "WPN", out Image wpnIcon, out TextMeshProUGUI wpnLbl);
+            // 5 Equipment Slots overlaid proportionally on body
+            CreateEquipSlot(silObj.transform, "Slot_HEAD", new Vector2(0f, 128f), "HEAD", out Image headIcon, out TextMeshProUGUI headLbl);
+            CreateEquipSlot(silObj.transform, "Slot_BODY", new Vector2(0f, 48f), "BODY", out Image bodyIcon, out TextMeshProUGUI bodyLbl);
+            CreateEquipSlot(silObj.transform, "Slot_WPN", new Vector2(-105f, 0f), "WPN", out Image wpnIcon, out TextMeshProUGUI wpnLbl);
             CreateEquipSlot(silObj.transform, "Slot_LEGS", new Vector2(0f, -55f), "LEGS", out Image legsIcon, out TextMeshProUGUI legsLbl);
-            CreateEquipSlot(silObj.transform, "Slot_FEET", new Vector2(0f, -125f), "FEET", out Image feetIcon, out TextMeshProUGUI feetLbl);
+            CreateEquipSlot(silObj.transform, "Slot_FEET", new Vector2(0f, -145f), "FEET", out Image feetIcon, out TextMeshProUGUI feetLbl);
 
             // Sub-Panel 2 (Center 720px): Backpack Grid Card
             GameObject bagCard = new GameObject("Card_Backpack", typeof(RectTransform));
