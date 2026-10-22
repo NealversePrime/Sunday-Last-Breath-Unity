@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v40_auto.flag";
+            string flagPath = "Temp/scene_v41_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -92,14 +92,12 @@ namespace SundayLastBreath.Editor
 
             AudioClip menuMusic = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/BGM/main_menu.mp3");
             AudioClip clickSfx = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
+            AudioClip hoverSfx = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/tick.mp3");
 
             SerializedObject audioSo = new SerializedObject(audioMgr);
             if (menuMusic != null) audioSo.FindProperty("menuMusicClip").objectReferenceValue = menuMusic;
-            if (clickSfx != null)
-            {
-                audioSo.FindProperty("buttonClickClip").objectReferenceValue = clickSfx;
-                audioSo.FindProperty("buttonHoverClip").objectReferenceValue = null;
-            }
+            if (clickSfx != null) audioSo.FindProperty("buttonClickClip").objectReferenceValue = clickSfx;
+            if (hoverSfx != null) audioSo.FindProperty("buttonHoverClip").objectReferenceValue = hoverSfx;
             audioSo.FindProperty("bgmVolume").floatValue = 0.75f;
             audioSo.ApplyModifiedProperties();
 
@@ -1565,14 +1563,20 @@ namespace SundayLastBreath.Editor
             RectTransform ptrRect = pTraitsObj.GetComponent<RectTransform>();
             StretchFull(ptrRect);
             ptrRect.offsetMin = new Vector2(16f, 14f); ptrRect.offsetMax = new Vector2(-16f, -14f);
+            VerticalLayoutGroup ptrVlg = pTraitsObj.AddComponent<VerticalLayoutGroup>();
+            ptrVlg.spacing = 8f;
+            ptrVlg.childControlWidth = true; ptrVlg.childControlHeight = false;
+            ptrVlg.childForceExpandWidth = true; ptrVlg.childForceExpandHeight = false;
             pTraitsObj.SetActive(false);
 
             CreateSectionBadge(pTraitsObj.transform, "TRAITS & SPECIAL PERKS");
             GameObject traitsScroll = new GameObject("TraitsScroll", typeof(RectTransform));
             traitsScroll.transform.SetParent(pTraitsObj.transform, false);
+            LayoutElement tsLe = traitsScroll.AddComponent<LayoutElement>();
+            tsLe.flexibleWidth = 1f;
+            tsLe.flexibleHeight = 1f;
             RectTransform tsScrollRect = traitsScroll.GetComponent<RectTransform>();
             StretchFull(tsScrollRect);
-            tsScrollRect.offsetMin = new Vector2(0f, 0f); tsScrollRect.offsetMax = new Vector2(0f, -32f);
 
             GameObject traitsContent = new GameObject("Content", typeof(RectTransform));
             traitsContent.transform.SetParent(traitsScroll.transform, false);
@@ -1592,14 +1596,20 @@ namespace SundayLastBreath.Editor
             RectTransform pmRect = pMapObj.GetComponent<RectTransform>();
             StretchFull(pmRect);
             pmRect.offsetMin = new Vector2(16f, 14f); pmRect.offsetMax = new Vector2(-16f, -14f);
+            VerticalLayoutGroup pmVlg = pMapObj.AddComponent<VerticalLayoutGroup>();
+            pmVlg.spacing = 8f;
+            pmVlg.childControlWidth = true; pmVlg.childControlHeight = false;
+            pmVlg.childForceExpandWidth = true; pmVlg.childForceExpandHeight = false;
             pMapObj.SetActive(false);
 
             CreateSectionBadge(pMapObj.transform, "LOCATION MAP // 4TH FLOOR");
             GameObject mapCard = new GameObject("MapCard", typeof(RectTransform));
             mapCard.transform.SetParent(pMapObj.transform, false);
+            LayoutElement mcLe = mapCard.AddComponent<LayoutElement>();
+            mcLe.flexibleWidth = 1f;
+            mcLe.flexibleHeight = 1f;
             RectTransform mcRect = mapCard.GetComponent<RectTransform>();
-            mcRect.anchorMin = new Vector2(0f, 0f); mcRect.anchorMax = new Vector2(1f, 1f);
-            mcRect.offsetMin = new Vector2(0f, 0f); mcRect.offsetMax = new Vector2(0f, -32f);
+            StretchFull(mcRect);
             Image mcBg = mapCard.AddComponent<Image>();
             mcBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
 
@@ -2209,6 +2219,24 @@ namespace SundayLastBreath.Editor
             cb.disabledColor = new Color(0.03f, 0.04f, 0.05f, 0.5f);
             button.colors = cb;
 
+            // Mask so sheen sweep stays strictly within button borders
+            btnObj.AddComponent<RectMask2D>();
+
+            // Sweeping Shine Sheen (replicating Twine CSS button::after radar sweep)
+            GameObject shineObj = new GameObject("ShineSweep", typeof(RectTransform));
+            shineObj.transform.SetParent(btnObj.transform, false);
+            RectTransform shineRect = shineObj.GetComponent<RectTransform>();
+            shineRect.anchorMin = new Vector2(0f, 0f);
+            shineRect.anchorMax = new Vector2(0f, 1f);
+            shineRect.pivot = new Vector2(0.5f, 0.5f);
+            shineRect.sizeDelta = new Vector2(60f, 40f);
+            shineRect.anchoredPosition = new Vector2(-120f, 0f);
+            shineRect.localRotation = Quaternion.Euler(0f, 0f, -25f);
+            Image shineImg = shineObj.AddComponent<Image>();
+            shineImg.color = new Color(1f, 1f, 1f, 0.14f);
+            shineImg.raycastTarget = false;
+            shineObj.SetActive(false);
+
             // 5px Accent Bar on Left (matching Twine border-left: 5px solid var(--accent-gold))
             GameObject barObj = new GameObject("AccentBar");
             barObj.transform.SetParent(btnObj.transform, false);
@@ -2258,6 +2286,10 @@ namespace SundayLastBreath.Editor
             subLabel.color = new Color(0.68f, 0.70f, 0.74f);
             subLabel.text = subText;
             subLabel.raycastTarget = false;
+
+            // Attach TacticalChoiceButton for 10px hover slide, border glow, sheen sweep, and audio triggers
+            TacticalChoiceButton tcb = btnObj.AddComponent<TacticalChoiceButton>();
+            tcb.Initialize(button, tcRect, bg, barImg, ol, shineRect, accentColor);
         }
 
         private static GameObject BuildStoryLogModal(Transform parent, out TextMeshProUGUI logContentTmp, out Button closeBtn, out Button closeBottomBtn)
