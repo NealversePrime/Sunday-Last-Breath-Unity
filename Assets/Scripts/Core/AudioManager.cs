@@ -178,7 +178,7 @@ namespace SundayLastBreath.Core
 
         public void PlayButtonHover()
         {
-            if (buttonHoverClip != null) PlaySFX(buttonHoverClip, 0.6f);
+            // Muted per design preference (Option 1): hover uses visual highlight/slide only, reserving SFX strictly for clicks.
         }
 
         public void SetMasterVolume(float volume)

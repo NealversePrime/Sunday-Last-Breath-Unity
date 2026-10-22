@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v26_auto.flag";
+                string flagPath = "Temp/scene_v27_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -88,7 +88,7 @@ namespace SundayLastBreath.Editor
             if (clickSfx != null)
             {
                 audioSo.FindProperty("buttonClickClip").objectReferenceValue = clickSfx;
-                audioSo.FindProperty("buttonHoverClip").objectReferenceValue = clickSfx;
+                audioSo.FindProperty("buttonHoverClip").objectReferenceValue = null;
             }
             audioSo.ApplyModifiedProperties();
 
