@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v33_auto.flag";
+                string flagPath = "Temp/scene_v34_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -1068,7 +1068,7 @@ namespace SundayLastBreath.Editor
             btnOpenLog.colors = lcb;
 
             TextMeshProUGUI btnLogTmp = CreateTMPText(btnLogObj.transform, "Label",
-                "<b><color=#4FC3F7>[ 📜 VIEW LOG ]</color></b>",
+                "<b><color=#4FC3F7>[ VIEW LOG ]</color></b>",
                 11f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
             RectTransform bltRect = btnLogTmp.rectTransform;
             StretchFull(bltRect);
