@@ -123,8 +123,17 @@ namespace SundayLastBreath.UI
         public event Action OnVitalsUpdated;
         public event Action OnInventoryUpdated;
 
+        private bool _listenersHooked = false;
+
         private void Awake()
         {
+            EnsureListeners();
+        }
+
+        public void EnsureListeners()
+        {
+            if (_listenersHooked) return;
+            _listenersHooked = true;
             SetupSlotListeners();
             SetupFilterListeners();
             SetupTabListeners();
@@ -133,36 +142,36 @@ namespace SundayLastBreath.UI
 
         private void SetupSlotListeners()
         {
-            if (slotHeadBtn != null) slotHeadBtn.onClick.AddListener(() => OnEquipSlotClicked("HEAD"));
-            if (slotBodyBtn != null) slotBodyBtn.onClick.AddListener(() => OnEquipSlotClicked("BODY"));
-            if (slotWpnBtn != null) slotWpnBtn.onClick.AddListener(() => OnEquipSlotClicked("WPN"));
-            if (slotLegsBtn != null) slotLegsBtn.onClick.AddListener(() => OnEquipSlotClicked("LEGS"));
-            if (slotFeetBtn != null) slotFeetBtn.onClick.AddListener(() => OnEquipSlotClicked("FEET"));
+            if (slotHeadBtn != null) { slotHeadBtn.onClick.RemoveAllListeners(); slotHeadBtn.onClick.AddListener(() => OnEquipSlotClicked("HEAD")); }
+            if (slotBodyBtn != null) { slotBodyBtn.onClick.RemoveAllListeners(); slotBodyBtn.onClick.AddListener(() => OnEquipSlotClicked("BODY")); }
+            if (slotWpnBtn != null) { slotWpnBtn.onClick.RemoveAllListeners(); slotWpnBtn.onClick.AddListener(() => OnEquipSlotClicked("WPN")); }
+            if (slotLegsBtn != null) { slotLegsBtn.onClick.RemoveAllListeners(); slotLegsBtn.onClick.AddListener(() => OnEquipSlotClicked("LEGS")); }
+            if (slotFeetBtn != null) { slotFeetBtn.onClick.RemoveAllListeners(); slotFeetBtn.onClick.AddListener(() => OnEquipSlotClicked("FEET")); }
         }
 
         private void SetupFilterListeners()
         {
-            if (btnFilterAll != null) btnFilterAll.onClick.AddListener(() => SetFilter(InventoryFilter.All));
-            if (btnFilterWeapons != null) btnFilterWeapons.onClick.AddListener(() => SetFilter(InventoryFilter.Weapons));
-            if (btnFilterConsumables != null) btnFilterConsumables.onClick.AddListener(() => SetFilter(InventoryFilter.Consumables));
-            if (btnFilterApparel != null) btnFilterApparel.onClick.AddListener(() => SetFilter(InventoryFilter.Apparel));
-            if (btnFilterTools != null) btnFilterTools.onClick.AddListener(() => SetFilter(InventoryFilter.Tools));
+            if (btnFilterAll != null) { btnFilterAll.onClick.RemoveAllListeners(); btnFilterAll.onClick.AddListener(() => SetFilter(InventoryFilter.All)); }
+            if (btnFilterWeapons != null) { btnFilterWeapons.onClick.RemoveAllListeners(); btnFilterWeapons.onClick.AddListener(() => SetFilter(InventoryFilter.Weapons)); }
+            if (btnFilterConsumables != null) { btnFilterConsumables.onClick.RemoveAllListeners(); btnFilterConsumables.onClick.AddListener(() => SetFilter(InventoryFilter.Consumables)); }
+            if (btnFilterApparel != null) { btnFilterApparel.onClick.RemoveAllListeners(); btnFilterApparel.onClick.AddListener(() => SetFilter(InventoryFilter.Apparel)); }
+            if (btnFilterTools != null) { btnFilterTools.onClick.RemoveAllListeners(); btnFilterTools.onClick.AddListener(() => SetFilter(InventoryFilter.Tools)); }
         }
 
         private void SetupTabListeners()
         {
-            if (tabBtnDossier != null) tabBtnDossier.onClick.AddListener(() => SwitchRightTab(true));
-            if (tabBtnFloor != null) tabBtnFloor.onClick.AddListener(() => SwitchRightTab(false));
-            if (btnTakeAllFloor != null) btnTakeAllFloor.onClick.AddListener(TakeAllFloorItems);
+            if (tabBtnDossier != null) { tabBtnDossier.onClick.RemoveAllListeners(); tabBtnDossier.onClick.AddListener(() => SwitchRightTab(true)); }
+            if (tabBtnFloor != null) { tabBtnFloor.onClick.RemoveAllListeners(); tabBtnFloor.onClick.AddListener(() => SwitchRightTab(false)); }
+            if (btnTakeAllFloor != null) { btnTakeAllFloor.onClick.RemoveAllListeners(); btnTakeAllFloor.onClick.AddListener(TakeAllFloorItems); }
         }
 
         private void SetupActionListeners()
         {
-            if (btnActionEquip != null) btnActionEquip.onClick.AddListener(ExecuteEquip);
-            if (btnActionUnequip != null) btnActionUnequip.onClick.AddListener(ExecuteUnequip);
-            if (btnActionUse != null) btnActionUse.onClick.AddListener(ExecuteUse);
-            if (btnActionDrop != null) btnActionDrop.onClick.AddListener(ExecuteDrop);
-            if (btnActionTake != null) btnActionTake.onClick.AddListener(ExecuteTakeFloorItem);
+            if (btnActionEquip != null) { btnActionEquip.onClick.RemoveAllListeners(); btnActionEquip.onClick.AddListener(ExecuteEquip); }
+            if (btnActionUnequip != null) { btnActionUnequip.onClick.RemoveAllListeners(); btnActionUnequip.onClick.AddListener(ExecuteUnequip); }
+            if (btnActionUse != null) { btnActionUse.onClick.RemoveAllListeners(); btnActionUse.onClick.AddListener(ExecuteUse); }
+            if (btnActionDrop != null) { btnActionDrop.onClick.RemoveAllListeners(); btnActionDrop.onClick.AddListener(ExecuteDrop); }
+            if (btnActionTake != null) { btnActionTake.onClick.RemoveAllListeners(); btnActionTake.onClick.AddListener(ExecuteTakeFloorItem); }
         }
 
         public void BindAudio(AudioSource src, AudioClip eqClip, AudioClip useClip, AudioClip drpClip, AudioClip ltClip)
@@ -177,6 +186,7 @@ namespace SundayLastBreath.UI
 
         public void Initialize(CharacterData player, List<InventoryEntry> roomFloorItems)
         {
+            EnsureListeners();
             _player = player;
             _floorItems = roomFloorItems;
 
@@ -190,6 +200,8 @@ namespace SundayLastBreath.UI
             RefreshFloorGrid();
             RefreshDossier();
             RefreshCapacityAndWeight();
+            UpdateFilterButtonVisuals();
+            UpdateTabButtonVisuals(dossierPanel != null && dossierPanel.activeSelf);
         }
 
         #region Active Loadout Paper Doll
@@ -274,6 +286,7 @@ namespace SundayLastBreath.UI
         {
             _currentFilter = filter;
             RefreshBackpackGrid();
+            UpdateFilterButtonVisuals();
             PlaySFX(lootSFX);
         }
 
@@ -628,6 +641,46 @@ namespace SundayLastBreath.UI
         {
             if (dossierPanel != null) dossierPanel.SetActive(showDossier);
             if (floorPanel != null) floorPanel.SetActive(!showDossier);
+            UpdateTabButtonVisuals(showDossier);
+        }
+
+        private void UpdateFilterButtonVisuals()
+        {
+            UpdateFilterBtnVisual(btnFilterAll, _currentFilter == InventoryFilter.All);
+            UpdateFilterBtnVisual(btnFilterWeapons, _currentFilter == InventoryFilter.Weapons);
+            UpdateFilterBtnVisual(btnFilterConsumables, _currentFilter == InventoryFilter.Consumables);
+            UpdateFilterBtnVisual(btnFilterApparel, _currentFilter == InventoryFilter.Apparel);
+            UpdateFilterBtnVisual(btnFilterTools, _currentFilter == InventoryFilter.Tools);
+        }
+
+        private void UpdateFilterBtnVisual(Button btn, bool isActive)
+        {
+            if (btn == null) return;
+            Image bg = btn.GetComponent<Image>();
+            Outline ol = btn.GetComponent<Outline>();
+            TextMeshProUGUI tmp = btn.GetComponentInChildren<TextMeshProUGUI>();
+
+            if (bg != null) bg.color = isActive ? new Color(0.18f, 0.24f, 0.34f, 1f) : new Color(0.08f, 0.10f, 0.14f, 0.95f);
+            if (ol != null) ol.effectColor = isActive ? new Color(0.22f, 0.74f, 0.97f, 1f) : new Color(0.20f, 0.24f, 0.30f, 0.65f);
+            if (tmp != null) tmp.color = isActive ? Color.white : new Color(0.65f, 0.70f, 0.75f);
+        }
+
+        private void UpdateTabButtonVisuals(bool showingDossier)
+        {
+            UpdateTabBtnVisual(tabBtnDossier, showingDossier);
+            UpdateTabBtnVisual(tabBtnFloor, !showingDossier);
+        }
+
+        private void UpdateTabBtnVisual(Button btn, bool isActive)
+        {
+            if (btn == null) return;
+            Image bg = btn.GetComponent<Image>();
+            Outline ol = btn.GetComponent<Outline>();
+            TextMeshProUGUI tmp = btn.GetComponentInChildren<TextMeshProUGUI>();
+
+            if (bg != null) bg.color = isActive ? new Color(0.18f, 0.24f, 0.34f, 1f) : new Color(0.08f, 0.10f, 0.14f, 0.95f);
+            if (ol != null) ol.effectColor = isActive ? new Color(0.95f, 0.75f, 0.20f, 1f) : new Color(0.20f, 0.24f, 0.30f, 0.65f);
+            if (tmp != null) tmp.color = isActive ? Color.white : new Color(0.65f, 0.70f, 0.75f);
         }
 
         private void RefreshDossier()

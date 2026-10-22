@@ -1039,9 +1039,12 @@ namespace SundayLastBreath.UI
 
         private void RefreshRightGearPanel()
         {
+            UpdateFloorItemsNotification();
+
             if (tacticalGearController != null)
             {
                 tacticalGearController.Initialize(currentPlayer, floorItems);
+                return;
             }
 
             // Sync local equip strings with currentPlayer
