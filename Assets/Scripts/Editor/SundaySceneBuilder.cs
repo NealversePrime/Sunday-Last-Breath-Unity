@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v47_auto.flag";
+            string flagPath = "Temp/scene_v48_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -5564,31 +5564,31 @@ namespace SundayLastBreath.Editor
             CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 104f,
                 "unit_407", "UNIT 407", "SAFEHOUSE",
                 "hallway_1", "CORRIDOR N", "NORTH SPINE",
-                "unit_406", "UNIT 406", "PROFESSOR",
+                "unit_406", "UNIT 406", "RESIDENTIAL",
                 hasSouthCorridorLink: true);
 
             CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 52f,
-                "unit_405", "UNIT 405", "HUNTER'S APT",
+                "unit_405", "UNIT 405", "RESIDENTIAL",
                 "hallway_2", "CORRIDOR MN", "MID-NORTH",
-                "unit_404", "UNIT 404", "BARRICADED",
+                "unit_404", "UNIT 404", "RESIDENTIAL",
                 hasSouthCorridorLink: true);
 
             CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 0f,
-                "unit_403", "UNIT 403", "BIOHAZARD",
+                "unit_403", "UNIT 403", "RESIDENTIAL",
                 "hallway_3", "CORRIDOR MS", "MID-SOUTH",
-                "unit_402", "UNIT 402", "DOOR AJAR",
+                "unit_402", "UNIT 402", "RESIDENTIAL",
                 hasSouthCorridorLink: true);
 
             CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -52f,
                 "unit_401", "UNIT 401", "RESIDENCE",
                 "hallway_4", "CORRIDOR S", "SOUTH SPINE",
-                "utility", "UTILITY BAY", "MAINTENANCE",
+                "utility", "UTILITY BAY", "SERVICE ROOM",
                 hasSouthCorridorLink: true);
 
             CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -104f,
-                "stairs", "STAIRWELL W", "DESCEND 2F",
-                "hallway_end", "STAIR FOYER", "SOUTH END",
-                "empty_bot", "EAST WING", "COLLAPSED",
+                "stairs", "STAIRWELL W", "FIRE EXIT",
+                "hallway_end", "STAIR FOYER", "SOUTH FOYER",
+                "empty_bot", "EAST WING", "EAST WING",
                 hasSouthCorridorLink: false);
 
             // Bottom Clearance Legend Strip (Bottom 22px inside BlueprintViewport)

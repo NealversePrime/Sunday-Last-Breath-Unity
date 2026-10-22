@@ -39,6 +39,9 @@ namespace SundayLastBreath.Data
         public bool isAccessible = true;
 
         [Header("Tactical Recon Intel")]
+        public bool isDiscovered = false;
+        public string undiscoveredSub = "RESIDENTIAL";
+        public string undiscoveredTitle = "RESIDENTIAL UNIT";
         public string statusTag = "CURRENT SECTOR";
         public string threatLevel = "NONE";
         public string scavengeStatus = "LOOTED / SECURED";
