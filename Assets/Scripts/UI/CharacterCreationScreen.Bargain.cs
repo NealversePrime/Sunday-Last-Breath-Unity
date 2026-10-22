@@ -220,7 +220,7 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            if (bargainPanel != null && bargainPanel.transform.Find("BargainBuiltMarker_V3") != null)
+            if (bargainPanel != null && bargainPanel.transform.Find("BargainBuiltMarker_V4") != null)
             {
                 BindBargainReferences();
                 // Panel was built in the editor and saved into the scene. Runtime (non-persistent)
@@ -253,7 +253,7 @@ namespace SundayLastBreath.UI
             }
 
             // Build Marker
-            GameObject marker = new GameObject("BargainBuiltMarker_V3");
+            GameObject marker = new GameObject("BargainBuiltMarker_V4");
             marker.transform.SetParent(bargainPanel.transform, false);
 
             // Dark Atmosphere Background
@@ -267,23 +267,30 @@ namespace SundayLastBreath.UI
             hRect.anchorMin = new Vector2(0.5f, 1f);
             hRect.anchorMax = new Vector2(0.5f, 1f);
             hRect.pivot = new Vector2(0.5f, 1f);
-            hRect.sizeDelta = new Vector2(1560f, 98f);
-            hRect.anchoredPosition = new Vector2(0f, -16f);
+            hRect.sizeDelta = new Vector2(1560f, 114f);
+            hRect.anchoredPosition = new Vector2(0f, -10f);
 
-            CreateUIText(headerObj.transform, "Badge",
+            TextMeshProUGUI badgeTmp = CreateUIText(headerObj.transform, "Badge",
                 "<b><color=#EF5350>[ STEP 04 // PROTOCOL: SURVIVAL BARGAIN ]</color></b>",
-                11.5f, TextAlignmentOptions.Center, new Color(0.93f, 0.33f, 0.31f), FontRole.Mono,
-                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -18f), new Vector2(0f, 0f));
+                15f, TextAlignmentOptions.Center, new Color(0.93f, 0.33f, 0.31f), FontRole.Mono,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -24f), new Vector2(0f, 0f));
+            if (badgeTmp != null) badgeTmp.overflowMode = TextOverflowModes.Overflow;
 
-            CreateUIText(headerObj.transform, "Title",
+            TextMeshProUGUI titleTmp = CreateUIText(headerObj.transform, "Title",
                 "THE SURVIVAL BARGAIN",
-                32f, TextAlignmentOptions.Center, new Color(0.95f, 0.85f, 0.40f), FontRole.Display,
-                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -56f), new Vector2(0f, -16f));
+                34f, TextAlignmentOptions.Center, new Color(0.95f, 0.85f, 0.40f), FontRole.Display,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -76f), new Vector2(0f, -24f));
+            if (titleTmp != null)
+            {
+                titleTmp.characterSpacing = 4f;
+                titleTmp.overflowMode = TextOverflowModes.Overflow;
+            }
 
-            CreateUIText(headerObj.transform, "Subtitle",
+            TextMeshProUGUI subTmp = CreateUIText(headerObj.transform, "Subtitle",
                 "VOLUNTARILY ACCEPT PHYSICAL OR PSYCHOLOGICAL FLAWS TO ACQUIRE EXTRA M.O.R.T.A.L. ATTRIBUTE POINTS (MAX 2).",
-                13f, TextAlignmentOptions.Center, new Color(0.70f, 0.78f, 0.86f), FontRole.Body,
-                new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 22f));
+                13.5f, TextAlignmentOptions.Center, new Color(0.70f, 0.78f, 0.86f), FontRole.Body,
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -108f), new Vector2(0f, -78f));
+            if (subTmp != null) subTmp.overflowMode = TextOverflowModes.Overflow;
 
             // 2. Status Banner (Pill Bar)
             GameObject bannerObj = new GameObject("BargainBanner");
@@ -293,7 +300,7 @@ namespace SundayLastBreath.UI
             bRect.anchorMax = new Vector2(0.5f, 1f);
             bRect.pivot = new Vector2(0.5f, 1f);
             bRect.sizeDelta = new Vector2(1560f, 42f);
-            bRect.anchoredPosition = new Vector2(0f, -118f);
+            bRect.anchoredPosition = new Vector2(0f, -128f);
 
             Image bBg = bannerObj.AddComponent<Image>();
             bBg.color = new Color(0.06f, 0.10f, 0.15f, 0.95f);
@@ -563,34 +570,42 @@ namespace SundayLastBreath.UI
             ol.effectColor = new Color(0.18f, 0.26f, 0.34f, 0.6f);
             ol.effectDistance = new Vector2(1f, -1f);
 
-            // Left Letter Accent
+            // Left Letter Accent Box (Neatly aligned INSIDE the row card)
             Color accentColor = GetMortalStatColor(desc.type);
             GameObject letBox = new GameObject("LetterBox");
             letBox.transform.SetParent(row.transform, false);
             RectTransform letRect = letBox.AddComponent<RectTransform>();
-            letRect.anchorMin = new Vector2(0f, 0f);
-            letRect.anchorMax = new Vector2(0f, 1f);
-            letRect.sizeDelta = new Vector2(54f, 0f);
-            letRect.anchoredPosition = new Vector2(16f, 0f);
+            letRect.anchorMin = new Vector2(0f, 0.5f);
+            letRect.anchorMax = new Vector2(0f, 0.5f);
+            letRect.pivot = new Vector2(0f, 0.5f);
+            letRect.sizeDelta = new Vector2(52f, 52f);
+            letRect.anchoredPosition = new Vector2(14f, 0f);
 
             Image letBg = letBox.AddComponent<Image>();
-            letBg.color = new Color(accentColor.r * 0.25f, accentColor.g * 0.25f, accentColor.b * 0.25f, 0.8f);
+            letBg.color = new Color(accentColor.r * 0.18f, accentColor.g * 0.18f, accentColor.b * 0.18f, 0.95f);
 
-            CreateUIText(letBox.transform, "LetterText",
+            Outline letOl = letBox.AddComponent<Outline>();
+            letOl.effectColor = new Color(accentColor.r, accentColor.g, accentColor.b, 0.85f);
+            letOl.effectDistance = new Vector2(1f, -1f);
+
+            TextMeshProUGUI letTmp = CreateUIText(letBox.transform, "LetterText",
                 $"<b>{desc.letter}</b>",
-                18f, TextAlignmentOptions.Center, accentColor, FontRole.Display,
+                26f, TextAlignmentOptions.Center, accentColor, FontRole.Display,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            if (letTmp != null) letTmp.overflowMode = TextOverflowModes.Overflow;
 
             // Name + Summary
-            CreateUIText(row.transform, "NameLine",
+            TextMeshProUGUI nameTmp = CreateUIText(row.transform, "NameLine",
                 $"<color=#{ColorUtility.ToHtmlStringRGB(accentColor)}><b>{desc.name}</b></color> <color=#90A4AE>({desc.code})</color>",
                 16f, TextAlignmentOptions.Left, Color.white, FontRole.Display,
-                new Vector2(0f, 0.5f), new Vector2(0.6f, 1f), new Vector2(80f, 0f), new Vector2(0f, -6f));
+                new Vector2(0f, 0.5f), new Vector2(0.65f, 1f), new Vector2(80f, 0f), new Vector2(0f, -6f));
+            if (nameTmp != null) nameTmp.overflowMode = TextOverflowModes.Overflow;
 
-            CreateUIText(row.transform, "SummaryLine",
+            TextMeshProUGUI sumTmp = CreateUIText(row.transform, "SummaryLine",
                 $"<color=#90A4AE>{desc.summary}</color>",
                 12f, TextAlignmentOptions.Left, new Color(0.70f, 0.78f, 0.86f), FontRole.Body,
-                new Vector2(0f, 0f), new Vector2(0.65f, 0.5f), new Vector2(80f, 8f), new Vector2(0f, 0f));
+                new Vector2(0f, 0f), new Vector2(0.68f, 0.5f), new Vector2(80f, 8f), new Vector2(0f, 0f));
+            if (sumTmp != null) sumTmp.overflowMode = TextOverflowModes.Overflow;
 
             // Controls on Right: [ - ] [ Value ] [ + ]
             GameObject ctrlObj = new GameObject("Controls");
