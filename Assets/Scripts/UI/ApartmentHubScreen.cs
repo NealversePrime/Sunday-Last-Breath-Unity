@@ -74,6 +74,7 @@ namespace SundayLastBreath.UI
         [Header("Tactical Map & Skills View Controllers")]
         [SerializeField] private TacticalMapViewController tacticalMapController;
         [SerializeField] private TacticalSkillsViewController tacticalSkillsController;
+        [SerializeField] private TacticalGearViewController tacticalGearController;
 
         [Header("Left PDA - Skills, Traits & Lore Tabs")]
         [SerializeField] private TextMeshProUGUI pdaAttributesText;
@@ -299,6 +300,19 @@ namespace SundayLastBreath.UI
             {
                 btnModeGear.onClick.RemoveAllListeners();
                 btnModeGear.onClick.AddListener(() => SwitchConsoleMode(ConsoleMode.Gear));
+            }
+
+            if (tacticalGearController != null)
+            {
+                tacticalGearController.OnVitalsUpdated += () =>
+                {
+                    UpdateVitalsUI();
+                };
+                tacticalGearController.OnInventoryUpdated += () =>
+                {
+                    UpdateFloorItemsNotification();
+                    RefreshStoryLogUI();
+                };
             }
 
             if (fullScreenClickCatcher != null)
@@ -954,14 +968,38 @@ namespace SundayLastBreath.UI
         {
             if (currentPlayer == null || currentPlayer.inventory == null) return;
 
-            foreach (var entry in currentPlayer.inventory)
+            for (int i = currentPlayer.inventory.Count - 1; i >= 0; i--)
             {
+                if (i >= currentPlayer.inventory.Count) continue;
+                var entry = currentPlayer.inventory[i];
                 string slot = ItemDatabase.GetEquipSlot(entry.itemId);
-                if (slot == "HEAD" && string.IsNullOrEmpty(equippedHead)) equippedHead = entry.itemId;
-                else if (slot == "BODY" && string.IsNullOrEmpty(equippedBody)) equippedBody = entry.itemId;
-                else if (slot == "WPN" && string.IsNullOrEmpty(equippedWpn)) equippedWpn = entry.itemId;
-                else if (slot == "LEGS" && string.IsNullOrEmpty(equippedLegs)) equippedLegs = entry.itemId;
-                else if (slot == "FEET" && string.IsNullOrEmpty(equippedFeet)) equippedFeet = entry.itemId;
+                if (string.IsNullOrEmpty(slot)) continue;
+
+                if (slot == "HEAD" && string.IsNullOrEmpty(currentPlayer.equippedHead))
+                {
+                    currentPlayer.EquipItem(slot, entry.itemId);
+                    equippedHead = entry.itemId;
+                }
+                else if (slot == "BODY" && string.IsNullOrEmpty(currentPlayer.equippedBody))
+                {
+                    currentPlayer.EquipItem(slot, entry.itemId);
+                    equippedBody = entry.itemId;
+                }
+                else if (slot == "WPN" && string.IsNullOrEmpty(currentPlayer.equippedWpn))
+                {
+                    currentPlayer.EquipItem(slot, entry.itemId);
+                    equippedWpn = entry.itemId;
+                }
+                else if (slot == "LEGS" && string.IsNullOrEmpty(currentPlayer.equippedLegs))
+                {
+                    currentPlayer.EquipItem(slot, entry.itemId);
+                    equippedLegs = entry.itemId;
+                }
+                else if (slot == "FEET" && string.IsNullOrEmpty(currentPlayer.equippedFeet))
+                {
+                    currentPlayer.EquipItem(slot, entry.itemId);
+                    equippedFeet = entry.itemId;
+                }
             }
         }
 
@@ -1001,6 +1039,21 @@ namespace SundayLastBreath.UI
 
         private void RefreshRightGearPanel()
         {
+            if (tacticalGearController != null)
+            {
+                tacticalGearController.Initialize(currentPlayer, floorItems);
+            }
+
+            // Sync local equip strings with currentPlayer
+            if (currentPlayer != null)
+            {
+                if (!string.IsNullOrEmpty(currentPlayer.equippedHead)) equippedHead = currentPlayer.equippedHead;
+                if (!string.IsNullOrEmpty(currentPlayer.equippedBody)) equippedBody = currentPlayer.equippedBody;
+                if (!string.IsNullOrEmpty(currentPlayer.equippedWpn)) equippedWpn = currentPlayer.equippedWpn;
+                if (!string.IsNullOrEmpty(currentPlayer.equippedLegs)) equippedLegs = currentPlayer.equippedLegs;
+                if (!string.IsNullOrEmpty(currentPlayer.equippedFeet)) equippedFeet = currentPlayer.equippedFeet;
+            }
+
             // 1. Update Active Loadout Slots on Body Wireframe
             UpdateEquipSlotVisual(equipHeadIcon, equipHeadLabel, equippedHead, "HEAD");
             UpdateEquipSlotVisual(equipBodyIcon, equipBodyLabel, equippedBody, "BODY");

@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v49_auto.flag";
+            string flagPath = "Temp/scene_v50_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -1629,13 +1629,15 @@ namespace SundayLastBreath.Editor
             dgRect.anchoredPosition = Vector2.zero;
             dockGear.SetActive(false);
 
-            // Sub-Panel 1 (Left 460px): Active Loadout Card
+            TacticalGearViewController gearCtrl = dockGear.AddComponent<TacticalGearViewController>();
+
+            // Sub-Panel 1 (Left 420px): Active Loadout Card
             GameObject loadoutCard = new GameObject("Card_ActiveLoadout", typeof(RectTransform));
             loadoutCard.transform.SetParent(dockGear.transform, false);
             RectTransform lcCardRect = loadoutCard.GetComponent<RectTransform>();
             lcCardRect.anchorMin = new Vector2(0f, 0f); lcCardRect.anchorMax = new Vector2(0f, 1f);
             lcCardRect.pivot = new Vector2(0f, 0.5f);
-            lcCardRect.offsetMin = Vector2.zero; lcCardRect.offsetMax = new Vector2(460f, 0f);
+            lcCardRect.offsetMin = Vector2.zero; lcCardRect.offsetMax = new Vector2(420f, 0f);
             Image lcBgImg = loadoutCard.AddComponent<Image>();
             lcBgImg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
             Outline lcCardOl = loadoutCard.AddComponent<Outline>();
@@ -1649,7 +1651,7 @@ namespace SundayLastBreath.Editor
             lhr2.anchoredPosition = new Vector2(14f, -10f);
             lhr2.sizeDelta = new Vector2(-28f, 22f);
 
-            // Wireframe Human Body Silhouette (Enlarged for proportional slot layout)
+            // Wireframe Human Body Silhouette
             GameObject silObj = new GameObject("BodySilhouette", typeof(RectTransform));
             silObj.transform.SetParent(loadoutCard.transform, false);
             RectTransform silRect = silObj.GetComponent<RectTransform>();
@@ -1664,21 +1666,20 @@ namespace SundayLastBreath.Editor
             Sprite silSprite = LoadSpriteSafe("Assets/Sprites/UI/silhouette.png");
             if (silSprite != null) silImg.sprite = silSprite;
 
-            // 5 Equipment Slots overlaid proportionally on body
-            CreateEquipSlot(silObj.transform, "Slot_HEAD", new Vector2(0f, 142f), "HEAD", out Image headIcon, out TextMeshProUGUI headLbl);
-            CreateEquipSlot(silObj.transform, "Slot_BODY", new Vector2(0f, 80f), "BODY", out Image bodyIcon, out TextMeshProUGUI bodyLbl);
-            CreateEquipSlot(silObj.transform, "Slot_WPN", new Vector2(-76f, -10f), "WPN", out Image wpnIcon, out TextMeshProUGUI wpnLbl);
-            CreateEquipSlot(silObj.transform, "Slot_LEGS", new Vector2(0f, -58f), "LEGS", out Image legsIcon, out TextMeshProUGUI legsLbl);
-            CreateEquipSlot(silObj.transform, "Slot_FEET", new Vector2(0f, -155f), "FEET", out Image feetIcon, out TextMeshProUGUI feetLbl);
+            CreateEquipSlot(silObj.transform, "Slot_HEAD", new Vector2(0f, 142f), "HEAD", out Button headBtn, out Image headIcon, out TextMeshProUGUI headLbl, out Outline headOl);
+            CreateEquipSlot(silObj.transform, "Slot_BODY", new Vector2(0f, 80f), "BODY", out Button bodyBtn, out Image bodyIcon, out TextMeshProUGUI bodyLbl, out Outline bodyOl);
+            CreateEquipSlot(silObj.transform, "Slot_WPN", new Vector2(-76f, -10f), "WPN", out Button wpnBtn, out Image wpnIcon, out TextMeshProUGUI wpnLbl, out Outline wpnOl);
+            CreateEquipSlot(silObj.transform, "Slot_LEGS", new Vector2(0f, -58f), "LEGS", out Button legsBtn, out Image legsIcon, out TextMeshProUGUI legsLbl, out Outline legsOl);
+            CreateEquipSlot(silObj.transform, "Slot_FEET", new Vector2(0f, -155f), "FEET", out Button feetBtn, out Image feetIcon, out TextMeshProUGUI feetLbl, out Outline feetOl);
 
-            // Sub-Panel 2 (Center 720px): Backpack Grid Card
+            // Sub-Panel 2 (Center 680px): Backpack Grid Card
             GameObject bagCard = new GameObject("Card_Backpack", typeof(RectTransform));
             bagCard.transform.SetParent(dockGear.transform, false);
             RectTransform bcRect = bagCard.GetComponent<RectTransform>();
             bcRect.anchorMin = new Vector2(0.5f, 0.5f); bcRect.anchorMax = new Vector2(0.5f, 0.5f);
             bcRect.pivot = new Vector2(0.5f, 0.5f);
-            bcRect.sizeDelta = new Vector2(720f, 400f);
-            bcRect.anchoredPosition = new Vector2(20f, 0f);
+            bcRect.sizeDelta = new Vector2(680f, 400f);
+            bcRect.anchoredPosition = new Vector2(-10f, 0f);
             Image bcCardBg = bagCard.AddComponent<Image>();
             bcCardBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
             Outline bcOl = bagCard.AddComponent<Outline>();
@@ -1687,57 +1688,284 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI bheadTmp = CreateTMPText(bagCard.transform, "Header", "BACKPACK", 12.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform bhr = bheadTmp.rectTransform;
-            bhr.anchorMin = new Vector2(0f, 1f); bhr.anchorMax = new Vector2(0.5f, 1f);
+            bhr.anchorMin = new Vector2(0f, 1f); bhr.anchorMax = new Vector2(0.4f, 1f);
             bhr.pivot = new Vector2(0f, 1f);
             bhr.anchoredPosition = new Vector2(16f, -10f);
             bhr.sizeDelta = new Vector2(0f, 22f);
 
-            TextMeshProUGUI pdaBackpackCountTmp = CreateTMPText(bagCard.transform, "Count", "0/12", 11.5f, new Color(0.65f, 0.68f, 0.72f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            TextMeshProUGUI pdaBackpackCountTmp = CreateTMPText(bagCard.transform, "Count", "[ 0 / 12 SLOTS ]", 11.5f, new Color(0.65f, 0.68f, 0.72f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
             RectTransform bcr = pdaBackpackCountTmp.rectTransform;
-            bcr.anchorMin = new Vector2(0.5f, 1f); bcr.anchorMax = new Vector2(1f, 1f);
+            bcr.anchorMin = new Vector2(0.6f, 1f); bcr.anchorMax = new Vector2(1f, 1f);
             bcr.pivot = new Vector2(1f, 1f);
             bcr.anchoredPosition = new Vector2(-16f, -10f);
             bcr.sizeDelta = new Vector2(0f, 22f);
 
+            // Capacity fill bar
+            GameObject capTrackObj = new GameObject("CapacityTrack", typeof(RectTransform));
+            capTrackObj.transform.SetParent(bagCard.transform, false);
+            RectTransform capTrackRt = capTrackObj.GetComponent<RectTransform>();
+            capTrackRt.anchorMin = new Vector2(0f, 1f); capTrackRt.anchorMax = new Vector2(1f, 1f);
+            capTrackRt.pivot = new Vector2(0.5f, 1f);
+            capTrackRt.anchoredPosition = new Vector2(0f, -34f);
+            capTrackRt.sizeDelta = new Vector2(-32f, 4f);
+            Image ctImg = capTrackObj.AddComponent<Image>();
+            ctImg.color = new Color(0.12f, 0.14f, 0.18f, 1f);
+
+            GameObject capFillObj = new GameObject("Fill", typeof(RectTransform));
+            capFillObj.transform.SetParent(capTrackObj.transform, false);
+            RectTransform cft = capFillObj.GetComponent<RectTransform>();
+            StretchFull(cft);
+            Image capFillImg = capFillObj.AddComponent<Image>();
+            capFillImg.color = new Color(0.22f, 0.74f, 0.97f, 1f);
+            capFillImg.type = Image.Type.Filled;
+            capFillImg.fillMethod = Image.FillMethod.Horizontal;
+            capFillImg.fillAmount = 0.5f;
+
+            // Filter tabs row
+            GameObject filterRowObj = new GameObject("FilterRow", typeof(RectTransform));
+            filterRowObj.transform.SetParent(bagCard.transform, false);
+            RectTransform frt = filterRowObj.GetComponent<RectTransform>();
+            frt.anchorMin = new Vector2(0f, 1f); frt.anchorMax = new Vector2(1f, 1f);
+            frt.pivot = new Vector2(0.5f, 1f);
+            frt.anchoredPosition = new Vector2(0f, -44f);
+            frt.sizeDelta = new Vector2(-32f, 24f);
+            HorizontalLayoutGroup frHlg = filterRowObj.AddComponent<HorizontalLayoutGroup>();
+            frHlg.spacing = 6f;
+            frHlg.childAlignment = TextAnchor.MiddleLeft;
+            frHlg.childControlWidth = true; frHlg.childControlHeight = true;
+            frHlg.childForceExpandWidth = true; frHlg.childForceExpandHeight = true;
+
+            CreateFilterButton(filterRowObj.transform, "Btn_All", "ALL", out Button btnFAll);
+            CreateFilterButton(filterRowObj.transform, "Btn_Wpn", "WEAPONS", out Button btnFWpn);
+            CreateFilterButton(filterRowObj.transform, "Btn_Med", "MED / FOOD", out Button btnFMed);
+            CreateFilterButton(filterRowObj.transform, "Btn_App", "APPAREL", out Button btnFApp);
+            CreateFilterButton(filterRowObj.transform, "Btn_Tool", "TOOLS", out Button btnFTool);
+
+            // Backpack Grid
             GameObject bagGridObj = new GameObject("BackpackGrid", typeof(RectTransform));
             bagGridObj.transform.SetParent(bagCard.transform, false);
             RectTransform bgr = bagGridObj.GetComponent<RectTransform>();
             StretchFull(bgr);
-            bgr.offsetMin = new Vector2(16f, 14f);
-            bgr.offsetMax = new Vector2(-16f, -40f);
+            bgr.offsetMin = new Vector2(16f, 32f);
+            bgr.offsetMax = new Vector2(-16f, -74f);
             GridLayoutGroup bgGlg = bagGridObj.AddComponent<GridLayoutGroup>();
             bgGlg.cellSize = new Vector2(74f, 74f);
             bgGlg.spacing = new Vector2(10f, 10f);
             bgGlg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             bgGlg.constraintCount = 5;
 
-            // Sub-Panel 3 (Right 400px): Room / Floor Items Stash
-            GameObject floorCard = new GameObject("Card_FloorItems", typeof(RectTransform));
-            floorCard.transform.SetParent(dockGear.transform, false);
-            RectTransform fcRect = floorCard.GetComponent<RectTransform>();
-            fcRect.anchorMin = new Vector2(1f, 0f); fcRect.anchorMax = new Vector2(1f, 1f);
-            fcRect.pivot = new Vector2(1f, 0.5f);
-            fcRect.offsetMin = new Vector2(-400f, 0f); fcRect.offsetMax = Vector2.zero;
-            Image fcCardBg = floorCard.AddComponent<Image>();
-            fcCardBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
-            Outline fcOl = floorCard.AddComponent<Outline>();
-            fcOl.effectColor = new Color(0.20f, 0.24f, 0.30f, 0.85f);
-            fcOl.effectDistance = new Vector2(1f, -1f);
+            // Weight text
+            TextMeshProUGUI weightTmp = CreateTMPText(bagCard.transform, "WeightText", "ENCUMBRANCE: 0.0 KG", 10.5f, new Color(0.55f, 0.60f, 0.68f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform wtr = weightTmp.rectTransform;
+            wtr.anchorMin = new Vector2(0f, 0f); wtr.anchorMax = new Vector2(1f, 0f);
+            wtr.pivot = new Vector2(0f, 0f);
+            wtr.anchoredPosition = new Vector2(16f, 8f);
+            wtr.sizeDelta = new Vector2(-32f, 20f);
 
-            TextMeshProUGUI fheadTmp = CreateTMPText(floorCard.transform, "Header", "ROOM / TABLE ITEMS", 12f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            // Sub-Panel 3 (Right 490px): Dual Inspector / Room Loot Stash Card
+            GameObject rightCard = new GameObject("Card_RightInspectorStash", typeof(RectTransform));
+            rightCard.transform.SetParent(dockGear.transform, false);
+            RectTransform rcRect = rightCard.GetComponent<RectTransform>();
+            rcRect.anchorMin = new Vector2(1f, 0f); rcRect.anchorMax = new Vector2(1f, 1f);
+            rcRect.pivot = new Vector2(1f, 0.5f);
+            rcRect.offsetMin = new Vector2(-490f, 0f); rcRect.offsetMax = Vector2.zero;
+            Image rcCardBg = rightCard.AddComponent<Image>();
+            rcCardBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
+            Outline rcOl = rightCard.AddComponent<Outline>();
+            rcOl.effectColor = new Color(0.20f, 0.24f, 0.30f, 0.85f);
+            rcOl.effectDistance = new Vector2(1f, -1f);
+
+            // Top Dual Tabs
+            GameObject rightTabsObj = new GameObject("RightTabs", typeof(RectTransform));
+            rightTabsObj.transform.SetParent(rightCard.transform, false);
+            RectTransform rtr = rightTabsObj.GetComponent<RectTransform>();
+            rtr.anchorMin = new Vector2(0f, 1f); rtr.anchorMax = new Vector2(1f, 1f);
+            rtr.pivot = new Vector2(0.5f, 1f);
+            rtr.anchoredPosition = new Vector2(0f, -8f);
+            rtr.sizeDelta = new Vector2(-20f, 26f);
+            HorizontalLayoutGroup rtHlg = rightTabsObj.AddComponent<HorizontalLayoutGroup>();
+            rtHlg.spacing = 8f;
+            rtHlg.childAlignment = TextAnchor.MiddleCenter;
+            rtHlg.childControlWidth = true; rtHlg.childControlHeight = true;
+            rtHlg.childForceExpandWidth = true; rtHlg.childForceExpandHeight = true;
+
+            CreateTabPillButton(rightTabsObj.transform, "Tab_Dossier", "ITEM DOSSIER", out Button tabDossierBtn, out TextMeshProUGUI _);
+            CreateTabPillButton(rightTabsObj.transform, "Tab_Floor", "ROOM ITEMS", out Button tabFloorBtn, out TextMeshProUGUI tabFloorCountTmp);
+
+            // 1. Panel: Item Dossier
+            GameObject dossierPanelObj = new GameObject("Panel_ItemDossier", typeof(RectTransform));
+            dossierPanelObj.transform.SetParent(rightCard.transform, false);
+            RectTransform dpr = dossierPanelObj.GetComponent<RectTransform>();
+            StretchFull(dpr);
+            dpr.offsetMin = new Vector2(12f, 10f);
+            dpr.offsetMax = new Vector2(-12f, -38f);
+
+            // Empty Notice
+            GameObject dEmptyObj = new GameObject("EmptyState", typeof(RectTransform));
+            dEmptyObj.transform.SetParent(dossierPanelObj.transform, false);
+            RectTransform der = dEmptyObj.GetComponent<RectTransform>();
+            StretchFull(der);
+            TextMeshProUGUI dEmptyTmp = CreateTMPText(dEmptyObj.transform, "Text", "(Select an item in your backpack or loadout slot to inspect tactical intel & specs)", 11f, new Color(0.5f, 0.55f, 0.6f), TextAlignmentOptions.Center, FontStyles.Italic);
+            RectTransform det = dEmptyTmp.rectTransform;
+            StretchFull(det);
+
+            // Detail Content Container
+            GameObject dContentObj = new GameObject("DetailContent", typeof(RectTransform));
+            dContentObj.transform.SetParent(dossierPanelObj.transform, false);
+            RectTransform dcr = dContentObj.GetComponent<RectTransform>();
+            StretchFull(dcr);
+            dContentObj.SetActive(false);
+
+            // Header Row (Icon + Name + Category + Caliber/Weight)
+            GameObject dTopRow = new GameObject("TopRow", typeof(RectTransform));
+            dTopRow.transform.SetParent(dContentObj.transform, false);
+            RectTransform dtr = dTopRow.GetComponent<RectTransform>();
+            dtr.anchorMin = new Vector2(0f, 1f); dtr.anchorMax = new Vector2(1f, 1f);
+            dtr.pivot = new Vector2(0f, 1f);
+            dtr.anchoredPosition = new Vector2(0f, 0f);
+            dtr.sizeDelta = new Vector2(0f, 76f);
+
+            // Holographic Icon Reticle Frame
+            GameObject iconFrame = new GameObject("IconFrame", typeof(RectTransform));
+            iconFrame.transform.SetParent(dTopRow.transform, false);
+            RectTransform ifr = iconFrame.GetComponent<RectTransform>();
+            ifr.anchorMin = new Vector2(0f, 0.5f); ifr.anchorMax = new Vector2(0f, 0.5f);
+            ifr.pivot = new Vector2(0f, 0.5f);
+            ifr.anchoredPosition = new Vector2(0f, 0f);
+            ifr.sizeDelta = new Vector2(72f, 72f);
+            Image ifBg = iconFrame.AddComponent<Image>();
+            ifBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
+            Outline ifOl = iconFrame.AddComponent<Outline>();
+            ifOl.effectColor = new Color(0.22f, 0.74f, 0.97f, 0.75f);
+            ifOl.effectDistance = new Vector2(1f, -1f);
+
+            GameObject dIconObj = new GameObject("Icon");
+            dIconObj.transform.SetParent(iconFrame.transform, false);
+            Image dIconImg = dIconObj.AddComponent<Image>();
+            dIconImg.preserveAspect = true;
+            dIconImg.raycastTarget = false;
+            RectTransform dir = dIconObj.GetComponent<RectTransform>();
+            StretchFull(dir);
+            dir.offsetMin = new Vector2(6f, 6f);
+            dir.offsetMax = new Vector2(-6f, -6f);
+
+            // Title Column
+            GameObject titleCol = new GameObject("TitleCol", typeof(RectTransform));
+            titleCol.transform.SetParent(dTopRow.transform, false);
+            RectTransform tcr = titleCol.GetComponent<RectTransform>();
+            tcr.anchorMin = new Vector2(0f, 0f); tcr.anchorMax = new Vector2(1f, 1f);
+            tcr.offsetMin = new Vector2(82f, 0f);
+            tcr.offsetMax = Vector2.zero;
+
+            TextMeshProUGUI dNameTmp = CreateTMPText(titleCol.transform, "ItemName", "GLOCK 19", 14f, new Color(0.95f, 0.75f, 0.20f), TextAlignmentOptions.TopLeft, FontStyles.Bold);
+            RectTransform dnt = dNameTmp.rectTransform;
+            dnt.anchorMin = new Vector2(0f, 1f); dnt.anchorMax = new Vector2(1f, 1f);
+            dnt.pivot = new Vector2(0f, 1f);
+            dnt.anchoredPosition = new Vector2(0f, 0f);
+            dnt.sizeDelta = new Vector2(0f, 20f);
+
+            TextMeshProUGUI dCatTmp = CreateTMPText(titleCol.transform, "Category", "<color=#38BDF8>[RANGED WEAPON]</color>", 10.5f, Color.white, TextAlignmentOptions.TopLeft, FontStyles.Bold);
+            RectTransform dct = dCatTmp.rectTransform;
+            dct.anchorMin = new Vector2(0f, 1f); dct.anchorMax = new Vector2(1f, 1f);
+            dct.pivot = new Vector2(0f, 1f);
+            dct.anchoredPosition = new Vector2(0f, -22f);
+            dct.sizeDelta = new Vector2(0f, 18f);
+
+            TextMeshProUGUI dSubTmp = CreateTMPText(titleCol.transform, "SubInfo", "SLOT: WPN | CALIBER: 9mm Ammo | 1.2 KG", 9.5f, new Color(0.65f, 0.70f, 0.75f), TextAlignmentOptions.TopLeft);
+            RectTransform dst = dSubTmp.rectTransform;
+            dst.anchorMin = new Vector2(0f, 1f); dst.anchorMax = new Vector2(1f, 1f);
+            dst.pivot = new Vector2(0f, 1f);
+            dst.anchoredPosition = new Vector2(0f, -42f);
+            dst.sizeDelta = new Vector2(0f, 18f);
+
+            // Stats Sheet Card
+            GameObject statsBox = new GameObject("StatsBox", typeof(RectTransform));
+            statsBox.transform.SetParent(dContentObj.transform, false);
+            RectTransform sbr = statsBox.GetComponent<RectTransform>();
+            sbr.anchorMin = new Vector2(0f, 1f); sbr.anchorMax = new Vector2(1f, 1f);
+            sbr.pivot = new Vector2(0f, 1f);
+            sbr.anchoredPosition = new Vector2(0f, -84f);
+            sbr.sizeDelta = new Vector2(0f, 76f);
+            Image statsBoxBg = statsBox.AddComponent<Image>();
+            statsBoxBg.color = new Color(0.06f, 0.08f, 0.10f, 0.95f);
+            Outline sbOl = statsBox.AddComponent<Outline>();
+            sbOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.75f);
+            sbOl.effectDistance = new Vector2(1f, -1f);
+
+            TextMeshProUGUI dStatsTmp = CreateTMPText(statsBox.transform, "StatsText", "TACTICAL ACCURACY: 60%\nMAX TARGET ENGAGEMENT: 1 Hostile\nMAGAZINE SPEC: 9mm Ammo", 10f, new Color(0.85f, 0.88f, 0.92f), TextAlignmentOptions.TopLeft);
+            RectTransform dsr = dStatsTmp.rectTransform;
+            StretchFull(dsr);
+            dsr.offsetMin = new Vector2(10f, 6f);
+            dsr.offsetMax = new Vector2(-10f, -6f);
+
+            // Lore description
+            GameObject descBox = new GameObject("DescBox", typeof(RectTransform));
+            descBox.transform.SetParent(dContentObj.transform, false);
+            RectTransform dbr = descBox.GetComponent<RectTransform>();
+            dbr.anchorMin = new Vector2(0f, 1f); dbr.anchorMax = new Vector2(1f, 1f);
+            dbr.pivot = new Vector2(0f, 1f);
+            dbr.anchoredPosition = new Vector2(0f, -166f);
+            dbr.sizeDelta = new Vector2(0f, 76f);
+
+            TextMeshProUGUI dDescTmp = CreateTMPText(descBox.transform, "DescText", "\"Reliable 9mm police service pistol.\"", 10.5f, new Color(0.70f, 0.75f, 0.80f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
+            RectTransform ddr = dDescTmp.rectTransform;
+            StretchFull(ddr);
+
+            // Actions Row
+            GameObject actRow = new GameObject("ActionButtonsRow", typeof(RectTransform));
+            actRow.transform.SetParent(dContentObj.transform, false);
+            RectTransform arr = actRow.GetComponent<RectTransform>();
+            arr.anchorMin = new Vector2(0f, 0f); arr.anchorMax = new Vector2(1f, 0f);
+            arr.pivot = new Vector2(0.5f, 0f);
+            arr.anchoredPosition = new Vector2(0f, 28f);
+            arr.sizeDelta = new Vector2(0f, 32f);
+            HorizontalLayoutGroup arHlg = actRow.AddComponent<HorizontalLayoutGroup>();
+            arHlg.spacing = 8f;
+            arHlg.childAlignment = TextAnchor.MiddleCenter;
+            arHlg.childControlWidth = true; arHlg.childControlHeight = true;
+            arHlg.childForceExpandWidth = true; arHlg.childForceExpandHeight = true;
+
+            CreateDossierActionButton(actRow.transform, "Btn_Equip", "EQUIP GEAR", new Color(0.14f, 0.54f, 0.78f), out Button btnEquip);
+            CreateDossierActionButton(actRow.transform, "Btn_Unequip", "UNEQUIP", new Color(0.85f, 0.52f, 0.12f), out Button btnUnequip);
+            CreateDossierActionButton(actRow.transform, "Btn_Use", "CONSUME / USE", new Color(0.13f, 0.65f, 0.32f), out Button btnUse);
+            CreateDossierActionButton(actRow.transform, "Btn_Drop", "DROP TO ROOM", new Color(0.72f, 0.22f, 0.22f), out Button btnDrop);
+            CreateDossierActionButton(actRow.transform, "Btn_Take", "TAKE ITEM", new Color(0.13f, 0.65f, 0.32f), out Button btnTake);
+
+            // Toast text
+            TextMeshProUGUI dToastTmp = CreateTMPText(dContentObj.transform, "ToastText", "", 10f, new Color(0.95f, 0.85f, 0.45f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform dttr = dToastTmp.rectTransform;
+            dttr.anchorMin = new Vector2(0f, 0f); dttr.anchorMax = new Vector2(1f, 0f);
+            dttr.pivot = new Vector2(0.5f, 0f);
+            dttr.anchoredPosition = new Vector2(0f, 4f);
+            dttr.sizeDelta = new Vector2(0f, 20f);
+
+            // 2. Panel: Floor / Room Loot Stash
+            GameObject floorPanelObj = new GameObject("Panel_FloorItems", typeof(RectTransform));
+            floorPanelObj.transform.SetParent(rightCard.transform, false);
+            RectTransform fpr = floorPanelObj.GetComponent<RectTransform>();
+            StretchFull(fpr);
+            fpr.offsetMin = new Vector2(12f, 10f);
+            fpr.offsetMax = new Vector2(-12f, -38f);
+            floorPanelObj.SetActive(false);
+
+            GameObject fheadObj = new GameObject("FloorHeaderRow", typeof(RectTransform));
+            fheadObj.transform.SetParent(floorPanelObj.transform, false);
+            RectTransform fhrr = fheadObj.GetComponent<RectTransform>();
+            fhrr.anchorMin = new Vector2(0f, 1f); fhrr.anchorMax = new Vector2(1f, 1f);
+            fhrr.pivot = new Vector2(0f, 1f);
+            fhrr.anchoredPosition = new Vector2(0f, 0f);
+            fhrr.sizeDelta = new Vector2(0f, 28f);
+
+            TextMeshProUGUI fheadTmp = CreateTMPText(fheadObj.transform, "Header", "ROOM / TABLE ITEMS", 11.5f, new Color(0.91f, 0.30f, 0.24f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform fhr = fheadTmp.rectTransform;
-            fhr.anchorMin = new Vector2(0f, 1f); fhr.anchorMax = new Vector2(0.5f, 1f);
-            fhr.pivot = new Vector2(0f, 1f);
-            fhr.anchoredPosition = new Vector2(14f, -10f);
-            fhr.sizeDelta = new Vector2(0f, 22f);
+            fhr.anchorMin = new Vector2(0f, 0f); fhr.anchorMax = new Vector2(0.55f, 1f);
+            fhr.offsetMin = Vector2.zero; fhr.offsetMax = Vector2.zero;
 
             GameObject fBtnObj = new GameObject("Btn_GatherFloor", typeof(RectTransform));
-            fBtnObj.transform.SetParent(floorCard.transform, false);
+            fBtnObj.transform.SetParent(fheadObj.transform, false);
             RectTransform fbr = fBtnObj.GetComponent<RectTransform>();
-            fbr.anchorMin = new Vector2(1f, 1f); fbr.anchorMax = new Vector2(1f, 1f);
-            fbr.pivot = new Vector2(1f, 1f);
-            fbr.anchoredPosition = new Vector2(-12f, -10f);
-            fbr.sizeDelta = new Vector2(140f, 26f);
+            fbr.anchorMin = new Vector2(0.55f, 0f); fbr.anchorMax = new Vector2(1f, 1f);
+            fbr.offsetMin = Vector2.zero; fbr.offsetMax = Vector2.zero;
             Image fbImg = fBtnObj.AddComponent<Image>();
             fbImg.color = new Color(0.78f, 0.32f, 0.26f, 0.95f);
             Button btnFloorGather = fBtnObj.AddComponent<Button>();
@@ -1748,20 +1976,86 @@ namespace SundayLastBreath.Editor
             StretchFull(fbtRect);
 
             GameObject floorGridObj = new GameObject("FloorGrid", typeof(RectTransform));
-            floorGridObj.transform.SetParent(floorCard.transform, false);
+            floorGridObj.transform.SetParent(floorPanelObj.transform, false);
             RectTransform fgr = floorGridObj.GetComponent<RectTransform>();
             StretchFull(fgr);
-            fgr.offsetMin = new Vector2(14f, 12f);
-            fgr.offsetMax = new Vector2(-14f, -44f);
+            fgr.offsetMin = new Vector2(0f, 0f);
+            fgr.offsetMax = new Vector2(0f, -34f);
             GridLayoutGroup fgGlg = floorGridObj.AddComponent<GridLayoutGroup>();
             fgGlg.cellSize = new Vector2(72f, 72f);
             fgGlg.spacing = new Vector2(8f, 8f);
             fgGlg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            fgGlg.constraintCount = 4;
+            fgGlg.constraintCount = 5;
 
-            TextMeshProUGUI pdaFloorEmptyTmp = CreateTMPText(floorCard.transform, "EmptyNotice", "(Table is empty)", 11.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.Center, FontStyles.Italic);
+            TextMeshProUGUI pdaFloorEmptyTmp = CreateTMPText(floorPanelObj.transform, "EmptyNotice", "(Table is empty)", 11.5f, new Color(0.55f, 0.58f, 0.62f), TextAlignmentOptions.Center, FontStyles.Italic);
             RectTransform fer = pdaFloorEmptyTmp.rectTransform;
             StretchFull(fer);
+
+            // Configure Serialized Properties for TacticalGearViewController
+            SerializedObject soGear = new SerializedObject(gearCtrl);
+            soGear.FindProperty("slotHeadBtn").objectReferenceValue = headBtn;
+            soGear.FindProperty("slotHeadIcon").objectReferenceValue = headIcon;
+            soGear.FindProperty("slotHeadLabel").objectReferenceValue = headLbl;
+            soGear.FindProperty("slotHeadOutline").objectReferenceValue = headOl;
+
+            soGear.FindProperty("slotBodyBtn").objectReferenceValue = bodyBtn;
+            soGear.FindProperty("slotBodyIcon").objectReferenceValue = bodyIcon;
+            soGear.FindProperty("slotBodyLabel").objectReferenceValue = bodyLbl;
+            soGear.FindProperty("slotBodyOutline").objectReferenceValue = bodyOl;
+
+            soGear.FindProperty("slotWpnBtn").objectReferenceValue = wpnBtn;
+            soGear.FindProperty("slotWpnIcon").objectReferenceValue = wpnIcon;
+            soGear.FindProperty("slotWpnLabel").objectReferenceValue = wpnLbl;
+            soGear.FindProperty("slotWpnOutline").objectReferenceValue = wpnOl;
+
+            soGear.FindProperty("slotLegsBtn").objectReferenceValue = legsBtn;
+            soGear.FindProperty("slotLegsIcon").objectReferenceValue = legsIcon;
+            soGear.FindProperty("slotLegsLabel").objectReferenceValue = legsLbl;
+            soGear.FindProperty("slotLegsOutline").objectReferenceValue = legsOl;
+
+            soGear.FindProperty("slotFeetBtn").objectReferenceValue = feetBtn;
+            soGear.FindProperty("slotFeetIcon").objectReferenceValue = feetIcon;
+            soGear.FindProperty("slotFeetLabel").objectReferenceValue = feetLbl;
+            soGear.FindProperty("slotFeetOutline").objectReferenceValue = feetOl;
+
+            soGear.FindProperty("backpackGridRoot").objectReferenceValue = bagGridObj.transform;
+            soGear.FindProperty("backpackCountText").objectReferenceValue = pdaBackpackCountTmp;
+            soGear.FindProperty("backpackCapacityFill").objectReferenceValue = capFillImg;
+            soGear.FindProperty("weightText").objectReferenceValue = weightTmp;
+
+            soGear.FindProperty("btnFilterAll").objectReferenceValue = btnFAll;
+            soGear.FindProperty("btnFilterWeapons").objectReferenceValue = btnFWpn;
+            soGear.FindProperty("btnFilterConsumables").objectReferenceValue = btnFMed;
+            soGear.FindProperty("btnFilterApparel").objectReferenceValue = btnFApp;
+            soGear.FindProperty("btnFilterTools").objectReferenceValue = btnFTool;
+
+            soGear.FindProperty("tabBtnDossier").objectReferenceValue = tabDossierBtn;
+            soGear.FindProperty("tabBtnFloor").objectReferenceValue = tabFloorBtn;
+            soGear.FindProperty("tabFloorCountText").objectReferenceValue = tabFloorCountTmp;
+            soGear.FindProperty("dossierPanel").objectReferenceValue = dossierPanelObj;
+            soGear.FindProperty("floorPanel").objectReferenceValue = floorPanelObj;
+
+            soGear.FindProperty("dossierEmptyState").objectReferenceValue = dEmptyObj;
+            soGear.FindProperty("dossierDetailContent").objectReferenceValue = dContentObj;
+            soGear.FindProperty("dossierItemName").objectReferenceValue = dNameTmp;
+            soGear.FindProperty("dossierCategoryBadge").objectReferenceValue = dCatTmp;
+            soGear.FindProperty("dossierIcon").objectReferenceValue = dIconImg;
+            soGear.FindProperty("dossierSubInfo").objectReferenceValue = dSubTmp;
+            soGear.FindProperty("dossierStatsText").objectReferenceValue = dStatsTmp;
+            soGear.FindProperty("dossierDescription").objectReferenceValue = dDescTmp;
+            soGear.FindProperty("dossierToast").objectReferenceValue = dToastTmp;
+
+            soGear.FindProperty("btnActionEquip").objectReferenceValue = btnEquip;
+            soGear.FindProperty("btnActionUnequip").objectReferenceValue = btnUnequip;
+            soGear.FindProperty("btnActionUse").objectReferenceValue = btnUse;
+            soGear.FindProperty("btnActionDrop").objectReferenceValue = btnDrop;
+            soGear.FindProperty("btnActionTake").objectReferenceValue = btnTake;
+
+            soGear.FindProperty("floorGridRoot").objectReferenceValue = floorGridObj.transform;
+            soGear.FindProperty("floorEmptyNotice").objectReferenceValue = pdaFloorEmptyTmp;
+            soGear.FindProperty("btnTakeAllFloor").objectReferenceValue = btnFloorGather;
+
+            soGear.ApplyModifiedPropertiesWithoutUndo();
 
             // =========================================================================
             // 5. MODAL OVERLAYS (Phone, Radio, Hacking)
@@ -1817,7 +2111,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("thirstValueText").objectReferenceValue = thrValTmp;
             so.FindProperty("clockTimeText").objectReferenceValue = clockTimeTmp;
             so.FindProperty("clockDayText").objectReferenceValue = clockDayTmp;
-            so.FindProperty("floorItemsCard").objectReferenceValue = floorCard;
+            so.FindProperty("floorItemsCard").objectReferenceValue = rightCard;
             so.FindProperty("floorItemsButton").objectReferenceValue = btnFloorGather;
             so.FindProperty("floorItemsCountText").objectReferenceValue = floorCountTmp;
 
@@ -1833,6 +2127,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("pdaPanelMap").objectReferenceValue = pMapObj;
             so.FindProperty("tacticalMapController").objectReferenceValue = mapCtrl;
             so.FindProperty("tacticalSkillsController").objectReferenceValue = skillsCtrl;
+            so.FindProperty("tacticalGearController").objectReferenceValue = gearCtrl;
             so.FindProperty("pdaPanelLore").objectReferenceValue = pLoreObj;
 
             so.FindProperty("pdaCharNameText").objectReferenceValue = pdaCharNameTmp;
@@ -2058,7 +2353,8 @@ namespace SundayLastBreath.Editor
             tr.offsetMax = new Vector2(-10f, 0f);
         }
 
-        private static void CreateEquipSlot(Transform parent, string name, Vector2 pos, string slotName, out Image iconImg, out TextMeshProUGUI slotLabel)
+        private static void CreateEquipSlot(Transform parent, string name, Vector2 pos, string slotName,
+            out Button slotBtn, out Image iconImg, out TextMeshProUGUI slotLabel, out Outline outline)
         {
             GameObject slotObj = new GameObject(name);
             slotObj.transform.SetParent(parent, false);
@@ -2067,18 +2363,22 @@ namespace SundayLastBreath.Editor
             sr.anchorMax = new Vector2(0.5f, 0.5f);
             sr.pivot = new Vector2(0.5f, 0.5f);
             sr.anchoredPosition = pos;
-            sr.sizeDelta = new Vector2(46f, 46f);
+            sr.sizeDelta = new Vector2(48f, 48f);
 
             Image bg = slotObj.AddComponent<Image>();
-            bg.color = new Color(0.04f, 0.05f, 0.07f, 0.92f);
-            Outline ol = slotObj.AddComponent<Outline>();
-            ol.effectColor = new Color(0.22f, 0.74f, 0.97f, 0.7f); // Neon cyan outline
-            ol.effectDistance = new Vector2(1f, -1f);
+            bg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
+            outline = slotObj.AddComponent<Outline>();
+            outline.effectColor = new Color(0.22f, 0.74f, 0.97f, 0.7f); // Neon cyan outline
+            outline.effectDistance = new Vector2(1f, -1f);
+
+            slotBtn = slotObj.AddComponent<Button>();
+            slotBtn.targetGraphic = bg;
 
             GameObject iconObj = new GameObject("Icon");
             iconObj.transform.SetParent(slotObj.transform, false);
             iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
             RectTransform ir = iconObj.GetComponent<RectTransform>();
             StretchFull(ir);
             ir.offsetMin = new Vector2(4f, 4f);
@@ -2086,8 +2386,63 @@ namespace SundayLastBreath.Editor
             iconObj.SetActive(false);
 
             slotLabel = CreateTMPText(slotObj.transform, "SlotLabel", slotName, 9.5f, new Color(0.45f, 0.65f, 0.85f), TextAlignmentOptions.Center, FontStyles.Bold);
+            slotLabel.raycastTarget = false;
             RectTransform lr = slotLabel.rectTransform;
             StretchFull(lr);
+        }
+
+        private static void CreateFilterButton(Transform parent, string name, string label, out Button btn)
+        {
+            GameObject obj = new GameObject(name, typeof(RectTransform));
+            obj.transform.SetParent(parent, false);
+            Image bg = obj.AddComponent<Image>();
+            bg.color = new Color(0.10f, 0.12f, 0.16f, 0.95f);
+            Outline ol = obj.AddComponent<Outline>();
+            ol.effectColor = new Color(0.22f, 0.28f, 0.36f, 0.85f);
+            ol.effectDistance = new Vector2(1f, -1f);
+            btn = obj.AddComponent<Button>();
+            btn.targetGraphic = bg;
+
+            TextMeshProUGUI tmp = CreateTMPText(obj.transform, "Text", label, 9.5f, new Color(0.80f, 0.85f, 0.90f), TextAlignmentOptions.Center, FontStyles.Bold);
+            tmp.raycastTarget = false;
+            RectTransform tr = tmp.rectTransform;
+            StretchFull(tr);
+        }
+
+        private static void CreateTabPillButton(Transform parent, string name, string label, out Button btn, out TextMeshProUGUI textTmp)
+        {
+            GameObject obj = new GameObject(name, typeof(RectTransform));
+            obj.transform.SetParent(parent, false);
+            Image bg = obj.AddComponent<Image>();
+            bg.color = new Color(0.12f, 0.15f, 0.20f, 0.95f);
+            Outline ol = obj.AddComponent<Outline>();
+            ol.effectColor = new Color(0.25f, 0.35f, 0.45f, 0.85f);
+            ol.effectDistance = new Vector2(1f, -1f);
+            btn = obj.AddComponent<Button>();
+            btn.targetGraphic = bg;
+
+            textTmp = CreateTMPText(obj.transform, "Text", label, 10f, new Color(0.85f, 0.90f, 0.95f), TextAlignmentOptions.Center, FontStyles.Bold);
+            textTmp.raycastTarget = false;
+            RectTransform tr = textTmp.rectTransform;
+            StretchFull(tr);
+        }
+
+        private static void CreateDossierActionButton(Transform parent, string name, string label, Color color, out Button btn)
+        {
+            GameObject obj = new GameObject(name, typeof(RectTransform));
+            obj.transform.SetParent(parent, false);
+            Image bg = obj.AddComponent<Image>();
+            bg.color = color;
+            Outline ol = obj.AddComponent<Outline>();
+            ol.effectColor = new Color(0f, 0f, 0f, 0.6f);
+            ol.effectDistance = new Vector2(1f, -1f);
+            btn = obj.AddComponent<Button>();
+            btn.targetGraphic = bg;
+
+            TextMeshProUGUI tmp = CreateTMPText(obj.transform, "Text", label, 10f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            tmp.raycastTarget = false;
+            RectTransform tr = tmp.rectTransform;
+            StretchFull(tr);
         }
 
         private static void CreateVitalBar(Transform parent, string name, Sprite iconSprite, Sprite fillSprite, Color fillColor,

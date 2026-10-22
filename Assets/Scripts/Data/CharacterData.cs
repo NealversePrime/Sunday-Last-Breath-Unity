@@ -65,6 +65,11 @@ namespace SundayLastBreath.Data
         public int thirst = 100;
         public int humanity = 50;
 
+        [Header("Progression (XP & Level)")]
+        public int level = 1;
+        public int xp = 0;
+        public int xpRequired = 100;
+
         [Header("M.O.R.T.A.L. Attributes (1 - 10)")]
         public int str = 3;   // Might
         public int per = 3;   // Observation
@@ -91,7 +96,14 @@ namespace SundayLastBreath.Data
         public int survival = 0;
         public int resolve = 0;
 
-        [Header("Perks, Drawbacks & Inventory")]
+        [Header("Active Loadout (Paper Doll Equipment)")]
+        public string equippedHead = "";
+        public string equippedBody = "";
+        public string equippedWpn = "";
+        public string equippedLegs = "";
+        public string equippedFeet = "";
+
+        [Header("Backpack Inventory & Encumbrance")]
         public int bagLimit = 12;
         public List<TraitEntry> traits = new List<TraitEntry>();
         public List<string> selectedDrawbacks = new List<string>();
@@ -110,17 +122,297 @@ namespace SundayLastBreath.Data
             return traits.Exists(t => t.name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public void AddItem(string itemId, int qty = 1)
+        public string GetEquippedInSlot(string slot)
         {
+            if (string.IsNullOrEmpty(slot)) return "";
+            switch (slot.ToUpperInvariant())
+            {
+                case "HEAD": return equippedHead;
+                case "BODY": return equippedBody;
+                case "WPN":
+                case "WEAPON": return equippedWpn;
+                case "LEGS": return equippedLegs;
+                case "FEET":
+                case "BOOTS": return equippedFeet;
+                default: return "";
+            }
+        }
+
+        public void SetEquippedInSlot(string slot, string itemId)
+        {
+            if (string.IsNullOrEmpty(slot)) return;
+            switch (slot.ToUpperInvariant())
+            {
+                case "HEAD": equippedHead = itemId ?? ""; break;
+                case "BODY": equippedBody = itemId ?? ""; break;
+                case "WPN":
+                case "WEAPON": equippedWpn = itemId ?? ""; break;
+                case "LEGS": equippedLegs = itemId ?? ""; break;
+                case "FEET":
+                case "BOOTS": equippedFeet = itemId ?? ""; break;
+            }
+        }
+
+        /// <summary>
+        /// Adds an item to the player's backpack. Stacks if stackable.
+        /// Returns true if added, false if inventory is full.
+        /// </summary>
+        public bool AddItem(string itemId, int qty = 1)
+        {
+            if (string.IsNullOrEmpty(itemId) || qty <= 0) return false;
+
+            var def = ItemDatabase.GetDefinition(itemId);
+            bool isStackable = def != null && def.stackable;
+
+            if (isStackable)
+            {
+                var found = inventory.Find(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase));
+                if (found != null)
+                {
+                    found.quantity += qty;
+                    return true;
+                }
+            }
+
+            if (inventory.Count >= bagLimit)
+            {
+                return false; // Backpack capacity full
+            }
+
+            inventory.Add(new InventoryEntry(itemId, qty));
+            return true;
+        }
+
+        /// <summary>
+        /// Removes or decrements an item from the player's backpack.
+        /// </summary>
+        public bool RemoveItem(string itemId, int qty = 1)
+        {
+            if (string.IsNullOrEmpty(itemId)) return false;
+
             var found = inventory.Find(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase));
-            if (found != null)
+            if (found == null) return false;
+
+            found.quantity -= qty;
+            if (found.quantity <= 0)
             {
-                found.quantity += qty;
+                inventory.Remove(found);
             }
-            else
+            return true;
+        }
+
+        /// <summary>
+        /// Equips an item from the backpack to the specified slot.
+        /// Returns previously equipped item to inventory if slot was occupied.
+        /// </summary>
+        public bool EquipItem(string slot, string itemId)
+        {
+            if (string.IsNullOrEmpty(slot) || string.IsNullOrEmpty(itemId)) return false;
+
+            var invItem = inventory.Find(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase));
+            if (invItem == null) return false;
+
+            string currentlyEquipped = GetEquippedInSlot(slot);
+
+            // Decrement or remove from backpack
+            RemoveItem(itemId, 1);
+
+            // Put current gear back into backpack if any
+            if (!string.IsNullOrEmpty(currentlyEquipped) && !currentlyEquipped.Equals("none", StringComparison.OrdinalIgnoreCase))
             {
-                inventory.Add(new InventoryEntry(itemId, qty));
+                AddItem(currentlyEquipped, 1);
             }
+
+            SetEquippedInSlot(slot, itemId);
+            return true;
+        }
+
+        /// <summary>
+        /// Unequips an item from the paper doll slot back into the backpack.
+        /// Returns false if backpack has no free slot.
+        /// </summary>
+        public bool UnequipItem(string slot)
+        {
+            string currentlyEquipped = GetEquippedInSlot(slot);
+            if (string.IsNullOrEmpty(currentlyEquipped) || currentlyEquipped.Equals("none", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (inventory.Count >= bagLimit)
+            {
+                return false; // Cannot unequip when backpack is full
+            }
+
+            AddItem(currentlyEquipped, 1);
+            SetEquippedInSlot(slot, "");
+            return true;
+        }
+
+        /// <summary>
+        /// Drops an equipped item directly from the slot.
+        /// </summary>
+        public string DropEquipped(string slot)
+        {
+            string currentlyEquipped = GetEquippedInSlot(slot);
+            if (string.IsNullOrEmpty(currentlyEquipped) || currentlyEquipped.Equals("none", StringComparison.OrdinalIgnoreCase))
+                return "";
+
+            SetEquippedInSlot(slot, "");
+            return currentlyEquipped;
+        }
+
+        /// <summary>
+        /// Consumes an item, applying health, stamina, hunger, thirst, humanity, and skill buffs.
+        /// Implements trait modifiers (FIELD MEDIC, STERILE, HERBALIST, HUNGRY).
+        /// </summary>
+        public bool UseItem(string itemId, out string feedbackMsg)
+        {
+            feedbackMsg = "";
+            var def = ItemDatabase.GetDefinition(itemId);
+            if (def == null) return false;
+
+            var invItem = inventory.Find(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase));
+            if (invItem == null)
+            {
+                feedbackMsg = "Item not found in backpack.";
+                return false;
+            }
+
+            int healAmount = def.heal;
+            int staminaAmount = def.stamina;
+            int humAmount = def.humanity;
+            int hungerAmount = def.hunger;
+            int thirstAmount = def.thirst;
+
+            // Trait Modifiers
+            if (HasTrait("FIELD MEDIC") && healAmount > 0) healAmount *= 2;
+            if (HasTrait("STERILE") && healAmount > 0) healAmount += 20;
+            if (HasTrait("HERBALIST"))
+            {
+                bool isNourishment = itemId.Equals("Bottled Water", StringComparison.OrdinalIgnoreCase) ||
+                                     itemId.IndexOf("Food", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                     itemId.IndexOf("Jerky", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (isNourishment)
+                {
+                    healAmount += 10;
+                    staminaAmount += 10;
+                }
+            }
+
+            bool used = false;
+            var parts = new List<string>();
+
+            if (healAmount > 0)
+            {
+                hp = Mathf.Clamp(hp + healAmount, 0, hpMax);
+                parts.Add($"+{healAmount} HP");
+                used = true;
+            }
+
+            if (staminaAmount != 0)
+            {
+                stamina = Mathf.Clamp(stamina + staminaAmount, 0, staminaMax);
+                parts.Add(staminaAmount > 0 ? $"+{staminaAmount} Stamina" : $"{staminaAmount} Stamina");
+                used = true;
+            }
+
+            if (humAmount > 0)
+            {
+                humanity = Mathf.Clamp(humanity + humAmount, 0, 100);
+                parts.Add($"+{humAmount} Humanity");
+                used = true;
+            }
+
+            if (hungerAmount > 0)
+            {
+                hunger = Mathf.Clamp(hunger + hungerAmount, 0, 100);
+                parts.Add($"+{hungerAmount}% Hunger");
+                used = true;
+            }
+
+            if (thirstAmount > 0)
+            {
+                thirst = Mathf.Clamp(thirst + thirstAmount, 0, 100);
+                parts.Add($"+{thirstAmount}% Thirst");
+                used = true;
+            }
+
+            // Skill Manuals
+            if (!string.IsNullOrEmpty(def.skill))
+            {
+                switch (def.skill.ToLowerInvariant())
+                {
+                    case "tech": tech = Mathf.Clamp(tech + 1, 0, 5); break;
+                    case "medicine": medicine = Mathf.Clamp(medicine + 1, 0, 5); break;
+                    case "shooting": shooting = Mathf.Clamp(shooting + 1, 0, 5); break;
+                    case "melee": melee = Mathf.Clamp(melee + 1, 0, 5); break;
+                    case "stealth": stealth = Mathf.Clamp(stealth + 1, 0, 5); break;
+                    case "scavenging": scavenging = Mathf.Clamp(scavenging + 1, 0, 5); break;
+                    case "survival": survival = Mathf.Clamp(survival + 1, 0, 5); break;
+                    case "resolve": resolve = Mathf.Clamp(resolve + 1, 0, 5); break;
+                }
+                parts.Add($"+1 {def.skill.ToUpperInvariant()} Skill");
+                used = true;
+            }
+
+            // XP
+            if (def.xp > 0)
+            {
+                GainXP(def.xp);
+                parts.Add($"+{def.xp} XP");
+                used = true;
+            }
+
+            // Drawback: HUNGRY demands extra ration
+            if (HasTrait("HUNGRY") && hungerAmount > 0 && invItem.quantity > 1)
+            {
+                invItem.quantity -= 1;
+                parts.Add("[Hungry: ate extra]");
+            }
+
+            if (used)
+            {
+                RemoveItem(itemId, 1);
+                feedbackMsg = $"Consumed {itemId}: {string.Join(", ", parts)}";
+                return true;
+            }
+
+            feedbackMsg = "Item cannot be consumed right now.";
+            return false;
+        }
+
+        public void GainXP(int amount)
+        {
+            if (amount <= 0) return;
+            xp += amount;
+            while (xp >= xpRequired)
+            {
+                xp -= xpRequired;
+                level++;
+                xpRequired = Mathf.RoundToInt(xpRequired * 1.5f);
+            }
+        }
+
+        public float GetTotalWeight()
+        {
+            float total = 0f;
+            foreach (var item in inventory)
+            {
+                var def = ItemDatabase.GetDefinition(item.itemId);
+                float w = def != null ? def.weight : 0.5f;
+                total += w * item.quantity;
+            }
+
+            string[] equipped = { equippedHead, equippedBody, equippedWpn, equippedLegs, equippedFeet };
+            foreach (var eq in equipped)
+            {
+                if (!string.IsNullOrEmpty(eq))
+                {
+                    var def = ItemDatabase.GetDefinition(eq);
+                    total += def != null ? def.weight : 1.0f;
+                }
+            }
+
+            return total;
         }
     }
 }
