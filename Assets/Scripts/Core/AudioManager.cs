@@ -173,7 +173,7 @@ namespace SundayLastBreath.Core
 
         public void PlayButtonClick()
         {
-            if (buttonClickClip != null) PlaySFX(buttonClickClip);
+            if (buttonClickClip != null) PlaySFX(buttonClickClip, 0.4f);
         }
 
         public void PlayButtonHover()

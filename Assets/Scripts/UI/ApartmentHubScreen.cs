@@ -1747,7 +1747,7 @@ namespace SundayLastBreath.UI
         {
             if (sfxSource != null && clickClip != null)
             {
-                sfxSource.PlayOneShot(clickClip, 0.7f);
+                sfxSource.PlayOneShot(clickClip, 0.4f);
             }
         }
         #endregion
