@@ -358,9 +358,12 @@ namespace SundayLastBreath.UI
 
             if (clockTickClip != null && clockTickSource != null)
             {
-                clockTickSource.clip = clockTickClip;
-                clockTickSource.volume = 0.25f;
-                clockTickSource.Play();
+                if (!clockTickSource.isPlaying || clockTickSource.clip != clockTickClip)
+                {
+                    clockTickSource.clip = clockTickClip;
+                    clockTickSource.volume = 0.25f;
+                    clockTickSource.Play();
+                }
             }
 
             EnsureIdentityConsoleBuilt();
@@ -369,6 +372,15 @@ namespace SundayLastBreath.UI
             InitializeButtons();
             SundayTypography.ApplyHierarchy(transform);
             ShowGenderPanel();
+        }
+
+        protected override void OnScreenClosed()
+        {
+            base.OnScreenClosed();
+            if (clockTickSource != null && clockTickSource.isPlaying)
+            {
+                clockTickSource.Stop();
+            }
         }
 
         private void ResetCreationState()

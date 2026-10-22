@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v42_auto.flag";
+            string flagPath = "Temp/scene_v43_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -92,7 +92,9 @@ namespace SundayLastBreath.Editor
 
             AudioClip menuMusic = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/BGM/main_menu.mp3");
             AudioClip clickSfx = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
-            AudioClip hoverSfx = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/tick.mp3");
+            // Note: tick.mp3 is the 8-second ambient clock ticking track from Twine, NOT a short UI hover tick.
+            // Leaving buttonHoverClip unassigned (null) avoids firing an 8-second clock loop on hover.
+            AudioClip hoverSfx = null;
 
             SerializedObject audioSo = new SerializedObject(audioMgr);
             if (menuMusic != null) audioSo.FindProperty("menuMusicClip").objectReferenceValue = menuMusic;
