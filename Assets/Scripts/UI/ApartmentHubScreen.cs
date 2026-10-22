@@ -968,12 +968,35 @@ namespace SundayLastBreath.UI
         {
             if (currentPlayer == null || currentPlayer.inventory == null) return;
 
-            for (int i = currentPlayer.inventory.Count - 1; i >= 0; i--)
+            // 1. Weapon Slot Priority: Prioritize Primary Firearms (Ranged) first, then Melee weapons
+            string bestWpn = null;
+            foreach (var entry in currentPlayer.inventory)
             {
-                if (i >= currentPlayer.inventory.Count) continue;
+                var def = ItemDatabase.GetDefinition(entry.itemId);
+                if (def == null) continue;
+                if (def.category == ItemCategory.RangedWeapon)
+                {
+                    bestWpn = entry.itemId;
+                    break;
+                }
+                else if (def.category == ItemCategory.MeleeWeapon && bestWpn == null)
+                {
+                    bestWpn = entry.itemId;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(bestWpn) && string.IsNullOrEmpty(currentPlayer.equippedWpn))
+            {
+                currentPlayer.EquipItem("WPN", bestWpn);
+                equippedWpn = bestWpn;
+            }
+
+            // 2. Apparel Slots
+            for (int i = 0; i < currentPlayer.inventory.Count; i++)
+            {
                 var entry = currentPlayer.inventory[i];
                 string slot = ItemDatabase.GetEquipSlot(entry.itemId);
-                if (string.IsNullOrEmpty(slot)) continue;
+                if (string.IsNullOrEmpty(slot) || slot == "WPN") continue;
 
                 if (slot == "HEAD" && string.IsNullOrEmpty(currentPlayer.equippedHead))
                 {
@@ -984,11 +1007,6 @@ namespace SundayLastBreath.UI
                 {
                     currentPlayer.EquipItem(slot, entry.itemId);
                     equippedBody = entry.itemId;
-                }
-                else if (slot == "WPN" && string.IsNullOrEmpty(currentPlayer.equippedWpn))
-                {
-                    currentPlayer.EquipItem(slot, entry.itemId);
-                    equippedWpn = entry.itemId;
                 }
                 else if (slot == "LEGS" && string.IsNullOrEmpty(currentPlayer.equippedLegs))
                 {
@@ -1676,14 +1694,33 @@ namespace SundayLastBreath.UI
             hasPacked = true;
             AutoEquipFromInventory();
 
-            // Spawn extra apartment loot on the floor/kitchen counter (Twine Prologue_Menu houseLootSpawned)
+            // Spawn extra apartment loot on the kitchen counter (Twine Prologue_Menu houseLootSpawned)
             floorItems.Clear();
             floorItems.Add(new InventoryEntry("Stale Coffee", 1));
-            floorItems.Add(new InventoryEntry("Kitchen Knife", 1));
+
+            // Only spawn Kitchen Knife if the player is unarmed!
+            // If the player already has weapons (e.g. Police Officer with Glock 19 or Combat Knife),
+            // spawn practical medical supplies (Bandage) to avoid weapon clutter!
+            bool isAlreadyArmed = !string.IsNullOrEmpty(currentPlayer?.equippedWpn);
+            if (!isAlreadyArmed && currentPlayer?.inventory != null)
+            {
+                foreach (var inv in currentPlayer.inventory)
+                {
+                    var def = ItemDatabase.GetDefinition(inv.itemId);
+                    if (def != null && (def.category == ItemCategory.RangedWeapon || def.category == ItemCategory.MeleeWeapon))
+                    {
+                        isAlreadyArmed = true;
+                        break;
+                    }
+                }
+            }
+
+            string bonusSupplyName = isAlreadyArmed ? "Bandage" : "Kitchen Knife";
+            floorItems.Add(new InventoryEntry(bonusSupplyName, 1));
             floorItems.Add(new InventoryEntry("T-Shirt", 1));
 
             AppendStoryLog("23:49", "ACTION // WORK EQUIPMENT SECURED",
-                "You geared up. You strapped on your heavy equipment and weapons. Rummaging through your kitchen, you uncovered extra supplies: Stale Coffee, Kitchen Knife, and a spare T-Shirt.");
+                $"You geared up. You strapped on your equipment and weapons. Rummaging through your kitchen, you uncovered extra supplies: Stale Coffee, {bonusSupplyName}, and a spare T-Shirt.");
             if (situationBoxText != null)
             {
                 situationBoxText.text = "\"Your gear is strapped tight and weapons loaded. Footsteps and muffled shrieks echo from the 4th floor corridor outside. Extra supplies sit on the kitchen counter.\"";
