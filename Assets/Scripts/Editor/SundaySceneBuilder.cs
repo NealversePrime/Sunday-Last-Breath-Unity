@@ -27,7 +27,7 @@ namespace SundayLastBreath.Editor
             {
                 if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-                string flagPath = "Temp/scene_v31_auto.flag";
+                string flagPath = "Temp/scene_v32_auto.flag";
                 if (!File.Exists(flagPath))
                 {
                     Directory.CreateDirectory("Temp");
@@ -1004,6 +1004,86 @@ namespace SundayLastBreath.Editor
             mVlg2.childControlWidth = true;
             mVlg2.childControlHeight = false;
 
+            // Current Situation & Story Box (Option A)
+            GameObject sitBox = new GameObject("SituationBox", typeof(RectTransform));
+            sitBox.transform.SetParent(menuObj.transform, false);
+            LayoutElement sitLe = sitBox.AddComponent<LayoutElement>();
+            sitLe.preferredHeight = 84f;
+            sitLe.flexibleWidth = 1f;
+
+            Image sitBg = sitBox.AddComponent<Image>();
+            sitBg.color = new Color(0.06f, 0.08f, 0.11f, 0.95f);
+            Outline sitOl = sitBox.AddComponent<Outline>();
+            sitOl.effectColor = new Color(0.20f, 0.28f, 0.38f, 0.8f);
+            sitOl.effectDistance = new Vector2(1f, -1f);
+
+            GameObject sitAccent = new GameObject("GoldBar", typeof(RectTransform));
+            sitAccent.transform.SetParent(sitBox.transform, false);
+            RectTransform saRect2 = sitAccent.GetComponent<RectTransform>();
+            saRect2.anchorMin = new Vector2(0f, 0f); saRect2.anchorMax = new Vector2(0f, 1f);
+            saRect2.pivot = new Vector2(0f, 0.5f);
+            saRect2.sizeDelta = new Vector2(4f, 0f);
+            saRect2.anchoredPosition = Vector2.zero;
+            Image saImg2 = sitAccent.AddComponent<Image>();
+            saImg2.color = new Color(0.95f, 0.75f, 0.35f);
+            LayoutElement saIgnore2 = sitAccent.AddComponent<LayoutElement>();
+            saIgnore2.ignoreLayout = true;
+
+            // Header Row: Title & View Log Button
+            GameObject sitTopRow = new GameObject("TopRow", typeof(RectTransform));
+            sitTopRow.transform.SetParent(sitBox.transform, false);
+            RectTransform strRect = sitTopRow.AddComponent<RectTransform>();
+            strRect.anchorMin = new Vector2(0f, 1f); strRect.anchorMax = new Vector2(1f, 1f);
+            strRect.pivot = new Vector2(0.5f, 1f);
+            strRect.sizeDelta = new Vector2(0f, 28f);
+            strRect.anchoredPosition = new Vector2(0f, -6f);
+
+            TextMeshProUGUI sitTitleTmp = CreateTMPText(sitTopRow.transform, "Title",
+                "<b><color=#F5A623>● CURRENT SITUATION</color></b>  <color=#78909C>// LIVING ROOM (23:45 DAY 0)</color>",
+                12.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform sttRect = sitTitleTmp.rectTransform;
+            sttRect.anchorMin = new Vector2(0f, 0f); sttRect.anchorMax = new Vector2(0.75f, 1f);
+            sttRect.offsetMin = new Vector2(16f, 0f); sttRect.offsetMax = Vector2.zero;
+
+            // View Log Button
+            GameObject btnLogObj = new GameObject("Btn_OpenStoryLog", typeof(RectTransform));
+            btnLogObj.transform.SetParent(sitTopRow.transform, false);
+            RectTransform btnLogRect = btnLogObj.GetComponent<RectTransform>();
+            btnLogRect.anchorMin = new Vector2(1f, 0.5f); btnLogRect.anchorMax = new Vector2(1f, 0.5f);
+            btnLogRect.pivot = new Vector2(1f, 0.5f);
+            btnLogRect.sizeDelta = new Vector2(148f, 24f);
+            btnLogRect.anchoredPosition = new Vector2(-12f, 0f);
+
+            Image btnLogBg = btnLogObj.AddComponent<Image>();
+            btnLogBg.color = new Color(0.10f, 0.16f, 0.22f, 0.95f);
+            Outline btnLogOl = btnLogObj.AddComponent<Outline>();
+            btnLogOl.effectColor = new Color(0.30f, 0.65f, 0.85f, 0.8f);
+            btnLogOl.effectDistance = new Vector2(1f, -1f);
+
+            Button btnOpenLog = btnLogObj.AddComponent<Button>();
+            btnOpenLog.targetGraphic = btnLogBg;
+            ColorBlock lcb = btnOpenLog.colors;
+            lcb.normalColor = btnLogBg.color;
+            lcb.highlightedColor = new Color(0.18f, 0.28f, 0.38f, 1f);
+            btnOpenLog.colors = lcb;
+
+            TextMeshProUGUI btnLogTmp = CreateTMPText(btnLogObj.transform, "Label",
+                "<b><color=#4FC3F7>[ 📜 VIEW LOG ]</color></b>",
+                11f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform bltRect = btnLogTmp.rectTransform;
+            StretchFull(bltRect);
+
+            // Situation Body Text
+            TextMeshProUGUI sitBodyTmp = CreateTMPText(sitBox.transform, "SituationBody",
+                "\"The television drones with cold emergency static. Sirens wail across the Seattle skyline. You stand in your living room in the dark, weighing your immediate options before the power grid or the front door fails.\"",
+                13f, new Color(0.82f, 0.86f, 0.92f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
+            sitBodyTmp.lineSpacing = 4f;
+            sitBodyTmp.textWrappingMode = TextWrappingModes.Normal;
+            RectTransform sbtRect = sitBodyTmp.rectTransform;
+            sbtRect.anchorMin = new Vector2(0f, 0f); sbtRect.anchorMax = new Vector2(1f, 1f);
+            sbtRect.offsetMin = new Vector2(16f, 6f);
+            sbtRect.offsetMax = new Vector2(-16f, -32f);
+
             // Packed Success Banner
             GameObject pBanner = new GameObject("PackedSuccessBanner", typeof(RectTransform));
             pBanner.transform.SetParent(menuObj.transform, false);
@@ -1649,6 +1729,9 @@ namespace SundayLastBreath.Editor
             GameObject hackObj = BuildHackingModal(modalsRoot.transform, out TextMeshProUGUI hackTerminalTmp, out GameObject hackFinishObj, out Button closeHackBtn);
             hackObj.SetActive(false);
 
+            GameObject storyLogObj = BuildStoryLogModal(modalsRoot.transform, out TextMeshProUGUI logContentTmp, out Button closeLogBtn, out Button closeLogBotBtn);
+            storyLogObj.SetActive(false);
+
             // Audio Clips
             AudioClip atmosphereClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/BGM/atmosphere.mp3");
             AudioClip ebsWarningClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/ebs_warning.mp3");
@@ -1779,6 +1862,14 @@ namespace SundayLastBreath.Editor
             so.FindProperty("hackingTerminalText").objectReferenceValue = hackTerminalTmp;
             so.FindProperty("hackingFinishContainer").objectReferenceValue = hackFinishObj;
             so.FindProperty("closeHackingButton").objectReferenceValue = closeHackBtn;
+
+            so.FindProperty("situationBox").objectReferenceValue = sitBox;
+            so.FindProperty("situationBoxText").objectReferenceValue = sitBodyTmp;
+            so.FindProperty("openStoryLogButton").objectReferenceValue = btnOpenLog;
+            so.FindProperty("storyLogModal").objectReferenceValue = storyLogObj;
+            so.FindProperty("closeStoryLogButton").objectReferenceValue = closeLogBtn;
+            so.FindProperty("closeStoryLogBottomButton").objectReferenceValue = closeLogBotBtn;
+            so.FindProperty("storyLogContentText").objectReferenceValue = logContentTmp;
 
             if (atmosphereClip != null) so.FindProperty("atmosphereClip").objectReferenceValue = atmosphereClip;
             if (ebsWarningClip != null) so.FindProperty("ebsWarningClip").objectReferenceValue = ebsWarningClip;
@@ -2077,6 +2168,116 @@ namespace SundayLastBreath.Editor
             subLabel.color = new Color(0.68f, 0.70f, 0.74f);
             subLabel.text = subText;
             subLabel.raycastTarget = false;
+        }
+
+        private static GameObject BuildStoryLogModal(Transform parent, out TextMeshProUGUI logContentTmp, out Button closeBtn, out Button closeBottomBtn)
+        {
+            GameObject modalObj = new GameObject("StoryLogModal");
+            modalObj.transform.SetParent(parent, false);
+            RectTransform rect = modalObj.AddComponent<RectTransform>();
+            StretchFull(rect);
+
+            Image backdrop = modalObj.AddComponent<Image>();
+            backdrop.color = new Color(0f, 0f, 0f, 0.88f);
+            backdrop.raycastTarget = true;
+
+            GameObject panel = new GameObject("LogPanel");
+            panel.transform.SetParent(modalObj.transform, false);
+            RectTransform pRect = panel.AddComponent<RectTransform>();
+            pRect.sizeDelta = new Vector2(920f, 580f);
+            pRect.anchoredPosition = Vector2.zero;
+            Image pBg = panel.AddComponent<Image>();
+            pBg.color = new Color(0.04f, 0.05f, 0.07f, 0.98f);
+            Outline pOl = panel.AddComponent<Outline>();
+            pOl.effectColor = new Color(0.24f, 0.36f, 0.48f, 0.85f);
+            pOl.effectDistance = new Vector2(1.5f, -1.5f);
+
+            // Header Bar (56px)
+            GameObject headerObj = new GameObject("Header");
+            headerObj.transform.SetParent(panel.transform, false);
+            RectTransform hRect = headerObj.AddComponent<RectTransform>();
+            hRect.anchorMin = new Vector2(0f, 1f); hRect.anchorMax = new Vector2(1f, 1f);
+            hRect.pivot = new Vector2(0.5f, 1f);
+            hRect.sizeDelta = new Vector2(0f, 56f);
+            hRect.anchoredPosition = Vector2.zero;
+            Image hBg = headerObj.AddComponent<Image>();
+            hBg.color = new Color(0.07f, 0.10f, 0.14f, 0.98f);
+
+            TextMeshProUGUI hTmp = CreateTMPText(headerObj.transform, "Title",
+                "<b><color=#4FC3F7>SURVIVOR CHRONICLE // INCIDENT & STORY LOG</color></b>\n<size=75%><color=#90A4AE>ARCHIVED TRANSCRIPTS, BROADCAST RECORDS, AND OBSERVATIONS</color></size>",
+                14f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            RectTransform htRect = hTmp.rectTransform;
+            htRect.anchorMin = new Vector2(0f, 0f); htRect.anchorMax = new Vector2(1f, 1f);
+            htRect.offsetMin = new Vector2(20f, 0f); htRect.offsetMax = new Vector2(-60f, 0f);
+
+            // Close Button [ X ] on Header
+            GameObject closeObj = new GameObject("Btn_CloseTop");
+            closeObj.transform.SetParent(headerObj.transform, false);
+            RectTransform cRect = closeObj.AddComponent<RectTransform>();
+            cRect.anchorMin = new Vector2(1f, 0.5f); cRect.anchorMax = new Vector2(1f, 0.5f);
+            cRect.pivot = new Vector2(1f, 0.5f);
+            cRect.sizeDelta = new Vector2(34f, 34f);
+            cRect.anchoredPosition = new Vector2(-12f, 0f);
+            Image cBg = closeObj.AddComponent<Image>();
+            cBg.color = new Color(0.16f, 0.08f, 0.08f, 0.95f);
+            Outline cOl = closeObj.AddComponent<Outline>();
+            cOl.effectColor = new Color(0.85f, 0.25f, 0.25f, 0.8f);
+            closeBtn = closeObj.AddComponent<Button>();
+            closeBtn.targetGraphic = cBg;
+            TextMeshProUGUI cTmp = CreateTMPText(closeObj.transform, "Label", "✕", 18f, new Color(0.95f, 0.4f, 0.4f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform ctRect = cTmp.rectTransform;
+            StretchFull(ctRect);
+
+            // Scroll View for Log Text
+            GameObject scrollObj = CreateScrollView(panel.transform, "LogScrollView", new Vector2(880f, 440f), true, out Transform content);
+            RectTransform sRect = scrollObj.GetComponent<RectTransform>();
+            sRect.anchorMin = new Vector2(0f, 0f); sRect.anchorMax = new Vector2(1f, 1f);
+            sRect.offsetMin = new Vector2(20f, 56f);
+            sRect.offsetMax = new Vector2(-20f, -64f);
+
+            VerticalLayoutGroup vlg = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(8, 8, 8, 8);
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+
+            // Content text
+            logContentTmp = CreateTMPText(content, "LogContentText", "", 13.5f, new Color(0.88f, 0.91f, 0.96f), TextAlignmentOptions.TopLeft);
+            logContentTmp.lineSpacing = 6f;
+            logContentTmp.textWrappingMode = TextWrappingModes.Normal;
+            RectTransform lcRect = logContentTmp.rectTransform;
+            lcRect.anchorMin = new Vector2(0f, 1f); lcRect.anchorMax = new Vector2(1f, 1f);
+            lcRect.pivot = new Vector2(0.5f, 1f);
+
+            // Footer Bar
+            GameObject footObj = new GameObject("Footer");
+            footObj.transform.SetParent(panel.transform, false);
+            RectTransform fRect = footObj.AddComponent<RectTransform>();
+            fRect.anchorMin = new Vector2(0f, 0f); fRect.anchorMax = new Vector2(1f, 0f);
+            fRect.pivot = new Vector2(0.5f, 0f);
+            fRect.sizeDelta = new Vector2(0f, 48f);
+            fRect.anchoredPosition = Vector2.zero;
+            Image fBg = footObj.AddComponent<Image>();
+            fBg.color = new Color(0.06f, 0.08f, 0.11f, 0.98f);
+
+            GameObject botCloseObj = new GameObject("Btn_CloseBottom");
+            botCloseObj.transform.SetParent(footObj.transform, false);
+            RectTransform bcRect = botCloseObj.AddComponent<RectTransform>();
+            bcRect.anchorMin = new Vector2(0.5f, 0.5f); bcRect.anchorMax = new Vector2(0.5f, 0.5f);
+            bcRect.pivot = new Vector2(0.5f, 0.5f);
+            bcRect.sizeDelta = new Vector2(240f, 36f);
+            bcRect.anchoredPosition = Vector2.zero;
+            Image bcBg = botCloseObj.AddComponent<Image>();
+            bcBg.color = new Color(0.12f, 0.16f, 0.22f, 0.95f);
+            Outline bcOl = botCloseObj.AddComponent<Outline>();
+            bcOl.effectColor = new Color(0.35f, 0.65f, 0.85f, 0.7f);
+            closeBottomBtn = botCloseObj.AddComponent<Button>();
+            closeBottomBtn.targetGraphic = bcBg;
+            TextMeshProUGUI bcTmp = CreateTMPText(botCloseObj.transform, "Label", "<b>[ CLOSE ARCHIVE ]</b>", 12f, new Color(0.85f, 0.90f, 0.95f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform bctRect = bcTmp.rectTransform;
+            StretchFull(bctRect);
+
+            modalObj.SetActive(false);
+            return modalObj;
         }
 
         private static GameObject BuildPhoneModal(Transform parent, out Button closeButton)

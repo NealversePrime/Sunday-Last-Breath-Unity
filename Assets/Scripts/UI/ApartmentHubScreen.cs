@@ -148,6 +148,15 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI hackTerminalSub;
         [SerializeField] private Button leaveApartmentButton;
 
+        [Header("Story Log System (Option A)")]
+        [SerializeField] private GameObject situationBox;
+        [SerializeField] private TextMeshProUGUI situationBoxText;
+        [SerializeField] private Button openStoryLogButton;
+        [SerializeField] private GameObject storyLogModal;
+        [SerializeField] private Button closeStoryLogButton;
+        [SerializeField] private Button closeStoryLogBottomButton;
+        [SerializeField] private TextMeshProUGUI storyLogContentText;
+
         [Header("Modal Overlays")]
         [SerializeField] private GameObject phoneModal;
         [SerializeField] private Button closePhoneButton;
@@ -341,6 +350,26 @@ namespace SundayLastBreath.UI
                 closeHackingButton.onClick.RemoveAllListeners();
                 closeHackingButton.onClick.AddListener(OnCloseHackingClicked);
             }
+
+            if (openStoryLogButton != null)
+            {
+                openStoryLogButton.onClick.RemoveAllListeners();
+                openStoryLogButton.onClick.AddListener(OnOpenStoryLogClicked);
+            }
+
+            if (closeStoryLogButton != null)
+            {
+                closeStoryLogButton.onClick.RemoveAllListeners();
+                closeStoryLogButton.onClick.AddListener(OnCloseStoryLogClicked);
+            }
+
+            if (closeStoryLogBottomButton != null)
+            {
+                closeStoryLogBottomButton.onClick.RemoveAllListeners();
+                closeStoryLogBottomButton.onClick.AddListener(OnCloseStoryLogClicked);
+            }
+
+            InitializeStoryLogs();
 
             // Left PDA Tab Buttons
             if (pdaTabStatusBtn != null)
@@ -1404,6 +1433,13 @@ namespace SundayLastBreath.UI
             hasPacked = true;
             AutoEquipFromInventory();
 
+            AppendStoryLog("23:49", "ACTION // WORK EQUIPMENT SECURED",
+                "You geared up. You strapped on your heavy equipment, shoved smaller supplies into pockets, and pulled a kitchen knife from the block. The table is now clear.");
+            if (situationBoxText != null)
+            {
+                situationBoxText.text = "\"Your gear is strapped tight and weapons loaded. Footsteps and muffled shrieks echo from the 4th floor corridor outside. There is nothing left for you in Unit 404.\"";
+            }
+
             // Objectives
             objectiveSystem.CompleteObjective("pack_gear");
             objectiveSystem.ActivateObjective("leave_apt");
@@ -1443,6 +1479,9 @@ namespace SundayLastBreath.UI
                 gameClock.GetTimeString()
             );
 
+            AppendStoryLog(gameClock.GetTimeString(), "INTEL // SOCIAL MEDIA INTERCEPT",
+                "CityScanner reports police in riot gear and gas masks sealing 5th St Hospital. A blurry civilian video shows an infected person continuing to sprint despite three center-mass gunshot wounds before the feed cuts. Cellular network is dead.");
+
             EvaluateHubButtonStates();
         }
 
@@ -1481,6 +1520,9 @@ namespace SundayLastBreath.UI
                 "Police dispatch authorized unrestricted lethal force. Standard body shots are ineffective against the infected. Neutralization requires destroying the brain. All physical contact must be avoided.",
                 gameClock.GetTimeString()
             );
+
+            AppendStoryLog(gameClock.GetTimeString(), "INTEL // EMERGENCY POLICE DISPATCH",
+                "Emergency dispatch confirmed unrestricted lethal cranial force authorization. Body shots ineffective. Neutralization requires cranial destruction. Harborview perimeter compromised.");
 
             EvaluateHubButtonStates();
         }
@@ -1568,6 +1610,9 @@ namespace SundayLastBreath.UI
                 "The outbreak is uncontained. The military considers the city a lost cause and has ordered a 'Sector Purge' (firebombing) at 0600 hours. I managed to download a Tier-1 Military Clearance Passkey before severing the connection.",
                 gameClock.GetTimeString()
             );
+
+            AppendStoryLog(gameClock.GetTimeString(), "RECON // MILITARY DIRECTIVE EXTRACTION",
+                "Extracted CDC & Homeland Defense containment directive. Saved Tier-1 Emergency Access Clearance Passkey directly to your Survivor PDA storage.");
 
             EvaluateHubButtonStates();
             RefreshAllPDAPanels();
@@ -1743,6 +1788,66 @@ namespace SundayLastBreath.UI
             lr.sizeDelta = new Vector2(-6f, 36f);
             lr.anchoredPosition = new Vector2(0f, 4f);
         }
+
+        #region Story Log System (Option A)
+        private readonly List<string> _storyLogs = new List<string>();
+
+        private void InitializeStoryLogs()
+        {
+            if (_storyLogs.Count > 0) return;
+
+            _storyLogs.Add(
+                "<b><color=#EF5350>[23:43] TV BROADCAST // EMERGENCY ALERT SYSTEM (CIVIL DANGER WARNING)</color></b>\n" +
+                "\"The following message is transmitted at the request of the King County Sheriff's Office. This is not a test.\n\n" +
+                "A Civil Danger Warning is in effect for the Seattle metropolitan area. Authorities reported a rapidly spreading biological hazard. Affected individuals exhibit extreme, unprovoked violence. The pathogen is highly contagious through fluid contact.\n\n" +
+                "Shelter in place immediately. Major interstates are closed. Lock all doors, turn off lights, and remain completely silent. The National Guard has been deployed. Lethal force is authorized.\""
+            );
+
+            _storyLogs.Add(
+                "<b><color=#F5BF42>[23:44] REACTION // INNER MONOLOGUE</color></b>\n" +
+                "\"Lethal force authorized... They don't lock down the whole city for mass hysteria. And this front door isn't heavy enough to keep a panicked mob out.\"\n\n" +
+                "<i>Through the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens. And closer... the muffled sound of heavy, frantic footsteps pounding down the hallway outside your door.</i>"
+            );
+
+            _storyLogs.Add(
+                "<b><color=#4FC3F7>[23:45] APARTMENT HUB // UNIT 404 LIVING ROOM</color></b>\n" +
+                "You are standing in the middle of your living room in your pajamas. You feel naked. Vulnerable.\n\n" +
+                "You glance around the dim room, illuminated only by the harsh red glow of the TV. Your everyday carry sits on the cramped desk. But your heavier equipment rests by the front door, exactly where you dropped it after yesterday's shift.\n\n" +
+                "It's not a tactical survival kit. But right now, the tools of your trade are the only thing standing between you and whatever violent outbreak is tearing the city apart."
+            );
+
+            RefreshStoryLogUI();
+        }
+
+        public void AppendStoryLog(string timestamp, string header, string content)
+        {
+            InitializeStoryLogs();
+            string entry = $"<b><color=#66BB6A>[{timestamp}] {header}</color></b>\n{content}";
+            _storyLogs.Add(entry);
+            RefreshStoryLogUI();
+        }
+
+        private void RefreshStoryLogUI()
+        {
+            if (storyLogContentText != null)
+            {
+                storyLogContentText.text = string.Join("\n\n<color=#2C3E50>──────────────────────────────────────────────────────────────────────────</color>\n\n", _storyLogs);
+            }
+        }
+
+        public void OnOpenStoryLogClicked()
+        {
+            PlayClickSFX();
+            InitializeStoryLogs();
+            if (storyLogModal != null) storyLogModal.SetActive(true);
+        }
+
+        public void OnCloseStoryLogClicked()
+        {
+            PlayClickSFX();
+            if (storyLogModal != null) storyLogModal.SetActive(false);
+        }
+        #endregion
 
         private void PlayClickSFX()
         {
