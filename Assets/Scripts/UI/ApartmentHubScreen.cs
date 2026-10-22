@@ -40,6 +40,9 @@ namespace SundayLastBreath.UI
         [SerializeField] private Button btnModeNarrative;
         [SerializeField] private Button btnModePDA;
         [SerializeField] private Button btnModeGear;
+        [SerializeField] private TextMeshProUGUI btnModeGearLabel;
+        [SerializeField] private GameObject btnModeGearBadge;
+        [SerializeField] private TextMeshProUGUI btnModeGearBadgeText;
         [SerializeField] private Image modeIndicatorNarrative;
         [SerializeField] private Image modeIndicatorPDA;
         [SerializeField] private Image modeIndicatorGear;
@@ -131,7 +134,6 @@ namespace SundayLastBreath.UI
         [SerializeField] private GameObject tableStashDisplay;
         [SerializeField] private Transform tableStashGrid;
         [SerializeField] private GameObject tableEmptyNotice;
-        [SerializeField] private Button beat3GatherButton;
 
         [Header("Prompts & Click Catchers")]
         [SerializeField] private GameObject continuePrompt;
@@ -420,11 +422,7 @@ namespace SundayLastBreath.UI
                 pdaSaveSettingsBtn.onClick.AddListener(PlayClickSFX);
             }
 
-            if (beat3GatherButton != null)
-            {
-                beat3GatherButton.onClick.RemoveAllListeners();
-                beat3GatherButton.onClick.AddListener(OnPackGearClicked);
-            }
+
 
             if (takeFloorItemsButton != null)
             {
@@ -468,7 +466,7 @@ namespace SundayLastBreath.UI
 
             if (floorItemsCard != null) floorItemsCard.SetActive(false);
             if (takeFloorItemsButton != null) takeFloorItemsButton.gameObject.SetActive(false);
-            if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(false);
+            UpdateFloorItemsNotification();
 
             UpdateClockUI();
             UpdateVitalsUI();
@@ -673,13 +671,6 @@ namespace SundayLastBreath.UI
             PlayClickSFX();
 
             // Advance to next awakening beat
-            if (awakeningStep == 3)
-            {
-                // In Beat 3, clicking the screen or gather button gears up
-                OnPackGearClicked();
-                return;
-            }
-
             awakeningStep++;
             if (awakeningStep > 3)
             {
@@ -957,6 +948,39 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private void UpdateFloorItemsNotification()
+        {
+            int count = floorItems != null ? floorItems.Count : 0;
+            bool hasLoot = count > 0;
+
+            if (btnModeGearLabel != null)
+            {
+                btnModeGearLabel.text = hasLoot 
+                    ? $"[3] TACTICAL GEAR [I] <color=#EF4444><b>[!]</b></color>" 
+                    : "[3] TACTICAL GEAR [I]";
+            }
+
+            if (btnModeGearBadge != null)
+            {
+                btnModeGearBadge.SetActive(hasLoot);
+            }
+
+            if (btnModeGearBadgeText != null && hasLoot)
+            {
+                btnModeGearBadgeText.text = $"{count}";
+            }
+
+            if (floorItemsButton != null)
+            {
+                floorItemsButton.gameObject.SetActive(hasLoot);
+            }
+
+            if (floorItemsCountText != null)
+            {
+                floorItemsCountText.text = hasLoot ? $"TAKE ALL ({count})" : "TAKE ALL";
+            }
+        }
+
         private void RefreshRightGearPanel()
         {
             // 1. Update Active Loadout Slots on Body Wireframe
@@ -1010,10 +1034,7 @@ namespace SundayLastBreath.UI
                 floorItemsButton.gameObject.SetActive(hasFloorLoot);
             }
 
-            if (floorItemsCountText != null)
-            {
-                floorItemsCountText.text = hasFloorLoot ? $"TAKE ALL ({floorItems.Count})" : "■ Floor Items (0)";
-            }
+            UpdateFloorItemsNotification();
 
             if (pdaFloorItemsGrid != null)
             {
@@ -1280,7 +1301,6 @@ namespace SundayLastBreath.UI
                 case 1:
                     // Beat 1: Civil Danger Warning (EAS Broadcast)
                     if (continuePrompt != null) continuePrompt.SetActive(true);
-                    if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(false);
                     if (beat1Container != null) beat1Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#EF4444>CHANNEL: EMERGENCY BROADCAST SYSTEM</color>";
@@ -1302,7 +1322,6 @@ namespace SundayLastBreath.UI
                 case 2:
                     // Beat 2: The Reaction
                     if (continuePrompt != null) continuePrompt.SetActive(true);
-                    if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(false);
                     if (beat2Container != null) beat2Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // INTERNAL MONOLOGUE ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#60A5FA>CHANNEL: NEURAL APPRAISAL</color>";
@@ -1350,8 +1369,7 @@ namespace SundayLastBreath.UI
 
                 case 3:
                     // Beat 3: Table Stash
-                    if (continuePrompt != null) continuePrompt.SetActive(false);
-                    if (beat3GatherButton != null) beat3GatherButton.gameObject.SetActive(true);
+                    if (continuePrompt != null) continuePrompt.SetActive(true);
                     if (staticSource != null) staticSource.Stop();
                     if (beat3Container != null) beat3Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
@@ -1548,10 +1566,11 @@ namespace SundayLastBreath.UI
                 takeFloorItemsButton.gameObject.SetActive(hasPacked && hasFloorLoot);
                 if (hasFloorLoot)
                 {
-                    if (takeFloorItemsLabel != null) takeFloorItemsLabel.text = $"COLLECT ROOM SUPPLIES [FLOOR ITEMS ({floorItems.Count})]";
-                    if (takeFloorItemsSub != null) takeFloorItemsSub.text = $"Gather extra supplies into your backpack.";
+                    if (takeFloorItemsLabel != null) takeFloorItemsLabel.text = $"COLLECT ROOM SUPPLIES <color=#EF4444>[! {floorItems.Count}]</color>";
+                    if (takeFloorItemsSub != null) takeFloorItemsSub.text = $"Gather extra supplies discovered in Unit 404 into your backpack.";
                 }
             }
+            UpdateFloorItemsNotification();
 
             // 6. Leave Apartment (unlocked only after packing!)
             if (leaveApartmentButton != null)
@@ -1630,6 +1649,7 @@ namespace SundayLastBreath.UI
             AppendStoryLog(gameClock.GetTimeString(), "LOOT // ROOM ITEMS SECURED",
                 "You scooped up all remaining supplies from the room into your backpack.");
 
+            UpdateFloorItemsNotification();
             RefreshRightGearPanel();
             RefreshAllPDAPanels();
             EvaluateHubButtonStates();
@@ -1650,6 +1670,7 @@ namespace SundayLastBreath.UI
                 AppendStoryLog(gameClock.GetTimeString(), "LOOT // ITEM SECURED",
                     $"You picked up {item.itemId} (x{item.quantity}) from the room.");
 
+                UpdateFloorItemsNotification();
                 RefreshRightGearPanel();
                 RefreshAllPDAPanels();
                 EvaluateHubButtonStates();

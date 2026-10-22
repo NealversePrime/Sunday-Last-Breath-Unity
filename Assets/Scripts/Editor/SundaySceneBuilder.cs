@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v36_auto.flag";
+            string flagPath = "Temp/scene_v37_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -706,9 +706,31 @@ namespace SundayLastBreath.Editor
             brHlg.childControlWidth = true; brHlg.childControlHeight = true;
             brHlg.childForceExpandWidth = true; brHlg.childForceExpandHeight = true;
 
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModeNarrative", "[1] NARRATIVE & LOG", out Button btnNarrative, out Image indNarrative, true);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "[2] SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, false);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "[3] TACTICAL GEAR [I]", out Button btnGear, out Image indGear, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModeNarrative", "[1] NARRATIVE & LOG", out Button btnNarrative, out Image indNarrative, out TextMeshProUGUI _, true);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "[2] SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, out TextMeshProUGUI _, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "[3] TACTICAL GEAR [I]", out Button btnGear, out Image indGear, out TextMeshProUGUI gearLabelTmp, false);
+
+            // Notification Badge on Tactical Gear Button (Red Pill with Exclamation)
+            GameObject gearBadgeObj = new GameObject("LootNotificationBadge", typeof(RectTransform));
+            gearBadgeObj.transform.SetParent(btnGear.transform, false);
+            RectTransform gbr = gearBadgeObj.GetComponent<RectTransform>();
+            gbr.anchorMin = new Vector2(1f, 0.5f);
+            gbr.anchorMax = new Vector2(1f, 0.5f);
+            gbr.pivot = new Vector2(1f, 0.5f);
+            gbr.anchoredPosition = new Vector2(-12f, 0f);
+            gbr.sizeDelta = new Vector2(26f, 18f);
+
+            Image gbImg = gearBadgeObj.AddComponent<Image>();
+            gbImg.color = new Color(0.92f, 0.20f, 0.15f, 0.95f); // Crimson red
+            Outline gbOl = gearBadgeObj.AddComponent<Outline>();
+            gbOl.effectColor = new Color(0.35f, 0.05f, 0.05f, 1f);
+            gbOl.effectDistance = new Vector2(1f, -1f);
+
+            TextMeshProUGUI gbText = CreateTMPText(gearBadgeObj.transform, "Text", "!", 10f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform gbt = gbText.rectTransform;
+            StretchFull(gbt);
+            gearBadgeObj.AddComponent<PulsingText>();
+            gearBadgeObj.SetActive(false);
 
             // =========================================================================
             // 4. BOTTOM SCREEN: INTERACTIVE TOUCH CONSOLE (Lower 40% of Screen)
@@ -993,26 +1015,7 @@ namespace SundayLastBreath.Editor
             RectTransform seRect = seTmp.rectTransform;
             seRect.sizeDelta = new Vector2(0f, 22f);
 
-            // Dedicated Gather Button on Beat 3
-            GameObject b3GatherBtnObj = new GameObject("Btn_Beat3Gather", typeof(RectTransform));
-            b3GatherBtnObj.transform.SetParent(b3Obj.transform, false);
-            RectTransform b3gbRect = b3GatherBtnObj.GetComponent<RectTransform>();
-            b3gbRect.anchorMin = new Vector2(1f, 0f); b3gbRect.anchorMax = new Vector2(1f, 0f);
-            b3gbRect.pivot = new Vector2(1f, 0f);
-            b3gbRect.anchoredPosition = new Vector2(0f, -4f);
-            b3gbRect.sizeDelta = new Vector2(360f, 32f);
-            Image b3gbBg = b3GatherBtnObj.AddComponent<Image>();
-            b3gbBg.color = new Color(0.12f, 0.14f, 0.18f, 0.95f);
-            Outline b3gbOl = b3GatherBtnObj.AddComponent<Outline>();
-            b3gbOl.effectColor = new Color(0.95f, 0.75f, 0.35f, 0.95f);
-            b3gbOl.effectDistance = new Vector2(1.5f, -1.5f);
-            Button btnBeat3Gather = b3GatherBtnObj.AddComponent<Button>();
-            btnBeat3Gather.targetGraphic = b3gbBg;
 
-            TextMeshProUGUI b3gbTmp = CreateTMPText(b3GatherBtnObj.transform, "Text", "GATHER YOUR GEAR & SUPPLIES <color=#FFA726>>></color>", 12f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform b3gbtRect = b3gbTmp.rectTransform;
-            StretchFull(b3gbtRect);
-            b3gbTmp.gameObject.AddComponent<PulsingText>();
 
             // Continue Prompt
             TextMeshProUGUI prTmp = CreateTMPText(awakeObj.transform, "ContinuePrompt", "CLICK TO CONTINUE <color=#FFA726>>></color>", 13.5f, new Color(0.85f, 0.85f, 0.85f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
@@ -1781,6 +1784,9 @@ namespace SundayLastBreath.Editor
             so.FindProperty("btnModeNarrative").objectReferenceValue = btnNarrative;
             so.FindProperty("btnModePDA").objectReferenceValue = btnPDA;
             so.FindProperty("btnModeGear").objectReferenceValue = btnGear;
+            so.FindProperty("btnModeGearLabel").objectReferenceValue = gearLabelTmp;
+            so.FindProperty("btnModeGearBadge").objectReferenceValue = gearBadgeObj;
+            so.FindProperty("btnModeGearBadgeText").objectReferenceValue = gbText;
             so.FindProperty("modeIndicatorNarrative").objectReferenceValue = indNarrative;
             so.FindProperty("modeIndicatorPDA").objectReferenceValue = indPDA;
             so.FindProperty("modeIndicatorGear").objectReferenceValue = indGear;
@@ -1874,7 +1880,6 @@ namespace SundayLastBreath.Editor
             so.FindProperty("tableStashDisplay").objectReferenceValue = stashObj;
             so.FindProperty("tableStashGrid").objectReferenceValue = sGridObj.transform;
             so.FindProperty("tableEmptyNotice").objectReferenceValue = seTmp.gameObject;
-            so.FindProperty("beat3GatherButton").objectReferenceValue = btnBeat3Gather;
 
             so.FindProperty("continuePrompt").objectReferenceValue = prTmp.gameObject;
             so.FindProperty("fullScreenClickCatcher").objectReferenceValue = ccBtn;
@@ -1926,7 +1931,7 @@ namespace SundayLastBreath.Editor
             return screen;
         }
 
-        private static void CreateConsoleModeButton(Transform parent, string name, string label, out Button button, out Image activeIndicator, bool isActiveDefault)
+        private static void CreateConsoleModeButton(Transform parent, string name, string label, out Button button, out Image activeIndicator, out TextMeshProUGUI labelTmp, bool isActiveDefault)
         {
             GameObject btnObj = new GameObject(name, typeof(RectTransform));
             btnObj.transform.SetParent(parent, false);
@@ -1949,8 +1954,8 @@ namespace SundayLastBreath.Editor
             ol.effectColor = new Color(0.24f, 0.28f, 0.35f, 0.85f);
             ol.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI tmp = CreateTMPText(btnObj.transform, "Label", label, 11f, new Color(0.88f, 0.90f, 0.94f), TextAlignmentOptions.Center, FontStyles.Bold);
-            RectTransform tr = tmp.rectTransform;
+            labelTmp = CreateTMPText(btnObj.transform, "Label", label, 11f, new Color(0.88f, 0.90f, 0.94f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform tr = labelTmp.rectTransform;
             StretchFull(tr);
 
             // Active Bottom Neon Line
