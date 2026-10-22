@@ -90,7 +90,7 @@ namespace SundayLastBreath.Core
         {
             if (menuMusicClip != null)
             {
-                PlayBGM(menuMusicClip, fadeDuration);
+                PlayBGM(menuMusicClip, fadeDuration, 0.75f);
             }
             else
             {
@@ -98,13 +98,13 @@ namespace SundayLastBreath.Core
             }
         }
 
-        public void PlayBGM(AudioClip clip, float fadeDuration = 1f)
+        public void PlayBGM(AudioClip clip, float fadeDuration = 1f, float volumeScale = 1f)
         {
             if (clip == null) return;
             if (bgmSource.isPlaying && bgmSource.clip == clip) return;
 
             if (bgmFadeCoroutine != null) StopCoroutine(bgmFadeCoroutine);
-            bgmFadeCoroutine = StartCoroutine(FadeBGM(clip, fadeDuration));
+            bgmFadeCoroutine = StartCoroutine(FadeBGM(clip, fadeDuration, volumeScale));
         }
 
         public void StopBGM(float fadeDuration = 1f)
@@ -113,10 +113,10 @@ namespace SundayLastBreath.Core
             bgmFadeCoroutine = StartCoroutine(FadeOutBGM(fadeDuration));
         }
 
-        private IEnumerator FadeBGM(AudioClip newClip, float duration)
+        private IEnumerator FadeBGM(AudioClip newClip, float duration, float volumeScale = 1f)
         {
             EnsureAudioListener();
-            float targetVol = masterVolume * bgmVolume;
+            float targetVol = masterVolume * bgmVolume * volumeScale;
 
             if (bgmSource.isPlaying && duration > 0.1f)
             {
