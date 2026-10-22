@@ -964,6 +964,12 @@ namespace SundayLastBreath.UI
                 btnModeGearBadge.SetActive(hasLoot);
             }
 
+            if (btnModeGear != null)
+            {
+                var rect = btnModeGear.GetComponent<RectTransform>();
+                if (rect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            }
+
             if (floorItemsButton != null)
             {
                 floorItemsButton.gameObject.SetActive(hasLoot);

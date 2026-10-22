@@ -54,6 +54,7 @@ namespace SundayLastBreath.UI
         {
             if (targetRect == null) targetRect = GetComponent<RectTransform>();
             if (targetImage == null) targetImage = GetComponent<Image>();
+            if (targetRect != null) targetRect.pivot = new Vector2(0.5f, 0.5f);
             baseScale = targetRect != null ? targetRect.localScale : Vector3.one;
         }
 

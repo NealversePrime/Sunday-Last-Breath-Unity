@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v39_auto.flag";
+            string flagPath = "Temp/scene_v40_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -710,18 +710,59 @@ namespace SundayLastBreath.Editor
             CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "[2] SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, out TextMeshProUGUI _, false);
             CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "[3] TACTICAL GEAR [I]", out Button btnGear, out Image indGear, out TextMeshProUGUI gearLabelTmp, false);
 
-            // Notification Badge on Tactical Gear Button (Uses User's Custom Canva Notification Sprite + Pulsing)
+            // Centered Content container for Tactical Gear button (Text + Notification Badge side-by-side)
+            GameObject gearContent = new GameObject("Content", typeof(RectTransform));
+            gearContent.transform.SetParent(btnGear.transform, false);
+            RectTransform gcr = gearContent.GetComponent<RectTransform>();
+            gcr.anchorMin = new Vector2(0.5f, 0.5f);
+            gcr.anchorMax = new Vector2(0.5f, 0.5f);
+            gcr.pivot = new Vector2(0.5f, 0.5f);
+            gcr.anchoredPosition = Vector2.zero;
+
+            HorizontalLayoutGroup gHlg = gearContent.AddComponent<HorizontalLayoutGroup>();
+            gHlg.childAlignment = TextAnchor.MiddleCenter;
+            gHlg.childControlWidth = false;
+            gHlg.childControlHeight = false;
+            gHlg.childForceExpandWidth = false;
+            gHlg.childForceExpandHeight = false;
+            gHlg.spacing = 8f;
+
+            ContentSizeFitter gCsf = gearContent.AddComponent<ContentSizeFitter>();
+            gCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            gCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            // Reparent and configure gearLabelTmp inside centered gearContent
+            gearLabelTmp.transform.SetParent(gearContent.transform, false);
+            RectTransform glTr = gearLabelTmp.rectTransform;
+            glTr.anchorMin = new Vector2(0.5f, 0.5f);
+            glTr.anchorMax = new Vector2(0.5f, 0.5f);
+            glTr.pivot = new Vector2(0.5f, 0.5f);
+            glTr.anchoredPosition = Vector2.zero;
+            gearLabelTmp.textWrappingMode = TextWrappingModes.NoWrap;
+            gearLabelTmp.alignment = TextAlignmentOptions.Center;
+            ContentSizeFitter glCsf = gearLabelTmp.gameObject.AddComponent<ContentSizeFitter>();
+            glCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            glCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            // Notification Badge directly beside text (Centered pivot, Canva sprite, Pulsing)
             GameObject gearBadgeObj = new GameObject("LootNotificationBadge", typeof(RectTransform));
-            gearBadgeObj.transform.SetParent(btnGear.transform, false);
+            gearBadgeObj.transform.SetParent(gearContent.transform, false);
             RectTransform gbr = gearBadgeObj.GetComponent<RectTransform>();
-            gbr.anchorMin = new Vector2(1f, 0.5f);
-            gbr.anchorMax = new Vector2(1f, 0.5f);
-            gbr.pivot = new Vector2(1f, 0.5f);
-            gbr.anchoredPosition = new Vector2(-12f, 0f);
-            gbr.sizeDelta = new Vector2(26f, 26f);
+            gbr.anchorMin = new Vector2(0.5f, 0.5f);
+            gbr.anchorMax = new Vector2(0.5f, 0.5f);
+            gbr.pivot = new Vector2(0.5f, 0.5f);
+            gbr.anchoredPosition = Vector2.zero;
+            gbr.sizeDelta = new Vector2(22f, 22f);
+
+            LayoutElement gbLe = gearBadgeObj.AddComponent<LayoutElement>();
+            gbLe.preferredWidth = 22f;
+            gbLe.preferredHeight = 22f;
+            gbLe.minWidth = 22f;
+            gbLe.minHeight = 22f;
 
             Image gbImg = gearBadgeObj.AddComponent<Image>();
             gbImg.preserveAspect = true;
+            gbImg.raycastTarget = false;
             Sprite notifSprite = LoadSpriteSafe("Assets/Sprites/UI/Notification.png");
             if (notifSprite != null)
             {
@@ -1658,7 +1699,7 @@ namespace SundayLastBreath.Editor
             // 5 Equipment Slots overlaid proportionally on body
             CreateEquipSlot(silObj.transform, "Slot_HEAD", new Vector2(0f, 142f), "HEAD", out Image headIcon, out TextMeshProUGUI headLbl);
             CreateEquipSlot(silObj.transform, "Slot_BODY", new Vector2(0f, 80f), "BODY", out Image bodyIcon, out TextMeshProUGUI bodyLbl);
-            CreateEquipSlot(silObj.transform, "Slot_WPN", new Vector2(-105f, -10f), "WPN", out Image wpnIcon, out TextMeshProUGUI wpnLbl);
+            CreateEquipSlot(silObj.transform, "Slot_WPN", new Vector2(-76f, -10f), "WPN", out Image wpnIcon, out TextMeshProUGUI wpnLbl);
             CreateEquipSlot(silObj.transform, "Slot_LEGS", new Vector2(0f, -58f), "LEGS", out Image legsIcon, out TextMeshProUGUI legsLbl);
             CreateEquipSlot(silObj.transform, "Slot_FEET", new Vector2(0f, -155f), "FEET", out Image feetIcon, out TextMeshProUGUI feetLbl);
 
