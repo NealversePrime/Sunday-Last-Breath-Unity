@@ -1209,6 +1209,35 @@ namespace SundayLastBreath.UI
 
         private void Update()
         {
+            // 0. Hotkey to dismiss Phone Modal if open (1, Escape, Space, Enter)
+            if (phoneModal != null && phoneModal.activeSelf)
+            {
+                bool dismissPhone = false;
+#if ENABLE_INPUT_SYSTEM
+                if (Keyboard.current != null)
+                {
+                    dismissPhone = Keyboard.current.escapeKey.wasPressedThisFrame ||
+                                   Keyboard.current.digit1Key.wasPressedThisFrame ||
+                                   Keyboard.current.numpad1Key.wasPressedThisFrame ||
+                                   Keyboard.current.spaceKey.wasPressedThisFrame ||
+                                   Keyboard.current.enterKey.wasPressedThisFrame ||
+                                   Keyboard.current.numpadEnterKey.wasPressedThisFrame;
+                }
+#else
+                dismissPhone = Input.GetKeyDown(KeyCode.Escape) ||
+                               Input.GetKeyDown(KeyCode.Alpha1) ||
+                               Input.GetKeyDown(KeyCode.Keypad1) ||
+                               Input.GetKeyDown(KeyCode.Space) ||
+                               Input.GetKeyDown(KeyCode.Return) ||
+                               Input.GetKeyDown(KeyCode.KeypadEnter);
+#endif
+                if (dismissPhone)
+                {
+                    OnClosePhoneClicked();
+                    return;
+                }
+            }
+
             // 1. Hotkeys for Choice Selection (1-8) when in Narrative Choice Hub Mode
             if (currentConsoleMode == ConsoleMode.Narrative && hubMenuContainer != null && hubMenuContainer.activeInHierarchy)
             {

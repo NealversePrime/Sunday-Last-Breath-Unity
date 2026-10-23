@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v54_auto.flag";
+            string flagPath = "Temp/scene_v55_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -2898,75 +2898,463 @@ namespace SundayLastBreath.Editor
 
         private static GameObject BuildPhoneModal(Transform parent, out Button closeButton)
         {
-            GameObject modalObj = new GameObject("PhoneModal");
+            GameObject modalObj = new GameObject("PhoneModal", typeof(RectTransform));
             modalObj.transform.SetParent(parent, false);
-            RectTransform rect = modalObj.AddComponent<RectTransform>();
+            RectTransform rect = modalObj.GetComponent<RectTransform>();
             StretchFull(rect);
 
             Image backdrop = modalObj.AddComponent<Image>();
-            backdrop.color = new Color(0f, 0f, 0f, 0.88f);
+            backdrop.color = new Color(0.015f, 0.02f, 0.03f, 0.94f);
             backdrop.raycastTarget = true;
 
-            GameObject phonePanel = new GameObject("PhonePanel");
-            phonePanel.transform.SetParent(modalObj.transform, false);
-            RectTransform pRect = phonePanel.AddComponent<RectTransform>();
-            pRect.sizeDelta = new Vector2(440f, 620f);
-            pRect.anchoredPosition = Vector2.zero;
-            Image pBg = phonePanel.AddComponent<Image>();
-            pBg.color = new Color(0.04f, 0.04f, 0.05f, 0.98f);
+            // Center Column Container (Contains: Intro prose -> Smartphone device -> Outro prose -> Action button)
+            GameObject centerCol = new GameObject("PhoneCenterColumn", typeof(RectTransform));
+            centerCol.transform.SetParent(modalObj.transform, false);
+            RectTransform colRect = centerCol.GetComponent<RectTransform>();
+            colRect.anchorMin = new Vector2(0.5f, 0.5f);
+            colRect.anchorMax = new Vector2(0.5f, 0.5f);
+            colRect.pivot = new Vector2(0.5f, 0.5f);
+            colRect.sizeDelta = new Vector2(560f, 960f);
+            colRect.anchoredPosition = Vector2.zero;
 
-            VerticalLayoutGroup vlg = phonePanel.AddComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(16, 16, 14, 14);
-            vlg.spacing = 10f;
+            VerticalLayoutGroup colVlg = centerCol.AddComponent<VerticalLayoutGroup>();
+            colVlg.padding = new RectOffset(0, 0, 10, 10);
+            colVlg.spacing = 12f;
+            colVlg.childAlignment = TextAnchor.MiddleCenter;
+            colVlg.childControlWidth = false;
+            colVlg.childControlHeight = true;
+            colVlg.childForceExpandWidth = false;
+            colVlg.childForceExpandHeight = false;
 
-            // Status bar
-            GameObject sbObj = new GameObject("StatusBar");
-            sbObj.transform.SetParent(phonePanel.transform, false);
-            TextMeshProUGUI sbTmp = sbObj.AddComponent<TextMeshProUGUI>();
-            sbTmp.fontSize = 11f;
-            sbTmp.text = "<color=#ff4444>[!] NO SIGNAL</color>                       <color=#ff4444>12%</color> [BAT]";
-            sbTmp.alignment = TextAlignmentOptions.Center;
+            // 1. TOP INTRO NARRATIVE PROSE (Twine faithful)
+            GameObject introObj = new GameObject("IntroProse", typeof(RectTransform));
+            introObj.transform.SetParent(centerCol.transform, false);
+            LayoutElement introLe = introObj.AddComponent<LayoutElement>();
+            introLe.preferredWidth = 540f;
+            introLe.preferredHeight = 58f;
+            introLe.minHeight = 58f;
+            introLe.flexibleHeight = 0f;
 
-            // Header
-            GameObject hObj = new GameObject("Header");
-            hObj.transform.SetParent(phonePanel.transform, false);
-            TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
-            hTmp.fontSize = 14f;
-            hTmp.fontStyle = FontStyles.Bold;
-            hTmp.text = "Trending: <color=#e74c3c>#SeattleLockdown</color>";
+            TextMeshProUGUI introTmp = introObj.AddComponent<TextMeshProUGUI>();
+            introTmp.fontSize = 12.5f;
+            introTmp.fontStyle = FontStyles.Italic;
+            introTmp.color = new Color(0.78f, 0.82f, 0.88f, 0.95f);
+            introTmp.lineSpacing = 4f;
+            introTmp.alignment = TextAlignmentOptions.Center;
+            introTmp.text = "You pull your phone from your pocket. The screen is cracked, glowing harshly in the dim room. You open the feed. The timeline is refreshing so fast it's making you dizzy.";
+            introTmp.textWrappingMode = TextWrappingModes.Normal;
+            SundayTypography.ApplyFont(introTmp, FontRole.Narrative);
 
-            // Tweets Text Container
-            GameObject feedObj = new GameObject("FeedText");
-            feedObj.transform.SetParent(phonePanel.transform, false);
-            LayoutElement fle = feedObj.AddComponent<LayoutElement>();
-            fle.preferredHeight = 360f;
-            fle.flexibleHeight = 1f;
-            TextMeshProUGUI fTmp = feedObj.AddComponent<TextMeshProUGUI>();
-            fTmp.fontSize = 12f;
-            fTmp.color = new Color(0.85f, 0.85f, 0.9f);
-            fTmp.lineSpacing = 12f;
-            fTmp.text = "<b>CityScanner</b> @CityScanner_WA • 2m\n" +
-                        "Does anyone know what's happening at the 5th St Hospital? Seeing police in gas masks and riot gear. They aren't letting ambulances through. Stay away!!\n\n" +
-                        "<color=#5dade2><b>NewsWire Breaking [VERIFIED]</b></color> @NewsWire_Alerts • 4m\n" +
-                        "EMERGENCY: CDC reporting 'unprecedented neuro-aggressive pathogen' causing extreme psychosis and unprovoked violence. Authorities urge citizens to avoid public spaces.\n\n" +
-                        "<b>User_9921</b> @anon_9921 • 11m\n" +
-                        "<color=#ff5555>[ATTACHED VIDEO: BLURRY]</color>\n" +
-                        "Look at his face! That's not rabies! The cops shot him three times in the chest and he kept running! Oh my god, he's— <i>[VIDEO ENDS]</i>\n\n" +
-                        "<color=#666666><i>Connection lost. Tap to retry.</i></color>";
+            // 2. SMARTPHONE DEVICE CHASSIS
+            GameObject phoneChassis = new GameObject("PhoneChassis", typeof(RectTransform));
+            phoneChassis.transform.SetParent(centerCol.transform, false);
+            LayoutElement chassisLe = phoneChassis.AddComponent<LayoutElement>();
+            chassisLe.preferredWidth = 430f;
+            chassisLe.preferredHeight = 510f;
+            chassisLe.minHeight = 510f;
+            chassisLe.flexibleHeight = 0f;
 
-            // Outro note
-            GameObject oObj = new GameObject("Outro");
-            oObj.transform.SetParent(phonePanel.transform, false);
-            TextMeshProUGUI oTmp = oObj.AddComponent<TextMeshProUGUI>();
-            oTmp.fontSize = 11f;
-            oTmp.color = new Color(0.7f, 0.7f, 0.7f);
-            oTmp.text = "A traffic map shows military checkpoints barricading bridges out of Seattle. Then the signal dies. The internet is gone.";
+            Image chassisBg = phoneChassis.AddComponent<Image>();
+            chassisBg.color = new Color(0.09f, 0.11f, 0.14f, 1f); // Dark titanium frame
+            Outline chassisOl = phoneChassis.AddComponent<Outline>();
+            chassisOl.effectColor = new Color(0.24f, 0.28f, 0.36f, 0.85f); // 1px specular bevel highlight
+            chassisOl.effectDistance = new Vector2(1f, -1f);
 
-            // Close Button
-            CreateApartmentMenuButton(phonePanel.transform, "Btn_ClosePhone", "LOWER THE PHONE AND RETURN",
-                "Add Intel to Lore Database.", new Color(0.35f, 0.75f, 0.95f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
+            // Top Hardware Slit (Speaker)
+            GameObject speakerObj = new GameObject("HardwareSpeaker", typeof(RectTransform));
+            speakerObj.transform.SetParent(phoneChassis.transform, false);
+            RectTransform spRect = speakerObj.GetComponent<RectTransform>();
+            spRect.anchorMin = new Vector2(0.5f, 1f); spRect.anchorMax = new Vector2(0.5f, 1f);
+            spRect.pivot = new Vector2(0.5f, 1f);
+            spRect.sizeDelta = new Vector2(52f, 4f);
+            spRect.anchoredPosition = new Vector2(0f, -8f);
+            Image spImg = speakerObj.AddComponent<Image>();
+            spImg.color = new Color(0.03f, 0.04f, 0.05f, 1f);
+
+            // Top Hardware Camera Pinhole
+            GameObject camObj = new GameObject("HardwareCamera", typeof(RectTransform));
+            camObj.transform.SetParent(phoneChassis.transform, false);
+            RectTransform camRect = camObj.GetComponent<RectTransform>();
+            camRect.anchorMin = new Vector2(0.5f, 1f); camRect.anchorMax = new Vector2(0.5f, 1f);
+            camRect.pivot = new Vector2(0.5f, 1f);
+            camRect.sizeDelta = new Vector2(7f, 7f);
+            camRect.anchoredPosition = new Vector2(-42f, -6.5f);
+            Image camImg = camObj.AddComponent<Image>();
+            camImg.color = new Color(0.02f, 0.03f, 0.06f, 1f);
+
+            // Inner OLED Display Area (with RectMask2D)
+            GameObject displayArea = new GameObject("OledDisplay", typeof(RectTransform));
+            displayArea.transform.SetParent(phoneChassis.transform, false);
+            RectTransform dispRect = displayArea.GetComponent<RectTransform>();
+            dispRect.anchorMin = new Vector2(0f, 0f); dispRect.anchorMax = new Vector2(1f, 1f);
+            dispRect.offsetMin = new Vector2(10f, 18f); // Left 10, Bottom 18
+            dispRect.offsetMax = new Vector2(-10f, -20f); // Right -10, Top -20
+            Image dispBg = displayArea.AddComponent<Image>();
+            dispBg.color = new Color(0.025f, 0.03f, 0.04f, 1f); // Deep OLED Black
+            displayArea.AddComponent<RectMask2D>();
+
+            // Status Bar (Top of OLED, height 24px)
+            GameObject sbObj = new GameObject("StatusBar", typeof(RectTransform));
+            sbObj.transform.SetParent(displayArea.transform, false);
+            RectTransform sbRect = sbObj.GetComponent<RectTransform>();
+            sbRect.anchorMin = new Vector2(0f, 1f); sbRect.anchorMax = new Vector2(1f, 1f);
+            sbRect.pivot = new Vector2(0.5f, 1f);
+            sbRect.sizeDelta = new Vector2(0f, 24f);
+            sbRect.anchoredPosition = Vector2.zero;
+            Image sbBg = sbObj.AddComponent<Image>();
+            sbBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
+
+            TextMeshProUGUI carrierTmp = CreateTMPText(sbObj.transform, "CarrierStatus", "<color=#ef4444><b>[!] NO SIGNAL</b></color>", 10f, new Color(0.95f, 0.35f, 0.35f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            carrierTmp.rectTransform.anchorMin = new Vector2(0f, 0f); carrierTmp.rectTransform.anchorMax = new Vector2(0.4f, 1f);
+            carrierTmp.rectTransform.offsetMin = new Vector2(10f, 0f); carrierTmp.rectTransform.offsetMax = Vector2.zero;
+            SundayTypography.ApplyFont(carrierTmp, FontRole.Mono);
+
+            TextMeshProUGUI clockTmp = CreateTMPText(sbObj.transform, "ClockText", "23:55", 10.5f, new Color(0.70f, 0.78f, 0.88f), TextAlignmentOptions.Center, FontStyles.Bold);
+            clockTmp.rectTransform.anchorMin = new Vector2(0.35f, 0f); clockTmp.rectTransform.anchorMax = new Vector2(0.65f, 1f);
+            clockTmp.rectTransform.offsetMin = Vector2.zero; clockTmp.rectTransform.offsetMax = Vector2.zero;
+            SundayTypography.ApplyFont(clockTmp, FontRole.Mono);
+
+            TextMeshProUGUI batteryTmp = CreateTMPText(sbObj.transform, "BatteryText", "<color=#ef4444><b>12%</b></color> <color=#ef4444>[■□]</color>", 10f, new Color(0.95f, 0.35f, 0.35f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            batteryTmp.rectTransform.anchorMin = new Vector2(0.6f, 0f); batteryTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
+            batteryTmp.rectTransform.offsetMin = Vector2.zero; batteryTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
+            SundayTypography.ApplyFont(batteryTmp, FontRole.Mono);
+
+            // App Header Bar (Height 32px)
+            GameObject headerObj = new GameObject("AppHeader", typeof(RectTransform));
+            headerObj.transform.SetParent(displayArea.transform, false);
+            RectTransform hRect = headerObj.GetComponent<RectTransform>();
+            hRect.anchorMin = new Vector2(0f, 1f); hRect.anchorMax = new Vector2(1f, 1f);
+            hRect.pivot = new Vector2(0.5f, 1f);
+            hRect.sizeDelta = new Vector2(0f, 32f);
+            hRect.anchoredPosition = new Vector2(0f, -24f);
+            Image hBg = headerObj.AddComponent<Image>();
+            hBg.color = new Color(0.06f, 0.075f, 0.10f, 0.98f);
+
+            TextMeshProUGUI hTmp = CreateTMPText(headerObj.transform, "TrendingHeader", "Trending: <color=#ef4444><b>#SeattleLockdown</b></color>", 12.5f, new Color(0.75f, 0.82f, 0.92f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            hTmp.rectTransform.anchorMin = new Vector2(0f, 0f); hTmp.rectTransform.anchorMax = new Vector2(0.8f, 1f);
+            hTmp.rectTransform.offsetMin = new Vector2(10f, 0f); hTmp.rectTransform.offsetMax = Vector2.zero;
+            SundayTypography.ApplyFont(hTmp, FontRole.Display);
+
+            TextMeshProUGUI liveTmp = CreateTMPText(headerObj.transform, "LiveBadge", "<color=#ef4444>●</color> LIVE", 9f, new Color(0.85f, 0.45f, 0.45f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            liveTmp.rectTransform.anchorMin = new Vector2(0.7f, 0f); liveTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
+            liveTmp.rectTransform.offsetMin = Vector2.zero; liveTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
+            SundayTypography.ApplyFont(liveTmp, FontRole.Mono);
+
+            // Divider under Header
+            GameObject divObj = new GameObject("HeaderDivider", typeof(RectTransform));
+            divObj.transform.SetParent(headerObj.transform, false);
+            RectTransform divRect = divObj.GetComponent<RectTransform>();
+            divRect.anchorMin = new Vector2(0f, 0f); divRect.anchorMax = new Vector2(1f, 0f);
+            divRect.pivot = new Vector2(0.5f, 0f);
+            divRect.sizeDelta = new Vector2(0f, 1f);
+            divRect.anchoredPosition = Vector2.zero;
+            Image divImg = divObj.AddComponent<Image>();
+            divImg.color = new Color(0.18f, 0.22f, 0.30f, 0.8f);
+
+            // Scroll View for Social Feed
+            GameObject scrollObj = new GameObject("FeedScrollView", typeof(RectTransform));
+            scrollObj.transform.SetParent(displayArea.transform, false);
+            RectTransform sRect = scrollObj.GetComponent<RectTransform>();
+            sRect.anchorMin = new Vector2(0f, 0f); sRect.anchorMax = new Vector2(1f, 1f);
+            sRect.offsetMin = new Vector2(0f, 14f); // Above home pill
+            sRect.offsetMax = new Vector2(0f, -56f); // Below status bar + app header
+
+            ScrollRect sr = scrollObj.AddComponent<ScrollRect>();
+            sr.horizontal = false;
+            sr.vertical = true;
+            sr.scrollSensitivity = 35f;
+            sr.inertia = true;
+            sr.decelerationRate = 0.135f;
+
+            GameObject viewport = new GameObject("Viewport", typeof(RectTransform));
+            viewport.transform.SetParent(scrollObj.transform, false);
+            RectTransform vRect = viewport.GetComponent<RectTransform>();
+            StretchFull(vRect);
+            viewport.AddComponent<RectMask2D>();
+            sr.viewport = vRect;
+
+            GameObject feedContent = new GameObject("FeedContent", typeof(RectTransform));
+            feedContent.transform.SetParent(viewport.transform, false);
+            RectTransform fcRect = feedContent.GetComponent<RectTransform>();
+            fcRect.anchorMin = new Vector2(0f, 1f); fcRect.anchorMax = new Vector2(1f, 1f);
+            fcRect.pivot = new Vector2(0.5f, 1f);
+            fcRect.sizeDelta = Vector2.zero;
+            sr.content = fcRect;
+
+            ContentSizeFitter fcFitter = feedContent.AddComponent<ContentSizeFitter>();
+            fcFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fcFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            VerticalLayoutGroup fcVlg = feedContent.AddComponent<VerticalLayoutGroup>();
+            fcVlg.padding = new RectOffset(10, 14, 8, 14);
+            fcVlg.spacing = 9f;
+            fcVlg.childControlWidth = true;
+            fcVlg.childControlHeight = true;
+            fcVlg.childForceExpandWidth = true;
+            fcVlg.childForceExpandHeight = false;
+
+            // Sleek Scrollbar
+            GameObject scrollbarObj = new GameObject("ScrollbarVertical", typeof(RectTransform));
+            scrollbarObj.transform.SetParent(scrollObj.transform, false);
+            RectTransform sbRt = scrollbarObj.GetComponent<RectTransform>();
+            sbRt.anchorMin = new Vector2(1f, 0f); sbRt.anchorMax = new Vector2(1f, 1f);
+            sbRt.pivot = new Vector2(1f, 0.5f);
+            sbRt.sizeDelta = new Vector2(4f, 0f);
+            sbRt.anchoredPosition = new Vector2(-2f, 0f);
+            Image sbTrackImg = scrollbarObj.AddComponent<Image>();
+            sbTrackImg.color = new Color(0.04f, 0.05f, 0.08f, 0.6f);
+
+            GameObject handleObj = new GameObject("Handle", typeof(RectTransform));
+            handleObj.transform.SetParent(scrollbarObj.transform, false);
+            RectTransform hdlRt = handleObj.GetComponent<RectTransform>();
+            StretchFull(hdlRt);
+            Image hdlImg = handleObj.AddComponent<Image>();
+            hdlImg.color = new Color(0.28f, 0.35f, 0.46f, 0.85f);
+
+            Scrollbar sbar = scrollbarObj.AddComponent<Scrollbar>();
+            sbar.direction = Scrollbar.Direction.BottomToTop;
+            sbar.targetGraphic = hdlImg;
+            sbar.handleRect = hdlRt;
+            sr.verticalScrollbar = sbar;
+            sr.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+
+            // Feed Post 1: CityScanner
+            CreatePhonePostCard(feedContent.transform, "C", new Color(0.10f, 0.16f, 0.24f), new Color(0.35f, 0.75f, 0.95f),
+                "CityScanner", "@CityScanner_WA • 2m",
+                "Does anyone know what's happening at the 5th St Hospital? Seeing police in gas masks and riot gear. They aren't letting ambulances through. Stay away!!",
+                null, false, "💬 412   ↺ 1.2K   ♥ 890");
+
+            // Feed Post 2: NewsWire Breaking ☑
+            CreatePhonePostCard(feedContent.transform, "N", new Color(0.04f, 0.22f, 0.40f), Color.white,
+                "NewsWire Breaking <color=#38bdf8>☑</color>", "@NewsWire_Alerts • 4m",
+                "EMERGENCY: CDC reporting 'unprecedented neuro-aggressive pathogen' causing extreme psychosis and unprovoked violence. Authorities urge citizens to avoid public spaces.",
+                "[ CDC HEALTH BULLETIN // EMERGENCY ]", false, "💬 3.4K   ↺ 14.8K   ♥ 2.1K");
+
+            // Feed Post 3: User_9921
+            CreatePhonePostCard(feedContent.transform, "U", new Color(0.32f, 0.08f, 0.08f), new Color(0.95f, 0.45f, 0.45f),
+                "User_9921", "@anon_9921 • 11m",
+                "Look at his face! That's not rabies! The cops shot him three times in the chest and he kept running! Oh my god, he's— <i>[VIDEO ENDS]</i>",
+                null, true, "💬 8.9K   ↺ 21.5K   ♥ 1.1K");
+
+            // Feed Post 4: Connection Lost Alert Card
+            GameObject cardLossObj = CreatePhoneDisconnectCard(feedContent.transform);
+
+            // Toast Alert Banner (drops down from top of OLED)
+            GameObject toastObj = new GameObject("DisconnectToast", typeof(RectTransform));
+            toastObj.transform.SetParent(displayArea.transform, false);
+            RectTransform dtRect = toastObj.GetComponent<RectTransform>();
+            dtRect.anchorMin = new Vector2(0f, 1f); dtRect.anchorMax = new Vector2(1f, 1f);
+            dtRect.pivot = new Vector2(0.5f, 1f);
+            dtRect.sizeDelta = new Vector2(0f, 32f);
+            dtRect.anchoredPosition = new Vector2(0f, 40f); // Hidden above initially
+            Image dtBg = toastObj.AddComponent<Image>();
+            dtBg.color = new Color(0.42f, 0.08f, 0.08f, 0.95f);
+            Outline dtOl = toastObj.AddComponent<Outline>();
+            dtOl.effectColor = new Color(0.90f, 0.25f, 0.25f, 0.9f);
+            dtOl.effectDistance = new Vector2(1f, -1f);
+            TextMeshProUGUI dtTmp = CreateTMPText(toastObj.transform, "ToastLabel", "<b>⚠ CELLULAR NETWORK SEVERED</b>  |  0 BARS", 10.5f, new Color(1f, 0.92f, 0.92f), TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(dtTmp.rectTransform);
+            SundayTypography.ApplyFont(dtTmp, FontRole.Mono);
+
+            // Bottom Hardware Home Pill
+            GameObject homePillObj = new GameObject("HomePill", typeof(RectTransform));
+            homePillObj.transform.SetParent(phoneChassis.transform, false);
+            RectTransform hpRect = homePillObj.GetComponent<RectTransform>();
+            hpRect.anchorMin = new Vector2(0.5f, 0f); hpRect.anchorMax = new Vector2(0.5f, 0f);
+            hpRect.pivot = new Vector2(0.5f, 0f);
+            hpRect.sizeDelta = new Vector2(80f, 4f);
+            hpRect.anchoredPosition = new Vector2(0f, 6f);
+            Image hpImg = homePillObj.AddComponent<Image>();
+            hpImg.color = new Color(0.32f, 0.38f, 0.48f, 0.7f);
+
+            // 3. BOTTOM OUTRO NARRATIVE PROSE (Twine faithful)
+            GameObject outroObj = new GameObject("OutroProse", typeof(RectTransform));
+            outroObj.transform.SetParent(centerCol.transform, false);
+            LayoutElement outroLe = outroObj.AddComponent<LayoutElement>();
+            outroLe.preferredWidth = 540f;
+            outroLe.preferredHeight = 72f;
+            outroLe.minHeight = 72f;
+            outroLe.flexibleHeight = 0f;
+
+            TextMeshProUGUI outroTmp = outroObj.AddComponent<TextMeshProUGUI>();
+            outroTmp.fontSize = 12f;
+            outroTmp.fontStyle = FontStyles.Italic;
+            outroTmp.color = new Color(0.78f, 0.82f, 0.88f, 0.95f);
+            outroTmp.lineSpacing = 4f;
+            outroTmp.alignment = TextAlignmentOptions.Center;
+            outroTmp.text = "The comments are a storm of denial, prayers, and wild conspiracies. One post catches your eye: a traffic map showing military checkpoints. <i>They are barricading the bridges out of the city.</i>\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. The internet is gone.";
+            outroTmp.textWrappingMode = TextWrappingModes.Normal;
+            SundayTypography.ApplyFont(outroTmp, FontRole.Narrative);
+
+            // 4. ACTION BUTTON
+            GameObject btnHolder = new GameObject("ButtonHolder", typeof(RectTransform));
+            btnHolder.transform.SetParent(centerCol.transform, false);
+            LayoutElement bhLe = btnHolder.AddComponent<LayoutElement>();
+            bhLe.preferredWidth = 430f;
+            bhLe.preferredHeight = 36f;
+            bhLe.minHeight = 36f;
+            bhLe.flexibleHeight = 0f;
+
+            CreateApartmentMenuButton(btnHolder.transform, "Btn_ClosePhone", "LOWER THE PHONE AND GET BACK TO REALITY",
+                "Add Intel to Lore Database.", new Color(0.95f, 0.55f, 0.20f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
+
+            // Wire SmartphoneFeedController
+            SmartphoneFeedController ctrl = modalObj.AddComponent<SmartphoneFeedController>();
+            SerializedObject soCtrl = new SerializedObject(ctrl);
+            soCtrl.FindProperty("feedScrollRect").objectReferenceValue = sr;
+            soCtrl.FindProperty("feedContent").objectReferenceValue = fcRect;
+            soCtrl.FindProperty("carrierStatusText").objectReferenceValue = carrierTmp;
+            soCtrl.FindProperty("clockText").objectReferenceValue = clockTmp;
+            soCtrl.FindProperty("batteryText").objectReferenceValue = batteryTmp;
+            soCtrl.FindProperty("disconnectToast").objectReferenceValue = dtRect;
+            soCtrl.FindProperty("connectionLostCard").objectReferenceValue = cardLossObj;
+
+            AudioClip beepClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
+            AudioClip staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/static.mp3");
+            AudioClip alertClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/tick.mp3");
+            soCtrl.FindProperty("screenWakeClip").objectReferenceValue = beepClip;
+            soCtrl.FindProperty("staticBurstClip").objectReferenceValue = staticClip;
+            soCtrl.FindProperty("alertBeepClip").objectReferenceValue = alertClip;
+            soCtrl.ApplyModifiedPropertiesWithoutUndo();
 
             return modalObj;
+        }
+
+        private static void CreatePhonePostCard(Transform parent, string avatarLetter, Color avatarBg, Color avatarTextColor,
+            string displayName, string handleWithTime, string postBody, string alertBadge, bool hasVideoAttachment, string engagementStats)
+        {
+            GameObject cardObj = new GameObject($"PostCard_{avatarLetter}", typeof(RectTransform));
+            cardObj.transform.SetParent(parent, false);
+
+            Image cardBg = cardObj.AddComponent<Image>();
+            cardBg.color = new Color(0.065f, 0.08f, 0.105f, 0.90f);
+
+            Outline cardOl = cardObj.AddComponent<Outline>();
+            cardOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.5f);
+            cardOl.effectDistance = new Vector2(1f, -1f);
+
+            VerticalLayoutGroup cardVlg = cardObj.AddComponent<VerticalLayoutGroup>();
+            cardVlg.padding = new RectOffset(10, 10, 8, 8);
+            cardVlg.spacing = 5f;
+            cardVlg.childControlWidth = true;
+            cardVlg.childControlHeight = true;
+            cardVlg.childForceExpandWidth = true;
+            cardVlg.childForceExpandHeight = false;
+
+            ContentSizeFitter cardFit = cardObj.AddComponent<ContentSizeFitter>();
+            cardFit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            cardFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            // Row 1: Header (Avatar + User Info)
+            GameObject headerRow = new GameObject("HeaderRow", typeof(RectTransform));
+            headerRow.transform.SetParent(cardObj.transform, false);
+            HorizontalLayoutGroup hlg = headerRow.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 8f;
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = true;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+
+            // Avatar circle
+            GameObject avatarObj = new GameObject("AvatarCircle", typeof(RectTransform));
+            avatarObj.transform.SetParent(headerRow.transform, false);
+            RectTransform aRect = avatarObj.GetComponent<RectTransform>();
+            aRect.sizeDelta = new Vector2(28f, 28f);
+            LayoutElement ale = avatarObj.AddComponent<LayoutElement>();
+            ale.preferredWidth = 28f; ale.preferredHeight = 28f;
+            ale.minWidth = 28f; ale.minHeight = 28f;
+
+            Image aBg = avatarObj.AddComponent<Image>();
+            aBg.color = avatarBg;
+            TextMeshProUGUI aTmp = CreateTMPText(avatarObj.transform, "Letter", avatarLetter, 12f, avatarTextColor, TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(aTmp.rectTransform);
+            SundayTypography.ApplyFont(aTmp, FontRole.Display);
+
+            // User Info (Name + Handle)
+            GameObject userObj = new GameObject("UserInfo", typeof(RectTransform));
+            userObj.transform.SetParent(headerRow.transform, false);
+            VerticalLayoutGroup uVlg = userObj.AddComponent<VerticalLayoutGroup>();
+            uVlg.spacing = 0f;
+            uVlg.childControlWidth = true; uVlg.childControlHeight = true;
+            uVlg.childForceExpandWidth = true; uVlg.childForceExpandHeight = false;
+
+            TextMeshProUGUI nameTmp = CreateTMPText(userObj.transform, "Name", displayName, 11f, new Color(0.95f, 0.97f, 1f), TextAlignmentOptions.Left, FontStyles.Bold);
+            SundayTypography.ApplyFont(nameTmp, FontRole.Body);
+
+            TextMeshProUGUI handleTmp = CreateTMPText(userObj.transform, "Handle", handleWithTime, 9.5f, new Color(0.50f, 0.56f, 0.66f), TextAlignmentOptions.Left);
+            SundayTypography.ApplyFont(handleTmp, FontRole.Mono);
+
+            // Row 2 (Optional Alert Badge)
+            if (!string.IsNullOrEmpty(alertBadge))
+            {
+                TextMeshProUGUI alTmp = CreateTMPText(cardObj.transform, "AlertBadge", alertBadge, 9.5f, new Color(0.95f, 0.45f, 0.45f), TextAlignmentOptions.Left, FontStyles.Bold);
+                alTmp.lineSpacing = 2f;
+                SundayTypography.ApplyFont(alTmp, FontRole.Mono);
+            }
+
+            // Row 3 (Optional Video Attachment Preview)
+            if (hasVideoAttachment)
+            {
+                GameObject vidObj = new GameObject("VideoAttachment", typeof(RectTransform));
+                vidObj.transform.SetParent(cardObj.transform, false);
+                LayoutElement vle = vidObj.AddComponent<LayoutElement>();
+                vle.preferredHeight = 44f; vle.minHeight = 44f;
+                Image vidBg = vidObj.AddComponent<Image>();
+                vidBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
+                Outline vidOl = vidObj.AddComponent<Outline>();
+                vidOl.effectColor = new Color(0.75f, 0.18f, 0.18f, 0.7f);
+
+                TextMeshProUGUI vidTmp = CreateTMPText(vidObj.transform, "VideoTag", "<color=#ef4444>▶ <b>[ATTACHED VIDEO: BLURRY]</b></color>\n<color=#64748b>0:14 / 0:38 • 5th & Pine St • Audio: Gunfire</color>", 9.5f, Color.white, TextAlignmentOptions.Center);
+                StretchFull(vidTmp.rectTransform);
+                SundayTypography.ApplyFont(vidTmp, FontRole.Mono);
+            }
+
+            // Row 4: Post Body
+            TextMeshProUGUI bodyTmp = CreateTMPText(cardObj.transform, "PostBody", postBody, 11f, new Color(0.82f, 0.86f, 0.92f), TextAlignmentOptions.Left);
+            bodyTmp.lineSpacing = 3f;
+            bodyTmp.textWrappingMode = TextWrappingModes.Normal;
+            SundayTypography.ApplyFont(bodyTmp, FontRole.Body);
+
+            // Row 5: Interaction Stats
+            if (!string.IsNullOrEmpty(engagementStats))
+            {
+                TextMeshProUGUI footTmp = CreateTMPText(cardObj.transform, "Stats", engagementStats, 9f, new Color(0.38f, 0.45f, 0.55f), TextAlignmentOptions.Left);
+                SundayTypography.ApplyFont(footTmp, FontRole.Mono);
+            }
+        }
+
+        private static GameObject CreatePhoneDisconnectCard(Transform parent)
+        {
+            GameObject cardObj = new GameObject("Card_ConnectionLost", typeof(RectTransform));
+            cardObj.transform.SetParent(parent, false);
+
+            Image dBg = cardObj.AddComponent<Image>();
+            dBg.color = new Color(0.14f, 0.04f, 0.04f, 0.92f);
+
+            Outline dOl = cardObj.AddComponent<Outline>();
+            dOl.effectColor = new Color(0.85f, 0.20f, 0.20f, 0.80f);
+            dOl.effectDistance = new Vector2(1f, -1f);
+
+            VerticalLayoutGroup dVlg = cardObj.AddComponent<VerticalLayoutGroup>();
+            dVlg.padding = new RectOffset(10, 10, 8, 8);
+            dVlg.spacing = 3f;
+            dVlg.childControlWidth = true;
+            dVlg.childControlHeight = true;
+            dVlg.childForceExpandWidth = true;
+            dVlg.childForceExpandHeight = false;
+
+            ContentSizeFitter dFit = cardObj.AddComponent<ContentSizeFitter>();
+            dFit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            dFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            TextMeshProUGUI dTitle = CreateTMPText(cardObj.transform, "Title", "<color=#ef4444><b>⚠ CONNECTION LOST // ERROR 503</b></color>", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            SundayTypography.ApplyFont(dTitle, FontRole.Mono);
+
+            TextMeshProUGUI dBody = CreateTMPText(cardObj.transform, "Desc", "Cellular towers offline. Packet stream terminated by host.\n<i>Feed frozen. Signal lost.</i>", 10f, new Color(0.72f, 0.77f, 0.84f), TextAlignmentOptions.Center);
+            SundayTypography.ApplyFont(dBody, FontRole.Body);
+
+            return cardObj;
         }
 
         private static GameObject BuildRadioModal(Transform parent, out Button closeButton)
