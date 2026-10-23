@@ -430,19 +430,20 @@ namespace SundayLastBreath.Data
             { "BAD KNEE", "trait_badknee" },
             { "LONE WOLF", "trait_lonewolf" },
             { "RADIO OPERATOR", "trait_radio" },
-            { "GUNSLINGER", "perk_gunslinger" },
-            { "SHOTGUNNER", "perk_shotgunner" },
-            { "BLUNT BRUISER", "perk_blunt_bruiser" },
-            { "BLADESMITH", "perk_bladesmith" },
-            { "IRON STOMACH", "perk_iron_stomach" },
-            { "FIELD FORAGER", "perk_field_forager" },
-            { "SECOND WIND", "perk_second_wind" },
-            { "IRON WILL", "perk_iron_will" },
-            { "CRISIS NEGOTIATOR", "perk_crisis_negotiator" },
-            { "COMMANDING PRESENCE", "perk_commanding_presence" },
-            { "FIELD MEDIC", "perk_iron_stomach" },
-            { "FAST LEARNER", "perk_second_wind" },
-            { "ADRENALINE", "perk_second_wind" }
+            { "GUNSLINGER", "gunslinger" },
+            { "SHOTGUNNER", "shotgunner" },
+            { "BLUNT BRUISER", "blunt_bruiser" },
+            { "BLADESMITH", "bladesmith" },
+            { "IRON STOMACH", "iron_stomach" },
+            { "FIELD FORAGER", "field_forager" },
+            { "SECOND WIND", "second_wind" },
+            { "IRON WILL", "iron_will" },
+            { "CRISIS NEGOTIATOR", "crisis_negotiator" },
+            { "COMMANDING PRESENCE", "commanding_presence" },
+            { "FIELD MEDIC", "field_medic" },
+            { "FAST LEARNER", "fast_learner" },
+            { "ADRENALINE", "adrenaline" },
+            { "STEADY HANDS", "steady_hands" }
         };
 
         private static void EnsureLoaded()
@@ -533,15 +534,25 @@ namespace SundayLastBreath.Data
 
             if (_traitIconCache.TryGetValue(traitName, out var icon)) return icon;
 
-            if (_traitAliases.TryGetValue(traitName.Trim(), out string aliasedKey) &&
-                _traitIconCache.TryGetValue(aliasedKey, out var aliasedIcon))
+            if (_traitAliases.TryGetValue(traitName.Trim(), out string aliasedKey))
             {
-                return aliasedIcon;
+                if (_traitIconCache.TryGetValue(aliasedKey, out var aliasedIcon)) return aliasedIcon;
+                if (_traitIconCache.TryGetValue("trait_" + aliasedKey, out var aliasedTIcon)) return aliasedTIcon;
             }
 
             string norm = traitName.Trim().ToLowerInvariant().Replace(" ", "_").Replace("-", "_");
+            if (_traitIconCache.TryGetValue(norm, out var directNormIcon)) return directNormIcon;
             if (_traitIconCache.TryGetValue("trait_" + norm, out var tIcon)) return tIcon;
             if (_traitIconCache.TryGetValue("perk_" + norm, out var pIcon)) return pIcon;
+
+            foreach (var kvp in _traitIconCache)
+            {
+                string keyNorm = kvp.Key.Trim().ToLowerInvariant();
+                if (keyNorm == norm || keyNorm.Replace("trait_", "").Replace("perk_", "") == norm)
+                {
+                    return kvp.Value;
+                }
+            }
 
             foreach (var kvp in _traitIconCache)
             {

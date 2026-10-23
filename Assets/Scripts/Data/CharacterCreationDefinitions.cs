@@ -65,6 +65,10 @@ namespace SundayLastBreath.Data
             new PerkData("iron_will", "IRON WILL", "Immunity to panic and 40% reduced Humanity loss during trauma.", "iron_will", "resolve", 2),
             new PerkData("crisis_negotiator", "CRISIS NEGOTIATOR", "De-escalate armed encounters peacefully and get 20% barter discounts.", "crisis_negotiator", "resolve", 2),
             new PerkData("commanding_presence", "COMMANDING PRESENCE", "Allied survivors gain +15% Accuracy and will not flee from terror.", "commanding_presence", "resolve", 3),
+            new PerkData("field_medic", "FIELD MEDIC", "Healing items restore 2x HP.", "field_medic", "medicine", 2),
+            new PerkData("fast_learner", "FAST LEARNER", "Gain XP 2x faster from survival actions.", "fast_learner", null, 0),
+            new PerkData("adrenaline", "ADRENALINE", "Instant stat boost and damage resist when HP drops below 30%.", "adrenaline", null, 0),
+            new PerkData("steady_hands", "STEADY HANDS", "+15 Accuracy bonus and reduced weapon sway.", "steady_hands", "shooting", 2),
         };
 
         public static readonly JobData[] Jobs = new JobData[]

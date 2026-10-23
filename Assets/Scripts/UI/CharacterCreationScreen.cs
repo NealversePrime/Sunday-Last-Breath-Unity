@@ -495,6 +495,10 @@ namespace SundayLastBreath.UI
                         string iconKey = perk.name.ToLower().Replace(" ", "_");
                         icon = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/Perks/{iconKey}.png");
 #endif
+                        if (icon == null)
+                        {
+                            icon = ItemDatabase.GetTraitIcon(perk.name);
+                        }
                         character.AddTrait(perk.name, perk.desc, icon);
                     }
                 }
@@ -1956,6 +1960,7 @@ namespace SundayLastBreath.UI
                     character.medicine = 3;
                     perkName = "FIELD MEDIC";
                     perkDesc = "Healing items restore 2x HP.";
+                    perkIcon = "field_medic";
                     break;
                 case "survival":
                     character.survival = 3;
@@ -1978,6 +1983,8 @@ namespace SundayLastBreath.UI
                 if (!string.IsNullOrEmpty(perkIcon))
                     icon = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/Perks/{perkIcon}.png");
 #endif
+                if (icon == null)
+                    icon = ItemDatabase.GetTraitIcon(perkName);
                 character.AddTrait(perkName, perkDesc, icon);
             }
         }
