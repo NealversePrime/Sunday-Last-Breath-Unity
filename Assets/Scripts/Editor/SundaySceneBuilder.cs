@@ -2417,7 +2417,7 @@ namespace SundayLastBreath.Editor
 
         private static void CreatePDATabButton(Transform parent, string name, string label, out Button button)
         {
-            GameObject btnObj = new GameObject(name);
+            GameObject btnObj = new GameObject(name, typeof(RectTransform));
             btnObj.transform.SetParent(parent, false);
             LayoutElement le = btnObj.AddComponent<LayoutElement>();
             le.preferredHeight = 28f;
@@ -2436,9 +2436,9 @@ namespace SundayLastBreath.Editor
             RectTransform tr = tmp.rectTransform;
             StretchFull(tr);
 
-            GameObject accent = new GameObject("BottomAccent");
+            GameObject accent = new GameObject("BottomAccent", typeof(RectTransform));
             accent.transform.SetParent(btnObj.transform, false);
-            RectTransform ar = accent.AddComponent<RectTransform>();
+            RectTransform ar = accent.GetComponent<RectTransform>();
             ar.anchorMin = new Vector2(0f, 0f); ar.anchorMax = new Vector2(1f, 0f);
             ar.pivot = new Vector2(0.5f, 0f);
             ar.sizeDelta = new Vector2(0f, 2f);
@@ -2474,9 +2474,9 @@ namespace SundayLastBreath.Editor
         private static void CreateEquipSlot(Transform parent, string name, Vector2 pos, string slotName,
             out Button slotBtn, out Image iconImg, out TextMeshProUGUI slotLabel, out Outline outline)
         {
-            GameObject slotObj = new GameObject(name);
+            GameObject slotObj = new GameObject(name, typeof(RectTransform));
             slotObj.transform.SetParent(parent, false);
-            RectTransform sr = slotObj.AddComponent<RectTransform>();
+            RectTransform sr = slotObj.GetComponent<RectTransform>();
             sr.anchorMin = new Vector2(0.5f, 0.5f);
             sr.anchorMax = new Vector2(0.5f, 0.5f);
             sr.pivot = new Vector2(0.5f, 0.5f);
@@ -2492,7 +2492,7 @@ namespace SundayLastBreath.Editor
             slotBtn = slotObj.AddComponent<Button>();
             slotBtn.targetGraphic = bg;
 
-            GameObject iconObj = new GameObject("Icon");
+            GameObject iconObj = new GameObject("Icon", typeof(RectTransform));
             iconObj.transform.SetParent(slotObj.transform, false);
             iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
@@ -2566,7 +2566,7 @@ namespace SundayLastBreath.Editor
         private static void CreateVitalBar(Transform parent, string name, Sprite iconSprite, Sprite fillSprite, Color fillColor,
             out Image barFill, out TextMeshProUGUI valueText, string defaultValue = "100")
         {
-            GameObject barObj = new GameObject(name);
+            GameObject barObj = new GameObject(name, typeof(RectTransform));
             barObj.transform.SetParent(parent, false);
             LayoutElement le = barObj.AddComponent<LayoutElement>();
             le.preferredHeight = 22f;
@@ -2581,9 +2581,9 @@ namespace SundayLastBreath.Editor
             ol.effectDistance = new Vector2(1f, -1f);
 
             // Fill Image
-            GameObject fillObj = new GameObject("Fill");
+            GameObject fillObj = new GameObject("Fill", typeof(RectTransform));
             fillObj.transform.SetParent(barObj.transform, false);
-            RectTransform fr = fillObj.AddComponent<RectTransform>();
+            RectTransform fr = fillObj.GetComponent<RectTransform>();
             StretchFull(fr);
             barFill = fillObj.AddComponent<Image>();
             barFill.type = Image.Type.Filled;
@@ -2595,16 +2595,16 @@ namespace SundayLastBreath.Editor
             barFill.raycastTarget = false;
 
             // Overlay content (Icon Left, Numeric Value Right)
-            GameObject overlayObj = new GameObject("Overlay");
+            GameObject overlayObj = new GameObject("Overlay", typeof(RectTransform));
             overlayObj.transform.SetParent(barObj.transform, false);
-            RectTransform or = overlayObj.AddComponent<RectTransform>();
+            RectTransform or = overlayObj.GetComponent<RectTransform>();
             StretchFull(or);
 
             if (iconSprite != null)
             {
-                GameObject iconObj = new GameObject("Icon");
+                GameObject iconObj = new GameObject("Icon", typeof(RectTransform));
                 iconObj.transform.SetParent(overlayObj.transform, false);
-                RectTransform ir = iconObj.AddComponent<RectTransform>();
+                RectTransform ir = iconObj.GetComponent<RectTransform>();
                 ir.anchorMin = new Vector2(0f, 0.5f);
                 ir.anchorMax = new Vector2(0f, 0.5f);
                 ir.pivot = new Vector2(0f, 0.5f);
@@ -2616,9 +2616,9 @@ namespace SundayLastBreath.Editor
                 ii.raycastTarget = false;
             }
 
-            GameObject valObj = new GameObject("Value");
+            GameObject valObj = new GameObject("Value", typeof(RectTransform));
             valObj.transform.SetParent(overlayObj.transform, false);
-            RectTransform vr = valObj.AddComponent<RectTransform>();
+            RectTransform vr = valObj.GetComponent<RectTransform>();
             vr.anchorMin = new Vector2(0f, 0f);
             vr.anchorMax = new Vector2(1f, 1f);
             vr.offsetMin = new Vector2(24f, 0f);
@@ -2635,9 +2635,9 @@ namespace SundayLastBreath.Editor
         private static void CreateApartmentMenuButton(Transform parent, string name, string mainText, string subText,
             Color accentColor, out Button button, out TextMeshProUGUI mainLabel, out TextMeshProUGUI subLabel, Color? bgColor = null, int choiceIndex = 1)
         {
-            GameObject btnObj = new GameObject(name);
+            GameObject btnObj = new GameObject(name, typeof(RectTransform));
             btnObj.transform.SetParent(parent, false);
-            RectTransform btnRect = btnObj.GetComponent<RectTransform>() ?? btnObj.AddComponent<RectTransform>();
+            RectTransform btnRect = btnObj.GetComponent<RectTransform>();
             btnRect.sizeDelta = new Vector2(0f, 34f);
 
             LayoutElement le = btnObj.AddComponent<LayoutElement>();
@@ -2683,9 +2683,9 @@ namespace SundayLastBreath.Editor
             shineObj.SetActive(false);
 
             // Left 3px Accent Bar (Hidden by default, reveals on hover)
-            GameObject barObj = new GameObject("AccentBar");
+            GameObject barObj = new GameObject("AccentBar", typeof(RectTransform));
             barObj.transform.SetParent(btnObj.transform, false);
-            RectTransform barRect = barObj.AddComponent<RectTransform>();
+            RectTransform barRect = barObj.GetComponent<RectTransform>();
             barRect.anchorMin = new Vector2(0f, 0f);
             barRect.anchorMax = new Vector2(0f, 1f);
             barRect.pivot = new Vector2(0f, 0.5f);
@@ -2780,18 +2780,18 @@ namespace SundayLastBreath.Editor
 
         private static GameObject BuildStoryLogModal(Transform parent, out TextMeshProUGUI logContentTmp, out Button closeBtn, out Button closeBottomBtn)
         {
-            GameObject modalObj = new GameObject("StoryLogModal");
+            GameObject modalObj = new GameObject("StoryLogModal", typeof(RectTransform));
             modalObj.transform.SetParent(parent, false);
-            RectTransform rect = modalObj.AddComponent<RectTransform>();
+            RectTransform rect = modalObj.GetComponent<RectTransform>();
             StretchFull(rect);
 
             Image backdrop = modalObj.AddComponent<Image>();
             backdrop.color = new Color(0f, 0f, 0f, 0.88f);
             backdrop.raycastTarget = true;
 
-            GameObject panel = new GameObject("LogPanel");
+            GameObject panel = new GameObject("LogPanel", typeof(RectTransform));
             panel.transform.SetParent(modalObj.transform, false);
-            RectTransform pRect = panel.AddComponent<RectTransform>();
+            RectTransform pRect = panel.GetComponent<RectTransform>();
             pRect.sizeDelta = new Vector2(920f, 580f);
             pRect.anchoredPosition = Vector2.zero;
             Image pBg = panel.AddComponent<Image>();
@@ -2801,9 +2801,9 @@ namespace SundayLastBreath.Editor
             pOl.effectDistance = new Vector2(1.5f, -1.5f);
 
             // Header Bar (56px)
-            GameObject headerObj = new GameObject("Header");
+            GameObject headerObj = new GameObject("Header", typeof(RectTransform));
             headerObj.transform.SetParent(panel.transform, false);
-            RectTransform hRect = headerObj.AddComponent<RectTransform>();
+            RectTransform hRect = headerObj.GetComponent<RectTransform>();
             hRect.anchorMin = new Vector2(0f, 1f); hRect.anchorMax = new Vector2(1f, 1f);
             hRect.pivot = new Vector2(0.5f, 1f);
             hRect.sizeDelta = new Vector2(0f, 56f);
@@ -2812,16 +2812,16 @@ namespace SundayLastBreath.Editor
             hBg.color = new Color(0.07f, 0.10f, 0.14f, 0.98f);
 
             TextMeshProUGUI hTmp = CreateTMPText(headerObj.transform, "Title",
-                "<b><color=#4FC3F7>INCIDENT & JOURNAL LOG // UNIT 407</color></b>\n<size=75%><color=#90A4AE>PERSONAL NOTES, BROADCAST TRANSCRIPTS, AND OBSERVATIONS</color></size>",
+                "<b><color=#4FC3F7>INCIDENT & JOURNAL LOG</color></b>\n<size=75%><color=#90A4AE>PERSONAL NOTES, BROADCAST TRANSCRIPTS, AND OBSERVATIONS</color></size>",
                 14f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform htRect = hTmp.rectTransform;
             htRect.anchorMin = new Vector2(0f, 0f); htRect.anchorMax = new Vector2(1f, 1f);
             htRect.offsetMin = new Vector2(20f, 0f); htRect.offsetMax = new Vector2(-60f, 0f);
 
             // Close Button [ X ] on Header
-            GameObject closeObj = new GameObject("Btn_CloseTop");
+            GameObject closeObj = new GameObject("Btn_CloseTop", typeof(RectTransform));
             closeObj.transform.SetParent(headerObj.transform, false);
-            RectTransform cRect = closeObj.AddComponent<RectTransform>();
+            RectTransform cRect = closeObj.GetComponent<RectTransform>();
             cRect.anchorMin = new Vector2(1f, 0.5f); cRect.anchorMax = new Vector2(1f, 0.5f);
             cRect.pivot = new Vector2(1f, 0.5f);
             cRect.sizeDelta = new Vector2(34f, 34f);
@@ -2857,9 +2857,9 @@ namespace SundayLastBreath.Editor
             lcRect.pivot = new Vector2(0.5f, 1f);
 
             // Footer Bar
-            GameObject footObj = new GameObject("Footer");
+            GameObject footObj = new GameObject("Footer", typeof(RectTransform));
             footObj.transform.SetParent(panel.transform, false);
-            RectTransform fRect = footObj.AddComponent<RectTransform>();
+            RectTransform fRect = footObj.GetComponent<RectTransform>();
             fRect.anchorMin = new Vector2(0f, 0f); fRect.anchorMax = new Vector2(1f, 0f);
             fRect.pivot = new Vector2(0.5f, 0f);
             fRect.sizeDelta = new Vector2(0f, 48f);
@@ -2867,9 +2867,9 @@ namespace SundayLastBreath.Editor
             Image fBg = footObj.AddComponent<Image>();
             fBg.color = new Color(0.06f, 0.08f, 0.11f, 0.98f);
 
-            GameObject botCloseObj = new GameObject("Btn_CloseBottom");
+            GameObject botCloseObj = new GameObject("Btn_CloseBottom", typeof(RectTransform));
             botCloseObj.transform.SetParent(footObj.transform, false);
-            RectTransform bcRect = botCloseObj.AddComponent<RectTransform>();
+            RectTransform bcRect = botCloseObj.GetComponent<RectTransform>();
             bcRect.anchorMin = new Vector2(0.5f, 0.5f); bcRect.anchorMax = new Vector2(0.5f, 0.5f);
             bcRect.pivot = new Vector2(0.5f, 0.5f);
             bcRect.sizeDelta = new Vector2(240f, 36f);
@@ -3736,7 +3736,7 @@ namespace SundayLastBreath.Editor
         private static GameObject BuildJobSelectionPanel(Transform parent, CharacterCreationScreen screen)
         {
             GameObject panel = CreatePanelContainer(parent, "JobSelectionPanel");
-            CreateHeader(panel.transform, "CIVILIAN BACKGROUND", "\"What was your life before the screaming started?\"");
+            CreateHeader(panel.transform, "CITIZEN BACKGROUND", "\"What was your life before the screaming started?\"");
 
             // Vertical ScrollView with 3-column Grid (matching Twine layout)
             GameObject scrollObj = CreateScrollView(panel.transform, "JobScrollView", new Vector2(1540, 890), true, out Transform content);

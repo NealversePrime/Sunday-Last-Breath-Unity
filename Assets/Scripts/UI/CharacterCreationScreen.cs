@@ -1023,7 +1023,7 @@ namespace SundayLastBreath.UI
             mbOut.effectDistance = new Vector2(1f, -1f);
             mirrorBox.AddComponent<RectMask2D>();
 
-            CreateModuleHeader(mirrorBox.transform, "■ MIRROR REFLECTION & PROFILE");
+            CreateModuleHeader(mirrorBox.transform, "■ MIRROR REFLECTION & CITIZEN PROFILE");
 
             // Properly wrapped inside MirrorProfileBox (anchor 0..1, offsetMin (18, 114), offsetMax (-18, -36))
             TextMeshProUGUI quoteTmp = CreateUIText(mirrorBox.transform, "ValMirrorQuote", "",

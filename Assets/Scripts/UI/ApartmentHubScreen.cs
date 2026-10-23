@@ -724,6 +724,10 @@ namespace SundayLastBreath.UI
                     t.text = t.text.Replace("TACTICAL GEAR", "BACKPACK & ITEMS");
                 if (t.text.Contains("SURVIVOR CHRONICLE"))
                     t.text = t.text.Replace("SURVIVOR CHRONICLE", "INCIDENT & JOURNAL LOG");
+                if (t.text.Contains("INCIDENT & JOURNAL LOG // UNIT 407"))
+                    t.text = t.text.Replace("INCIDENT & JOURNAL LOG // UNIT 407", "INCIDENT & JOURNAL LOG");
+                if (t.text.Contains("CIVILIAN BACKGROUND"))
+                    t.text = t.text.Replace("CIVILIAN BACKGROUND", "CITIZEN BACKGROUND");
                 if (t.text.Contains("SURVIVOR MATRIX"))
                     t.text = t.text.Replace("SURVIVOR MATRIX", "ATTRIBUTE PROFILE");
                 if (t.text.Contains("COMBAT & SURVIVAL DISCIPLINES // TACTICAL PROFICIENCY"))
@@ -795,11 +799,14 @@ namespace SundayLastBreath.UI
                     crt.sizeDelta = new Vector2(crt.sizeDelta.x, 34f);
                 }
                 LayoutElement le = child.GetComponent<LayoutElement>();
-                if (le == null) le = child.gameObject.AddComponent<LayoutElement>();
-                le.preferredHeight = 34f;
-                le.minHeight = 34f;
-                le.flexibleHeight = 0f;
-                le.flexibleWidth = 1f;
+                if (le == null && crt != null) le = child.gameObject.AddComponent<LayoutElement>();
+                if (le != null)
+                {
+                    le.preferredHeight = 34f;
+                    le.minHeight = 34f;
+                    le.flexibleHeight = 0f;
+                    le.flexibleWidth = 1f;
+                }
 
                 // 2. Ensure Left Accent Bar
                 Transform bar = child.Find("AccentBar");
@@ -2606,7 +2613,7 @@ namespace SundayLastBreath.UI
             );
 
             AppendStoryLog(gameClock.GetTimeString(), "NEWS // SOCIAL MEDIA TIMELINE",
-                "City news feeds report police in riot gear and gas masks sealing 5th St Hospital. A civilian video shows an infected person continuing to sprint despite multiple gunshot wounds before the network went dark. Cellular service is now completely dead.");
+                "City news feeds report police in riot gear and gas masks sealing 5th St Hospital. A cell phone video shows an infected person continuing to sprint despite multiple gunshot wounds before the network went dark. Cellular service is now completely dead.");
 
             EvaluateHubButtonStates();
         }
