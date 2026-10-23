@@ -148,6 +148,12 @@ namespace SundayLastBreath.Data
             return traits.Exists(t => t.name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
+        public bool HasItem(string itemId)
+        {
+            if (string.IsNullOrEmpty(itemId) || inventory == null) return false;
+            return inventory.Exists(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase));
+        }
+
         public string GetEquippedInSlot(string slot)
         {
             if (string.IsNullOrEmpty(slot)) return "";
