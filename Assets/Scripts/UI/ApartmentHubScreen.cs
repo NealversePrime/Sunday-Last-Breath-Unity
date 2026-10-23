@@ -2635,7 +2635,7 @@ namespace SundayLastBreath.UI
 
             if (!hasPacked)
             {
-                AudioManager.Instance?.PlayButtonHover();
+                PlayBeepSFX();
                 if (situationBoxText != null)
                 {
                     situationBoxText.text = "\"<color=#EF4444><b>[BLOCKED]</b> You have not gathered your starter work gear and service tools from the table! Facing the Seattle blackout unarmed and unprepared is suicide. Pack your gear first.</color>\"";
@@ -2940,6 +2940,11 @@ namespace SundayLastBreath.UI
             {
                 sfxSource.PlayOneShot(clickClip, 0.4f);
             }
+        }
+
+        private void PlayBeepSFX()
+        {
+            AudioManager.Instance?.PlayButtonHover();
         }
         #endregion
     }
