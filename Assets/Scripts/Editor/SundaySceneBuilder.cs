@@ -1157,7 +1157,7 @@ namespace SundayLastBreath.Editor
 
             // Situation Body Text
             TextMeshProUGUI sitBodyTmp = CreateTMPText(sitBox.transform, "SituationBody",
-                "\"The television drones with cold emergency static. Sirens wail across the Seattle skyline. You stand in your living room in the dark, weighing your immediate options before the power grid or the front door fails.\"",
+                "\"Sirens wail across the Seattle skyline in the blackout. In the dark of my apartment, the deadbolt on the front door is locked tight. My apartment keys, wallet, and everyday items are still sitting on the coffee table.\"",
                 11.5f, new Color(0.82f, 0.86f, 0.92f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
             sitBodyTmp.lineSpacing = 2.5f;
             sitBodyTmp.textWrappingMode = TextWrappingModes.Normal;
@@ -1187,7 +1187,7 @@ namespace SundayLastBreath.Editor
             pbgImg.color = new Color(0.18f, 0.80f, 0.44f);
 
             TextMeshProUGUI pbTmp = CreateTMPText(pBanner.transform, "Text",
-                "[+] Primary work equipment strapped on and secured into tactical pack.",
+                "✓ Pocketed my apartment keys, wallet, and gear off the table. The front door can now be unlocked.",
                 10.5f, new Color(0.35f, 0.95f, 0.55f), TextAlignmentOptions.MidlineLeft);
             RectTransform pbTextRect = pbTmp.rectTransform;
             StretchFull(pbTextRect);
@@ -1204,7 +1204,7 @@ namespace SundayLastBreath.Editor
             shLe.flexibleWidth = 1f;
 
             TextMeshProUGUI cshTmp = CreateTMPText(subHeadObj.transform, "Title",
-                "<b><color=#F5A623>// AVAILABLE TACTICAL INCLINATIONS & ACTIONS</color></b>  <color=#64748B>[HOTKEYS: 1–8 OR CLICK TO EXECUTE]</color>",
+                "<b><color=#F5A623>// WHAT SHOULD I DO NEXT?</color></b>  <color=#64748B>[KEYS: 1–8 OR CLICK]</color>",
                 10.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform shtr = cshTmp.rectTransform;
             StretchFull(shtr);
@@ -1216,8 +1216,7 @@ namespace SundayLastBreath.Editor
             choiceScrollObj.transform.SetParent(menuObj.transform, false);
             LayoutElement csLe = choiceScrollObj.AddComponent<LayoutElement>();
             csLe.flexibleHeight = 1f;
-            csLe.preferredHeight = 310f;
-            csLe.minHeight = 280f;
+            csLe.minHeight = 240f;
             csLe.flexibleWidth = 1f;
 
             ScrollRect choiceSr = choiceScrollObj.AddComponent<ScrollRect>();
@@ -1243,10 +1242,10 @@ namespace SundayLastBreath.Editor
             choiceContentRect.sizeDelta = Vector2.zero;
 
             VerticalLayoutGroup ccVlg = choiceContent.AddComponent<VerticalLayoutGroup>();
-            ccVlg.spacing = 4f;
+            ccVlg.spacing = 3f;
             ccVlg.padding = new RectOffset(2, 6, 2, 2);
             ccVlg.childControlWidth = true;
-            ccVlg.childControlHeight = false;
+            ccVlg.childControlHeight = true;
             ccVlg.childForceExpandWidth = true;
             ccVlg.childForceExpandHeight = false;
 
@@ -1286,39 +1285,46 @@ namespace SundayLastBreath.Editor
             choiceSr.verticalScrollbarSpacing = 4f;
 
             // Menu Action Buttons (Inside Scroll Content) - Direction A: Fallout 4 FDI Terminal Choice Rows
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_PackGear", "<color=#38BDF8>[ 02 MIN ]</color>  <color=#F59E0B>[ GEAR ]</color>  GATHER WORK GEAR & SUIT UP",
-                "Starter equipment, holster sidearm, and lace boots.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_PackGear",
+                "<b>Pick up my apartment keys, wallet, and work gear from the coffee table.</b>  <color=#64748B><i>(~2 min)</i></color>",
+                "",
                 new Color(0.95f, 0.75f, 0.35f), out Button btnPack, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchKitchen", "<color=#38BDF8>[ 03 MIN ]</color>  <color=#F59E0B>[ SUPPLIES ]</color>  SEARCH KITCHENETTE FOR PROVISIONS",
-                "Scrounge cupboards and fridge for preserved food and clean water.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchKitchen",
+                "<b>Check the kitchen cabinets and fridge for bottled water and food.</b>  <color=#64748B><i>(~3 min)</i></color>",
+                "",
                 new Color(0.95f, 0.70f, 0.30f), out Button btnKitchen, out TextMeshProUGUI kitchenLbl, out TextMeshProUGUI kitchenSub, choiceIndex: 2);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchBathroom", "<color=#38BDF8>[ 02 MIN ]</color>  <color=#2DD4BF>[ FIRST AID ]</color>  RAID BATHROOM MEDICINE CABINET",
-                "Grab painkillers, sterile bandages, and first-aid supplies.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchBathroom",
+                "<b>Check the bathroom medicine cabinet for painkillers and bandages.</b>  <color=#64748B><i>(~2 min)</i></color>",
+                "",
                 new Color(0.30f, 0.85f, 0.60f), out Button btnBathroom, out TextMeshProUGUI bathLbl, out TextMeshProUGUI bathSub, choiceIndex: 3);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchCloset", "<color=#38BDF8>[ 02 MIN ]</color>  <color=#818CF8>[ WEATHER ]</color>  PULL WEATHER GEAR FROM CLOSET",
-                "Retrieve weather protection, duct tape, and utility gear.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchCloset",
+                "<b>Grab my heavy coat, rain jacket, and flashlight from the front closet.</b>  <color=#64748B><i>(~2 min)</i></color>",
+                "",
                 new Color(0.40f, 0.75f, 0.95f), out Button btnCloset, out TextMeshProUGUI closetLbl, out TextMeshProUGUI closetSub, choiceIndex: 4);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_CheckPhone", "<color=#38BDF8>[ 01 MIN ]</color>  <color=#38BDF8>[ INTEL ]</color>  CHECK NEWS FEED ON PHONE",
-                "See what the internet knows before the grid goes down.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_CheckPhone",
+                "<b>Check my phone to see if anyone knows what is happening outside.</b>  <color=#64748B><i>(~1 min)</i></color>",
+                "",
                 new Color(0.35f, 0.75f, 0.95f), out Button btnPhone, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 5);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_ListenRadio", "<color=#38BDF8>[ 03 MIN ]</color>  <color=#F5A623>[ RADIO ]</color>  LISTEN TO EMERGENCY BAND",
-                "Monitor encrypted dispatch channels to locate perimeter breaches.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_ListenRadio",
+                "<b>Turn on the radio and listen to the emergency dispatch chatter.</b>  <color=#64748B><i>(~3 min)</i></color>",
+                "",
                 new Color(0.95f, 0.75f, 0.35f), out Button btnRadio, out TextMeshProUGUI radioLbl, out TextMeshProUGUI radioSub, choiceIndex: 6);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_HackTerminal", "<color=#38BDF8>[ 08 MIN ]</color>  <color=#10B981>[ TECH 3 ]</color>  BYPASS GOV FIREWALL",
-                "Breach military encryption to extract classified directives.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_HackTerminal",
+                "<b>Log onto the computer terminal to check if the network is responding.</b>  <color=#64748B><i>(~8 min)</i></color>",
+                "",
                 new Color(0.35f, 0.95f, 0.45f), out Button btnHacking, out TextMeshProUGUI hackLbl, out TextMeshProUGUI hackSub, choiceIndex: 7);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_LeaveApartment", "<s><color=#64748B>[ LOCKED ]</color>  <color=#EF4444>[ REQ: GEAR ]</color>  STEP INTO 4TH FLOOR CORRIDOR</s>",
-                "Coffee table stash is not empty! Gather all starter gear & weapons first.",
-                new Color(0.95f, 0.3f, 0.3f), out Button btnLeave, out TextMeshProUGUI _, out TextMeshProUGUI _,
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_LeaveApartment",
+                "<s><color=#94A3B8>Unlock the apartment door and step out into the hallway.</color></s>  <color=#EF4444><i>[Locked — My keys are still on the coffee table]</i></color>",
+                "",
+                new Color(0.95f, 0.40f, 0.40f), out Button btnLeave, out TextMeshProUGUI _, out TextMeshProUGUI _,
                 new Color(0.18f, 0.05f, 0.05f, 0.85f), choiceIndex: 8);
-            btnLeave.interactable = false;
 
 
             // -------------------------------------------------------------------------
@@ -2631,8 +2637,13 @@ namespace SundayLastBreath.Editor
         {
             GameObject btnObj = new GameObject(name);
             btnObj.transform.SetParent(parent, false);
+            RectTransform btnRect = btnObj.GetComponent<RectTransform>() ?? btnObj.AddComponent<RectTransform>();
+            btnRect.sizeDelta = new Vector2(0f, 34f);
+
             LayoutElement le = btnObj.AddComponent<LayoutElement>();
             le.preferredHeight = 34f;
+            le.minHeight = 34f;
+            le.flexibleHeight = 0f;
             le.flexibleWidth = 1f;
 
             Image bg = btnObj.AddComponent<Image>();
@@ -2692,7 +2703,7 @@ namespace SundayLastBreath.Editor
             gutRect.anchorMin = new Vector2(0f, 0f);
             gutRect.anchorMax = new Vector2(0f, 1f);
             gutRect.pivot = new Vector2(0f, 0.5f);
-            gutRect.sizeDelta = new Vector2(62f, 0f);
+            gutRect.sizeDelta = new Vector2(46f, 0f);
             gutRect.anchoredPosition = Vector2.zero;
 
             // Hover Chevron ">>" (Slides right on hover)
@@ -2702,7 +2713,7 @@ namespace SundayLastBreath.Editor
             chRect.anchorMin = new Vector2(0f, 0f);
             chRect.anchorMax = new Vector2(0f, 1f);
             chRect.pivot = new Vector2(0f, 0.5f);
-            chRect.anchoredPosition = new Vector2(2f, 0f);
+            chRect.anchoredPosition = new Vector2(-4f, 0f);
             chRect.sizeDelta = new Vector2(16f, 0f);
             TextMeshProUGUI chTmp = chObj.AddComponent<TextMeshProUGUI>();
             chTmp.fontSize = 12f;
@@ -2719,7 +2730,7 @@ namespace SundayLastBreath.Editor
             RectTransform hkRect = hkObj.GetComponent<RectTransform>();
             hkRect.anchorMin = new Vector2(0f, 0f);
             hkRect.anchorMax = new Vector2(1f, 1f);
-            hkRect.offsetMin = new Vector2(18f, 0f);
+            hkRect.offsetMin = new Vector2(16f, 0f);
             hkRect.offsetMax = Vector2.zero;
             TextMeshProUGUI hkTmp = hkObj.AddComponent<TextMeshProUGUI>();
             hkTmp.fontSize = 11.5f;
@@ -2730,64 +2741,41 @@ namespace SundayLastBreath.Editor
             hkTmp.raycastTarget = false;
             SundayTypography.ApplyFont(hkTmp, FontRole.Mono);
 
-            // Text Container (Flex Row for Action Label + Subtext Detail)
+            // Text Container (Full-width row with generous 18px gap after gutter)
             GameObject textCont = new GameObject("TextContainer", typeof(RectTransform));
             textCont.transform.SetParent(btnObj.transform, false);
             RectTransform tcRect = textCont.GetComponent<RectTransform>();
             tcRect.anchorMin = new Vector2(0f, 0f);
             tcRect.anchorMax = new Vector2(1f, 1f);
-            tcRect.offsetMin = new Vector2(74f, 0f);
+            tcRect.offsetMin = new Vector2(64f, 0f);
             tcRect.offsetMax = new Vector2(-16f, 0f);
 
-            HorizontalLayoutGroup tcHlg = textCont.AddComponent<HorizontalLayoutGroup>();
-            tcHlg.spacing = 14f;
-            tcHlg.childAlignment = TextAnchor.MiddleLeft;
-            tcHlg.childControlWidth = true;
-            tcHlg.childControlHeight = true;
-            tcHlg.childForceExpandWidth = false;
-            tcHlg.childForceExpandHeight = true;
-
-            // Main Label (Primary Action Prose)
+            // Single Main Label spanning full available row width (Rich Text handles colors & italics)
             GameObject mLblObj = new GameObject("MainLabel", typeof(RectTransform));
             mLblObj.transform.SetParent(textCont.transform, false);
+            RectTransform mlRect = mLblObj.GetComponent<RectTransform>();
+            mlRect.anchorMin = Vector2.zero;
+            mlRect.anchorMax = Vector2.one;
+            mlRect.offsetMin = Vector2.zero;
+            mlRect.offsetMax = Vector2.zero;
+            mlRect.pivot = new Vector2(0f, 0.5f);
+
             mainLabel = mLblObj.AddComponent<TextMeshProUGUI>();
             mainLabel.fontSize = 11.5f;
-            mainLabel.fontStyle = FontStyles.Bold;
+            mainLabel.fontStyle = FontStyles.Normal;
             mainLabel.alignment = TextAlignmentOptions.MidlineLeft;
             mainLabel.color = Color.white;
             mainLabel.text = mainText;
             mainLabel.raycastTarget = false;
             mainLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            mainLabel.overflowMode = TextOverflowModes.Ellipsis;
             SundayTypography.ApplyFont(mainLabel, FontRole.Body);
 
-            LayoutElement mlLe = mLblObj.AddComponent<LayoutElement>();
-            mlLe.preferredWidth = -1;
-            mlLe.flexibleWidth = 0;
-
-            ContentSizeFitter mlCsf = mLblObj.AddComponent<ContentSizeFitter>();
-            mlCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            mlCsf.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
-
-            // Sub Label (Inline detail / metadata)
-            GameObject sLblObj = new GameObject("SubLabel", typeof(RectTransform));
-            sLblObj.transform.SetParent(textCont.transform, false);
-            subLabel = sLblObj.AddComponent<TextMeshProUGUI>();
-            subLabel.fontSize = 10.5f;
-            subLabel.alignment = TextAlignmentOptions.MidlineLeft;
-            subLabel.color = new Color(0.64f, 0.72f, 0.82f);
-            subLabel.text = string.IsNullOrEmpty(subText) ? "" : $"— {subText}";
-            subLabel.raycastTarget = false;
-            subLabel.textWrappingMode = TextWrappingModes.NoWrap;
-            subLabel.overflowMode = TextOverflowModes.Ellipsis;
-            SundayTypography.ApplyFont(subLabel, FontRole.Body);
-
-            LayoutElement slLe = sLblObj.AddComponent<LayoutElement>();
-            slLe.flexibleWidth = 1f;
-            slLe.minWidth = 350f;
+            subLabel = null;
 
             // Attach TacticalChoiceButton for Fallout/BG3 hover animations, audio, and keyboard hotkeys
             TacticalChoiceButton tcb = btnObj.AddComponent<TacticalChoiceButton>();
-            tcb.Initialize(button, tcRect, bg, barImg, ol, shineRect, accentColor, chTmp, hkTmp, mainLabel, subLabel);
+            tcb.Initialize(button, tcRect, bg, barImg, ol, shineRect, accentColor, chTmp, hkTmp, mainLabel, null);
         }
 
         private static GameObject BuildStoryLogModal(Transform parent, out TextMeshProUGUI logContentTmp, out Button closeBtn, out Button closeBottomBtn)
@@ -3032,8 +3020,8 @@ namespace SundayLastBreath.Editor
             oTmp.text = "<color=#ff5555>'Aim for the head.'</color> Total lethal force. Standard body shots are useless. Whatever is outside, the law is officially dead.";
 
             // Close Button
-            CreateApartmentMenuButton(radioPanel.transform, "Btn_CloseRadio", "KILL THE RADIO AND RETURN",
-                "Add tactical intel to your PDA.", new Color(0.95f, 0.75f, 0.35f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
+            CreateApartmentMenuButton(radioPanel.transform, "Btn_CloseRadio", "<b>Turn off the radio and return to the living room.</b>",
+                "", new Color(0.95f, 0.75f, 0.35f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
 
             return modalObj;
         }
@@ -3095,8 +3083,8 @@ namespace SundayLastBreath.Editor
             foTmp.color = new Color(0.85f, 0.85f, 0.85f);
             foTmp.text = "<color=#ff4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military is firebombing the city at dawn. You secured a <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your device.";
 
-            CreateApartmentMenuButton(finishContainer.transform, "Btn_CloseHacking", "WIPE DRIVE & CLOSE LAPTOP",
-                "Save the Tier-1 Passkey to your PDA and log off.", new Color(0.35f, 0.95f, 0.45f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
+            CreateApartmentMenuButton(finishContainer.transform, "Btn_CloseHacking", "<b>Shut down the laptop and return to the living room.</b>",
+                "", new Color(0.35f, 0.95f, 0.45f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
 
             return modalObj;
         }

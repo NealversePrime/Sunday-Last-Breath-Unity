@@ -45,9 +45,9 @@ namespace SundayLastBreath.UI
         [SerializeField] private float slideDistance = 6f;
         [SerializeField] private float transitionSpeed = 16f;
 
-        private float defaultChevronOffset = 2f;
-        private float targetChevronOffset = 2f;
-        private float currentChevronOffset = 2f;
+        private float defaultChevronOffset = -4f;
+        private float targetChevronOffset = -4f;
+        private float currentChevronOffset = -4f;
         private bool isHovered = false;
         private Coroutine shineCoroutine;
 

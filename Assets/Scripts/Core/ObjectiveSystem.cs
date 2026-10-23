@@ -42,8 +42,8 @@ namespace SundayLastBreath.Core
         public ObjectiveSystem()
         {
             // Initial default objectives for Prologue
-            objectives.Add(new ObjectiveItem("pack_gear", "Gather your starter gear from the table", ObjectiveStatus.Active));
-            objectives.Add(new ObjectiveItem("leave_apt", "Leave your apartment and head outside", ObjectiveStatus.Locked));
+            objectives.Add(new ObjectiveItem("pack_gear", "Pick up your apartment keys and belongings from the coffee table", ObjectiveStatus.Active));
+            objectives.Add(new ObjectiveItem("leave_apt", "Unlock the apartment door and step out into the hallway", ObjectiveStatus.Locked));
         }
 
         public void AddObjective(string id, string desc, ObjectiveStatus status = ObjectiveStatus.Active)
