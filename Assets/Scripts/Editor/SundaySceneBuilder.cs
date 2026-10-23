@@ -707,8 +707,8 @@ namespace SundayLastBreath.Editor
             brHlg.childForceExpandWidth = true; brHlg.childForceExpandHeight = true;
 
             CreateConsoleModeButton(btnRow.transform, "Btn_ModeNarrative", "NARRATIVE & LOG [ESC]", out Button btnNarrative, out Image indNarrative, out TextMeshProUGUI _, true);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, out TextMeshProUGUI _, false);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "TACTICAL GEAR [I]", out Button btnGear, out Image indGear, out TextMeshProUGUI gearLabelTmp, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "PERSONAL PHONE [TAB]", out Button btnPDA, out Image indPDA, out TextMeshProUGUI _, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "BACKPACK & ITEMS [I]", out Button btnGear, out Image indGear, out TextMeshProUGUI gearLabelTmp, false);
 
             // Centered Content container for Tactical Gear button (Text + Notification Badge side-by-side)
             GameObject gearContent = new GameObject("Content", typeof(RectTransform));
@@ -1637,7 +1637,7 @@ namespace SundayLastBreath.Editor
             ccOl.effectDistance = new Vector2(1f, -1f);
 
             TextMeshProUGUI condTmp = CreateTMPText(condCard.transform, "Text",
-                "<color=#f39c12><b>TACTICAL CONDITION:</b></color>\n" +
+                "<color=#f39c12><b>CURRENT SITUATION:</b></color>\n" +
                 "• Shelter: Unit 407 (Living Room)\n" +
                 "• Status: Unprepared / In Pajamas\n" +
                 "• Threat: Civil Danger Warning (Category 5)\n" +
@@ -1755,7 +1755,7 @@ namespace SundayLastBreath.Editor
             lcCardOl.effectColor = new Color(0.95f, 0.48f, 0.12f, 0.55f);
             lcCardOl.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI lheadTmp = CreateTMPText(loadoutCard.transform, "Header", "ACTIVE LOADOUT", 12.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            TextMeshProUGUI lheadTmp = CreateTMPText(loadoutCard.transform, "Header", "CLOTHING & EQUIPPED", 12.5f, new Color(0.95f, 0.48f, 0.12f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform lhr2 = lheadTmp.rectTransform;
             lhr2.anchorMin = new Vector2(0f, 1f); lhr2.anchorMax = new Vector2(1f, 1f);
             lhr2.pivot = new Vector2(0f, 1f);
@@ -1900,7 +1900,7 @@ namespace SundayLastBreath.Editor
             rtHlg.childControlWidth = true; rtHlg.childControlHeight = true;
             rtHlg.childForceExpandWidth = true; rtHlg.childForceExpandHeight = true;
 
-            CreateTabPillButton(rightTabsObj.transform, "Tab_Dossier", "ITEM DOSSIER", out Button tabDossierBtn, out TextMeshProUGUI _);
+            CreateTabPillButton(rightTabsObj.transform, "Tab_Dossier", "ITEM DETAILS", out Button tabDossierBtn, out TextMeshProUGUI _);
             CreateTabPillButton(rightTabsObj.transform, "Tab_Floor", "ROOM ITEMS", out Button tabFloorBtn, out TextMeshProUGUI tabFloorCountTmp);
 
             // 1. Panel: Item Dossier
@@ -1916,7 +1916,7 @@ namespace SundayLastBreath.Editor
             dEmptyObj.transform.SetParent(dossierPanelObj.transform, false);
             RectTransform der = dEmptyObj.GetComponent<RectTransform>();
             StretchFull(der);
-            TextMeshProUGUI dEmptyTmp = CreateTMPText(dEmptyObj.transform, "Text", "(Select an item in your backpack or loadout slot to inspect tactical intel & specs)", 11f, new Color(0.5f, 0.55f, 0.6f), TextAlignmentOptions.Center, FontStyles.Italic);
+            TextMeshProUGUI dEmptyTmp = CreateTMPText(dEmptyObj.transform, "Text", "(Select an item in your backpack or clothing to inspect details)", 11f, new Color(0.5f, 0.55f, 0.6f), TextAlignmentOptions.Center, FontStyles.Italic);
             RectTransform det = dEmptyTmp.rectTransform;
             StretchFull(det);
 
@@ -2003,7 +2003,7 @@ namespace SundayLastBreath.Editor
             sbOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.75f);
             sbOl.effectDistance = new Vector2(1f, -1f);
 
-            TextMeshProUGUI dStatsTmp = CreateTMPText(statsBox.transform, "StatsText", "TACTICAL ACCURACY: 60%\nMAX TARGET ENGAGEMENT: 1 Hostile\nMAGAZINE SPEC: 9mm Ammo", 10f, new Color(0.85f, 0.88f, 0.92f), TextAlignmentOptions.TopLeft);
+            TextMeshProUGUI dStatsTmp = CreateTMPText(statsBox.transform, "StatsText", "ACCURACY: 60%\nMAX TARGET ENGAGEMENT: 1 Target\nAMMO TYPE: 9mm Ammo", 10f, new Color(0.85f, 0.88f, 0.92f), TextAlignmentOptions.TopLeft);
             RectTransform dsr = dStatsTmp.rectTransform;
             StretchFull(dsr);
             dsr.offsetMin = new Vector2(10f, 6f);
@@ -2812,7 +2812,7 @@ namespace SundayLastBreath.Editor
             hBg.color = new Color(0.07f, 0.10f, 0.14f, 0.98f);
 
             TextMeshProUGUI hTmp = CreateTMPText(headerObj.transform, "Title",
-                "<b><color=#4FC3F7>SURVIVOR CHRONICLE // INCIDENT & STORY LOG</color></b>\n<size=75%><color=#90A4AE>ARCHIVED TRANSCRIPTS, BROADCAST RECORDS, AND OBSERVATIONS</color></size>",
+                "<b><color=#4FC3F7>INCIDENT & JOURNAL LOG // UNIT 407</color></b>\n<size=75%><color=#90A4AE>PERSONAL NOTES, BROADCAST TRANSCRIPTS, AND OBSERVATIONS</color></size>",
                 14f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform htRect = hTmp.rectTransform;
             htRect.anchorMin = new Vector2(0f, 0f); htRect.anchorMax = new Vector2(1f, 1f);
@@ -3680,7 +3680,7 @@ namespace SundayLastBreath.Editor
             CreateStandardButton(btnsContainer.transform, "FEMALE", () => screen.SelectGender("Female"), new Vector2(200, 50));
             CreateStandardButton(btnsContainer.transform, "NON-BINARY", () => screen.SelectGender("Non-Binary"), new Vector2(200, 50));
 
-            CreateCustomInputRow(panel.transform, "CustomGenderRow", "Or define your own:", "Survivor", 
+            CreateCustomInputRow(panel.transform, "CustomGenderRow", "Or define your own:", "Custom", 
                 () => screen.ConfirmCustomGender(), out TMP_InputField inputField);
             so.FindProperty("customGenderInput").objectReferenceValue = inputField;
 
@@ -3736,7 +3736,7 @@ namespace SundayLastBreath.Editor
         private static GameObject BuildJobSelectionPanel(Transform parent, CharacterCreationScreen screen)
         {
             GameObject panel = CreatePanelContainer(parent, "JobSelectionPanel");
-            CreateHeader(panel.transform, "SURVIVOR IDENTITY", "\"What was your life before the screaming started?\"");
+            CreateHeader(panel.transform, "CIVILIAN BACKGROUND", "\"What was your life before the screaming started?\"");
 
             // Vertical ScrollView with 3-column Grid (matching Twine layout)
             GameObject scrollObj = CreateScrollView(panel.transform, "JobScrollView", new Vector2(1540, 890), true, out Transform content);
@@ -6531,7 +6531,7 @@ namespace SundayLastBreath.Editor
             legacySkillsTmp = legSkObj.AddComponent<TextMeshProUGUI>();
             legSkObj.SetActive(false);
 
-            CreateSectionBadge(pSkillsObj.transform, "CORE ATTRIBUTES // M.O.R.T.A.L. SURVIVOR MATRIX");
+            CreateSectionBadge(pSkillsObj.transform, "CORE ATTRIBUTES // M.O.R.T.A.L. ATTRIBUTE PROFILE");
 
             GameObject attrRow1 = CreateHUDCardRow(pSkillsObj.transform, "AttrRow1");
             CreateAttributeCard(skillsCtrl, attrRow1.transform, "STR", "[M] MIGHT", "Carry capacity, melee impact, and blunt leverage.", new Color(0.0f, 0.90f, 1.0f));
@@ -6543,7 +6543,7 @@ namespace SundayLastBreath.Editor
             CreateAttributeCard(skillsCtrl, attrRow2.transform, "CHA", "[A] LEADERSHIP", "Morale stability, negotiation, and bargain discounts.", new Color(0.0f, 0.90f, 1.0f));
             CreateAttributeCard(skillsCtrl, attrRow2.transform, "LCK", "[L] AUSPICE", "Critical hit rate, rare scavenge drops, and lucky saves.", new Color(0.0f, 0.90f, 1.0f));
 
-            CreateSectionBadge(pSkillsObj.transform, "COMBAT & SURVIVAL DISCIPLINES // TACTICAL PROFICIENCY");
+            CreateSectionBadge(pSkillsObj.transform, "SKILLS & PROFICIENCIES // PRACTICAL TRAINING");
 
             GameObject skRow1 = CreateHUDCardRow(pSkillsObj.transform, "SkillRow1");
             CreateSkillCard(skillsCtrl, skRow1.transform, "SHOOTING", "Firearm recoil control, precision spread, and reload speed.");

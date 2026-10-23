@@ -586,7 +586,7 @@ namespace SundayLastBreath.UI
             var u405 = new NodeModel(
                 "unit_405", "UNIT 405", "HUNTER'S APT", "MARCUS'S APARTMENT", "REINFORCED LOCK",
                 "UNKNOWN", "WEAPONS / AMMO", "METALLIC CLICK",
-                "Residence of Marcus, an experienced outdoorsman and big-game hunter. Faint scent of gun oil and cordite seeps beneath the steel-reinforced door frame. High-priority tactical cache.",
+                "Residence of Marcus, an experienced outdoorsman and big-game hunter. Faint scent of gun oil and cordite seeps beneath the steel-reinforced door frame. High-priority supply cache.",
                 isAccessible: false, isDiscovered: false, row: 1, col: 0, iconType: TacticalRoomIconType.Locked, isLocked: true,
                 undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 405");
 
@@ -988,15 +988,15 @@ namespace SundayLastBreath.UI
             {
                 if (isCurrent)
                 {
-                    intelScavengeText.text = $"<color=#64748b>SALVAGE:</color> <color=#2ecc71><b>{model.scavengeStatus}</b></color>";
+                    intelScavengeText.text = $"<color=#64748b>SUPPLIES:</color> <color=#2ecc71><b>{model.scavengeStatus}</b></color>";
                 }
                 else if (isDiscovered)
                 {
-                    intelScavengeText.text = $"<color=#64748b>SALVAGE:</color> <color=#f39c12><b>{model.scavengeStatus}</b></color>";
+                    intelScavengeText.text = $"<color=#64748b>SUPPLIES:</color> <color=#f39c12><b>{model.scavengeStatus}</b></color>";
                 }
                 else
                 {
-                    intelScavengeText.text = "<color=#64748b>SALVAGE:</color> <color=#94a3b8><b>UNKNOWN (UNSEARCHED)</b></color>";
+                    intelScavengeText.text = "<color=#64748b>SUPPLIES:</color> <color=#94a3b8><b>UNKNOWN (UNSEARCHED)</b></color>";
                 }
             }
 

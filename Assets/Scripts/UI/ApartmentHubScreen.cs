@@ -677,6 +677,70 @@ namespace SundayLastBreath.UI
 
             // 7. Re-skin all buttons in contentParent to compact 32px Fallout/BG3 CRPG row format
             SanitizeChoiceRowVisuals(contentParent);
+
+            // 8. Sanitize console switcher buttons and legacy baked badges to Day 0 civilian terminology
+            SanitizeCivilianTerminology();
+        }
+
+        private void SanitizeCivilianTerminology()
+        {
+            // 1. Console Mode Switcher Buttons
+            if (btnModeNarrative != null)
+            {
+                var tmp = btnModeNarrative.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null) tmp.text = "NARRATIVE & LOG [ESC]";
+            }
+            if (btnModePDA != null)
+            {
+                var tmp = btnModePDA.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null) tmp.text = "PERSONAL PHONE [TAB]";
+            }
+            if (btnModeGear != null)
+            {
+                int count = floorItems != null ? floorItems.Count : 0;
+                bool hasLoot = count > 0;
+                if (btnModeGearLabel != null)
+                {
+                    btnModeGearLabel.text = hasLoot 
+                        ? $"BACKPACK & ITEMS [I] <color=#F59E0B><b>({count})</b></color>" 
+                        : "BACKPACK & ITEMS [I]";
+                }
+                else
+                {
+                    var tmp = btnModeGear.GetComponentInChildren<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = "BACKPACK & ITEMS [I]";
+                }
+            }
+
+            // 2. Sanitize any legacy baked badges & headers across child texts
+            var allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (var t in allTexts)
+            {
+                if (t == null || string.IsNullOrEmpty(t.text)) continue;
+
+                if (t.text.Contains("SURVIVOR PDA"))
+                    t.text = t.text.Replace("SURVIVOR PDA", "PERSONAL PHONE");
+                if (t.text.Contains("TACTICAL GEAR"))
+                    t.text = t.text.Replace("TACTICAL GEAR", "BACKPACK & ITEMS");
+                if (t.text.Contains("SURVIVOR CHRONICLE"))
+                    t.text = t.text.Replace("SURVIVOR CHRONICLE", "INCIDENT & JOURNAL LOG");
+                if (t.text.Contains("SURVIVOR MATRIX"))
+                    t.text = t.text.Replace("SURVIVOR MATRIX", "ATTRIBUTE PROFILE");
+                if (t.text.Contains("COMBAT & SURVIVAL DISCIPLINES // TACTICAL PROFICIENCY"))
+                    t.text = t.text.Replace("COMBAT & SURVIVAL DISCIPLINES // TACTICAL PROFICIENCY", "SKILLS & PROFICIENCIES // PRACTICAL TRAINING");
+                if (t.text.Contains("TACTICAL CONDITION:"))
+                    t.text = t.text.Replace("TACTICAL CONDITION:", "CURRENT SITUATION:");
+                if (t.text.Contains("ACTIVE LOADOUT"))
+                    t.text = t.text.Replace("ACTIVE LOADOUT", "CLOTHING & EQUIPPED");
+                if (t.text.Contains("ITEM DOSSIER"))
+                    t.text = t.text.Replace("ITEM DOSSIER", "ITEM DETAILS");
+                if (t.text.Contains("tactical intel & specs"))
+                    t.text = t.text.Replace("tactical intel & specs", "details");
+                if (t.text.Contains("tactical intel, ballistic specs, and survival properties"))
+                    t.text = t.text.Replace("tactical intel, ballistic specs, and survival properties", "details and condition");
+                if (t.text.Contains("TACTICAL SLOTS"))
+                    t.text = t.text.Replace("TACTICAL SLOTS", "SLOTS");
+            }
         }
 
         private void SetChoiceButtonContent(Button btn, string singleFullText)
@@ -1527,8 +1591,8 @@ namespace SundayLastBreath.UI
             if (btnModeGearLabel != null)
             {
                 btnModeGearLabel.text = hasLoot 
-                    ? $"[3] TACTICAL GEAR [I] <color=#F59E0B><b>({count})</b></color>" 
-                    : "[3] TACTICAL GEAR [I]";
+                    ? $"BACKPACK & ITEMS [I] <color=#F59E0B><b>({count})</b></color>" 
+                    : "BACKPACK & ITEMS [I]";
             }
 
             if (btnModeGearBadge != null)

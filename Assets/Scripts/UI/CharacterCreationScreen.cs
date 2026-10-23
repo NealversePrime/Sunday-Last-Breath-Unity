@@ -436,7 +436,7 @@ namespace SundayLastBreath.UI
 
             string cleanLast = System.Text.RegularExpressions.Regex.Replace(ln.ToUpperInvariant(), "[^A-Z]", "");
             string cleanFirst = System.Text.RegularExpressions.Regex.Replace(fn.ToUpperInvariant(), "[^A-Z]", "");
-            if (string.IsNullOrEmpty(cleanLast)) cleanLast = "SURVIVOR";
+            if (string.IsNullOrEmpty(cleanLast)) cleanLast = "CITIZEN";
             if (string.IsNullOrEmpty(cleanFirst)) cleanFirst = "UNKNOWN";
 
             mrzLine1 = $"IDUSA<<{cleanLast}<<{cleanFirst}".PadRight(40, '<').Substring(0, 40);
@@ -593,7 +593,7 @@ namespace SundayLastBreath.UI
             }
             else
             {
-                character.gender = "Survivor";
+                character.gender = "Other";
             }
             PlayClick();
             RefreshIdentityConsoleUI(rebuildFirstNameChips: true);
@@ -1023,7 +1023,7 @@ namespace SundayLastBreath.UI
             mbOut.effectDistance = new Vector2(1f, -1f);
             mirrorBox.AddComponent<RectMask2D>();
 
-            CreateModuleHeader(mirrorBox.transform, "■ MIRROR REFLECTION & SURVIVOR PROFILE");
+            CreateModuleHeader(mirrorBox.transform, "■ MIRROR REFLECTION & PROFILE");
 
             // Properly wrapped inside MirrorProfileBox (anchor 0..1, offsetMin (18, 114), offsetMax (-18, -36))
             TextMeshProUGUI quoteTmp = CreateUIText(mirrorBox.transform, "ValMirrorQuote", "",
@@ -1079,7 +1079,7 @@ namespace SundayLastBreath.UI
             CreateGenderArchetypeButton(modGender.transform, "Btn_Gender_Female", "[F]  FEMALE", "Standard Female Profile", 296f, () => SelectGender("Female"));
             CreateGenderArchetypeButton(modGender.transform, "Btn_Gender_NonBinary", "[NB] NON-BINARY", "Non-Binary / Fluid Profile", 576f, () => SelectGender("Non-Binary"));
 
-            CreateInlineCustomInput(modGender.transform, "CustomGenderRow", "CUSTOM IDENTITY:", "Or type custom identity (e.g. Survivor)...",
+            CreateInlineCustomInput(modGender.transform, "CustomGenderRow", "CUSTOM IDENTITY:", "Or type custom identity (e.g. Non-Binary)...",
                 -102f, "APPLY", ConfirmCustomGender, out customGenderInput, (val) =>
                 {
                     if (!suppressInputCallback && !string.IsNullOrWhiteSpace(val))
@@ -2061,9 +2061,9 @@ namespace SundayLastBreath.UI
                 }
                 else
                 {
-                    hobbyHeaderTitle.text = "SURVIVOR WEAKNESS <size=75%><color=#EF5350>[CRITICAL DRAWBACK]</color></size>";
+                    hobbyHeaderTitle.text = "CHARACTER VULNERABILITY <size=75%><color=#EF5350>[CRITICAL DRAWBACK]</color></size>";
                     if (hobbyHeaderSubtitle != null)
-                        hobbyHeaderSubtitle.text = "\"Nobody survives untouched. What was your fatal flaw?\"";
+                        hobbyHeaderSubtitle.text = "\"Nobody is without flaws. What is your critical drawback?\"";
                 }
             }
 

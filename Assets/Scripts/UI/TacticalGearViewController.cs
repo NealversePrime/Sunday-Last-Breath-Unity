@@ -138,6 +138,15 @@ namespace SundayLastBreath.UI
             SetupFilterListeners();
             SetupTabListeners();
             SetupActionListeners();
+
+            if (tabBtnDossier != null)
+            {
+                var tmp = tabBtnDossier.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null && tmp.text.Contains("DOSSIER"))
+                {
+                    tmp.text = "ITEM DETAILS";
+                }
+            }
         }
 
         private void SetupSlotListeners()
@@ -861,7 +870,7 @@ namespace SundayLastBreath.UI
                     var emptyTmp = dossierEmptyState.GetComponentInChildren<TextMeshProUGUI>();
                     if (emptyTmp != null)
                     {
-                        emptyTmp.text = "<color=#38BDF8><b>[ TACTICAL ITEM INSPECTOR ]</b></color>\n\n<color=#94A3B8>Select any weapon, gear, ammo, or consumable in your Active Loadout, Backpack, or Room Stash to inspect tactical intel, ballistic specs, and survival properties.</color>";
+                        emptyTmp.text = "<color=#38BDF8><b>[ ITEM DETAILS ]</b></color>\n\n<color=#94A3B8>Select any item in your backpack, equipped clothing, or around the room to inspect its details and condition.</color>";
                     }
                 }
             }
@@ -916,7 +925,7 @@ namespace SundayLastBreath.UI
 
             if (def.category == ItemCategory.RangedWeapon || def.category == ItemCategory.MeleeWeapon)
             {
-                lines.Add($"<b>TACTICAL ACCURACY:</b> <color=#38BDF8>{def.accuracy}%</color>");
+                lines.Add($"<b>ACCURACY:</b> <color=#38BDF8>{def.accuracy}%</color>");
                 lines.Add($"<b>MAX TARGET ENGAGEMENT:</b> <color=#F59E0B>{def.targets} Hostile(s)</color>");
                 if (!string.IsNullOrEmpty(def.ammoType))
                 {
@@ -1009,7 +1018,7 @@ namespace SundayLastBreath.UI
             if (success)
             {
                 PlaySFX(equipSFX);
-                ShowToast($"<color=#10B981>[+] Equipped {def.displayName} to Active Loadout [{targetSlot}].</color>");
+                ShowToast($"<color=#10B981>[+] Equipped {def.displayName} [{targetSlot}].</color>");
 
                 _selectedSource = SelectedSource.Equipped;
                 _selectedSlot = targetSlot;
@@ -1180,7 +1189,7 @@ namespace SundayLastBreath.UI
 
             if (weightText != null && _player != null)
             {
-                weightText.text = $"ENCUMBRANCE: {_player.GetTotalWeight():F1} KG  |  TACTICAL SLOTS: {currentSlotsUsed}/{maxCapacity}";
+                weightText.text = $"WEIGHT: {_player.GetTotalWeight():F1} KG  |  SLOTS: {currentSlotsUsed}/{maxCapacity}";
             }
         }
 
