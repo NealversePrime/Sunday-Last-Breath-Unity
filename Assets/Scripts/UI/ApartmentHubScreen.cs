@@ -1676,21 +1676,26 @@ namespace SundayLastBreath.UI
                     int size = ItemDatabase.GetItemSlotSize(inv[i].itemId);
                     if (size == 2)
                     {
-                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true, isExtension: false);
+                        if (slotsRendered % 5 == 4 && slotsRendered < maxSlots)
+                        {
+                            CreateInventorySlotCell(pdaBackpackGrid, null, 0, false, isExtension: false, isTwoSlot: false);
+                            slotsRendered++;
+                        }
+                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true, isExtension: false, isTwoSlot: true);
                         slotsRendered++;
-                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, 0, true, isExtension: true);
+                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, 0, true, isExtension: true, isTwoSlot: false);
                         slotsRendered++;
                     }
                     else
                     {
-                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true, isExtension: false);
+                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true, isExtension: false, isTwoSlot: false);
                         slotsRendered++;
                     }
                 }
 
                 while (slotsRendered < maxSlots)
                 {
-                    CreateInventorySlotCell(pdaBackpackGrid, null, 0, false, isExtension: false);
+                    CreateInventorySlotCell(pdaBackpackGrid, null, 0, false, isExtension: false, isTwoSlot: false);
                     slotsRendered++;
                 }
             }
@@ -1752,44 +1757,53 @@ namespace SundayLastBreath.UI
             slotLabel.text = defaultSlotName;
         }
 
-        private void CreateInventorySlotCell(Transform parent, string itemId, int quantity, bool allowEquipClick, bool isExtension = false)
+        private void CreateInventorySlotCell(Transform parent, string itemId, int quantity, bool allowEquipClick, bool isExtension = false, bool isTwoSlot = false)
         {
             GameObject cell = new GameObject(string.IsNullOrEmpty(itemId) ? "EmptySlot" : (isExtension ? "Slot_" + itemId + "_Ext" : "Slot_" + itemId));
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(66f, 66f);
+            rt.sizeDelta = new Vector2(74f, 74f);
 
-            Image bg = cell.AddComponent<Image>();
-            bg.color = isExtension ? new Color(0.06f, 0.08f, 0.11f, 0.90f) : new Color(0.09f, 0.11f, 0.15f, 0.95f);
+            if (isExtension)
+            {
+                // Companion cell is an invisible layout placeholder in GridLayoutGroup
+                Image extBg = cell.AddComponent<Image>();
+                extBg.color = new Color(0f, 0f, 0f, 0f);
+                extBg.raycastTarget = false;
+                return;
+            }
 
-            Outline ol = cell.AddComponent<Outline>();
+            GameObject visualRoot;
+            if (isTwoSlot)
+            {
+                visualRoot = new GameObject("SpanRoot");
+                visualRoot.transform.SetParent(cell.transform, false);
+                RectTransform vrt = visualRoot.AddComponent<RectTransform>();
+                vrt.anchorMin = new Vector2(0f, 0f);
+                vrt.anchorMax = new Vector2(0f, 1f);
+                vrt.pivot = new Vector2(0f, 0.5f);
+                vrt.anchoredPosition = Vector2.zero;
+                vrt.sizeDelta = new Vector2(158f, 0f); // 74 * 2 + 10 spacing = 158px
+            }
+            else
+            {
+                visualRoot = cell;
+            }
+
+            Image bg = visualRoot.AddComponent<Image>();
+            bg.color = new Color(0.09f, 0.11f, 0.15f, 0.95f);
+
+            Outline ol = visualRoot.AddComponent<Outline>();
             ol.effectColor = string.IsNullOrEmpty(itemId)
                 ? new Color(0.18f, 0.20f, 0.24f, 0.75f)
-                : (isExtension ? new Color(0.20f, 0.24f, 0.30f, 0.65f) : new Color(0.28f, 0.32f, 0.38f, 0.95f));
+                : new Color(0.28f, 0.32f, 0.38f, 0.95f);
             ol.effectDistance = new Vector2(1f, -1f);
 
             if (string.IsNullOrEmpty(itemId)) return;
 
-            if (isExtension)
-            {
-                // Visual extension indicator
-                GameObject extObj = new GameObject("ExtText");
-                extObj.transform.SetParent(cell.transform, false);
-                TextMeshProUGUI extTmp = extObj.AddComponent<TextMeshProUGUI>();
-                extTmp.fontSize = 7.5f;
-                extTmp.alignment = TextAlignmentOptions.Center;
-                extTmp.color = new Color(0.55f, 0.60f, 0.68f, 0.75f);
-                extTmp.text = "[ >> BULKY ]\n<size=6.5><color=#64748B>PART 2/2</color></size>";
-                extTmp.raycastTarget = false;
-                RectTransform extr = extObj.GetComponent<RectTransform>();
-                extr.anchorMin = Vector2.zero; extr.anchorMax = Vector2.one;
-                extr.offsetMin = new Vector2(2f, 2f); extr.offsetMax = new Vector2(-2f, -2f);
-                return;
-            }
-
             // Contrast Well Halo
             GameObject wellObj = new GameObject("WellHalo");
-            wellObj.transform.SetParent(cell.transform, false);
+            wellObj.transform.SetParent(visualRoot.transform, false);
             Image wellImg = wellObj.AddComponent<Image>();
             wellImg.color = new Color(0.18f, 0.24f, 0.32f, 0.25f);
             wellImg.raycastTarget = false;
@@ -1797,19 +1811,18 @@ namespace SundayLastBreath.UI
             wrt.anchorMin = Vector2.zero; wrt.anchorMax = Vector2.one;
             wrt.offsetMin = new Vector2(4f, 12f); wrt.offsetMax = new Vector2(-4f, -4f);
 
-            // 2-Slot badge if slotSize == 2
-            int itemSlotSize = ItemDatabase.GetItemSlotSize(itemId);
-            if (itemSlotSize == 2)
+            // 2-Slot badge if isTwoSlot
+            if (isTwoSlot)
             {
                 GameObject slotBadge = new GameObject("SlotBadge");
-                slotBadge.transform.SetParent(cell.transform, false);
+                slotBadge.transform.SetParent(visualRoot.transform, false);
                 RectTransform sbr = slotBadge.AddComponent<RectTransform>();
                 sbr.anchorMin = new Vector2(1f, 1f); sbr.anchorMax = new Vector2(1f, 1f);
                 sbr.pivot = new Vector2(1f, 1f);
-                sbr.anchoredPosition = new Vector2(-2f, -2f);
-                sbr.sizeDelta = new Vector2(30f, 11f);
+                sbr.anchoredPosition = new Vector2(-4f, -4f);
+                sbr.sizeDelta = new Vector2(36f, 13f);
                 Image sbBg = slotBadge.AddComponent<Image>();
-                sbBg.color = new Color(0.85f, 0.55f, 0.10f, 0.25f);
+                sbBg.color = new Color(0.85f, 0.55f, 0.10f, 0.32f);
                 sbBg.raycastTarget = false;
 
                 GameObject sbtObj = new GameObject("Text");
@@ -1826,17 +1839,17 @@ namespace SundayLastBreath.UI
                 sbtr.offsetMin = Vector2.zero; sbtr.offsetMax = Vector2.zero;
             }
 
-            // Item Icon
+            // Item Icon - Centered horizontally across the full visual span
             GameObject iconObj = new GameObject("Icon");
-            iconObj.transform.SetParent(cell.transform, false);
+            iconObj.transform.SetParent(visualRoot.transform, false);
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
             RectTransform ir = iconObj.GetComponent<RectTransform>();
             ir.anchorMin = Vector2.zero;
             ir.anchorMax = Vector2.one;
-            ir.offsetMin = new Vector2(6f, 14f);
-            ir.offsetMax = new Vector2(-6f, -4f);
+            ir.offsetMin = new Vector2(isTwoSlot ? 10f : 6f, 14f);
+            ir.offsetMax = new Vector2(isTwoSlot ? -10f : -6f, -4f);
 
             Sprite s = ItemDatabase.GetItemIcon(itemId);
             if (s != null)
@@ -1851,12 +1864,12 @@ namespace SundayLastBreath.UI
 
             // Short Item Name at bottom
             GameObject nameObj = new GameObject("ItemName");
-            nameObj.transform.SetParent(cell.transform, false);
+            nameObj.transform.SetParent(visualRoot.transform, false);
             TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
             nameTmp.fontSize = 8.5f;
             nameTmp.alignment = TextAlignmentOptions.Center;
             nameTmp.color = new Color(0.78f, 0.82f, 0.86f);
-            nameTmp.text = itemId.Length > 10 ? itemId.Substring(0, 9) + "." : itemId;
+            nameTmp.text = isTwoSlot ? itemId : (itemId.Length > 10 ? itemId.Substring(0, 9) + "." : itemId);
             nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
             nameTmp.raycastTarget = false;
             RectTransform nr = nameObj.GetComponent<RectTransform>();
@@ -1870,7 +1883,7 @@ namespace SundayLastBreath.UI
             if (quantity > 1)
             {
                 GameObject qBadge = new GameObject("QtyBadge");
-                qBadge.transform.SetParent(cell.transform, false);
+                qBadge.transform.SetParent(visualRoot.transform, false);
                 RectTransform qr = qBadge.AddComponent<RectTransform>();
                 qr.anchorMin = new Vector2(1f, 0f);
                 qr.anchorMax = new Vector2(1f, 0f);
@@ -2393,6 +2406,20 @@ namespace SundayLastBreath.UI
             ReindexActiveChoiceHotkeys();
         }
 
+        private void AddFloorItem(string itemId, int quantity)
+        {
+            if (string.IsNullOrEmpty(itemId) || quantity <= 0) return;
+            var existing = floorItems.Find(f => string.Equals(f.itemId, itemId, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+            {
+                existing.quantity += quantity;
+            }
+            else
+            {
+                floorItems.Add(new InventoryEntry(itemId, quantity));
+            }
+        }
+
         private void OnPackGearClicked()
         {
             PlayClickSFX();
@@ -2403,39 +2430,52 @@ namespace SundayLastBreath.UI
             // Advance time +2 minutes
             gameClock.AddTime(2);
 
-            // Move table stash into player inventory
+            // Move table stash into player inventory, overflow to floorItems if full
             int gatheredCount = 0;
             if (currentPlayer != null)
             {
-                if (tableStash.Count == 0)
-                {
-                    currentPlayer.AddItem("Apartment Key", 1);
-                    currentPlayer.AddItem("Glock 19", 1);
-                    currentPlayer.AddItem("9mm Ammo", 24);
-                    currentPlayer.AddItem("Multi-Tool", 1);
-                    currentPlayer.AddItem("Flashlight", 1);
-                    currentPlayer.AddItem("Bandages", 2);
-                    gatheredCount = 6;
-                }
-                else
-                {
-                    foreach (var item in tableStash)
-                    {
-                        currentPlayer.AddItem(item.itemId, item.quantity);
-                        gatheredCount += item.quantity;
-                    }
-                    tableStash.Clear();
-                }
-
                 if (!currentPlayer.HasItem("Apartment Key") && !currentPlayer.HasItem("Apartment 407 Key"))
                 {
                     currentPlayer.AddItem("Apartment Key", 1);
                     gatheredCount++;
                 }
+
+                if (tableStash.Count == 0)
+                {
+                    string[] defaults = new[] { "Glock 19", "9mm Ammo", "Multi-Tool", "Flashlight", "Bandages" };
+                    int[] defaultQtys = new[] { 1, 24, 1, 1, 2 };
+                    for (int d = 0; d < defaults.Length; d++)
+                    {
+                        if (!currentPlayer.AddItem(defaults[d], defaultQtys[d]))
+                        {
+                            AddFloorItem(defaults[d], defaultQtys[d]);
+                        }
+                        gatheredCount++;
+                    }
+                }
+                else
+                {
+                    foreach (var item in tableStash)
+                    {
+                        if (string.Equals(item.itemId, "Apartment Key", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(item.itemId, "Apartment 407 Key", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        if (!currentPlayer.AddItem(item.itemId, item.quantity))
+                        {
+                            // If backpack is full, place remaining item on the room table/floor stash
+                            AddFloorItem(item.itemId, item.quantity);
+                        }
+                        gatheredCount += item.quantity;
+                    }
+                    tableStash.Clear();
+                }
             }
 
             hasPacked = true;
-            floorItems.Clear();
+            // Note: Keep room floorItems intact so player doesn't lose anything!
 
             AppendStoryLog(gameClock.GetTimeString(), "APARTMENT 407 // GATHERED ESSENTIALS",
                 $"I picked up my apartment keys, wallet, phone, and belongings off the coffee table. Outside, sirens echo through the pitch-black streets.");
@@ -2472,19 +2512,21 @@ namespace SundayLastBreath.UI
             kitchenSearched = true;
             gameClock.AddTime(3); // +3 minutes
 
-            currentPlayer.AddItem("Bottled Water", 2);
-            currentPlayer.AddItem("Canned Tuna", 1);
-            currentPlayer.AddItem("Can Opener", 1);
-            currentPlayer.AddItem("Stale Coffee", 1);
+            // Scavenged items go into floorItems (Room stash) so the player can choose what to bring
+            AddFloorItem("Bottled Water", 2);
+            AddFloorItem("Canned Tuna", 1);
+            AddFloorItem("Can Opener", 1);
+            AddFloorItem("Stale Coffee", 1);
 
-            AppendStoryLog(gameClock.GetTimeString(), "KITCHEN // GATHERED FOOD & WATER",
-                "I opened the cabinets and fridge in the dark. Found two bottles of water, a can of tuna, a can opener, and some coffee. When I turned the tap, only brown silt sputtered out.");
+            AppendStoryLog(gameClock.GetTimeString(), "KITCHEN // SUPPLIES FOUND",
+                "I opened the cabinets and fridge in the dark. Placed two bottles of water, canned tuna, a can opener, and stale coffee on the counter. When I turned the tap, only brown silt sputtered out.");
 
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"<color=#F59E0B>✓ Kitchen checked.</color> Found bottled water (x2), canned tuna, a can opener, and coffee. The tap water is dead brown sludge.\"";
+                situationBoxText.text = "\"<color=#F59E0B>✓ Kitchen checked.</color> Found bottled water (x2), canned tuna, a can opener, and coffee. Placed on counter. Open <color=#F59E0B>BACKPACK & ITEMS [I]</color> to choose what to bring.\"";
             }
 
+            UpdateFloorItemsNotification();
             RefreshRightGearPanel();
             RefreshAllPDAPanels();
             EvaluateHubButtonStates();
@@ -2498,18 +2540,20 @@ namespace SundayLastBreath.UI
             bathroomSearched = true;
             gameClock.AddTime(2); // +2 minutes
 
-            currentPlayer.AddItem("Painkillers", 1);
-            currentPlayer.AddItem("Bandage", 2);
-            currentPlayer.AddItem("Rubbing Alcohol", 1);
+            // Scavenged items go into floorItems (Room stash) so the player can choose what to bring
+            AddFloorItem("Painkillers", 1);
+            AddFloorItem("Bandage", 2);
+            AddFloorItem("Rubbing Alcohol", 1);
 
             AppendStoryLog(gameClock.GetTimeString(), "BATHROOM // MEDICINE CABINET",
-                "I felt my way into the dark bathroom and opened the medicine cabinet. Grabbed a bottle of painkillers, some bandages, and rubbing alcohol.");
+                "I felt my way into the dark bathroom and opened the medicine cabinet. Placed painkillers, bandages, and rubbing alcohol on the vanity counter.");
 
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"<color=#10B981>✓ Medicine cabinet checked.</color> Grabbed painkillers, bandages (x2), and rubbing alcohol.\"";
+                situationBoxText.text = "\"<color=#10B981>✓ Medicine cabinet checked.</color> Found painkillers, bandages (x2), and rubbing alcohol. Placed on vanity. Open <color=#10B981>BACKPACK & ITEMS [I]</color> to choose what to bring.\"";
             }
 
+            UpdateFloorItemsNotification();
             RefreshRightGearPanel();
             RefreshAllPDAPanels();
             EvaluateHubButtonStates();
@@ -2523,18 +2567,20 @@ namespace SundayLastBreath.UI
             closetSearched = true;
             gameClock.AddTime(2); // +2 minutes
 
-            currentPlayer.AddItem("Rain Poncho", 1);
-            currentPlayer.AddItem("Duct Tape", 1);
-            currentPlayer.AddItem("Matches", 1);
+            // Scavenged items go into floorItems (Room stash) so the player can choose what to bring
+            AddFloorItem("Rain Poncho", 1);
+            AddFloorItem("Duct Tape", 1);
+            AddFloorItem("Matches", 1);
 
             AppendStoryLog(gameClock.GetTimeString(), "FRONT CLOSET // COAT & SUPPLIES",
-                "I reached onto the top shelf of the coat closet and pulled down my heavy rain poncho, duct tape, and a box of matches.");
+                "I reached onto the top shelf of the coat closet and set down my heavy rain poncho, duct tape, and a box of matches on the hall bench.");
 
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"<color=#38BDF8>✓ Front closet checked.</color> Found my heavy rain poncho, duct tape, and matches.\"";
+                situationBoxText.text = "\"<color=#38BDF8>✓ Front closet checked.</color> Found my heavy rain poncho, duct tape, and matches. Placed on hall bench. Open <color=#38BDF8>BACKPACK & ITEMS [I]</color> to choose what to bring.\"";
             }
 
+            UpdateFloorItemsNotification();
             RefreshRightGearPanel();
             RefreshAllPDAPanels();
             EvaluateHubButtonStates();
@@ -2545,14 +2591,30 @@ namespace SundayLastBreath.UI
             PlayClickSFX();
             if (currentPlayer == null || floorItems.Count == 0) return;
 
-            foreach (var item in floorItems)
+            int taken = 0;
+            for (int i = floorItems.Count - 1; i >= 0; i--)
             {
-                currentPlayer.AddItem(item.itemId, item.quantity);
+                var item = floorItems[i];
+                if (currentPlayer.AddItem(item.itemId, item.quantity))
+                {
+                    floorItems.RemoveAt(i);
+                    taken++;
+                }
+                else
+                {
+                    if (situationBoxText != null)
+                    {
+                        situationBoxText.text = "<color=#EF4444>[!] Backpack capacity reached! Make room to pack remaining supplies.</color>";
+                    }
+                    break;
+                }
             }
-            floorItems.Clear();
 
-            AppendStoryLog(gameClock.GetTimeString(), "LOOT // ROOM ITEMS SECURED",
-                "You scooped up all remaining supplies from the room into your backpack.");
+            if (taken > 0)
+            {
+                AppendStoryLog(gameClock.GetTimeString(), "LOOT // ROOM ITEMS SECURED",
+                    $"Packed {taken} item(s) from the room into backpack.");
+            }
 
             UpdateFloorItemsNotification();
             RefreshRightGearPanel();
@@ -2569,11 +2631,20 @@ namespace SundayLastBreath.UI
             if (idx >= 0)
             {
                 var item = floorItems[idx];
-                currentPlayer.AddItem(item.itemId, item.quantity);
-                floorItems.RemoveAt(idx);
+                if (currentPlayer.AddItem(item.itemId, item.quantity))
+                {
+                    floorItems.RemoveAt(idx);
 
-                AppendStoryLog(gameClock.GetTimeString(), "LOOT // ITEM SECURED",
-                    $"You picked up {item.itemId} (x{item.quantity}) from the room.");
+                    AppendStoryLog(gameClock.GetTimeString(), "LOOT // ITEM SECURED",
+                        $"You packed {item.itemId} (x{item.quantity}) into your backpack.");
+                }
+                else
+                {
+                    if (situationBoxText != null)
+                    {
+                        situationBoxText.text = "<color=#EF4444>[!] Backpack capacity reached! Make room to carry this item.</color>";
+                    }
+                }
 
                 UpdateFloorItemsNotification();
                 RefreshRightGearPanel();

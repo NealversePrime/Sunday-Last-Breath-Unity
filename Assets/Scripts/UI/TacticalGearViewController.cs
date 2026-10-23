@@ -379,11 +379,19 @@ namespace SundayLastBreath.UI
 
                 if (size == 2)
                 {
-                    // Primary Cell (Slot 1 of 2)
+                    // If a 2-slot item starts at the end of a 5-column row (slotsRendered % 5 == 4),
+                    // insert an empty slot first so the bulky item cleanly spans 2 slots on the same row!
+                    if (slotsRendered % 5 == 4 && slotsRendered < maxSlots)
+                    {
+                        CreateEmptyCell(backpackGridRoot);
+                        slotsRendered++;
+                    }
+
+                    // Primary Cell (Slot 1 of 2) spanning across 2 columns (Resident Evil Remake style)
                     CreateBackpackCell(backpackGridRoot, entry.itemId, entry.quantity, capturedIndex, matches, isTwoSlot: true);
                     slotsRendered++;
 
-                    // Connected Companion Cell (Slot 2 of 2)
+                    // Connected Companion Cell (Slot 2 of 2) - invisible layout placeholder
                     CreateBackpackCompanionCell(backpackGridRoot, entry.itemId, capturedIndex, matches);
                     slotsRendered++;
                 }
@@ -410,16 +418,34 @@ namespace SundayLastBreath.UI
             rt.sizeDelta = new Vector2(74f, 74f);
 
             bool isSelected = _selectedSource == SelectedSource.Backpack && _selectedBackpackIndex == index;
+            var def = ItemDatabase.GetDefinition(itemId);
+            Color catColor = def != null ? ItemDatabase.GetCategoryBorderColor(def.category) : new Color(0.28f, 0.32f, 0.38f);
 
-            Image bg = cell.AddComponent<Image>();
+            // Container for the visual presentation (Resident Evil Remake continuous rectangular frame)
+            GameObject visualRoot;
+            if (isTwoSlot)
+            {
+                // Base cell in GridLayoutGroup remains 74x74, but visualRoot spans 2 cells + 10px spacing = 158px!
+                visualRoot = new GameObject("SpanRoot");
+                visualRoot.transform.SetParent(cell.transform, false);
+                RectTransform vrt = visualRoot.AddComponent<RectTransform>();
+                vrt.anchorMin = new Vector2(0f, 0f);
+                vrt.anchorMax = new Vector2(0f, 1f);
+                vrt.pivot = new Vector2(0f, 0.5f);
+                vrt.anchoredPosition = Vector2.zero;
+                vrt.sizeDelta = new Vector2(158f, 0f); // 74 * 2 + 10 spacing = 158px
+            }
+            else
+            {
+                visualRoot = cell;
+            }
+
+            Image bg = visualRoot.AddComponent<Image>();
             bg.color = isSelected 
                 ? new Color(0.16f, 0.22f, 0.32f, 0.98f) 
                 : new Color(0.09f, 0.12f, 0.16f, 0.95f);
 
-            var def = ItemDatabase.GetDefinition(itemId);
-            Color catColor = def != null ? ItemDatabase.GetCategoryBorderColor(def.category) : new Color(0.28f, 0.32f, 0.38f);
-
-            Outline ol = cell.AddComponent<Outline>();
+            Outline ol = visualRoot.AddComponent<Outline>();
             if (isSelected)
             {
                 ol.effectColor = new Color(0.95f, 0.75f, 0.20f, 1f); // Bright Gold selection highlight ONLY for selected item
@@ -434,9 +460,9 @@ namespace SundayLastBreath.UI
                 ol.effectDistance = new Vector2(1f, -1f);
             }
 
-            // Contrast Well Halo (Disc behind icon so dark items like bows/knives pop)
+            // Contrast Well Halo (Disc/well behind icon spanning full width)
             GameObject wellObj = new GameObject("WellHalo");
-            wellObj.transform.SetParent(cell.transform, false);
+            wellObj.transform.SetParent(visualRoot.transform, false);
             Image wellImg = wellObj.AddComponent<Image>();
             wellImg.color = new Color(0.18f, 0.24f, 0.32f, 0.30f);
             wellImg.raycastTarget = false;
@@ -448,7 +474,7 @@ namespace SundayLastBreath.UI
             if (def != null && matchesFilter)
             {
                 GameObject pipObj = new GameObject("CatPip");
-                pipObj.transform.SetParent(cell.transform, false);
+                pipObj.transform.SetParent(visualRoot.transform, false);
                 Image pipImg = pipObj.AddComponent<Image>();
                 pipImg.color = catColor;
                 pipImg.raycastTarget = false;
@@ -459,18 +485,18 @@ namespace SundayLastBreath.UI
                 prt.sizeDelta = new Vector2(3f, 12f);
             }
 
-            // 2-Slot Tactical Badge (Top Right)
+            // 2-Slot Tactical Badge (Top Right of 158px container)
             if (isTwoSlot && matchesFilter)
             {
                 GameObject slotBadge = new GameObject("SlotBadge");
-                slotBadge.transform.SetParent(cell.transform, false);
+                slotBadge.transform.SetParent(visualRoot.transform, false);
                 RectTransform sbr = slotBadge.AddComponent<RectTransform>();
                 sbr.anchorMin = new Vector2(1f, 1f); sbr.anchorMax = new Vector2(1f, 1f);
                 sbr.pivot = new Vector2(1f, 1f);
-                sbr.anchoredPosition = new Vector2(-3f, -3f);
-                sbr.sizeDelta = new Vector2(34f, 12f);
+                sbr.anchoredPosition = new Vector2(-4f, -4f);
+                sbr.sizeDelta = new Vector2(36f, 13f);
                 Image sbBg = slotBadge.AddComponent<Image>();
-                sbBg.color = new Color(0.85f, 0.55f, 0.10f, 0.28f);
+                sbBg.color = new Color(0.85f, 0.55f, 0.10f, 0.32f);
                 sbBg.raycastTarget = false;
 
                 GameObject sbtObj = new GameObject("Text");
@@ -487,15 +513,16 @@ namespace SundayLastBreath.UI
                 sbtr.offsetMin = Vector2.zero; sbtr.offsetMax = Vector2.zero;
             }
 
-            // Icon
+            // Icon - Centered horizontally across the full visual area with preserveAspect
             GameObject iconObj = new GameObject("Icon");
-            iconObj.transform.SetParent(cell.transform, false);
+            iconObj.transform.SetParent(visualRoot.transform, false);
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
             RectTransform ir = iconObj.GetComponent<RectTransform>();
             ir.anchorMin = Vector2.zero; ir.anchorMax = Vector2.one;
-            ir.offsetMin = new Vector2(8f, 16f); ir.offsetMax = new Vector2(-8f, -4f);
+            ir.offsetMin = new Vector2(isTwoSlot ? 10f : 8f, 16f);
+            ir.offsetMax = new Vector2(isTwoSlot ? -10f : -8f, -4f);
 
             Sprite s = ItemDatabase.GetItemIcon(itemId);
             if (s != null)
@@ -506,12 +533,12 @@ namespace SundayLastBreath.UI
 
             // Name
             GameObject nameObj = new GameObject("Name");
-            nameObj.transform.SetParent(cell.transform, false);
+            nameObj.transform.SetParent(visualRoot.transform, false);
             TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
             nameTmp.fontSize = 8.5f;
             nameTmp.alignment = TextAlignmentOptions.Center;
             nameTmp.color = matchesFilter ? (isSelected ? Color.white : new Color(0.85f, 0.88f, 0.92f)) : new Color(0.4f, 0.4f, 0.4f);
-            nameTmp.text = itemId.Length > 11 ? itemId.Substring(0, 10) + "." : itemId;
+            nameTmp.text = isTwoSlot ? itemId : (itemId.Length > 11 ? itemId.Substring(0, 10) + "." : itemId);
             nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
             nameTmp.raycastTarget = false;
             RectTransform nr = nameObj.GetComponent<RectTransform>();
@@ -524,7 +551,7 @@ namespace SundayLastBreath.UI
             if (quantity > 1)
             {
                 GameObject qBadge = new GameObject("QtyBadge");
-                qBadge.transform.SetParent(cell.transform, false);
+                qBadge.transform.SetParent(visualRoot.transform, false);
                 RectTransform qr = qBadge.AddComponent<RectTransform>();
                 qr.anchorMin = new Vector2(1f, 0f); qr.anchorMax = new Vector2(1f, 0f);
                 qr.pivot = new Vector2(1f, 0f);
@@ -560,44 +587,17 @@ namespace SundayLastBreath.UI
 
         private void CreateBackpackCompanionCell(Transform parent, string itemId, int index, bool matchesFilter)
         {
+            // Resident Evil Remake style: The companion cell is an invisible placeholder in GridLayoutGroup
+            // to reserve the second slot. The visual container on the primary cell already spans across both slots.
             GameObject cell = new GameObject("Slot_" + itemId + "_Ext");
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
             rt.sizeDelta = new Vector2(74f, 74f);
 
-            bool isSelected = _selectedSource == SelectedSource.Backpack && _selectedBackpackIndex == index;
-
+            // Transparent image to receive clicks on the right half of the 2-slot weapon
             Image bg = cell.AddComponent<Image>();
-            bg.color = isSelected 
-                ? new Color(0.14f, 0.19f, 0.28f, 0.95f) 
-                : new Color(0.07f, 0.09f, 0.12f, 0.90f);
-
-            Outline ol = cell.AddComponent<Outline>();
-            if (isSelected)
-            {
-                ol.effectColor = new Color(0.95f, 0.75f, 0.20f, 0.85f);
-                ol.effectDistance = new Vector2(2f, -2f);
-            }
-            else
-            {
-                ol.effectColor = matchesFilter 
-                    ? new Color(0.20f, 0.24f, 0.30f, 0.65f) 
-                    : new Color(0.10f, 0.12f, 0.15f, 0.35f);
-                ol.effectDistance = new Vector2(1f, -1f);
-            }
-
-            // Tactical bracket & link indicator
-            GameObject extObj = new GameObject("ExtText");
-            extObj.transform.SetParent(cell.transform, false);
-            TextMeshProUGUI extTmp = extObj.AddComponent<TextMeshProUGUI>();
-            extTmp.fontSize = 8.5f;
-            extTmp.alignment = TextAlignmentOptions.Center;
-            extTmp.color = isSelected ? new Color(0.95f, 0.75f, 0.25f, 0.9f) : new Color(0.55f, 0.60f, 0.68f, 0.75f);
-            extTmp.text = $"[ >> BULKY ]\n<size=7.5><color=#64748B>PART 2/2</color></size>";
-            extTmp.raycastTarget = false;
-            RectTransform extr = extObj.GetComponent<RectTransform>();
-            extr.anchorMin = Vector2.zero; extr.anchorMax = Vector2.one;
-            extr.offsetMin = new Vector2(4f, 4f); extr.offsetMax = new Vector2(-4f, -4f);
+            bg.color = new Color(0f, 0f, 0f, 0f);
+            bg.raycastTarget = true;
 
             Button btn = cell.AddComponent<Button>();
             btn.targetGraphic = bg;
@@ -661,41 +661,110 @@ namespace SundayLastBreath.UI
 
             if (!hasItems) return;
 
+            int floorSlotsRendered = 0;
             for (int i = 0; i < _floorItems.Count; i++)
             {
                 var entry = _floorItems[i];
                 int capIndex = i;
-                CreateFloorCell(floorGridRoot, entry.itemId, entry.quantity, capIndex);
+                var def = ItemDatabase.GetDefinition(entry.itemId);
+                int size = def != null ? Mathf.Max(1, def.slotSize) : 1;
+
+                if (size == 2)
+                {
+                    if (floorSlotsRendered % 5 == 4)
+                    {
+                        CreateFloorEmptyCell(floorGridRoot);
+                        floorSlotsRendered++;
+                    }
+
+                    CreateFloorCell(floorGridRoot, entry.itemId, entry.quantity, capIndex, isTwoSlot: true);
+                    floorSlotsRendered++;
+
+                    CreateFloorCompanionCell(floorGridRoot, entry.itemId, capIndex);
+                    floorSlotsRendered++;
+                }
+                else
+                {
+                    CreateFloorCell(floorGridRoot, entry.itemId, entry.quantity, capIndex, isTwoSlot: false);
+                    floorSlotsRendered++;
+                }
             }
         }
 
-        private void CreateFloorCell(Transform parent, string itemId, int quantity, int index)
+        private void CreateFloorCell(Transform parent, string itemId, int quantity, int index, bool isTwoSlot = false)
         {
             GameObject cell = new GameObject("FloorSlot_" + itemId);
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
             rt.sizeDelta = new Vector2(72f, 72f);
 
-            Image bg = cell.AddComponent<Image>();
-            bg.color = new Color(0.12f, 0.08f, 0.08f, 0.95f);
-
             bool isSelected = _selectedSource == SelectedSource.Floor && _selectedFloorIndex == index;
 
-            Outline ol = cell.AddComponent<Outline>();
+            // Container for visual presentation (Resident Evil Remake style 2-slot frame)
+            GameObject visualRoot;
+            if (isTwoSlot)
+            {
+                visualRoot = new GameObject("SpanRoot");
+                visualRoot.transform.SetParent(cell.transform, false);
+                RectTransform vrt = visualRoot.AddComponent<RectTransform>();
+                vrt.anchorMin = new Vector2(0f, 0f);
+                vrt.anchorMax = new Vector2(0f, 1f);
+                vrt.pivot = new Vector2(0f, 0.5f);
+                vrt.anchoredPosition = Vector2.zero;
+                vrt.sizeDelta = new Vector2(152f, 0f); // 72 * 2 + 8 spacing = 152px
+            }
+            else
+            {
+                visualRoot = cell;
+            }
+
+            Image bg = visualRoot.AddComponent<Image>();
+            bg.color = new Color(0.12f, 0.08f, 0.08f, 0.95f);
+
+            Outline ol = visualRoot.AddComponent<Outline>();
             ol.effectColor = isSelected
                 ? new Color(0.95f, 0.75f, 0.20f, 1f)
                 : new Color(0.91f, 0.30f, 0.24f, 0.85f); // Crimson border
             ol.effectDistance = isSelected ? new Vector2(2f, -2f) : new Vector2(1f, -1f);
 
-            // Icon
+            // 2-Slot Tactical Badge on Floor item
+            if (isTwoSlot)
+            {
+                GameObject slotBadge = new GameObject("SlotBadge");
+                slotBadge.transform.SetParent(visualRoot.transform, false);
+                RectTransform sbr = slotBadge.AddComponent<RectTransform>();
+                sbr.anchorMin = new Vector2(1f, 1f); sbr.anchorMax = new Vector2(1f, 1f);
+                sbr.pivot = new Vector2(1f, 1f);
+                sbr.anchoredPosition = new Vector2(-4f, -4f);
+                sbr.sizeDelta = new Vector2(36f, 13f);
+                Image sbBg = slotBadge.AddComponent<Image>();
+                sbBg.color = new Color(0.91f, 0.30f, 0.24f, 0.35f);
+                sbBg.raycastTarget = false;
+
+                GameObject sbtObj = new GameObject("Text");
+                sbtObj.transform.SetParent(slotBadge.transform, false);
+                TextMeshProUGUI sbTmp = sbtObj.AddComponent<TextMeshProUGUI>();
+                sbTmp.fontSize = 7.5f;
+                sbTmp.fontStyle = FontStyles.Bold;
+                sbTmp.alignment = TextAlignmentOptions.Center;
+                sbTmp.color = new Color(0.98f, 0.65f, 0.60f);
+                sbTmp.text = "2-SLOT";
+                sbTmp.raycastTarget = false;
+                RectTransform sbtr = sbtObj.GetComponent<RectTransform>();
+                sbtr.anchorMin = Vector2.zero; sbtr.anchorMax = Vector2.one;
+                sbtr.offsetMin = Vector2.zero; sbtr.offsetMax = Vector2.zero;
+            }
+
+            // Icon - Centered horizontally across the full visual span
             GameObject iconObj = new GameObject("Icon");
-            iconObj.transform.SetParent(cell.transform, false);
+            iconObj.transform.SetParent(visualRoot.transform, false);
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
             RectTransform ir = iconObj.GetComponent<RectTransform>();
             ir.anchorMin = Vector2.zero; ir.anchorMax = Vector2.one;
-            ir.offsetMin = new Vector2(6f, 14f); ir.offsetMax = new Vector2(-6f, -4f);
+            ir.offsetMin = new Vector2(isTwoSlot ? 10f : 6f, 14f);
+            ir.offsetMax = new Vector2(isTwoSlot ? -10f : -6f, -4f);
 
             Sprite s = ItemDatabase.GetItemIcon(itemId);
             if (s != null)
@@ -706,12 +775,12 @@ namespace SundayLastBreath.UI
 
             // Name
             GameObject nameObj = new GameObject("Name");
-            nameObj.transform.SetParent(cell.transform, false);
+            nameObj.transform.SetParent(visualRoot.transform, false);
             TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
             nameTmp.fontSize = 8.5f;
             nameTmp.alignment = TextAlignmentOptions.Center;
             nameTmp.color = new Color(0.95f, 0.85f, 0.85f);
-            nameTmp.text = itemId.Length > 10 ? itemId.Substring(0, 9) + "." : itemId;
+            nameTmp.text = isTwoSlot ? itemId : (itemId.Length > 10 ? itemId.Substring(0, 9) + "." : itemId);
             nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
             nameTmp.raycastTarget = false;
             RectTransform nr = nameObj.GetComponent<RectTransform>();
@@ -724,7 +793,7 @@ namespace SundayLastBreath.UI
             if (quantity > 1)
             {
                 GameObject qBadge = new GameObject("QtyBadge");
-                qBadge.transform.SetParent(cell.transform, false);
+                qBadge.transform.SetParent(visualRoot.transform, false);
                 RectTransform qr = qBadge.AddComponent<RectTransform>();
                 qr.anchorMin = new Vector2(1f, 0f); qr.anchorMax = new Vector2(1f, 0f);
                 qr.pivot = new Vector2(1f, 0f);
@@ -756,6 +825,42 @@ namespace SundayLastBreath.UI
             {
                 OnFloorItemClicked(capId, capIndex);
             });
+        }
+
+        private void CreateFloorCompanionCell(Transform parent, string itemId, int index)
+        {
+            GameObject cell = new GameObject("FloorSlot_" + itemId + "_Ext");
+            cell.transform.SetParent(parent, false);
+            RectTransform rt = cell.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(72f, 72f);
+
+            Image bg = cell.AddComponent<Image>();
+            bg.color = new Color(0f, 0f, 0f, 0f);
+            bg.raycastTarget = true;
+
+            Button btn = cell.AddComponent<Button>();
+            btn.targetGraphic = bg;
+            string capId = itemId;
+            int capIndex = index;
+            btn.onClick.AddListener(() =>
+            {
+                OnFloorItemClicked(capId, capIndex);
+            });
+        }
+
+        private void CreateFloorEmptyCell(Transform parent)
+        {
+            GameObject cell = new GameObject("EmptyFloorSlot");
+            cell.transform.SetParent(parent, false);
+            RectTransform rt = cell.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(72f, 72f);
+
+            Image bg = cell.AddComponent<Image>();
+            bg.color = new Color(0.04f, 0.05f, 0.07f, 0.75f);
+
+            Outline ol = cell.AddComponent<Outline>();
+            ol.effectColor = new Color(0.14f, 0.16f, 0.20f, 0.6f);
+            ol.effectDistance = new Vector2(1f, -1f);
         }
 
         private void OnFloorItemClicked(string itemId, int index)
