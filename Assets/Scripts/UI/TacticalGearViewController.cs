@@ -358,24 +358,42 @@ namespace SundayLastBreath.UI
                 : new List<InventoryEntry>();
 
             int maxSlots = _player != null ? Mathf.Max(6, _player.bagLimit) : 12;
+            int slotsRendered = 0;
 
-            for (int i = 0; i < maxSlots; i++)
+            for (int i = 0; i < inv.Count; i++)
             {
-                if (i < inv.Count)
+                var entry = inv[i];
+                bool matches = MatchesFilter(entry.itemId);
+                int capturedIndex = i;
+                var def = ItemDatabase.GetDefinition(entry.itemId);
+                int size = def != null ? Mathf.Max(1, def.slotSize) : 1;
+
+                if (size == 2)
                 {
-                    var entry = inv[i];
-                    bool matches = MatchesFilter(entry.itemId);
-                    int capturedIndex = i;
-                    CreateBackpackCell(backpackGridRoot, entry.itemId, entry.quantity, capturedIndex, matches);
+                    // Primary Cell (Slot 1 of 2)
+                    CreateBackpackCell(backpackGridRoot, entry.itemId, entry.quantity, capturedIndex, matches, isTwoSlot: true);
+                    slotsRendered++;
+
+                    // Connected Companion Cell (Slot 2 of 2)
+                    CreateBackpackCompanionCell(backpackGridRoot, entry.itemId, capturedIndex, matches);
+                    slotsRendered++;
                 }
                 else
                 {
-                    CreateEmptyCell(backpackGridRoot);
+                    CreateBackpackCell(backpackGridRoot, entry.itemId, entry.quantity, capturedIndex, matches, isTwoSlot: false);
+                    slotsRendered++;
                 }
+            }
+
+            // Fill remaining empty slots
+            while (slotsRendered < maxSlots)
+            {
+                CreateEmptyCell(backpackGridRoot);
+                slotsRendered++;
             }
         }
 
-        private void CreateBackpackCell(Transform parent, string itemId, int quantity, int index, bool matchesFilter)
+        private void CreateBackpackCell(Transform parent, string itemId, int quantity, int index, bool matchesFilter, bool isTwoSlot = false)
         {
             GameObject cell = new GameObject("Slot_" + itemId);
             cell.transform.SetParent(parent, false);
@@ -386,8 +404,8 @@ namespace SundayLastBreath.UI
 
             Image bg = cell.AddComponent<Image>();
             bg.color = isSelected 
-                ? new Color(0.14f, 0.18f, 0.24f, 0.98f) 
-                : new Color(0.06f, 0.08f, 0.11f, 0.95f);
+                ? new Color(0.16f, 0.22f, 0.32f, 0.98f) 
+                : new Color(0.09f, 0.12f, 0.16f, 0.95f);
 
             var def = ItemDatabase.GetDefinition(itemId);
             Color catColor = def != null ? ItemDatabase.GetCategoryBorderColor(def.category) : new Color(0.28f, 0.32f, 0.38f);
@@ -400,14 +418,24 @@ namespace SundayLastBreath.UI
             }
             else
             {
-                // Clean, crisp tactical steel border - NEVER yellow when unselected!
+                // Clean, crisp tactical steel border
                 ol.effectColor = matchesFilter 
-                    ? new Color(0.22f, 0.27f, 0.34f, 0.85f) 
+                    ? new Color(0.24f, 0.29f, 0.36f, 0.85f) 
                     : new Color(0.12f, 0.14f, 0.18f, 0.40f);
                 ol.effectDistance = new Vector2(1f, -1f);
             }
 
-            // Category Pip: Sleek 3x12 indicator on top-left of slot so category is clear without whole cell being yellow
+            // Contrast Well Halo (Disc behind icon so dark items like bows/knives pop)
+            GameObject wellObj = new GameObject("WellHalo");
+            wellObj.transform.SetParent(cell.transform, false);
+            Image wellImg = wellObj.AddComponent<Image>();
+            wellImg.color = new Color(0.18f, 0.24f, 0.32f, 0.30f);
+            wellImg.raycastTarget = false;
+            RectTransform wrt = wellObj.GetComponent<RectTransform>();
+            wrt.anchorMin = Vector2.zero; wrt.anchorMax = Vector2.one;
+            wrt.offsetMin = new Vector2(6f, 14f); wrt.offsetMax = new Vector2(-6f, -4f);
+
+            // Category Pip: Sleek 3x12 indicator on top-left of slot
             if (def != null && matchesFilter)
             {
                 GameObject pipObj = new GameObject("CatPip");
@@ -420,6 +448,34 @@ namespace SundayLastBreath.UI
                 prt.pivot = new Vector2(0f, 1f);
                 prt.anchoredPosition = new Vector2(4f, -4f);
                 prt.sizeDelta = new Vector2(3f, 12f);
+            }
+
+            // 2-Slot Tactical Badge (Top Right)
+            if (isTwoSlot && matchesFilter)
+            {
+                GameObject slotBadge = new GameObject("SlotBadge");
+                slotBadge.transform.SetParent(cell.transform, false);
+                RectTransform sbr = slotBadge.AddComponent<RectTransform>();
+                sbr.anchorMin = new Vector2(1f, 1f); sbr.anchorMax = new Vector2(1f, 1f);
+                sbr.pivot = new Vector2(1f, 1f);
+                sbr.anchoredPosition = new Vector2(-3f, -3f);
+                sbr.sizeDelta = new Vector2(34f, 12f);
+                Image sbBg = slotBadge.AddComponent<Image>();
+                sbBg.color = new Color(0.85f, 0.55f, 0.10f, 0.28f);
+                sbBg.raycastTarget = false;
+
+                GameObject sbtObj = new GameObject("Text");
+                sbtObj.transform.SetParent(slotBadge.transform, false);
+                TextMeshProUGUI sbTmp = sbtObj.AddComponent<TextMeshProUGUI>();
+                sbTmp.fontSize = 7.5f;
+                sbTmp.fontStyle = FontStyles.Bold;
+                sbTmp.alignment = TextAlignmentOptions.Center;
+                sbTmp.color = new Color(0.95f, 0.75f, 0.25f);
+                sbTmp.text = "2-SLOT";
+                sbTmp.raycastTarget = false;
+                RectTransform sbtr = sbtObj.GetComponent<RectTransform>();
+                sbtr.anchorMin = Vector2.zero; sbtr.anchorMax = Vector2.one;
+                sbtr.offsetMin = Vector2.zero; sbtr.offsetMax = Vector2.zero;
             }
 
             // Icon
@@ -482,6 +538,57 @@ namespace SundayLastBreath.UI
                 qtr.anchorMin = Vector2.zero; qtr.anchorMax = Vector2.one;
                 qtr.offsetMin = Vector2.zero; qtr.offsetMax = Vector2.zero;
             }
+
+            Button btn = cell.AddComponent<Button>();
+            btn.targetGraphic = bg;
+            string capId = itemId;
+            int capIndex = index;
+            btn.onClick.AddListener(() =>
+            {
+                OnBackpackItemClicked(capId, capIndex);
+            });
+        }
+
+        private void CreateBackpackCompanionCell(Transform parent, string itemId, int index, bool matchesFilter)
+        {
+            GameObject cell = new GameObject("Slot_" + itemId + "_Ext");
+            cell.transform.SetParent(parent, false);
+            RectTransform rt = cell.AddComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(74f, 74f);
+
+            bool isSelected = _selectedSource == SelectedSource.Backpack && _selectedBackpackIndex == index;
+
+            Image bg = cell.AddComponent<Image>();
+            bg.color = isSelected 
+                ? new Color(0.14f, 0.19f, 0.28f, 0.95f) 
+                : new Color(0.07f, 0.09f, 0.12f, 0.90f);
+
+            Outline ol = cell.AddComponent<Outline>();
+            if (isSelected)
+            {
+                ol.effectColor = new Color(0.95f, 0.75f, 0.20f, 0.85f);
+                ol.effectDistance = new Vector2(2f, -2f);
+            }
+            else
+            {
+                ol.effectColor = matchesFilter 
+                    ? new Color(0.20f, 0.24f, 0.30f, 0.65f) 
+                    : new Color(0.10f, 0.12f, 0.15f, 0.35f);
+                ol.effectDistance = new Vector2(1f, -1f);
+            }
+
+            // Tactical bracket & link indicator
+            GameObject extObj = new GameObject("ExtText");
+            extObj.transform.SetParent(cell.transform, false);
+            TextMeshProUGUI extTmp = extObj.AddComponent<TextMeshProUGUI>();
+            extTmp.fontSize = 8.5f;
+            extTmp.alignment = TextAlignmentOptions.Center;
+            extTmp.color = isSelected ? new Color(0.95f, 0.75f, 0.25f, 0.9f) : new Color(0.55f, 0.60f, 0.68f, 0.75f);
+            extTmp.text = $"[ ↳ BULKY ]\n<size=7.5><color=#64748B>PART 2/2</color></size>";
+            extTmp.raycastTarget = false;
+            RectTransform extr = extObj.GetComponent<RectTransform>();
+            extr.anchorMin = Vector2.zero; extr.anchorMax = Vector2.one;
+            extr.offsetMin = new Vector2(4f, 4f); extr.offsetMax = new Vector2(-4f, -4f);
 
             Button btn = cell.AddComponent<Button>();
             btn.targetGraphic = bg;
@@ -775,12 +882,14 @@ namespace SundayLastBreath.UI
                 dossierIcon.color = s != null ? Color.white : new Color(0.4f, 0.4f, 0.4f);
             }
 
-            // Sub Info (Stack & Caliber or Slot)
+            // Sub Info (Stack & Caliber or Slot & Tactical Size)
             if (dossierSubInfo != null)
             {
                 var subParts = new List<string>();
                 if (def.IsEquippable) subParts.Add($"SLOT: <color=#38BDF8>{def.EquipSlot}</color>");
                 if (!string.IsNullOrEmpty(def.ammoType)) subParts.Add($"CALIBER: <color=#F59E0B>{def.ammoType}</color>");
+                int size = def.slotSize;
+                subParts.Add($"SIZE: <color={(size == 2 ? "#F59E0B" : "#10B981")}>{size} {(size == 2 ? "SLOTS (BULKY)" : "SLOT")}</color>");
                 subParts.Add($"WEIGHT: <color=#94A3B8>{def.weight:F1} KG</color>");
                 dossierSubInfo.text = string.Join("  |  ", subParts);
             }
@@ -1042,17 +1151,17 @@ namespace SundayLastBreath.UI
         #region Capacity & Weight Readouts
         private void RefreshCapacityAndWeight()
         {
-            int currentCount = _player != null && _player.inventory != null ? _player.inventory.Count : 0;
+            int currentSlotsUsed = _player != null ? _player.GetTotalSlotsUsed() : 0;
             int maxCapacity = _player != null ? Mathf.Max(6, _player.bagLimit) : 12;
 
             if (backpackCountText != null)
             {
-                backpackCountText.text = $"[ {currentCount} / {maxCapacity} SLOTS ]";
+                backpackCountText.text = $"[ {currentSlotsUsed} / {maxCapacity} SLOTS ]";
             }
 
             if (backpackCapacityFill != null)
             {
-                float ratio = Mathf.Clamp01((float)currentCount / maxCapacity);
+                float ratio = Mathf.Clamp01((float)currentSlotsUsed / maxCapacity);
                 backpackCapacityFill.fillAmount = ratio;
 
                 if (ratio >= 1.0f)
@@ -1071,8 +1180,7 @@ namespace SundayLastBreath.UI
 
             if (weightText != null && _player != null)
             {
-                float weight = _player.GetTotalWeight();
-                weightText.text = $"ENCUMBRANCE: <color=#38BDF8>{weight:F1} KG</color>";
+                weightText.text = $"ENCUMBRANCE: {_player.GetTotalWeight():F1} KG  |  TACTICAL SLOTS: {currentSlotsUsed}/{maxCapacity}";
             }
         }
 

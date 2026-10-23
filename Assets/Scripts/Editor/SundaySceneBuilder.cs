@@ -1154,7 +1154,7 @@ namespace SundayLastBreath.Editor
 
             // Situation Body Text
             TextMeshProUGUI sitBodyTmp = CreateTMPText(sitBox.transform, "SituationBody",
-                ""The television drones with cold emergency static. Sirens wail across the Seattle skyline. You stand in your living room in the dark, weighing your immediate options before the power grid or the front door fails."",
+                "\"The television drones with cold emergency static. Sirens wail across the Seattle skyline. You stand in your living room in the dark, weighing your immediate options before the power grid or the front door fails.\"",
                 11.5f, new Color(0.82f, 0.86f, 0.92f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
             sitBodyTmp.lineSpacing = 2.5f;
             sitBodyTmp.textWrappingMode = TextWrappingModes.Normal;

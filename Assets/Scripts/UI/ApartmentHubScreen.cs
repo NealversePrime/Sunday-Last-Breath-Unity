@@ -1089,22 +1089,34 @@ namespace SundayLastBreath.UI
                     : new List<InventoryEntry>();
 
                 int maxSlots = currentPlayer != null ? Mathf.Max(6, currentPlayer.bagLimit) : 12;
+                int currentUsed = currentPlayer != null ? currentPlayer.GetTotalSlotsUsed() : inv.Count;
                 if (pdaBackpackCountText != null)
                 {
-                    pdaBackpackCountText.text = $"{inv.Count}/{maxSlots}";
+                    pdaBackpackCountText.text = $"{currentUsed}/{maxSlots}";
                 }
 
-                int totalCells = maxSlots;
-                for (int i = 0; i < totalCells; i++)
+                int slotsRendered = 0;
+                for (int i = 0; i < inv.Count; i++)
                 {
-                    if (i < inv.Count)
+                    int size = ItemDatabase.GetItemSlotSize(inv[i].itemId);
+                    if (size == 2)
                     {
-                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true);
+                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true, isExtension: false);
+                        slotsRendered++;
+                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, 0, true, isExtension: true);
+                        slotsRendered++;
                     }
                     else
                     {
-                        CreateInventorySlotCell(pdaBackpackGrid, null, 0, false);
+                        CreateInventorySlotCell(pdaBackpackGrid, inv[i].itemId, inv[i].quantity, true, isExtension: false);
+                        slotsRendered++;
                     }
+                }
+
+                while (slotsRendered < maxSlots)
+                {
+                    CreateInventorySlotCell(pdaBackpackGrid, null, 0, false, isExtension: false);
+                    slotsRendered++;
                 }
             }
 
@@ -1165,23 +1177,79 @@ namespace SundayLastBreath.UI
             slotLabel.text = defaultSlotName;
         }
 
-        private void CreateInventorySlotCell(Transform parent, string itemId, int quantity, bool allowEquipClick)
+        private void CreateInventorySlotCell(Transform parent, string itemId, int quantity, bool allowEquipClick, bool isExtension = false)
         {
-            GameObject cell = new GameObject(string.IsNullOrEmpty(itemId) ? "EmptySlot" : "Slot_" + itemId);
+            GameObject cell = new GameObject(string.IsNullOrEmpty(itemId) ? "EmptySlot" : (isExtension ? "Slot_" + itemId + "_Ext" : "Slot_" + itemId));
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
             rt.sizeDelta = new Vector2(66f, 66f);
 
             Image bg = cell.AddComponent<Image>();
-            bg.color = new Color(0.08f, 0.09f, 0.11f, 0.95f);
+            bg.color = isExtension ? new Color(0.06f, 0.08f, 0.11f, 0.90f) : new Color(0.09f, 0.11f, 0.15f, 0.95f);
 
             Outline ol = cell.AddComponent<Outline>();
             ol.effectColor = string.IsNullOrEmpty(itemId)
                 ? new Color(0.18f, 0.20f, 0.24f, 0.75f)
-                : new Color(0.28f, 0.32f, 0.38f, 0.95f);
+                : (isExtension ? new Color(0.20f, 0.24f, 0.30f, 0.65f) : new Color(0.28f, 0.32f, 0.38f, 0.95f));
             ol.effectDistance = new Vector2(1f, -1f);
 
             if (string.IsNullOrEmpty(itemId)) return;
+
+            if (isExtension)
+            {
+                // Visual extension indicator
+                GameObject extObj = new GameObject("ExtText");
+                extObj.transform.SetParent(cell.transform, false);
+                TextMeshProUGUI extTmp = extObj.AddComponent<TextMeshProUGUI>();
+                extTmp.fontSize = 7.5f;
+                extTmp.alignment = TextAlignmentOptions.Center;
+                extTmp.color = new Color(0.55f, 0.60f, 0.68f, 0.75f);
+                extTmp.text = "[ ↳ BULKY ]\n<size=6.5><color=#64748B>PART 2/2</color></size>";
+                extTmp.raycastTarget = false;
+                RectTransform extr = extObj.GetComponent<RectTransform>();
+                extr.anchorMin = Vector2.zero; extr.anchorMax = Vector2.one;
+                extr.offsetMin = new Vector2(2f, 2f); extr.offsetMax = new Vector2(-2f, -2f);
+                return;
+            }
+
+            // Contrast Well Halo
+            GameObject wellObj = new GameObject("WellHalo");
+            wellObj.transform.SetParent(cell.transform, false);
+            Image wellImg = wellObj.AddComponent<Image>();
+            wellImg.color = new Color(0.18f, 0.24f, 0.32f, 0.25f);
+            wellImg.raycastTarget = false;
+            RectTransform wrt = wellObj.GetComponent<RectTransform>();
+            wrt.anchorMin = Vector2.zero; wrt.anchorMax = Vector2.one;
+            wrt.offsetMin = new Vector2(4f, 12f); wrt.offsetMax = new Vector2(-4f, -4f);
+
+            // 2-Slot badge if slotSize == 2
+            int itemSlotSize = ItemDatabase.GetItemSlotSize(itemId);
+            if (itemSlotSize == 2)
+            {
+                GameObject slotBadge = new GameObject("SlotBadge");
+                slotBadge.transform.SetParent(cell.transform, false);
+                RectTransform sbr = slotBadge.AddComponent<RectTransform>();
+                sbr.anchorMin = new Vector2(1f, 1f); sbr.anchorMax = new Vector2(1f, 1f);
+                sbr.pivot = new Vector2(1f, 1f);
+                sbr.anchoredPosition = new Vector2(-2f, -2f);
+                sbr.sizeDelta = new Vector2(30f, 11f);
+                Image sbBg = slotBadge.AddComponent<Image>();
+                sbBg.color = new Color(0.85f, 0.55f, 0.10f, 0.25f);
+                sbBg.raycastTarget = false;
+
+                GameObject sbtObj = new GameObject("Text");
+                sbtObj.transform.SetParent(slotBadge.transform, false);
+                TextMeshProUGUI sbTmp = sbtObj.AddComponent<TextMeshProUGUI>();
+                sbTmp.fontSize = 7f;
+                sbTmp.fontStyle = FontStyles.Bold;
+                sbTmp.alignment = TextAlignmentOptions.Center;
+                sbTmp.color = new Color(0.95f, 0.75f, 0.25f);
+                sbTmp.text = "2-SLOT";
+                sbTmp.raycastTarget = false;
+                RectTransform sbtr = sbtObj.GetComponent<RectTransform>();
+                sbtr.anchorMin = Vector2.zero; sbtr.anchorMax = Vector2.one;
+                sbtr.offsetMin = Vector2.zero; sbtr.offsetMax = Vector2.zero;
+            }
 
             // Item Icon
             GameObject iconObj = new GameObject("Icon");

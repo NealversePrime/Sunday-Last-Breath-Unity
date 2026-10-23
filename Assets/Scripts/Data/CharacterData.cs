@@ -113,6 +113,28 @@ namespace SundayLastBreath.Data
         public List<string> selectedDrawbacks = new List<string>();
         public List<InventoryEntry> inventory = new List<InventoryEntry>();
 
+        /// <summary>
+        /// Calculates the total number of tactical backpack slots used (accounting for 1-slot and 2-slot bulky items).
+        /// </summary>
+        public int GetTotalSlotsUsed()
+        {
+            if (inventory == null) return 0;
+            int total = 0;
+            foreach (var item in inventory)
+            {
+                total += ItemDatabase.GetItemSlotSize(item.itemId);
+            }
+            return total;
+        }
+
+        /// <summary>
+        /// Returns the remaining free tactical backpack slots.
+        /// </summary>
+        public int GetFreeSlots()
+        {
+            return Mathf.Max(0, bagLimit - GetTotalSlotsUsed());
+        }
+
         public void AddTrait(string name, string desc, Sprite icon = null, bool isWeakness = false)
         {
             if (traits.Exists(t => t.name.Equals(name, StringComparison.OrdinalIgnoreCase)))
@@ -178,9 +200,10 @@ namespace SundayLastBreath.Data
                 }
             }
 
-            if (inventory.Count >= bagLimit)
+            int requiredSlots = ItemDatabase.GetItemSlotSize(itemId);
+            if (GetTotalSlotsUsed() + requiredSlots > bagLimit)
             {
-                return false; // Backpack capacity full
+                return false; // Backpack tactical capacity full
             }
 
             inventory.Add(new InventoryEntry(itemId, qty));
@@ -217,12 +240,24 @@ namespace SundayLastBreath.Data
             if (invItem == null) return false;
 
             string currentlyEquipped = GetEquippedInSlot(slot);
+            bool hasCurrentlyEquipped = !string.IsNullOrEmpty(currentlyEquipped) && !currentlyEquipped.Equals("none", StringComparison.OrdinalIgnoreCase);
+
+            if (hasCurrentlyEquipped)
+            {
+                int unequippedCost = ItemDatabase.GetItemSlotSize(currentlyEquipped);
+                int equippingCost = ItemDatabase.GetItemSlotSize(itemId);
+                int netSlotDiff = unequippedCost - equippingCost;
+                if (GetTotalSlotsUsed() + netSlotDiff > bagLimit)
+                {
+                    return false; // Not enough room to swap items in backpack
+                }
+            }
 
             // Decrement or remove from backpack
             RemoveItem(itemId, 1);
 
             // Put current gear back into backpack if any
-            if (!string.IsNullOrEmpty(currentlyEquipped) && !currentlyEquipped.Equals("none", StringComparison.OrdinalIgnoreCase))
+            if (hasCurrentlyEquipped)
             {
                 AddItem(currentlyEquipped, 1);
             }
@@ -241,9 +276,10 @@ namespace SundayLastBreath.Data
             if (string.IsNullOrEmpty(currentlyEquipped) || currentlyEquipped.Equals("none", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (inventory.Count >= bagLimit)
+            int requiredSlots = ItemDatabase.GetItemSlotSize(currentlyEquipped);
+            if (GetTotalSlotsUsed() + requiredSlots > bagLimit)
             {
-                return false; // Cannot unequip when backpack is full
+                return false; // Cannot unequip when backpack has insufficient free slots
             }
 
             AddItem(currentlyEquipped, 1);

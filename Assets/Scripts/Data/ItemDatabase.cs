@@ -48,6 +48,9 @@ namespace SundayLastBreath.Data
         // Weight / Encumbrance
         public float weight = 0.5f;
 
+        // Tactical Slot Size (RE2/RE4 Remake model: 1 slot = compact, 2 slots = bulky/heavy)
+        public int slotSize = 1;
+
         public bool IsEquippable =>
             category == ItemCategory.RangedWeapon ||
             category == ItemCategory.MeleeWeapon ||
@@ -128,21 +131,21 @@ namespace SundayLastBreath.Data
             RegisterDef(new ItemDefinition { id = "Five-Seven", displayName = "Five-Seven", category = ItemCategory.RangedWeapon, accuracy = 75, targets = 1, ammoType = "9mm Ammo", weight = 1.2f, description = "High-velocity tactical pistol with armor piercing capability." });
             RegisterDef(new ItemDefinition { id = "Magnum", displayName = "Magnum", category = ItemCategory.RangedWeapon, accuracy = 65, targets = 1, ammoType = ".500 Magnum", weight = 2.2f, description = "Hand cannon. High recoil, catastrophic kinetic punch." });
             RegisterDef(new ItemDefinition { id = "MP5", displayName = "MP5", category = ItemCategory.RangedWeapon, accuracy = 75, targets = 3, ammoType = "9mm Ammo", weight = 2.8f, description = "9mm submachine gun. Fast cyclic rate with controllable spread." });
-            RegisterDef(new ItemDefinition { id = "M4A1", displayName = "M4A1", category = ItemCategory.RangedWeapon, accuracy = 80, targets = 2, ammoType = "5.56mm Ammo", weight = 3.4f, description = "Military selective-fire carbine. High lethality at range." });
-            RegisterDef(new ItemDefinition { id = "Barret M82", displayName = "Barret M82", category = ItemCategory.RangedWeapon, accuracy = 95, targets = 1, ammoType = ".50 Cal", weight = 8.5f, description = "Anti-materiel heavy rifle. Devastating kinetic power." });
-            RegisterDef(new ItemDefinition { id = "Spas-12", displayName = "Spas-12", category = ItemCategory.RangedWeapon, accuracy = 60, targets = 3, ammoType = "Shotgun Shells", weight = 4.2f, description = "Dual-mode combat shotgun. High close-quarters spread." });
-            RegisterDef(new ItemDefinition { id = "Remington 870", displayName = "Remington 870", category = ItemCategory.RangedWeapon, accuracy = 70, targets = 2, ammoType = "Shotgun Shells", weight = 3.6f, description = "Pump-action shotgun with tight choke spread." });
-            RegisterDef(new ItemDefinition { id = "Compound Bow", displayName = "Compound Bow", category = ItemCategory.RangedWeapon, accuracy = 85, targets = 1, ammoType = "Arrows", weight = 1.8f, description = "Silent hunter's weapon. Arrows can be retrieved." });
+            RegisterDef(new ItemDefinition { id = "M4A1", displayName = "M4A1", category = ItemCategory.RangedWeapon, accuracy = 80, targets = 2, ammoType = "5.56mm Ammo", weight = 3.4f, slotSize = 2, description = "Military selective-fire carbine. High lethality at range." });
+            RegisterDef(new ItemDefinition { id = "Barret M82", displayName = "Barret M82", category = ItemCategory.RangedWeapon, accuracy = 95, targets = 1, ammoType = ".50 Cal", weight = 8.5f, slotSize = 2, description = "Anti-materiel heavy rifle. Devastating kinetic power." });
+            RegisterDef(new ItemDefinition { id = "Spas-12", displayName = "Spas-12", category = ItemCategory.RangedWeapon, accuracy = 60, targets = 3, ammoType = "Shotgun Shells", weight = 4.2f, slotSize = 2, description = "Dual-mode combat shotgun. High close-quarters spread." });
+            RegisterDef(new ItemDefinition { id = "Remington 870", displayName = "Remington 870", category = ItemCategory.RangedWeapon, accuracy = 70, targets = 2, ammoType = "Shotgun Shells", weight = 3.6f, slotSize = 2, description = "Pump-action shotgun with tight choke spread." });
+            RegisterDef(new ItemDefinition { id = "Compound Bow", displayName = "Compound Bow", category = ItemCategory.RangedWeapon, accuracy = 85, targets = 1, ammoType = "Arrows", weight = 1.8f, slotSize = 2, description = "Silent hunter's weapon. Arrows can be retrieved." });
 
             // --- MELEE WEAPONS ---
             RegisterDef(new ItemDefinition { id = "Crowbar", displayName = "Crowbar", category = ItemCategory.MeleeWeapon, accuracy = 90, targets = 1, weight = 2.5f, description = "Forged steel prying tool. Breaches reinforced crates and skull bone." });
             RegisterDef(new ItemDefinition { id = "Combat Knife", displayName = "Combat Knife", category = ItemCategory.MeleeWeapon, accuracy = 80, targets = 1, weight = 0.6f, description = "Military carbon blade. Completely silent in close quarters." });
             RegisterDef(new ItemDefinition { id = "Hunting Knife", displayName = "Hunting Knife", category = ItemCategory.MeleeWeapon, accuracy = 85, targets = 1, weight = 0.7f, description = "Serrated field blade designed for deep gouging lacerations." });
             RegisterDef(new ItemDefinition { id = "Kitchen Knife", displayName = "Kitchen Knife", category = ItemCategory.MeleeWeapon, accuracy = 70, targets = 1, weight = 0.4f, description = "Chef's knife. Razor sharp stainless steel, but brittle under heavy impact." });
-            RegisterDef(new ItemDefinition { id = "Sledgehammer", displayName = "Sledgehammer", category = ItemCategory.MeleeWeapon, accuracy = 50, targets = 2, weight = 6.0f, description = "Heavy industrial demolition hammer. Breaches barricaded doors. Slow swing." });
+            RegisterDef(new ItemDefinition { id = "Sledgehammer", displayName = "Sledgehammer", category = ItemCategory.MeleeWeapon, accuracy = 50, targets = 2, weight = 6.0f, slotSize = 2, description = "Heavy industrial demolition hammer. Breaches barricaded doors. Slow swing." });
             RegisterDef(new ItemDefinition { id = "Scalpel", displayName = "Scalpel", category = ItemCategory.MeleeWeapon, accuracy = 90, targets = 1, weight = 0.2f, description = "Surgical steel precision blade. Pinpoint critical strikes." });
-            RegisterDef(new ItemDefinition { id = "Golf Club", displayName = "Golf Club", category = ItemCategory.MeleeWeapon, accuracy = 60, targets = 1, weight = 1.2f, description = "Titanium driver. Medium reach with good kinetic transfer." });
-            RegisterDef(new ItemDefinition { id = "Baseball Bat", displayName = "Baseball Bat", category = ItemCategory.MeleeWeapon, accuracy = 70, targets = 1, weight = 1.4f, description = "Hardwood slugger. Solid knockback against charging hostiles." });
+            RegisterDef(new ItemDefinition { id = "Golf Club", displayName = "Golf Club", category = ItemCategory.MeleeWeapon, accuracy = 60, targets = 1, weight = 1.2f, slotSize = 2, description = "Titanium driver. Medium reach with good kinetic transfer." });
+            RegisterDef(new ItemDefinition { id = "Baseball Bat", displayName = "Baseball Bat", category = ItemCategory.MeleeWeapon, accuracy = 70, targets = 1, weight = 1.4f, slotSize = 2, description = "Hardwood slugger. Solid knockback against charging hostiles." });
             RegisterDef(new ItemDefinition { id = "Cane", displayName = "Cane", category = ItemCategory.MeleeWeapon, accuracy = 50, targets = 1, weight = 0.8f, description = "Sturdy oak walking stick. Improvised striking weapon." });
             RegisterDef(new ItemDefinition { id = "Tire Iron", displayName = "Tire Iron", category = ItemCategory.MeleeWeapon, accuracy = 60, targets = 1, weight = 2.0f, description = "Rusted roadside automotive crossbar club." });
 
@@ -156,7 +159,7 @@ namespace SundayLastBreath.Data
             RegisterDef(new ItemDefinition { id = "Arrows", displayName = "Arrows", category = ItemCategory.Ammunition, stackable = true, maxStack = 20, weight = 0.04f, description = "Carbon-composite broadhead arrows for archery hunting." });
 
             // --- APPAREL & WEARABLES ---
-            RegisterDef(new ItemDefinition { id = "Tactical Vest", displayName = "Tactical Vest", category = ItemCategory.WearableBody, weight = 3.5f, description = "Ballistic Kevlar body armor. Reduces torso projectile & bite damage." });
+            RegisterDef(new ItemDefinition { id = "Tactical Vest", displayName = "Tactical Vest", category = ItemCategory.WearableBody, weight = 3.5f, slotSize = 2, description = "Ballistic Kevlar body armor. Reduces torso projectile & bite damage." });
             RegisterDef(new ItemDefinition { id = "Leather Jacket", displayName = "Leather Jacket", category = ItemCategory.WearableBody, weight = 2.0f, description = "Heavy cowhide jacket. Provides minor laceration and bite protection." });
             RegisterDef(new ItemDefinition { id = "T-Shirt", displayName = "T-Shirt", category = ItemCategory.WearableBody, weight = 0.3f, description = "Worn civilian cotton shirt. Provides zero defensive protection." });
             RegisterDef(new ItemDefinition { id = "Jeans", displayName = "Jeans", category = ItemCategory.WearableLegs, weight = 1.0f, description = "Durable denim pants with reinforced stitching." });
@@ -215,7 +218,7 @@ namespace SundayLastBreath.Data
             RegisterDef(new ItemDefinition { id = "Cigarettes", displayName = "Cigarettes", category = ItemCategory.ToolUtility, stackable = true, maxStack = 20, humanity = 5, weight = 0.1f, description = "Pack of filter cigarettes. Steady nerves and universal trade commodity (+5 Humanity)." });
             RegisterDef(new ItemDefinition { id = "Deck of Cards", displayName = "Deck of Cards", category = ItemCategory.ToolUtility, weight = 0.15f, description = "Full 52-card poker deck. Solitaire passes the grueling hours." });
             RegisterDef(new ItemDefinition { id = "Old Map", displayName = "Old Map", category = ItemCategory.ToolUtility, weight = 0.1f, description = "A faded street layout of the Ascott district and local city highways." });
-            RegisterDef(new ItemDefinition { id = "Guitar", displayName = "Guitar", category = ItemCategory.ToolUtility, weight = 2.5f, description = "Acoustic six-string wooden guitar. Playing chords restores survivor morale." });
+            RegisterDef(new ItemDefinition { id = "Guitar", displayName = "Guitar", category = ItemCategory.ToolUtility, weight = 2.5f, slotSize = 2, description = "Acoustic six-string wooden guitar. Playing chords restores survivor morale." });
             RegisterDef(new ItemDefinition { id = "Batteries", displayName = "Batteries", category = ItemCategory.ToolUtility, stackable = true, maxStack = 12, weight = 0.1f, description = "Standard 1.5V alkaline AA battery cells for radios and electronic tools." });
             RegisterDef(new ItemDefinition { id = "Rope", displayName = "Rope", category = ItemCategory.ToolUtility, weight = 1.5f, description = "Twelve meters of high-tensile braided nylon climbing cord." });
             RegisterDef(new ItemDefinition { id = "Tier-1 Military Clearance Passkey", displayName = "Tier-1 Clearance Passkey", category = ItemCategory.ValuableKey, weight = 0.1f, description = "Magnetic security card issued by the National Guard quarantine division." });
@@ -575,6 +578,16 @@ namespace SundayLastBreath.Data
             if (n.Contains("shoes") || n.Contains("boots") || n.Contains("sneakers")) return "FEET";
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns the tactical slot size of an item (1 = standard compact item, 2 = bulky/long weapon or equipment).
+        /// </summary>
+        public static int GetItemSlotSize(string itemId)
+        {
+            if (string.IsNullOrEmpty(itemId)) return 1;
+            var def = GetDefinition(itemId);
+            return def != null ? Mathf.Max(1, def.slotSize) : 1;
         }
     }
 }
