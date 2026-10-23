@@ -2840,6 +2840,16 @@ namespace SundayLastBreath.UI
 
             PlayClickSFX();
 
+            // One-time use: consume the Apartment Key when unlocking the deadbolt and stepping out
+            if (currentPlayer != null)
+            {
+                currentPlayer.RemoveItem("Apartment Key", 1);
+                currentPlayer.RemoveItem("Apartment 407 Key", 1);
+            }
+
+            AppendStoryLog(gameClock.GetTimeString(), "HALLWAY // LEFT UNIT 407",
+                "I turned the brass key in the deadbolt, unlocked the door, and stepped out into the 4th floor hallway. The door clicked shut behind me, locked tight.");
+
             // Complete leave apartment objective, add escape building
             objectiveSystem.CompleteObjective("leave_apt");
             objectiveSystem.AddObjective("escape_building", "Find a way down to the ground floor", ObjectiveStatus.Active);

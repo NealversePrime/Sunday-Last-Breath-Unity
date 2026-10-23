@@ -206,7 +206,7 @@ namespace SundayLastBreath.Data
             RegisterDef(new ItemDefinition { id = "Compass", displayName = "Compass", category = ItemCategory.ToolUtility, weight = 0.15f, description = "Fluid-damped magnetic compass for land navigation when GPS grids collapse." });
             RegisterDef(new ItemDefinition { id = "Lighter", displayName = "Lighter", category = ItemCategory.ToolUtility, weight = 0.1f, description = "Refillable butane flip lighter. Reliable flame source." });
             RegisterDef(new ItemDefinition { id = "Jerry Can", displayName = "Jerry Can", category = ItemCategory.ToolUtility, weight = 2.5f, description = "Steel 20-liter canister for gasoline fuel storage." });
-            RegisterDef(new ItemDefinition { id = "Apartment Key", displayName = "Apartment 407 Key", category = ItemCategory.ValuableKey, weight = 0.05f, description = "Brass tumbler key on a keychain for Unit 407. You cannot lock or unlock your apartment door without it." });
+            RegisterDef(new ItemDefinition { id = "Apartment Key", displayName = "Apartment 407 Key", category = ItemCategory.ValuableKey, weight = 0.05f, description = "Brass tumbler key on a keychain labeled 'Room 407'. Required once to unlock the front door deadbolt and step out into the hallway." });
             RegisterDef(new ItemDefinition { id = "Car Keys", displayName = "Car Keys", category = ItemCategory.ValuableKey, weight = 0.1f, description = "Key fob for an old sedan parked down in the Ascott basement lot." });
             RegisterDef(new ItemDefinition { id = "Bluetooth Speaker", displayName = "Bluetooth Speaker", category = ItemCategory.ToolUtility, weight = 0.5f, description = "Portable speaker. Can be paired and activated remotely to distract hostiles." });
             RegisterDef(new ItemDefinition { id = "Ceramic Mug", displayName = "Ceramic Mug", category = ItemCategory.ToolUtility, weight = 0.4f, description = "Heavy stoneware coffee cup. Can be thrown to lure stalkers toward the noise." });
@@ -389,7 +389,9 @@ namespace SundayLastBreath.Data
             { "Compass", "compass" },
             { "Lighter", "lighter" },
             { "Jerry Can", "jerrycan" },
-            { "Apartment Key", "car_keys" },
+            { "Apartment Key", "apartment_key" },
+            { "Apartment 407 Key", "apartment_key" },
+            { "Unit 407 Key", "apartment_key" },
             { "Car Keys", "car_keys" },
             { "Bluetooth Speaker", "speaker" },
             { "Ceramic Mug", "mug" },
