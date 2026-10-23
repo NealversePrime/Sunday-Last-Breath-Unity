@@ -795,6 +795,17 @@ namespace SundayLastBreath.UI
             SelectNode(currentLocationId);
         }
 
+        public string CurrentLocationId => currentLocationId;
+
+        public NodeModel GetNode(string roomId)
+        {
+            if (string.IsNullOrEmpty(roomId)) return null;
+            nodeRegistry.TryGetValue(roomId, out NodeModel model);
+            return model;
+        }
+
+        public event Action<string, NodeModel> OnPlayerLocationChanged;
+
         public void SetCurrentLocation(string locationId)
         {
             if (!nodeRegistry.ContainsKey(locationId)) return;
@@ -803,6 +814,7 @@ namespace SundayLastBreath.UI
             DiscoverAdjacentRooms(locationId);
             RefreshAllNodes();
             SelectNode(locationId);
+            OnPlayerLocationChanged?.Invoke(locationId, nodeRegistry[locationId]);
         }
 
         public void DiscoverRoom(string roomId)

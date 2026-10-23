@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v51_auto.flag";
+            string flagPath = "Temp/scene_v52_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -205,7 +205,7 @@ namespace SundayLastBreath.Editor
             TextMeshProUGUI thTmp = thTitle.AddComponent<TextMeshProUGUI>();
             thTmp.fontSize = 12f;
             thTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            thTmp.text = "<b>■ UNIT 404 // LIVING ROOM INTERIOR</b>";
+            thTmp.text = "<b>■ UNIT 407 // LIVING ROOM INTERIOR</b>";
             thTmp.color = new Color(0.65f, 0.75f, 0.88f);
             thTmp.raycastTarget = false;
 
@@ -522,7 +522,7 @@ namespace SundayLastBreath.Editor
             thbImg.raycastTarget = false;
 
             // LEFT: Tactical Location Badge
-            TextMeshProUGUI locBadgeTmp = CreateTMPText(topHeader.transform, "LocationBadge", "■ UNIT 404 // THE ASCOTT RESIDENCY [4TH FLOOR]", 12f, new Color(0.72f, 0.82f, 0.94f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            TextMeshProUGUI locBadgeTmp = CreateTMPText(topHeader.transform, "LocationBadge", "\u25a0 UNIT 407 // THE ASCOTT RESIDENCY [4TH FLOOR]", 12f, new Color(0.72f, 0.82f, 0.94f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform lbr = locBadgeTmp.rectTransform;
             lbr.anchorMin = new Vector2(0f, 0.5f);
             lbr.anchorMax = new Vector2(0f, 0.5f);
@@ -1196,7 +1196,7 @@ namespace SundayLastBreath.Editor
                 new Color(0.95f, 0.75f, 0.35f), out Button btnPack, out TextMeshProUGUI _, out TextMeshProUGUI _);
 
             CreateApartmentMenuButton(menuObj.transform, "Btn_TakeFloorItems", "COLLECT ROOM SUPPLIES [FLOOR ITEMS]",
-                "Gather extra supplies discovered in Unit 404 into your backpack.",
+                "Gather extra supplies discovered in Unit 407 into your backpack.",
                 new Color(0.95f, 0.65f, 0.25f), out Button btnTakeFloor, out TextMeshProUGUI takeFloorLbl, out TextMeshProUGUI takeFloorSub);
 
             CreateApartmentMenuButton(menuObj.transform, "Btn_CheckPhone", "CHECK NEWS FEED",
@@ -1527,7 +1527,7 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI condTmp = CreateTMPText(condCard.transform, "Text",
                 "<color=#f39c12><b>TACTICAL CONDITION:</b></color>\n" +
-                "• Shelter: Unit 404 (Living Room)\n" +
+                "• Shelter: Unit 407 (Living Room)\n" +
                 "• Status: Unprepared / In Pajamas\n" +
                 "• Threat: Civil Danger Warning (Category 5)\n" +
                 "• Time to Sector Purge: 06:15 remaining", 11f, new Color(0.75f, 0.78f, 0.84f));
@@ -2101,6 +2101,7 @@ namespace SundayLastBreath.Editor
             so.FindProperty("dockContainerGear").objectReferenceValue = dockGear;
 
             // Top HUD
+            so.FindProperty("locationText").objectReferenceValue = locBadgeTmp;
             so.FindProperty("hpBarFill").objectReferenceValue = hpFill;
             so.FindProperty("hpValueText").objectReferenceValue = hpValTmp;
             so.FindProperty("staminaBarFill").objectReferenceValue = stmFill;

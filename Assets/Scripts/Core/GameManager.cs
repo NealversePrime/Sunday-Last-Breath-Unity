@@ -176,7 +176,21 @@ namespace SundayLastBreath.Core
         public void TransitionFromApartmentToHallway()
         {
             currentState = GameState.Hallway;
-            Debug.Log("<color=yellow>[GameManager] Transitioning from Apartment Unit 404 to 4th Floor Hallway...</color>");
+            Debug.Log("<color=yellow>[GameManager] Transitioning from Apartment Unit 407 to 4th Floor Hallway...</color>");
+            SetPlayerLocation("hallway_1", "CORRIDOR N // NORTH SPINE");
+        }
+
+        public void SetPlayerLocation(string roomId, string sectorName = null)
+        {
+            if (CurrentPlayer != null)
+            {
+                CurrentPlayer.currentLocationId = roomId;
+            }
+
+            if (apartmentHubScreen != null)
+            {
+                apartmentHubScreen.SetLocation(roomId, sectorName);
+            }
         }
 
         private void HideAllScreensInstant()

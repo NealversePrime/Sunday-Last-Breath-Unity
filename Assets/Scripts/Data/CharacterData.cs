@@ -55,6 +55,10 @@ namespace SundayLastBreath.Data
 
         public string FullName => $"{firstName} {lastName}".Trim();
 
+        [Header("Location State")]
+        public string currentLocationId = "unit_407";
+        public string currentLocationName = "UNIT 407 // THE ASCOTT RESIDENCY [4TH FLOOR]";
+
         [Header("Vitals (0 - 100)")]
         public int hp = 100;
         public int hpMax = 100;

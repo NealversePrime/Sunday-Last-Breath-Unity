@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 namespace SundayLastBreath.UI
 {
     /// <summary>
-    /// Master Controller for the Apartment Hub (Unit 404 - Prologue).
+    /// Master Controller for the Apartment Hub (Unit 407 - Prologue).
     /// Combines the 60/40 Top Stage + Bottom VN Dock in the center with
     /// persistent Left & Right Survivor PDA panels (Status, Skills, Traits, Map, Lore,
     /// Active Loadout, Backpack Grid, and Floor Items) filling the widescreen side wings.
@@ -502,6 +502,12 @@ namespace SundayLastBreath.UI
             SwitchPDATab("STATUS", playSound: false);
             SwitchConsoleMode(ConsoleMode.Narrative, playSound: false);
             EvaluateHubButtonStates();
+
+            // Automatic Location Synchronization across Top HUD & Tactical Map
+            string startLoc = (currentPlayer != null && !string.IsNullOrEmpty(currentPlayer.currentLocationId))
+                ? currentPlayer.currentLocationId
+                : "unit_407";
+            SetLocation(startLoc);
 
             // Load player avatar frames
             cachedAvatarFrames = CharacterCreationScreen.LoadPlayerFrames();
@@ -1351,7 +1357,7 @@ namespace SundayLastBreath.UI
                     // Beat 1: Civil Danger Warning (EAS Broadcast)
                     if (continuePrompt != null) continuePrompt.SetActive(true);
                     if (beat1Container != null) beat1Container.SetActive(true);
-                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // LIVING ROOM ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#EF4444>CHANNEL: EMERGENCY BROADCAST SYSTEM</color>";
 
                     // Play emergency warning TTS / robotic broadcast
@@ -1372,7 +1378,7 @@ namespace SundayLastBreath.UI
                     // Beat 2: The Reaction
                     if (continuePrompt != null) continuePrompt.SetActive(true);
                     if (beat2Container != null) beat2Container.SetActive(true);
-                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // INTERNAL MONOLOGUE ]</color>";
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // INTERNAL MONOLOGUE ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#60A5FA>CHANNEL: NEURAL APPRAISAL</color>";
 
                     // Stop EAS broadcast, start low TV static
@@ -1421,7 +1427,7 @@ namespace SundayLastBreath.UI
                     if (continuePrompt != null) continuePrompt.SetActive(true);
                     if (staticSource != null) staticSource.Stop();
                     if (beat3Container != null) beat3Container.SetActive(true);
-                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // LIVING ROOM ]</color>";
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // LIVING ROOM ]</color>";
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#F59E0B>CHANNEL: EQUIPMENT INSPECTION</color>";
 
                     if (tableStashDisplay != null)
@@ -1526,7 +1532,7 @@ namespace SundayLastBreath.UI
             if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
             if (continuePrompt != null) continuePrompt.SetActive(false);
 
-            if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 404 // ACTIONS ]</color>";
+            if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // ACTIONS ]</color>";
             if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#10B981>STATUS: READY FOR TRANSIT</color>";
 
             EvaluateHubButtonStates();
@@ -1616,7 +1622,7 @@ namespace SundayLastBreath.UI
                 if (hasFloorLoot)
                 {
                     if (takeFloorItemsLabel != null) takeFloorItemsLabel.text = $"COLLECT ROOM SUPPLIES <color=#EF4444>[! {floorItems.Count}]</color>";
-                    if (takeFloorItemsSub != null) takeFloorItemsSub.text = $"Gather extra supplies discovered in Unit 404 into your backpack.";
+                    if (takeFloorItemsSub != null) takeFloorItemsSub.text = $"Gather extra supplies discovered in Unit 407 into your backpack.";
                 }
             }
             UpdateFloorItemsNotification();
@@ -1930,6 +1936,70 @@ namespace SundayLastBreath.UI
         }
         #endregion
 
+        #region Dynamic Location Management
+        /// <summary>
+        /// Automatically synchronizes the player's location across:
+        /// 1. Top HUD location badge (locationText / LocationBadge)
+        /// 2. Bottom Dock location header (dockHeaderLocation)
+        /// 3. CharacterData persistent location
+        /// 4. Tactical Map controller bio-radar beacon & node selection
+        /// </summary>
+        public void SetLocation(string roomId, string customSectorSubtitle = null)
+        {
+            if (string.IsNullOrEmpty(roomId)) roomId = "unit_407";
+
+            string roomDisplay = roomId.ToUpper();
+            string sectorSubtitle = customSectorSubtitle;
+
+            if (tacticalMapController != null)
+            {
+                tacticalMapController.SetCurrentLocation(roomId);
+                var node = tacticalMapController.GetNode(roomId);
+                if (node != null)
+                {
+                    roomDisplay = !string.IsNullOrEmpty(node.roomCode) ? node.roomCode : node.id.ToUpper();
+                    if (string.IsNullOrEmpty(sectorSubtitle))
+                    {
+                        sectorSubtitle = !string.IsNullOrEmpty(node.shortSub) ? node.shortSub : node.title;
+                    }
+                }
+            }
+
+            UpdateLocationDisplay(roomDisplay, sectorSubtitle);
+
+            if (currentPlayer != null)
+            {
+                currentPlayer.currentLocationId = roomId;
+                if (locationText != null) currentPlayer.currentLocationName = locationText.text;
+            }
+        }
+
+        public void UpdateLocationDisplay(string roomTitle, string sectorSubtitle = null)
+        {
+            string displayTitle = !string.IsNullOrEmpty(roomTitle) ? roomTitle.ToUpper() : "UNIT 407";
+            string formattedTop = $"■ {displayTitle}";
+
+            if (!string.IsNullOrEmpty(sectorSubtitle))
+            {
+                formattedTop += $" // {sectorSubtitle.ToUpper()}";
+            }
+            else if (!displayTitle.Contains("ASCOTT"))
+            {
+                formattedTop += " // THE ASCOTT RESIDENCY [4TH FLOOR]";
+            }
+
+            if (locationText != null)
+            {
+                locationText.text = formattedTop;
+            }
+
+            if (dockHeaderLocation != null)
+            {
+                dockHeaderLocation.text = $"<color=#FFA726>[ {displayTitle} ]</color>";
+            }
+        }
+        #endregion
+
         #region UI Display Helpers
         private void UpdateClockUI()
         {
@@ -2087,7 +2157,7 @@ namespace SundayLastBreath.UI
             );
 
             _storyLogs.Add(
-                "<b><color=#4FC3F7>[23:45] APARTMENT HUB // UNIT 404 LIVING ROOM</color></b>\n" +
+                "<b><color=#4FC3F7>[23:45] APARTMENT HUB // UNIT 407 LIVING ROOM</color></b>\n" +
                 "You are standing in the middle of your living room in your pajamas. You feel naked. Vulnerable.\n\n" +
                 "You glance around the dim room, illuminated only by the harsh red glow of the TV. Your everyday carry sits on the cramped desk. But your heavier equipment rests by the front door, exactly where you dropped it after yesterday's shift.\n\n" +
                 "It's not a tactical survival kit. But right now, the tools of your trade are the only thing standing between you and whatever violent outbreak is tearing the city apart."
