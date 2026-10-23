@@ -48,3 +48,4 @@ namespace SundayLastBreath.Data
         public List<PassageChoiceData> choices = new List<PassageChoiceData>();
     }
 }
+

@@ -219,6 +219,21 @@ namespace SundayLastBreath.Data
             RegisterDef(new ItemDefinition { id = "Batteries", displayName = "Batteries", category = ItemCategory.ToolUtility, stackable = true, maxStack = 12, weight = 0.1f, description = "Standard 1.5V alkaline AA battery cells for radios and electronic tools." });
             RegisterDef(new ItemDefinition { id = "Rope", displayName = "Rope", category = ItemCategory.ToolUtility, weight = 1.5f, description = "Twelve meters of high-tensile braided nylon climbing cord." });
             RegisterDef(new ItemDefinition { id = "Tier-1 Military Clearance Passkey", displayName = "Tier-1 Clearance Passkey", category = ItemCategory.ValuableKey, weight = 0.1f, description = "Magnetic security card issued by the National Guard quarantine division." });
+
+            // --- EXPANDED SURVIVAL & DOMESTIC ITEMS ---
+            RegisterDef(new ItemDefinition { id = "Can Opener", displayName = "Can Opener", category = ItemCategory.ToolUtility, weight = 0.2f, description = "Manual stainless rotary can opener. Opens canned provisions cleanly without dulling combat knives." });
+            RegisterDef(new ItemDefinition { id = "Hydro Flask", displayName = "Hydro Flask", category = ItemCategory.FoodRation, stackable = false, heal = 5, stamina = 15, thirst = 50, weight = 0.6f, description = "Insulated 32oz vacuum flask. Durable, boil-safe, and keeps water cold or hot for 24 hours." });
+            RegisterDef(new ItemDefinition { id = "Suture Kit", displayName = "Suture Kit", category = ItemCategory.MedicalConsumable, stackable = true, maxStack = 5, heal = 40, weight = 0.25f, description = "Curved surgical needle and medical nylon thread. Stitches deep lacerations and prevents lethal arterial bleeding." });
+            RegisterDef(new ItemDefinition { id = "Rain Poncho", displayName = "Rain Poncho", category = ItemCategory.WearableBody, weight = 0.3f, description = "Heavyweight hooded vinyl poncho. Shields you and your backpack from freezing Seattle rain." });
+            RegisterDef(new ItemDefinition { id = "Matches", displayName = "Matches", category = ItemCategory.ToolUtility, stackable = true, maxStack = 50, weight = 0.05f, description = "Waterproof strike-anywhere sulfur matches. Reliable ignition for campfires and dark corridors." });
+            RegisterDef(new ItemDefinition { id = "Trash Bags", displayName = "Trash Bags", category = ItemCategory.ToolUtility, stackable = true, maxStack = 10, weight = 0.2f, description = "Heavy-duty 55-gallon contractor trash bags. Waterproofing layer, makeshift poncho, or emergency corpse cover." });
+            RegisterDef(new ItemDefinition { id = "Metal Canteen", displayName = "Metal Canteen", category = ItemCategory.FoodRation, stackable = false, heal = 5, stamina = 10, thirst = 40, weight = 0.5f, description = "Anodized aluminum military field canteen. Boil-safe over open flames to purify tainted water." });
+            RegisterDef(new ItemDefinition { id = "Rubbing Alcohol", displayName = "Rubbing Alcohol", category = ItemCategory.MedicalConsumable, stackable = true, maxStack = 5, heal = 10, weight = 0.4f, description = "70% Isopropyl antiseptic solution. Sterilizes infected puncture wounds and doubles as an incendiary accelerant." });
+            RegisterDef(new ItemDefinition { id = "Walkie-Talkie", displayName = "Walkie-Talkie", category = ItemCategory.ToolUtility, weight = 0.4f, description = "Handheld VHF transceiver. Intercepts local emergency broadcasts, distress chirps, and tactical chatter." });
+            RegisterDef(new ItemDefinition { id = "Battery", displayName = "Battery", category = ItemCategory.ToolUtility, stackable = true, maxStack = 12, weight = 0.1f, description = "Standard 1.5V alkaline AA battery cell. Powers tactical radios, flashlights, and electronic tools." });
+            RegisterDef(new ItemDefinition { id = "Bandage", displayName = "Bandage", category = ItemCategory.MedicalConsumable, stackable = true, maxStack = 10, heal = 25, weight = 0.1f, description = "Sterile elastic compression dressing. Halts active hemorrhaging and wraps fractured limbs." });
+            RegisterDef(new ItemDefinition { id = "Canned Tuna", displayName = "Canned Tuna", category = ItemCategory.FoodRation, stackable = true, maxStack = 8, heal = 15, hunger = 35, weight = 0.3f, description = "Preserved tuna in oil. High protein, long shelf-life survival ration." });
+            RegisterDef(new ItemDefinition { id = "Canned Beans", displayName = "Canned Beans", category = ItemCategory.FoodRation, stackable = true, maxStack = 8, heal = 15, hunger = 40, weight = 0.4f, description = "Hearty baked beans in tomato sauce. Substantial nourishment that requires a can opener." });
         }
 
         private static void RegisterDef(ItemDefinition def)
@@ -384,9 +399,22 @@ namespace SundayLastBreath.Data
             { "Deck of Cards", "cards" },
             { "Old Map", "map" },
             { "Batteries", "batteries" },
+            { "Battery", "batteries" },
+            { "Bandages", "bandage" },
             { "Rope", "rope" },
             { "Fuse", "fuse" },
-            { "Tier-1 Military Clearance Passkey", "fuse" }
+            { "Tier-1 Military Clearance Passkey", "fuse" },
+            { "Can Opener", "multitool" },
+            { "Hydro Flask", "waterbottle" },
+            { "Suture Kit", "scalpel" },
+            { "Rain Poncho", "jacket" },
+            { "Matches", "lighter" },
+            { "Trash Bags", "handbag" },
+            { "Metal Canteen", "waterbottle" },
+            { "Rubbing Alcohol", "sanitizer" },
+            { "Walkie-Talkie", "speaker" },
+            { "Canned Tuna", "canfood" },
+            { "Canned Beans", "canfood" }
         };
 
         private static readonly Dictionary<string, string> _traitAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -536,7 +564,7 @@ namespace SundayLastBreath.Data
 
             string n = itemId.Trim().ToLowerInvariant();
             if (n.Contains("hat") || n.Contains("glasses") || n.Contains("helmet")) return "HEAD";
-            if (n.Contains("shirt") || n.Contains("jacket") || n.Contains("vest") || n.Contains("coat")) return "BODY";
+            if (n.Contains("shirt") || n.Contains("jacket") || n.Contains("vest") || n.Contains("coat") || n.Contains("poncho")) return "BODY";
             if (n.Contains("glock") || n.Contains("knife") || n.Contains("sledgehammer") || n.Contains("scalpel") ||
                 n.Contains("club") || n.Contains("bat") || n.Contains("bow") || n.Contains("cane") ||
                 n.Contains("revolver") || n.Contains("rifle") || n.Contains("shotgun") || n.Contains("mp5") || n.Contains("makarov")) return "WPN";

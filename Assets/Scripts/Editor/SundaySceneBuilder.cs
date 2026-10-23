@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v53_auto.flag";
+            string flagPath = "Temp/scene_v54_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -1262,13 +1262,21 @@ namespace SundayLastBreath.Editor
             choiceSr.verticalScrollbarSpacing = 4f;
 
             // Menu Action Buttons (Inside Scroll Content)
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_PackGear", "GATHER YOUR GEAR & SUPPLIES",
-                "4 Minutes | Gear up. Grab your work equipment by the door and raid the kitchen for anything useful.",
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_PackGear", "GATHER WORK GEAR & SUIT UP",
+                "2 Minutes | Collect your starter job gear, strap on your holster, and lace boots.",
                 new Color(0.95f, 0.75f, 0.35f), out Button btnPack, out TextMeshProUGUI _, out TextMeshProUGUI _);
 
-            CreateApartmentMenuButton(choiceContent.transform, "Btn_TakeFloorItems", "COLLECT ROOM SUPPLIES [FLOOR ITEMS]",
-                "Gather extra supplies discovered in Unit 407 into your backpack.",
-                new Color(0.95f, 0.65f, 0.25f), out Button btnTakeFloor, out TextMeshProUGUI takeFloorLbl, out TextMeshProUGUI takeFloorSub);
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchKitchen", "SEARCH KITCHENETTE FOR PROVISIONS",
+                "3 Minutes | Scrounge cupboards and fridge for preserved food and clean water.",
+                new Color(0.95f, 0.70f, 0.30f), out Button btnKitchen, out TextMeshProUGUI kitchenLbl, out TextMeshProUGUI kitchenSub);
+
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchBathroom", "RAID BATHROOM MEDICINE CABINET",
+                "2 Minutes | Grab painkillers, sterile bandages, and first-aid supplies.",
+                new Color(0.30f, 0.85f, 0.60f), out Button btnBathroom, out TextMeshProUGUI bathLbl, out TextMeshProUGUI bathSub);
+
+            CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchCloset", "PULL WEATHER GEAR FROM CLOSET",
+                "2 Minutes | Retrieve weather protection, duct tape, and utility gear.",
+                new Color(0.40f, 0.75f, 0.95f), out Button btnCloset, out TextMeshProUGUI closetLbl, out TextMeshProUGUI closetSub);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_CheckPhone", "CHECK NEWS FEED",
                 "1 Minute | See what the internet knows before the grid goes down.",
@@ -2270,9 +2278,15 @@ namespace SundayLastBreath.Editor
             so.FindProperty("packGearButton").objectReferenceValue = btnPack;
             so.FindProperty("packedSuccessBanner").objectReferenceValue = pBanner;
             so.FindProperty("packedSuccessText").objectReferenceValue = pbTmp;
-            so.FindProperty("takeFloorItemsButton").objectReferenceValue = btnTakeFloor;
-            so.FindProperty("takeFloorItemsLabel").objectReferenceValue = takeFloorLbl;
-            so.FindProperty("takeFloorItemsSub").objectReferenceValue = takeFloorSub;
+            so.FindProperty("searchKitchenButton").objectReferenceValue = btnKitchen;
+            so.FindProperty("searchKitchenLabel").objectReferenceValue = kitchenLbl;
+            so.FindProperty("searchKitchenSub").objectReferenceValue = kitchenSub;
+            so.FindProperty("searchBathroomButton").objectReferenceValue = btnBathroom;
+            so.FindProperty("searchBathroomLabel").objectReferenceValue = bathLbl;
+            so.FindProperty("searchBathroomSub").objectReferenceValue = bathSub;
+            so.FindProperty("searchClosetButton").objectReferenceValue = btnCloset;
+            so.FindProperty("searchClosetLabel").objectReferenceValue = closetLbl;
+            so.FindProperty("searchClosetSub").objectReferenceValue = closetSub;
             so.FindProperty("checkPhoneButton").objectReferenceValue = btnPhone;
             so.FindProperty("listenRadioButton").objectReferenceValue = btnRadio;
             so.FindProperty("listenRadioLabel").objectReferenceValue = radioLbl;

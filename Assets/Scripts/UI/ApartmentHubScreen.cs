@@ -148,9 +148,20 @@ namespace SundayLastBreath.UI
         [SerializeField] private Button packGearButton;
         [SerializeField] private GameObject packedSuccessBanner;
         [SerializeField] private TextMeshProUGUI packedSuccessText;
-        [SerializeField] private Button takeFloorItemsButton;
-        [SerializeField] private TextMeshProUGUI takeFloorItemsLabel;
-        [SerializeField] private TextMeshProUGUI takeFloorItemsSub;
+
+        [Header("Model A: Domestic Scavenge Actions")]
+        [SerializeField] private Button searchKitchenButton;
+        [SerializeField] private TextMeshProUGUI searchKitchenLabel;
+        [SerializeField] private TextMeshProUGUI searchKitchenSub;
+
+        [SerializeField] private Button searchBathroomButton;
+        [SerializeField] private TextMeshProUGUI searchBathroomLabel;
+        [SerializeField] private TextMeshProUGUI searchBathroomSub;
+
+        [SerializeField] private Button searchClosetButton;
+        [SerializeField] private TextMeshProUGUI searchClosetLabel;
+        [SerializeField] private TextMeshProUGUI searchClosetSub;
+
         [SerializeField] private Button checkPhoneButton;
         [SerializeField] private Button listenRadioButton;
         [SerializeField] private TextMeshProUGUI listenRadioLabel;
@@ -212,6 +223,9 @@ namespace SundayLastBreath.UI
         private string equippedFeet = "";
 
         private bool hasPacked = false;
+        private bool kitchenSearched = false;
+        private bool bathroomSearched = false;
+        private bool closetSearched = false;
         private bool phoneVisited = false;
         private bool radioVisited = false;
         private bool hackingVisited = false;
@@ -441,10 +455,22 @@ namespace SundayLastBreath.UI
 
 
 
-            if (takeFloorItemsButton != null)
+            if (searchKitchenButton != null)
             {
-                takeFloorItemsButton.onClick.RemoveAllListeners();
-                takeFloorItemsButton.onClick.AddListener(OnTakeAllFloorItemsClicked);
+                searchKitchenButton.onClick.RemoveAllListeners();
+                searchKitchenButton.onClick.AddListener(OnSearchKitchenClicked);
+            }
+
+            if (searchBathroomButton != null)
+            {
+                searchBathroomButton.onClick.RemoveAllListeners();
+                searchBathroomButton.onClick.AddListener(OnSearchBathroomClicked);
+            }
+
+            if (searchClosetButton != null)
+            {
+                searchClosetButton.onClick.RemoveAllListeners();
+                searchClosetButton.onClick.AddListener(OnSearchClosetClicked);
             }
 
             if (floorItemsButton != null)
@@ -487,11 +513,16 @@ namespace SundayLastBreath.UI
             }
 
             hasPacked = false;
+            kitchenSearched = false;
+            bathroomSearched = false;
+            closetSearched = false;
             introSeen = false;
             awakeningStep = 1;
 
             if (floorItemsCard != null && tacticalGearController == null) floorItemsCard.SetActive(false);
-            if (takeFloorItemsButton != null) takeFloorItemsButton.gameObject.SetActive(false);
+            if (searchKitchenButton != null) searchKitchenButton.gameObject.SetActive(false);
+            if (searchBathroomButton != null) searchBathroomButton.gameObject.SetActive(false);
+            if (searchClosetButton != null) searchClosetButton.gameObject.SetActive(false);
             UpdateFloorItemsNotification();
 
             UpdateClockUI();
@@ -1614,15 +1645,67 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 5. Take Floor Items Button (Hub Menu)
-            if (takeFloorItemsButton != null)
+            // 5. Model A: Domestic Scavenge Actions (Kitchenette, Bathroom, Closet)
+            if (searchKitchenButton != null)
             {
-                bool hasFloorLoot = floorItems != null && floorItems.Count > 0;
-                takeFloorItemsButton.gameObject.SetActive(hasPacked && hasFloorLoot);
-                if (hasFloorLoot)
+                searchKitchenButton.gameObject.SetActive(hasPacked);
+                if (hasPacked)
                 {
-                    if (takeFloorItemsLabel != null) takeFloorItemsLabel.text = $"COLLECT ROOM SUPPLIES <color=#EF4444>[! {floorItems.Count}]</color>";
-                    if (takeFloorItemsSub != null) takeFloorItemsSub.text = $"Gather extra supplies discovered in Unit 407 into your backpack.";
+                    searchKitchenButton.interactable = !kitchenSearched;
+                    if (searchKitchenLabel != null)
+                    {
+                        searchKitchenLabel.text = kitchenSearched
+                            ? "<s>KITCHENETTE (PICKED CLEAN)</s>"
+                            : "SEARCH KITCHENETTE FOR PROVISIONS";
+                    }
+                    if (searchKitchenSub != null)
+                    {
+                        searchKitchenSub.text = kitchenSearched
+                            ? "<color=#64748B>Cupboards and fridge stripped bare. Faucet spits brown sludge.</color>"
+                            : "<color=#F59E0B>[3 MINUTES]</color> Scrounge cupboards and fridge for preserved food and clean water.";
+                    }
+                }
+            }
+
+            if (searchBathroomButton != null)
+            {
+                searchBathroomButton.gameObject.SetActive(hasPacked);
+                if (hasPacked)
+                {
+                    searchBathroomButton.interactable = !bathroomSearched;
+                    if (searchBathroomLabel != null)
+                    {
+                        searchBathroomLabel.text = bathroomSearched
+                            ? "<s>MEDICINE CABINET (PICKED CLEAN)</s>"
+                            : "RAID BATHROOM MEDICINE CABINET";
+                    }
+                    if (searchBathroomSub != null)
+                    {
+                        searchBathroomSub.text = bathroomSearched
+                            ? "<color=#64748B>Medicine cabinet stripped bare. Mirrored glass cracked.</color>"
+                            : "<color=#F59E0B>[2 MINUTES]</color> Grab painkillers, sterile bandages, and first-aid supplies.";
+                    }
+                }
+            }
+
+            if (searchClosetButton != null)
+            {
+                searchClosetButton.gameObject.SetActive(hasPacked);
+                if (hasPacked)
+                {
+                    searchClosetButton.interactable = !closetSearched;
+                    if (searchClosetLabel != null)
+                    {
+                        searchClosetLabel.text = closetSearched
+                            ? "<s>HALLWAY CLOSET (PICKED CLEAN)</s>"
+                            : "PULL WEATHER GEAR FROM CLOSET";
+                    }
+                    if (searchClosetSub != null)
+                    {
+                        searchClosetSub.text = closetSearched
+                            ? "<color=#64748B>Closet shelves and coat rack are empty.</color>"
+                            : "<color=#F59E0B>[2 MINUTES]</color> Retrieve weather protection, duct tape, and utility gear.";
+                    }
                 }
             }
             UpdateFloorItemsNotification();
@@ -1641,8 +1724,8 @@ namespace SundayLastBreath.UI
             introSeen = true;
             awakeningStep = 4;
 
-            // Advance time +4 minutes
-            gameClock.AddTime(4);
+            // Advance time +2 minutes
+            gameClock.AddTime(2);
 
             // Move table stash into player inventory
             if (currentPlayer != null)
@@ -1655,19 +1738,13 @@ namespace SundayLastBreath.UI
             }
 
             hasPacked = true;
-            // Player manually equips items via Tactical Gear Workstation [3]
-
-            // Spawn extra apartment loot on the floor/kitchen counter (Twine Prologue_Menu houseLootSpawned)
             floorItems.Clear();
-            floorItems.Add(new InventoryEntry("Stale Coffee", 1));
-            floorItems.Add(new InventoryEntry("Kitchen Knife", 1));
-            floorItems.Add(new InventoryEntry("T-Shirt", 1));
 
-            AppendStoryLog("23:49", "ACTION // WORK EQUIPMENT SECURED",
-                "You geared up. You strapped on your heavy equipment and weapons. Rummaging through your kitchen, you uncovered extra supplies: Stale Coffee, Kitchen Knife, and a spare T-Shirt.");
+            AppendStoryLog(gameClock.GetTimeString(), "ACTION // WORK EQUIPMENT SECURED",
+                "You geared up. You strapped on your primary equipment and weapons. Sirens wail outside across the Ascott district corridor.");
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"Your gear is strapped tight and weapons loaded. Footsteps and muffled shrieks echo from the 4th floor corridor outside. Extra supplies sit on the kitchen counter.\"";
+                situationBoxText.text = "\"Your primary equipment is secured. Outside, emergency sirens wail across the Ascott district. Do you scavenge the rest of your apartment before heading into the corridor?\"";
             }
 
             if (packedSuccessBanner != null)
@@ -1676,7 +1753,7 @@ namespace SundayLastBreath.UI
             }
             if (packedSuccessText != null)
             {
-                packedSuccessText.text = "<color=#10B981>✓ You geared up. You strapped on your heavy equipment and weapons.\n<color=#F5BF42>[!] Extra supplies uncovered on the kitchen counter. Collect them below or in Tactical Gear [I].</color></color>";
+                packedSuccessText.text = "<color=#10B981>✓ Primary gear and equipment secured into your pack.\n<color=#38BDF8>[!] You can scavenge your apartment rooms below before stepping into the corridor.</color></color>";
             }
 
             // Objectives
@@ -1685,6 +1762,82 @@ namespace SundayLastBreath.UI
 
             ShowHubMenu();
             PopulateTableStashUI();
+            RefreshRightGearPanel();
+            RefreshAllPDAPanels();
+            EvaluateHubButtonStates();
+        }
+
+        private void OnSearchKitchenClicked()
+        {
+            PlayClickSFX();
+            if (currentPlayer == null || kitchenSearched) return;
+
+            kitchenSearched = true;
+            gameClock.AddTime(3); // +3 minutes
+
+            currentPlayer.AddItem("Bottled Water", 2);
+            currentPlayer.AddItem("Canned Tuna", 1);
+            currentPlayer.AddItem("Can Opener", 1);
+            currentPlayer.AddItem("Stale Coffee", 1);
+
+            AppendStoryLog(gameClock.GetTimeString(), "SCAVENGE // KITCHENETTE RAIDED",
+                "You raided the kitchen cupboards and fridge. You secured 2x Bottled Water, Canned Tuna, a manual Can Opener, and Stale Coffee before the tap sputtered dead brown sludge.");
+
+            if (situationBoxText != null)
+            {
+                situationBoxText.text = "\"Kitchen cupboards scavenged: clean water, canned rations, and a can opener secured into your backpack. Time is slipping away.\"";
+            }
+
+            RefreshRightGearPanel();
+            RefreshAllPDAPanels();
+            EvaluateHubButtonStates();
+        }
+
+        private void OnSearchBathroomClicked()
+        {
+            PlayClickSFX();
+            if (currentPlayer == null || bathroomSearched) return;
+
+            bathroomSearched = true;
+            gameClock.AddTime(2); // +2 minutes
+
+            currentPlayer.AddItem("Painkillers", 1);
+            currentPlayer.AddItem("Bandage", 2);
+            currentPlayer.AddItem("Rubbing Alcohol", 1);
+
+            AppendStoryLog(gameClock.GetTimeString(), "SCAVENGE // MEDICINE CABINET",
+                "Behind the bathroom mirror, you grabbed emergency medical supplies: Painkillers, 2x Bandages, and Rubbing Alcohol. The mirror reflects your pale face.");
+
+            if (situationBoxText != null)
+            {
+                situationBoxText.text = "\"Medicine cabinet stripped bare: sterile bandages, painkillers, and rubbing alcohol secured into your medical pouch.\"";
+            }
+
+            RefreshRightGearPanel();
+            RefreshAllPDAPanels();
+            EvaluateHubButtonStates();
+        }
+
+        private void OnSearchClosetClicked()
+        {
+            PlayClickSFX();
+            if (currentPlayer == null || closetSearched) return;
+
+            closetSearched = true;
+            gameClock.AddTime(2); // +2 minutes
+
+            currentPlayer.AddItem("Rain Poncho", 1);
+            currentPlayer.AddItem("Duct Tape", 1);
+            currentPlayer.AddItem("Matches", 1);
+
+            AppendStoryLog(gameClock.GetTimeString(), "SCAVENGE // HALLWAY CLOSET",
+                "You rummaged through the dark hallway closet. You pulled out a heavy Rain Poncho, industrial Duct Tape, and a box of waterproof Matches.");
+
+            if (situationBoxText != null)
+            {
+                situationBoxText.text = "\"Hallway closet checked: heavy rain poncho, duct tape, and waterproof matches secured.\"";
+            }
+
             RefreshRightGearPanel();
             RefreshAllPDAPanels();
             EvaluateHubButtonStates();
