@@ -1088,13 +1088,13 @@ namespace SundayLastBreath.UI
                     ? currentPlayer.inventory
                     : new List<InventoryEntry>();
 
-                int maxSlots = currentPlayer != null ? Mathf.Max(10, currentPlayer.bagLimit) : 12;
+                int maxSlots = currentPlayer != null ? Mathf.Max(6, currentPlayer.bagLimit) : 12;
                 if (pdaBackpackCountText != null)
                 {
                     pdaBackpackCountText.text = $"{inv.Count}/{maxSlots}";
                 }
 
-                int totalCells = Mathf.Max(12, maxSlots);
+                int totalCells = maxSlots;
                 for (int i = 0; i < totalCells; i++)
                 {
                     if (i < inv.Count)

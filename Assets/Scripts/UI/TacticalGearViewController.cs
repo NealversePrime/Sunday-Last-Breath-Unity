@@ -357,7 +357,7 @@ namespace SundayLastBreath.UI
                 ? _player.inventory
                 : new List<InventoryEntry>();
 
-            int maxSlots = _player != null ? Mathf.Max(12, _player.bagLimit) : 12;
+            int maxSlots = _player != null ? Mathf.Max(6, _player.bagLimit) : 12;
 
             for (int i = 0; i < maxSlots; i++)
             {
@@ -1043,7 +1043,7 @@ namespace SundayLastBreath.UI
         private void RefreshCapacityAndWeight()
         {
             int currentCount = _player != null && _player.inventory != null ? _player.inventory.Count : 0;
-            int maxCapacity = _player != null ? Mathf.Max(12, _player.bagLimit) : 12;
+            int maxCapacity = _player != null ? Mathf.Max(6, _player.bagLimit) : 12;
 
             if (backpackCountText != null)
             {
