@@ -2709,7 +2709,7 @@ namespace SundayLastBreath.Editor
             // Text Container (Flex Row for Action Label + Subtext Detail)
             GameObject textCont = new GameObject("TextContainer", typeof(RectTransform));
             textCont.transform.SetParent(btnObj.transform, false);
-            RectTransform tcRect = textCont.AddComponent<RectTransform>();
+            RectTransform tcRect = textCont.GetComponent<RectTransform>();
             tcRect.anchorMin = new Vector2(0f, 0f);
             tcRect.anchorMax = new Vector2(1f, 1f);
             tcRect.offsetMin = new Vector2(50f, 0f);
