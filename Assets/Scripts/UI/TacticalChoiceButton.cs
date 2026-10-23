@@ -32,10 +32,10 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI subLabelTmp;
 
         [Header("Colors & Styling")]
-        [SerializeField] private Color baseBgColor = new Color(0.06f, 0.08f, 0.11f, 0.75f);
-        [SerializeField] private Color hoverBgColor = new Color(0.12f, 0.16f, 0.22f, 0.95f);
-        [SerializeField] private Color baseOutlineColor = new Color(0.18f, 0.22f, 0.28f, 0.50f);
-        [SerializeField] private Color hoverOutlineColor = new Color(0.95f, 0.70f, 0.25f, 0.90f);
+        [SerializeField] private Color baseBgColor = new Color(0.04f, 0.06f, 0.09f, 0.65f);
+        [SerializeField] private Color hoverBgColor = new Color(0.95f, 0.65f, 0.15f, 0.14f);
+        [SerializeField] private Color baseOutlineColor = new Color(0.18f, 0.22f, 0.28f, 0.40f);
+        [SerializeField] private Color hoverOutlineColor = new Color(0.95f, 0.70f, 0.25f, 0.85f);
         [SerializeField] private Color baseAccentColor = new Color(0.95f, 0.75f, 0.35f);
         [SerializeField] private Color hoverAccentColor = new Color(1f, 0.85f, 0.40f);
         [SerializeField] private Color normalHotkeyColor = new Color(0.85f, 0.65f, 0.30f, 0.95f);

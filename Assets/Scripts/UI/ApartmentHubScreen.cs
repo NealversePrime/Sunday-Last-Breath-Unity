@@ -496,14 +496,41 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 2. Ensure SituationBox and PackedSuccessBanner stay directly under hubMenuContainer (outside scrollview)
-            if (situationBox != null && situationBox.transform.parent != hubMenuContainer.transform)
+            // 2. Ensure VerticalLayoutGroup properties on hubMenuContainer (Guarantees choice viewport fills entire console)
+            var vlgRoot = hubMenuContainer.GetComponent<VerticalLayoutGroup>();
+            if (vlgRoot != null)
             {
-                situationBox.transform.SetParent(hubMenuContainer.transform, false);
+                vlgRoot.spacing = 4f;
+                vlgRoot.childControlHeight = true;
+                vlgRoot.childForceExpandHeight = false;
+                vlgRoot.childControlWidth = true;
+                vlgRoot.childForceExpandWidth = true;
             }
-            if (packedSuccessBanner != null && packedSuccessBanner.transform.parent != hubMenuContainer.transform)
+
+            // Ensure SituationBox layout element stays compact
+            if (situationBox != null)
             {
-                packedSuccessBanner.transform.SetParent(hubMenuContainer.transform, false);
+                if (situationBox.transform.parent != hubMenuContainer.transform)
+                {
+                    situationBox.transform.SetParent(hubMenuContainer.transform, false);
+                }
+                LayoutElement sle = situationBox.GetComponent<LayoutElement>() ?? situationBox.AddComponent<LayoutElement>();
+                sle.preferredHeight = 58f;
+                sle.flexibleHeight = 0f;
+                sle.flexibleWidth = 1f;
+            }
+
+            // Ensure PackedSuccessBanner stays compact
+            if (packedSuccessBanner != null)
+            {
+                if (packedSuccessBanner.transform.parent != hubMenuContainer.transform)
+                {
+                    packedSuccessBanner.transform.SetParent(hubMenuContainer.transform, false);
+                }
+                LayoutElement ple = packedSuccessBanner.GetComponent<LayoutElement>() ?? packedSuccessBanner.AddComponent<LayoutElement>();
+                ple.preferredHeight = 26f;
+                ple.flexibleHeight = 0f;
+                ple.flexibleWidth = 1f;
             }
 
             // 3. Find or Wrap in ScrollView for choices
@@ -512,12 +539,6 @@ namespace SundayLastBreath.UI
 
             if (sr == null)
             {
-                var oldVlg = hubMenuContainer.GetComponent<VerticalLayoutGroup>();
-                if (oldVlg != null)
-                {
-                    oldVlg.spacing = 4f;
-                }
-
                 GameObject scrollObj = new GameObject("ChoiceScrollView", typeof(RectTransform));
                 scrollObj.transform.SetParent(hubMenuContainer.transform, false);
                 RectTransform srt = scrollObj.GetComponent<RectTransform>();
@@ -525,6 +546,7 @@ namespace SundayLastBreath.UI
                 srt.offsetMin = Vector2.zero; srt.offsetMax = Vector2.zero;
                 LayoutElement scLe = scrollObj.AddComponent<LayoutElement>();
                 scLe.flexibleHeight = 1f;
+                scLe.minHeight = 240f;
                 scLe.flexibleWidth = 1f;
 
                 sr = scrollObj.AddComponent<ScrollRect>();
@@ -550,7 +572,7 @@ namespace SundayLastBreath.UI
                 crt.sizeDelta = Vector2.zero;
 
                 VerticalLayoutGroup vlg = content.AddComponent<VerticalLayoutGroup>();
-                vlg.spacing = 4f;
+                vlg.spacing = 3f;
                 vlg.padding = new RectOffset(2, 6, 2, 2);
                 vlg.childControlWidth = true;
                 vlg.childControlHeight = false;
@@ -569,7 +591,7 @@ namespace SundayLastBreath.UI
                 for (int i = 0; i < hubMenuContainer.transform.childCount; i++)
                 {
                     Transform child = hubMenuContainer.transform.GetChild(i);
-                    if (child != scrollObj.transform && child != situationBox?.transform && child != packedSuccessBanner?.transform)
+                    if (child != scrollObj.transform && child != situationBox?.transform && child != packedSuccessBanner?.transform && child.gameObject.name != "ChoiceSubHeader")
                     {
                         childrenToMove.Add(child);
                     }
@@ -581,19 +603,31 @@ namespace SundayLastBreath.UI
             }
             else
             {
+                LayoutElement scLe = sr.GetComponent<LayoutElement>() ?? sr.gameObject.AddComponent<LayoutElement>();
+                scLe.flexibleHeight = 1f;
+                scLe.minHeight = 240f;
+                scLe.flexibleWidth = 1f;
+
                 contentParent = sr.content != null ? sr.content.transform : sr.transform;
                 var cvlg = contentParent.GetComponent<VerticalLayoutGroup>();
                 if (cvlg != null)
                 {
-                    cvlg.spacing = 4f;
+                    cvlg.spacing = 3f;
                     cvlg.padding = new RectOffset(2, 6, 2, 2);
+                    cvlg.childControlWidth = true;
+                    cvlg.childControlHeight = false;
+                    cvlg.childForceExpandWidth = true;
+                    cvlg.childForceExpandHeight = false;
                 }
             }
 
-            // 4. Ensure situationBox and packedSuccessBanner are correctly ordered before the scrollview
-            if (situationBox != null) situationBox.transform.SetSiblingIndex(0);
-            if (packedSuccessBanner != null) packedSuccessBanner.transform.SetSiblingIndex(1);
-            if (sr != null) sr.transform.SetSiblingIndex(2);
+            // 4. Ensure header order: SituationBox -> PackedSuccessBanner -> ChoiceSubHeader -> ScrollView
+            int sIdx = 0;
+            if (situationBox != null) situationBox.transform.SetSiblingIndex(sIdx++);
+            if (packedSuccessBanner != null) packedSuccessBanner.transform.SetSiblingIndex(sIdx++);
+            Transform sh = hubMenuContainer.transform.Find("ChoiceSubHeader");
+            if (sh != null) sh.SetSiblingIndex(sIdx++);
+            if (sr != null) sr.transform.SetSiblingIndex(sIdx++);
 
             // 5. Dynamically create missing Scavenge Buttons if null
             Button templateBtn = packGearButton != null ? packGearButton : leaveApartmentButton;
@@ -645,10 +679,10 @@ namespace SundayLastBreath.UI
                 Transform child = contentParent.GetChild(i);
                 if (child == null) continue;
 
-                // 1. Force 32px height for high density
+                // 1. Force 34px height for Direction A Fallout 4 FDI density
                 LayoutElement le = child.GetComponent<LayoutElement>();
                 if (le == null) le = child.gameObject.AddComponent<LayoutElement>();
-                le.preferredHeight = 32f;
+                le.preferredHeight = 34f;
                 le.flexibleWidth = 1f;
 
                 // 2. Ensure Left Accent Bar
@@ -913,9 +947,9 @@ namespace SundayLastBreath.UI
             awakeningStep = 1;
 
             if (floorItemsCard != null && tacticalGearController == null) floorItemsCard.SetActive(false);
-            if (searchKitchenButton != null) searchKitchenButton.gameObject.SetActive(false);
-            if (searchBathroomButton != null) searchBathroomButton.gameObject.SetActive(false);
-            if (searchClosetButton != null) searchClosetButton.gameObject.SetActive(false);
+            if (searchKitchenButton != null) searchKitchenButton.gameObject.SetActive(true);
+            if (searchBathroomButton != null) searchBathroomButton.gameObject.SetActive(true);
+            if (searchClosetButton != null) searchClosetButton.gameObject.SetActive(true);
             UpdateFloorItemsNotification();
 
             UpdateClockUI();
@@ -2127,20 +2161,20 @@ namespace SundayLastBreath.UI
                     if (isPolice)
                     {
                         listenRadioButton.interactable = true;
-                        if (listenRadioLabel != null) listenRadioLabel.text = "<color=#F59E0B>[POLICE]</color> LISTEN TO EMERGENCY BAND";
-                        if (listenRadioSub != null) listenRadioSub.text = "— 3 Minutes | Monitor encrypted dispatch channels";
+                        if (listenRadioLabel != null) listenRadioLabel.text = "<color=#38BDF8>[03 MIN]</color> <color=#F5A623>[POLICE]</color> LISTEN TO EMERGENCY BAND";
+                        if (listenRadioSub != null) listenRadioSub.text = "— Monitor encrypted police dispatch channels";
                     }
                     else if (hasTech1)
                     {
                         listenRadioButton.interactable = true;
-                        if (listenRadioLabel != null) listenRadioLabel.text = "<color=#38BDF8>[TECH 1]</color> HACK LOCAL POLICE CHATTER";
-                        if (listenRadioSub != null) listenRadioSub.text = "— 5 Minutes | Intercept dispatch frequency and bypass scramblers";
+                        if (listenRadioLabel != null) listenRadioLabel.text = "<color=#38BDF8>[05 MIN]</color> <color=#10B981>[TECH 1]</color> HACK LOCAL POLICE CHATTER";
+                        if (listenRadioSub != null) listenRadioSub.text = "— Intercept dispatch frequency and bypass scramblers";
                     }
                     else
                     {
                         listenRadioButton.interactable = false;
-                        if (listenRadioLabel != null) listenRadioLabel.text = "<s>ACCESS EMERGENCY BAND</s>";
-                        if (listenRadioSub != null) listenRadioSub.text = "<color=#EF4444>[LOCKED: REQ POLICE OR TECH 1 & TACTICS 4]</color>";
+                        if (listenRadioLabel != null) listenRadioLabel.text = "<s><color=#64748B>[LOCKED]</color> <color=#EF4444>[REQ: POLICE OR TECH 1]</color> ACCESS EMERGENCY BAND</s>";
+                        if (listenRadioSub != null) listenRadioSub.text = "— Requires Police Officer job or Tech 1 & Tactics 4";
                     }
                 }
             }
@@ -2160,88 +2194,79 @@ namespace SundayLastBreath.UI
                     if (hasTech3)
                     {
                         hackTerminalButton.interactable = true;
-                        if (hackTerminalLabel != null) hackTerminalLabel.text = "<color=#10B981>[TECH 3]</color> BYPASS GOV FIREWALL";
-                        if (hackTerminalSub != null) hackTerminalSub.text = "— 8 Minutes | Breach military encryption to extract directives";
+                        if (hackTerminalLabel != null) hackTerminalLabel.text = "<color=#38BDF8>[08 MIN]</color> <color=#10B981>[TECH 3]</color> BYPASS GOV FIREWALL";
+                        if (hackTerminalSub != null) hackTerminalSub.text = "— Breach military encryption to extract directives";
                     }
                     else
                     {
                         hackTerminalButton.interactable = false;
-                        if (hackTerminalLabel != null) hackTerminalLabel.text = "<s>BYPASS GOV FIREWALL</s>";
-                        if (hackTerminalSub != null) hackTerminalSub.text = "<color=#EF4444>[LOCKED: REQ TECH 3 & TACTICS 6]</color>";
+                        if (hackTerminalLabel != null) hackTerminalLabel.text = "<s><color=#64748B>[LOCKED]</color> <color=#EF4444>[REQ: TECH 3]</color> BYPASS GOV FIREWALL</s>";
+                        if (hackTerminalSub != null) hackTerminalSub.text = "— Requires Tech 3 & Tactics 6";
                     }
                 }
             }
 
-            // 5. Model A: Domestic Scavenge Actions (Kitchenette, Bathroom, Closet)
+            // 5. Model A: Domestic Scavenge Actions (Kitchenette, Bathroom, Closet) - Always Available
             if (searchKitchenButton != null)
             {
-                searchKitchenButton.gameObject.SetActive(hasPacked);
-                if (hasPacked)
+                searchKitchenButton.gameObject.SetActive(true);
+                searchKitchenButton.interactable = !kitchenSearched;
+                if (searchKitchenLabel != null)
                 {
-                    searchKitchenButton.interactable = !kitchenSearched;
-                    if (searchKitchenLabel != null)
-                    {
-                        searchKitchenLabel.text = kitchenSearched
-                            ? "<s>KITCHENETTE (CLEARED)</s>"
-                            : "<color=#F59E0B>[3 MIN]</color> SEARCH KITCHENETTE FOR PROVISIONS";
-                    }
-                    if (searchKitchenSub != null)
-                    {
-                        searchKitchenSub.text = kitchenSearched
-                            ? "— <color=#64748B>Cupboards and fridge stripped bare</color>"
-                            : "— Scrounge cupboards and fridge for preserved food and clean water";
-                    }
+                    searchKitchenLabel.text = kitchenSearched
+                        ? "<s><color=#64748B>[03 MIN] [CLEARED] KITCHENETTE</color></s>"
+                        : "<color=#38BDF8>[03 MIN]</color> <color=#F59E0B>[SUPPLIES]</color> SEARCH KITCHENETTE FOR PROVISIONS";
+                }
+                if (searchKitchenSub != null)
+                {
+                    searchKitchenSub.text = kitchenSearched
+                        ? "— <color=#475569>Cupboards and fridge stripped bare</color>"
+                        : "— Scrounge cupboards and fridge for preserved food and clean water";
                 }
             }
 
             if (searchBathroomButton != null)
             {
-                searchBathroomButton.gameObject.SetActive(hasPacked);
-                if (hasPacked)
+                searchBathroomButton.gameObject.SetActive(true);
+                searchBathroomButton.interactable = !bathroomSearched;
+                if (searchBathroomLabel != null)
                 {
-                    searchBathroomButton.interactable = !bathroomSearched;
-                    if (searchBathroomLabel != null)
-                    {
-                        searchBathroomLabel.text = bathroomSearched
-                            ? "<s>MEDICINE CABINET (CLEARED)</s>"
-                            : "<color=#10B981>[2 MIN]</color> RAID BATHROOM MEDICINE CABINET";
-                    }
-                    if (searchBathroomSub != null)
-                    {
-                        searchBathroomSub.text = bathroomSearched
-                            ? "— <color=#64748B>Medicine cabinet stripped bare</color>"
-                            : "— Grab painkillers, sterile bandages, and first-aid supplies";
-                    }
+                    searchBathroomLabel.text = bathroomSearched
+                        ? "<s><color=#64748B>[02 MIN] [CLEARED] MEDICINE CABINET</color></s>"
+                        : "<color=#38BDF8>[02 MIN]</color> <color=#2DD4BF>[FIRST AID]</color> RAID BATHROOM MEDICINE CABINET";
+                }
+                if (searchBathroomSub != null)
+                {
+                    searchBathroomSub.text = bathroomSearched
+                        ? "— <color=#475569>Medicine cabinet stripped bare</color>"
+                        : "— Grab painkillers, sterile bandages, and first-aid supplies";
                 }
             }
 
             if (searchClosetButton != null)
             {
-                searchClosetButton.gameObject.SetActive(hasPacked);
-                if (hasPacked)
+                searchClosetButton.gameObject.SetActive(true);
+                searchClosetButton.interactable = !closetSearched;
+                if (searchClosetLabel != null)
                 {
-                    searchClosetButton.interactable = !closetSearched;
-                    if (searchClosetLabel != null)
-                    {
-                        searchClosetLabel.text = closetSearched
-                            ? "<s>HALLWAY CLOSET (CLEARED)</s>"
-                            : "<color=#38BDF8>[2 MIN]</color> PULL WEATHER GEAR FROM CLOSET";
-                    }
-                    if (searchClosetSub != null)
-                    {
-                        searchClosetSub.text = closetSearched
-                            ? "— <color=#64748B>Closet shelves and coat rack are empty</color>"
-                            : "— Retrieve weather protection, duct tape, and utility gear";
-                    }
+                    searchClosetLabel.text = closetSearched
+                        ? "<s><color=#64748B>[02 MIN] [CLEARED] HALLWAY CLOSET</color></s>"
+                        : "<color=#38BDF8>[02 MIN]</color> <color=#818CF8>[WEATHER]</color> PULL WEATHER GEAR FROM CLOSET";
+                }
+                if (searchClosetSub != null)
+                {
+                    searchClosetSub.text = closetSearched
+                        ? "— <color=#475569>Closet shelves and coat rack are empty</color>"
+                        : "— Retrieve weather protection, duct tape, and utility gear";
                 }
             }
 
-            // 6. Leave Apartment (unlocked only after packing!)
+            // 6. Leave Apartment (Always visible in list)
             if (leaveApartmentButton != null)
             {
-                leaveApartmentButton.gameObject.SetActive(hasPacked);
+                leaveApartmentButton.gameObject.SetActive(true);
                 TextMeshProUGUI leaveLbl = leaveApartmentButton.GetComponentInChildren<TextMeshProUGUI>();
-                if (leaveLbl != null && leaveLbl.gameObject.name == "MainLabel")
+                if (leaveLbl != null && (leaveLbl.gameObject.name == "MainLabel" || leaveLbl.gameObject.name == "Label"))
                 {
                     leaveLbl.text = "<color=#EF4444>[EXIT]</color> STEP INTO 4TH FLOOR CORRIDOR";
                 }
@@ -2607,6 +2632,16 @@ namespace SundayLastBreath.UI
         private void OnLeaveApartmentClicked()
         {
             PlayClickSFX();
+
+            if (!hasPacked)
+            {
+                AudioManager.Instance?.PlayButtonHover();
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "\"<color=#EF4444><b>[BLOCKED]</b> You have not gathered your starter work gear and service tools from the table! Facing the Seattle blackout unarmed and unprepared is suicide. Pack your gear first.</color>\"";
+                }
+                return;
+            }
 
             // Complete leave apartment objective, add escape building
             objectiveSystem.CompleteObjective("leave_apt");
