@@ -118,6 +118,14 @@ namespace SundayLastBreath.Editor
             ApartmentHubScreen apartmentHubScreen = BuildApartmentHubScreen(screensObj.transform);
             SundayTypography.ApplyHierarchy(screensObj.transform);
 
+            // Initial Screen States: Boot cleanly into StudioSplashScreen
+            disclaimerScreen.gameObject.SetActive(false);
+            titleScreen.gameObject.SetActive(false);
+            prologueScreen.gameObject.SetActive(false);
+            creationScreen.gameObject.SetActive(false);
+            apartmentHubScreen.gameObject.SetActive(false);
+            splashScreen.gameObject.SetActive(true);
+
             // 7. GameManager
             GameObject gameMgrObj = new GameObject("GameManager");
             GameManager gameMgr = gameMgrObj.AddComponent<GameManager>();
