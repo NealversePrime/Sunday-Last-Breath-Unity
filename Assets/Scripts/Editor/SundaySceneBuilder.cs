@@ -706,9 +706,9 @@ namespace SundayLastBreath.Editor
             brHlg.childControlWidth = true; brHlg.childControlHeight = true;
             brHlg.childForceExpandWidth = true; brHlg.childForceExpandHeight = true;
 
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModeNarrative", "[1] NARRATIVE & LOG", out Button btnNarrative, out Image indNarrative, out TextMeshProUGUI _, true);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "[2] SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, out TextMeshProUGUI _, false);
-            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "[3] TACTICAL GEAR [I]", out Button btnGear, out Image indGear, out TextMeshProUGUI gearLabelTmp, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModeNarrative", "NARRATIVE & LOG [ESC]", out Button btnNarrative, out Image indNarrative, out TextMeshProUGUI _, true);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModePDA", "SURVIVOR PDA [TAB]", out Button btnPDA, out Image indPDA, out TextMeshProUGUI _, false);
+            CreateConsoleModeButton(btnRow.transform, "Btn_ModeGear", "TACTICAL GEAR [I]", out Button btnGear, out Image indGear, out TextMeshProUGUI gearLabelTmp, false);
 
             // Centered Content container for Tactical Gear button (Text + Notification Badge side-by-side)
             GameObject gearContent = new GameObject("Content", typeof(RectTransform));
@@ -1083,11 +1083,11 @@ namespace SundayLastBreath.Editor
             mVlg2.childControlWidth = true;
             mVlg2.childControlHeight = false;
 
-            // Current Situation & Story Box (Sleek 70px Header)
+            // Current Situation & Story Box (Sleek 58px Compact Header)
             GameObject sitBox = new GameObject("SituationBox", typeof(RectTransform));
             sitBox.transform.SetParent(menuObj.transform, false);
             LayoutElement sitLe = sitBox.AddComponent<LayoutElement>();
-            sitLe.preferredHeight = 70f;
+            sitLe.preferredHeight = 58f;
             sitLe.flexibleWidth = 1f;
 
             Image sitBg = sitBox.AddComponent<Image>();
@@ -1163,11 +1163,11 @@ namespace SundayLastBreath.Editor
             sbtRect.offsetMin = new Vector2(16f, 4f);
             sbtRect.offsetMax = new Vector2(-16f, -30f);
 
-            // Packed Success Banner (Sleek 32px Compact Alert)
+            // Packed Success Banner (Sleek 26px Compact Alert)
             GameObject pBanner = new GameObject("PackedSuccessBanner", typeof(RectTransform));
             pBanner.transform.SetParent(menuObj.transform, false);
             LayoutElement pBle = pBanner.AddComponent<LayoutElement>();
-            pBle.preferredHeight = 32f;
+            pBle.preferredHeight = 26f;
             Image pbImg = pBanner.AddComponent<Image>();
             pbImg.color = new Color(0.04f, 0.16f, 0.06f, 0.90f);
 
@@ -1182,8 +1182,8 @@ namespace SundayLastBreath.Editor
             pbgImg.color = new Color(0.18f, 0.80f, 0.44f);
 
             TextMeshProUGUI pbTmp = CreateTMPText(pBanner.transform, "Text",
-                "[+] You geared up. You strapped on your heavy equipment, shoved smaller items into pockets, and pulled a Kitchen Knife from the block.",
-                11f, new Color(0.35f, 0.95f, 0.55f), TextAlignmentOptions.MidlineLeft);
+                "[+] Primary work equipment strapped on and secured into tactical pack.",
+                10.5f, new Color(0.35f, 0.95f, 0.55f), TextAlignmentOptions.MidlineLeft);
             RectTransform pbTextRect = pbTmp.rectTransform;
             StretchFull(pbTextRect);
             pbTextRect.offsetMin = new Vector2(14f, 0f);
@@ -1220,7 +1220,8 @@ namespace SundayLastBreath.Editor
             choiceContentRect.sizeDelta = Vector2.zero;
 
             VerticalLayoutGroup ccVlg = choiceContent.AddComponent<VerticalLayoutGroup>();
-            ccVlg.spacing = 6f;
+            ccVlg.spacing = 4f;
+            ccVlg.padding = new RectOffset(2, 6, 2, 2);
             ccVlg.childControlWidth = true;
             ccVlg.childControlHeight = false;
             ccVlg.childForceExpandWidth = true;
@@ -1261,39 +1262,39 @@ namespace SundayLastBreath.Editor
             choiceSr.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
             choiceSr.verticalScrollbarSpacing = 4f;
 
-            // Menu Action Buttons (Inside Scroll Content)
+            // Menu Action Buttons (Inside Scroll Content) - Compact Fallout/BG3 CRPG Choice Rows
             CreateApartmentMenuButton(choiceContent.transform, "Btn_PackGear", "GATHER WORK GEAR & SUIT UP",
                 "2 Minutes | Collect your starter job gear, strap on your holster, and lace boots.",
-                new Color(0.95f, 0.75f, 0.35f), out Button btnPack, out TextMeshProUGUI _, out TextMeshProUGUI _);
+                new Color(0.95f, 0.75f, 0.35f), out Button btnPack, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchKitchen", "SEARCH KITCHENETTE FOR PROVISIONS",
                 "3 Minutes | Scrounge cupboards and fridge for preserved food and clean water.",
-                new Color(0.95f, 0.70f, 0.30f), out Button btnKitchen, out TextMeshProUGUI kitchenLbl, out TextMeshProUGUI kitchenSub);
+                new Color(0.95f, 0.70f, 0.30f), out Button btnKitchen, out TextMeshProUGUI kitchenLbl, out TextMeshProUGUI kitchenSub, choiceIndex: 2);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchBathroom", "RAID BATHROOM MEDICINE CABINET",
                 "2 Minutes | Grab painkillers, sterile bandages, and first-aid supplies.",
-                new Color(0.30f, 0.85f, 0.60f), out Button btnBathroom, out TextMeshProUGUI bathLbl, out TextMeshProUGUI bathSub);
+                new Color(0.30f, 0.85f, 0.60f), out Button btnBathroom, out TextMeshProUGUI bathLbl, out TextMeshProUGUI bathSub, choiceIndex: 3);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_SearchCloset", "PULL WEATHER GEAR FROM CLOSET",
                 "2 Minutes | Retrieve weather protection, duct tape, and utility gear.",
-                new Color(0.40f, 0.75f, 0.95f), out Button btnCloset, out TextMeshProUGUI closetLbl, out TextMeshProUGUI closetSub);
+                new Color(0.40f, 0.75f, 0.95f), out Button btnCloset, out TextMeshProUGUI closetLbl, out TextMeshProUGUI closetSub, choiceIndex: 4);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_CheckPhone", "CHECK NEWS FEED",
                 "1 Minute | See what the internet knows before the grid goes down.",
-                new Color(0.35f, 0.75f, 0.95f), out Button btnPhone, out TextMeshProUGUI _, out TextMeshProUGUI _);
+                new Color(0.35f, 0.75f, 0.95f), out Button btnPhone, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 5);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_ListenRadio", "LISTEN TO EMERGENCY BAND [POLICE]",
                 "3 Minutes | Monitor encrypted dispatch channels. Find out where lines are breaking.",
-                new Color(0.95f, 0.75f, 0.35f), out Button btnRadio, out TextMeshProUGUI radioLbl, out TextMeshProUGUI radioSub);
+                new Color(0.95f, 0.75f, 0.35f), out Button btnRadio, out TextMeshProUGUI radioLbl, out TextMeshProUGUI radioSub, choiceIndex: 6);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_HackTerminal", "BYPASS GOV FIREWALL [TECH 3]",
                 "8 Minutes | Breach military-grade encryption to extract classified directives.",
-                new Color(0.35f, 0.95f, 0.45f), out Button btnHacking, out TextMeshProUGUI hackLbl, out TextMeshProUGUI hackSub);
+                new Color(0.35f, 0.95f, 0.45f), out Button btnHacking, out TextMeshProUGUI hackLbl, out TextMeshProUGUI hackSub, choiceIndex: 7);
 
             CreateApartmentMenuButton(choiceContent.transform, "Btn_LeaveApartment", "LEAVE APARTMENT",
                 "Exit to the 4th Floor Hallway. Ready your weapon. There is no turning back.",
                 new Color(0.95f, 0.3f, 0.3f), out Button btnLeave, out TextMeshProUGUI _, out TextMeshProUGUI _,
-                new Color(0.20f, 0.05f, 0.05f, 0.95f));
+                new Color(0.20f, 0.05f, 0.05f, 0.95f), choiceIndex: 8);
 
 
             // -------------------------------------------------------------------------
@@ -2602,20 +2603,20 @@ namespace SundayLastBreath.Editor
         }
 
         private static void CreateApartmentMenuButton(Transform parent, string name, string mainText, string subText,
-            Color accentColor, out Button button, out TextMeshProUGUI mainLabel, out TextMeshProUGUI subLabel, Color? bgColor = null)
+            Color accentColor, out Button button, out TextMeshProUGUI mainLabel, out TextMeshProUGUI subLabel, Color? bgColor = null, int choiceIndex = 1)
         {
             GameObject btnObj = new GameObject(name);
             btnObj.transform.SetParent(parent, false);
             LayoutElement le = btnObj.AddComponent<LayoutElement>();
-            le.preferredHeight = 46f;
+            le.preferredHeight = 32f;
             le.flexibleWidth = 1f;
 
             Image bg = btnObj.AddComponent<Image>();
-            bg.color = bgColor ?? new Color(0.08f, 0.09f, 0.11f, 0.98f);
+            bg.color = bgColor ?? new Color(0.06f, 0.08f, 0.11f, 0.75f);
             bg.raycastTarget = true;
 
             Outline ol = btnObj.AddComponent<Outline>();
-            ol.effectColor = new Color(0.24f, 0.16f, 0.16f, 0.85f);
+            ol.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.50f);
             ol.effectDistance = new Vector2(1f, -1f);
 
             button = btnObj.AddComponent<Button>();
@@ -2623,82 +2624,140 @@ namespace SundayLastBreath.Editor
 
             ColorBlock cb = button.colors;
             cb.normalColor = bg.color;
-            cb.highlightedColor = new Color(0.14f, 0.16f, 0.20f, 1f);
-            cb.pressedColor = new Color(0.05f, 0.06f, 0.08f, 1f);
-            cb.disabledColor = new Color(0.03f, 0.04f, 0.05f, 0.5f);
+            cb.highlightedColor = new Color(0.14f, 0.18f, 0.24f, 1f);
+            cb.pressedColor = new Color(0.04f, 0.05f, 0.07f, 1f);
+            cb.disabledColor = new Color(0.03f, 0.04f, 0.05f, 0.4f);
             button.colors = cb;
 
             // Mask so sheen sweep stays strictly within button borders
             btnObj.AddComponent<RectMask2D>();
 
-            // Sweeping Shine Sheen (replicating Twine CSS button::after radar sweep)
+            // Sweeping Shine Sheen
             GameObject shineObj = new GameObject("ShineSweep", typeof(RectTransform));
             shineObj.transform.SetParent(btnObj.transform, false);
             RectTransform shineRect = shineObj.GetComponent<RectTransform>();
             shineRect.anchorMin = new Vector2(0f, 0f);
             shineRect.anchorMax = new Vector2(0f, 1f);
             shineRect.pivot = new Vector2(0.5f, 0.5f);
-            shineRect.sizeDelta = new Vector2(60f, 40f);
+            shineRect.sizeDelta = new Vector2(50f, 32f);
             shineRect.anchoredPosition = new Vector2(-120f, 0f);
             shineRect.localRotation = Quaternion.Euler(0f, 0f, -25f);
             Image shineImg = shineObj.AddComponent<Image>();
-            shineImg.color = new Color(1f, 1f, 1f, 0.14f);
+            shineImg.color = new Color(1f, 1f, 1f, 0.12f);
             shineImg.raycastTarget = false;
             shineObj.SetActive(false);
 
-            // 5px Accent Bar on Left (matching Twine border-left: 5px solid var(--accent-gold))
+            // Left 3px Accent Bar (Hidden by default, reveals on hover)
             GameObject barObj = new GameObject("AccentBar");
             barObj.transform.SetParent(btnObj.transform, false);
             RectTransform barRect = barObj.AddComponent<RectTransform>();
             barRect.anchorMin = new Vector2(0f, 0f);
             barRect.anchorMax = new Vector2(0f, 1f);
             barRect.pivot = new Vector2(0f, 0.5f);
-            barRect.sizeDelta = new Vector2(5f, 0f);
+            barRect.sizeDelta = new Vector2(3f, 0f);
             barRect.anchoredPosition = Vector2.zero;
             Image barImg = barObj.AddComponent<Image>();
             barImg.color = accentColor;
             barImg.raycastTarget = false;
+            barObj.SetActive(false);
 
-            // Text Container
-            GameObject textCont = new GameObject("TextContainer");
+            // Gutter Container (Holds ">>" hover indicator & "[ 1 ]" bracketed hotkey)
+            GameObject gutterObj = new GameObject("Gutter", typeof(RectTransform));
+            gutterObj.transform.SetParent(btnObj.transform, false);
+            RectTransform gutRect = gutterObj.GetComponent<RectTransform>();
+            gutRect.anchorMin = new Vector2(0f, 0f);
+            gutRect.anchorMax = new Vector2(0f, 1f);
+            gutRect.pivot = new Vector2(0f, 0.5f);
+            gutRect.sizeDelta = new Vector2(46f, 0f);
+            gutRect.anchoredPosition = Vector2.zero;
+
+            // Hover Chevron ">>" (Slides right on hover)
+            GameObject chObj = new GameObject("HoverChevron", typeof(RectTransform));
+            chObj.transform.SetParent(gutterObj.transform, false);
+            RectTransform chRect = chObj.GetComponent<RectTransform>();
+            chRect.anchorMin = new Vector2(0f, 0f);
+            chRect.anchorMax = new Vector2(0f, 1f);
+            chRect.pivot = new Vector2(0f, 0.5f);
+            chRect.anchoredPosition = new Vector2(-4f, 0f);
+            chRect.sizeDelta = new Vector2(16f, 0f);
+            TextMeshProUGUI chTmp = chObj.AddComponent<TextMeshProUGUI>();
+            chTmp.fontSize = 12f;
+            chTmp.fontStyle = FontStyles.Bold;
+            chTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            chTmp.color = new Color(1f, 0.65f, 0.15f); // Amber glow
+            chTmp.text = ">>";
+            chTmp.raycastTarget = false;
+            chObj.SetActive(false);
+
+            // Hotkey Label "[ 1 ]"
+            GameObject hkObj = new GameObject("HotkeyLabel", typeof(RectTransform));
+            hkObj.transform.SetParent(gutterObj.transform, false);
+            RectTransform hkRect = hkObj.GetComponent<RectTransform>();
+            hkRect.anchorMin = new Vector2(0f, 0f);
+            hkRect.anchorMax = new Vector2(1f, 1f);
+            hkRect.offsetMin = new Vector2(16f, 0f);
+            hkRect.offsetMax = Vector2.zero;
+            TextMeshProUGUI hkTmp = hkObj.AddComponent<TextMeshProUGUI>();
+            hkTmp.fontSize = 11.5f;
+            hkTmp.fontStyle = FontStyles.Bold;
+            hkTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            hkTmp.color = new Color(0.85f, 0.65f, 0.30f, 0.95f);
+            hkTmp.text = $"[ {choiceIndex} ]";
+            hkTmp.raycastTarget = false;
+            SundayTypography.ApplyFont(hkTmp, FontRole.Mono);
+
+            // Text Container (Flex Row for Action Label + Subtext Detail)
+            GameObject textCont = new GameObject("TextContainer", typeof(RectTransform));
             textCont.transform.SetParent(btnObj.transform, false);
             RectTransform tcRect = textCont.AddComponent<RectTransform>();
-            StretchFull(tcRect);
-            tcRect.offsetMin = new Vector2(16f, 3f);
-            tcRect.offsetMax = new Vector2(-14f, -3f);
+            tcRect.anchorMin = new Vector2(0f, 0f);
+            tcRect.anchorMax = new Vector2(1f, 1f);
+            tcRect.offsetMin = new Vector2(50f, 0f);
+            tcRect.offsetMax = new Vector2(-10f, 0f);
 
-            GameObject mLblObj = new GameObject("MainLabel");
+            HorizontalLayoutGroup tcHlg = textCont.AddComponent<HorizontalLayoutGroup>();
+            tcHlg.spacing = 10f;
+            tcHlg.childAlignment = TextAnchor.MiddleLeft;
+            tcHlg.childControlWidth = false;
+            tcHlg.childControlHeight = true;
+            tcHlg.childForceExpandWidth = false;
+            tcHlg.childForceExpandHeight = true;
+
+            // Main Label (Primary Action Prose)
+            GameObject mLblObj = new GameObject("MainLabel", typeof(RectTransform));
             mLblObj.transform.SetParent(textCont.transform, false);
-            RectTransform mlRect = mLblObj.AddComponent<RectTransform>();
-            mlRect.anchorMin = new Vector2(0f, 0.45f);
-            mlRect.anchorMax = new Vector2(1f, 1f);
-            mlRect.offsetMin = Vector2.zero;
-            mlRect.offsetMax = Vector2.zero;
             mainLabel = mLblObj.AddComponent<TextMeshProUGUI>();
-            mainLabel.fontSize = 12.5f;
+            mainLabel.fontSize = 11.5f;
             mainLabel.fontStyle = FontStyles.Bold;
             mainLabel.alignment = TextAlignmentOptions.MidlineLeft;
             mainLabel.color = Color.white;
             mainLabel.text = mainText;
             mainLabel.raycastTarget = false;
+            SundayTypography.ApplyFont(mainLabel, FontRole.Body);
 
-            GameObject sLblObj = new GameObject("SubLabel");
+            ContentSizeFitter mlCsf = mLblObj.AddComponent<ContentSizeFitter>();
+            mlCsf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            mlCsf.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+            // Sub Label (Inline detail / metadata)
+            GameObject sLblObj = new GameObject("SubLabel", typeof(RectTransform));
             sLblObj.transform.SetParent(textCont.transform, false);
-            RectTransform slRect = sLblObj.AddComponent<RectTransform>();
-            slRect.anchorMin = new Vector2(0f, 0f);
-            slRect.anchorMax = new Vector2(1f, 0.45f);
-            slRect.offsetMin = Vector2.zero;
-            slRect.offsetMax = Vector2.zero;
             subLabel = sLblObj.AddComponent<TextMeshProUGUI>();
-            subLabel.fontSize = 9.5f;
+            subLabel.fontSize = 10f;
             subLabel.alignment = TextAlignmentOptions.MidlineLeft;
-            subLabel.color = new Color(0.68f, 0.70f, 0.74f);
-            subLabel.text = subText;
+            subLabel.color = new Color(0.64f, 0.70f, 0.78f);
+            subLabel.text = string.IsNullOrEmpty(subText) ? "" : $"— {subText}";
             subLabel.raycastTarget = false;
+            subLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            subLabel.overflowMode = TextOverflowModes.Ellipsis;
+            SundayTypography.ApplyFont(subLabel, FontRole.Body);
 
-            // Attach TacticalChoiceButton for 10px hover slide, border glow, sheen sweep, and audio triggers
+            LayoutElement slLe = sLblObj.AddComponent<LayoutElement>();
+            slLe.flexibleWidth = 1f;
+
+            // Attach TacticalChoiceButton for Fallout/BG3 hover animations, audio, and keyboard hotkeys
             TacticalChoiceButton tcb = btnObj.AddComponent<TacticalChoiceButton>();
-            tcb.Initialize(button, tcRect, bg, barImg, ol, shineRect, accentColor);
+            tcb.Initialize(button, tcRect, bg, barImg, ol, shineRect, accentColor, chTmp, hkTmp, mainLabel, subLabel);
         }
 
         private static GameObject BuildStoryLogModal(Transform parent, out TextMeshProUGUI logContentTmp, out Button closeBtn, out Button closeBottomBtn)

@@ -481,6 +481,8 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private readonly List<TacticalChoiceButton> activeChoiceButtons = new List<TacticalChoiceButton>();
+
         private void EnsureHubMenuSanitized()
         {
             if (hubMenuContainer == null) return;
@@ -494,20 +496,36 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 2. Wrap in ScrollView if missing (backward compatibility with older scene builds)
+            // 2. Ensure SituationBox and PackedSuccessBanner stay directly under hubMenuContainer (outside scrollview)
+            if (situationBox != null && situationBox.transform.parent != hubMenuContainer.transform)
+            {
+                situationBox.transform.SetParent(hubMenuContainer.transform, false);
+            }
+            if (packedSuccessBanner != null && packedSuccessBanner.transform.parent != hubMenuContainer.transform)
+            {
+                packedSuccessBanner.transform.SetParent(hubMenuContainer.transform, false);
+            }
+
+            // 3. Find or Wrap in ScrollView for choices
             ScrollRect sr = hubMenuContainer.GetComponentInChildren<ScrollRect>(true);
-            Transform contentParent = hubMenuContainer.transform;
+            Transform contentParent = null;
 
             if (sr == null)
             {
                 var oldVlg = hubMenuContainer.GetComponent<VerticalLayoutGroup>();
-                if (oldVlg != null) Destroy(oldVlg);
+                if (oldVlg != null)
+                {
+                    oldVlg.spacing = 4f;
+                }
 
                 GameObject scrollObj = new GameObject("ChoiceScrollView", typeof(RectTransform));
                 scrollObj.transform.SetParent(hubMenuContainer.transform, false);
                 RectTransform srt = scrollObj.GetComponent<RectTransform>();
                 srt.anchorMin = Vector2.zero; srt.anchorMax = Vector2.one;
                 srt.offsetMin = Vector2.zero; srt.offsetMax = Vector2.zero;
+                LayoutElement scLe = scrollObj.AddComponent<LayoutElement>();
+                scLe.flexibleHeight = 1f;
+                scLe.flexibleWidth = 1f;
 
                 sr = scrollObj.AddComponent<ScrollRect>();
                 sr.horizontal = false;
@@ -532,7 +550,8 @@ namespace SundayLastBreath.UI
                 crt.sizeDelta = Vector2.zero;
 
                 VerticalLayoutGroup vlg = content.AddComponent<VerticalLayoutGroup>();
-                vlg.spacing = 6f;
+                vlg.spacing = 4f;
+                vlg.padding = new RectOffset(2, 6, 2, 2);
                 vlg.childControlWidth = true;
                 vlg.childControlHeight = false;
                 vlg.childForceExpandWidth = true;
@@ -545,12 +564,15 @@ namespace SundayLastBreath.UI
                 sr.content = crt;
                 contentParent = content.transform;
 
-                // Reparent existing buttons
+                // Reparent only choice buttons to contentParent
                 List<Transform> childrenToMove = new List<Transform>();
                 for (int i = 0; i < hubMenuContainer.transform.childCount; i++)
                 {
                     Transform child = hubMenuContainer.transform.GetChild(i);
-                    if (child != scrollObj.transform) childrenToMove.Add(child);
+                    if (child != scrollObj.transform && child != situationBox?.transform && child != packedSuccessBanner?.transform)
+                    {
+                        childrenToMove.Add(child);
+                    }
                 }
                 foreach (var c in childrenToMove)
                 {
@@ -560,9 +582,20 @@ namespace SundayLastBreath.UI
             else
             {
                 contentParent = sr.content != null ? sr.content.transform : sr.transform;
+                var cvlg = contentParent.GetComponent<VerticalLayoutGroup>();
+                if (cvlg != null)
+                {
+                    cvlg.spacing = 4f;
+                    cvlg.padding = new RectOffset(2, 6, 2, 2);
+                }
             }
 
-            // 3. Dynamically create missing Scavenge Buttons if null
+            // 4. Ensure situationBox and packedSuccessBanner are correctly ordered before the scrollview
+            if (situationBox != null) situationBox.transform.SetSiblingIndex(0);
+            if (packedSuccessBanner != null) packedSuccessBanner.transform.SetSiblingIndex(1);
+            if (sr != null) sr.transform.SetSiblingIndex(2);
+
+            // 5. Dynamically create missing Scavenge Buttons if null
             Button templateBtn = packGearButton != null ? packGearButton : leaveApartmentButton;
             if (templateBtn != null)
             {
@@ -589,16 +622,190 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 4. Ensure logical child order in contentParent so choices flow naturally
-            if (packedSuccessBanner != null) packedSuccessBanner.transform.SetSiblingIndex(0);
-            if (packGearButton != null) packGearButton.transform.SetSiblingIndex(1);
-            if (searchKitchenButton != null) searchKitchenButton.transform.SetSiblingIndex(2);
-            if (searchBathroomButton != null) searchBathroomButton.transform.SetSiblingIndex(3);
-            if (searchClosetButton != null) searchClosetButton.transform.SetSiblingIndex(4);
-            if (checkPhoneButton != null) checkPhoneButton.transform.SetSiblingIndex(5);
-            if (listenRadioButton != null) listenRadioButton.transform.SetSiblingIndex(6);
-            if (hackTerminalButton != null) hackTerminalButton.transform.SetSiblingIndex(7);
-            if (leaveApartmentButton != null) leaveApartmentButton.transform.SetSiblingIndex(8);
+            // 6. Ensure logical child order in contentParent so choices flow naturally
+            if (packGearButton != null) packGearButton.transform.SetSiblingIndex(0);
+            if (searchKitchenButton != null) searchKitchenButton.transform.SetSiblingIndex(1);
+            if (searchBathroomButton != null) searchBathroomButton.transform.SetSiblingIndex(2);
+            if (searchClosetButton != null) searchClosetButton.transform.SetSiblingIndex(3);
+            if (checkPhoneButton != null) checkPhoneButton.transform.SetSiblingIndex(4);
+            if (listenRadioButton != null) listenRadioButton.transform.SetSiblingIndex(5);
+            if (hackTerminalButton != null) hackTerminalButton.transform.SetSiblingIndex(6);
+            if (leaveApartmentButton != null) leaveApartmentButton.transform.SetSiblingIndex(7);
+
+            // 7. Re-skin all buttons in contentParent to compact 32px Fallout/BG3 CRPG row format
+            SanitizeChoiceRowVisuals(contentParent);
+        }
+
+        private void SanitizeChoiceRowVisuals(Transform contentParent)
+        {
+            if (contentParent == null) return;
+
+            for (int i = 0; i < contentParent.childCount; i++)
+            {
+                Transform child = contentParent.GetChild(i);
+                if (child == null) continue;
+
+                // 1. Force 32px height for high density
+                LayoutElement le = child.GetComponent<LayoutElement>();
+                if (le == null) le = child.gameObject.AddComponent<LayoutElement>();
+                le.preferredHeight = 32f;
+                le.flexibleWidth = 1f;
+
+                // 2. Ensure Left Accent Bar
+                Transform bar = child.Find("AccentBar");
+                Image barImg = null;
+                if (bar != null)
+                {
+                    barImg = bar.GetComponent<Image>();
+                    RectTransform brt = bar.GetComponent<RectTransform>();
+                    if (brt != null)
+                    {
+                        brt.anchorMin = new Vector2(0f, 0f);
+                        brt.anchorMax = new Vector2(0f, 1f);
+                        brt.pivot = new Vector2(0f, 0.5f);
+                        brt.sizeDelta = new Vector2(3f, 0f);
+                        brt.anchoredPosition = Vector2.zero;
+                    }
+                    bar.gameObject.SetActive(false);
+                }
+
+                // 3. Ensure Gutter with HoverChevron (>>) and HotkeyLabel ([ 1 ])
+                Transform gutter = child.Find("Gutter");
+                TextMeshProUGUI chTmp = null;
+                TextMeshProUGUI hkTmp = null;
+
+                if (gutter == null)
+                {
+                    GameObject gutObj = new GameObject("Gutter", typeof(RectTransform));
+                    gutObj.transform.SetParent(child, false);
+                    gutObj.transform.SetSiblingIndex(0);
+                    RectTransform gutRect = gutObj.GetComponent<RectTransform>();
+                    gutRect.anchorMin = new Vector2(0f, 0f);
+                    gutRect.anchorMax = new Vector2(0f, 1f);
+                    gutRect.pivot = new Vector2(0f, 0.5f);
+                    gutRect.sizeDelta = new Vector2(46f, 0f);
+                    gutRect.anchoredPosition = Vector2.zero;
+                    gutter = gutObj.transform;
+
+                    // HoverChevron (>>)
+                    GameObject chObj = new GameObject("HoverChevron", typeof(RectTransform));
+                    chObj.transform.SetParent(gutter, false);
+                    RectTransform chRect = chObj.GetComponent<RectTransform>();
+                    chRect.anchorMin = new Vector2(0f, 0f);
+                    chRect.anchorMax = new Vector2(0f, 1f);
+                    chRect.pivot = new Vector2(0f, 0.5f);
+                    chRect.anchoredPosition = new Vector2(-4f, 0f);
+                    chRect.sizeDelta = new Vector2(16f, 0f);
+                    chTmp = chObj.AddComponent<TextMeshProUGUI>();
+                    chTmp.fontSize = 12f;
+                    chTmp.fontStyle = FontStyles.Bold;
+                    chTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                    chTmp.color = new Color(1f, 0.65f, 0.15f);
+                    chTmp.text = ">>";
+                    chTmp.raycastTarget = false;
+                    chObj.SetActive(false);
+
+                    // HotkeyLabel ([ 1 ])
+                    GameObject hkObj = new GameObject("HotkeyLabel", typeof(RectTransform));
+                    hkObj.transform.SetParent(gutter, false);
+                    RectTransform hkRect = hkObj.GetComponent<RectTransform>();
+                    hkRect.anchorMin = new Vector2(0f, 0f);
+                    hkRect.anchorMax = new Vector2(1f, 1f);
+                    hkRect.offsetMin = new Vector2(16f, 0f);
+                    hkRect.offsetMax = Vector2.zero;
+                    hkTmp = hkObj.AddComponent<TextMeshProUGUI>();
+                    hkTmp.fontSize = 11.5f;
+                    hkTmp.fontStyle = FontStyles.Bold;
+                    hkTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                    hkTmp.color = new Color(0.85f, 0.65f, 0.30f, 0.95f);
+                    hkTmp.text = $"[ {i + 1} ]";
+                    hkTmp.raycastTarget = false;
+                    SundayTypography.ApplyFont(hkTmp, FontRole.Mono);
+                }
+                else
+                {
+                    Transform ch = gutter.Find("HoverChevron");
+                    if (ch != null) chTmp = ch.GetComponent<TextMeshProUGUI>();
+                    Transform hk = gutter.Find("HotkeyLabel");
+                    if (hk != null) hkTmp = hk.GetComponent<TextMeshProUGUI>();
+                }
+
+                // 4. Ensure TextContainer is formatted as a single-line horizontal flex row
+                Transform textCont = child.Find("TextContainer") ?? child.Find("LabelContainer");
+                TextMeshProUGUI mainLbl = null;
+                TextMeshProUGUI subLbl = null;
+
+                if (textCont != null)
+                {
+                    RectTransform tcRect = textCont.GetComponent<RectTransform>();
+                    tcRect.anchorMin = new Vector2(0f, 0f);
+                    tcRect.anchorMax = new Vector2(1f, 1f);
+                    tcRect.offsetMin = new Vector2(50f, 0f);
+                    tcRect.offsetMax = new Vector2(-10f, 0f);
+
+                    HorizontalLayoutGroup hlg = textCont.GetComponent<HorizontalLayoutGroup>();
+                    if (hlg == null) hlg = textCont.gameObject.AddComponent<HorizontalLayoutGroup>();
+                    hlg.spacing = 10f;
+                    hlg.childAlignment = TextAnchor.MiddleLeft;
+                    hlg.childControlWidth = false;
+                    hlg.childControlHeight = true;
+                    hlg.childForceExpandWidth = false;
+                    hlg.childForceExpandHeight = true;
+
+                    Transform ml = textCont.Find("MainLabel") ?? textCont.Find("Label") ?? textCont.Find("Title");
+                    if (ml != null)
+                    {
+                        mainLbl = ml.GetComponent<TextMeshProUGUI>();
+                        if (mainLbl != null)
+                        {
+                            mainLbl.fontSize = 11.5f;
+                            mainLbl.fontStyle = FontStyles.Bold;
+                            mainLbl.alignment = TextAlignmentOptions.MidlineLeft;
+                            SundayTypography.ApplyFont(mainLbl, FontRole.Body);
+
+                            ContentSizeFitter csf = ml.GetComponent<ContentSizeFitter>();
+                            if (csf == null) csf = ml.gameObject.AddComponent<ContentSizeFitter>();
+                            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                            csf.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+                        }
+                    }
+
+                    Transform sl = textCont.Find("SubLabel") ?? textCont.Find("SubText");
+                    if (sl != null)
+                    {
+                        subLbl = sl.GetComponent<TextMeshProUGUI>();
+                        if (subLbl != null)
+                        {
+                            subLbl.fontSize = 10f;
+                            subLbl.alignment = TextAlignmentOptions.MidlineLeft;
+                            subLbl.color = new Color(0.64f, 0.70f, 0.78f);
+                            subLbl.textWrappingMode = TextWrappingModes.NoWrap;
+                            subLbl.overflowMode = TextOverflowModes.Ellipsis;
+                            SundayTypography.ApplyFont(subLbl, FontRole.Body);
+
+                            LayoutElement slLe = sl.GetComponent<LayoutElement>();
+                            if (slLe == null) slLe = sl.gameObject.AddComponent<LayoutElement>();
+                            slLe.flexibleWidth = 1f;
+                        }
+                    }
+                }
+
+                // 5. Initialize or re-link TacticalChoiceButton
+                Button btn = child.GetComponent<Button>();
+                if (btn != null)
+                {
+                    TacticalChoiceButton tcb = child.GetComponent<TacticalChoiceButton>();
+                    if (tcb == null) tcb = child.gameObject.AddComponent<TacticalChoiceButton>();
+
+                    Image bg = child.GetComponent<Image>();
+                    Outline ol = child.GetComponent<Outline>();
+                    Transform shine = child.Find("ShineSweep");
+                    RectTransform shineRect = shine != null ? shine.GetComponent<RectTransform>() : null;
+                    Color accent = barImg != null ? barImg.color : new Color(0.95f, 0.75f, 0.35f);
+
+                    tcb.Initialize(btn, textCont as RectTransform, bg, barImg, ol, shineRect, accent, chTmp, hkTmp, mainLbl, subLbl);
+                }
+            }
         }
 
         private Button CreateScavengeButtonClone(Button template, Transform parent, string name, string title, string sub, Color accentColor, UnityEngine.Events.UnityAction action, out TextMeshProUGUI titleTmp, out TextMeshProUGUI subTmp)
@@ -616,9 +823,10 @@ namespace SundayLastBreath.UI
 
             // Find AccentBar
             Transform bar = go.transform.Find("AccentBar");
+            Image barImg = null;
             if (bar != null)
             {
-                Image barImg = bar.GetComponent<Image>();
+                barImg = bar.GetComponent<Image>();
                 if (barImg != null) barImg.color = accentColor;
             }
 
@@ -626,16 +834,28 @@ namespace SundayLastBreath.UI
             TextMeshProUGUI[] tmps = go.GetComponentsInChildren<TextMeshProUGUI>(true);
             foreach (var t in tmps)
             {
-                if (t.gameObject.name == "MainLabel" || t.gameObject.name == "Label" || t.gameObject.name == "Title" || t.fontSize > 12f)
+                if (t.gameObject.name == "MainLabel" || t.gameObject.name == "Label" || t.gameObject.name == "Title" || t.fontSize > 11f)
                 {
                     titleTmp = t;
                     t.text = title;
                 }
-                else if (t.gameObject.name == "SubLabel" || t.gameObject.name == "SubText" || t.fontSize <= 12f)
+                else if (t.gameObject.name == "SubLabel" || t.gameObject.name == "SubText" || t.fontSize <= 11f)
                 {
                     subTmp = t;
-                    t.text = sub;
+                    t.text = string.IsNullOrEmpty(sub) ? "" : $"— {sub}";
                 }
+            }
+
+            // Find gutter labels
+            TextMeshProUGUI chTmp = null;
+            TextMeshProUGUI hkTmp = null;
+            Transform gut = go.transform.Find("Gutter");
+            if (gut != null)
+            {
+                Transform ch = gut.Find("HoverChevron");
+                if (ch != null) chTmp = ch.GetComponent<TextMeshProUGUI>();
+                Transform hk = gut.Find("HotkeyLabel");
+                if (hk != null) hkTmp = hk.GetComponent<TextMeshProUGUI>();
             }
 
             // Re-bind TacticalChoiceButton for hover animation & audio
@@ -646,8 +866,7 @@ namespace SundayLastBreath.UI
                 Image bg = go.GetComponent<Image>();
                 Outline ol = go.GetComponent<Outline>();
                 RectTransform shineRect = go.transform.Find("ShineSweep") as RectTransform;
-                Image barImg = bar != null ? bar.GetComponent<Image>() : null;
-                tcb.Initialize(btn, tcRect, bg, barImg, ol, shineRect, accentColor);
+                tcb.Initialize(btn, tcRect, bg, barImg, ol, shineRect, accentColor, chTmp, hkTmp, titleTmp, subTmp);
             }
 
             return btn;
@@ -821,41 +1040,54 @@ namespace SundayLastBreath.UI
 
         private void Update()
         {
-            // Hotkeys for 3DS Switchable Console Mode
+            // 1. Hotkeys for Choice Selection (1-8) when in Narrative Choice Hub Mode
+            if (currentConsoleMode == ConsoleMode.Narrative && hubMenuContainer != null && hubMenuContainer.activeInHierarchy)
+            {
+                for (int i = 0; i < Mathf.Min(activeChoiceButtons.Count, 8); i++)
+                {
+                    if (IsChoiceHotkeyPressed(i + 1))
+                    {
+                        activeChoiceButtons[i].TriggerClick();
+                        break;
+                    }
+                }
+            }
+
+            // 2. Hotkeys for Console Mode Switching (Tab, I, Esc, F1-F3)
 #if ENABLE_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
-                if (Keyboard.current.digit1Key.wasPressedThisFrame || Keyboard.current.numpad1Key.wasPressedThisFrame)
+                if (Keyboard.current.tabKey.wasPressedThisFrame || Keyboard.current.pKey.wasPressedThisFrame || Keyboard.current.f2Key.wasPressedThisFrame)
+                {
+                    SwitchConsoleMode(currentConsoleMode == ConsoleMode.PDA ? ConsoleMode.Narrative : ConsoleMode.PDA);
+                }
+                else if (Keyboard.current.iKey.wasPressedThisFrame || Keyboard.current.f3Key.wasPressedThisFrame)
+                {
+                    SwitchConsoleMode(currentConsoleMode == ConsoleMode.Gear ? ConsoleMode.Narrative : ConsoleMode.Gear);
+                }
+                else if ((Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.f1Key.wasPressedThisFrame) && currentConsoleMode != ConsoleMode.Narrative)
                 {
                     SwitchConsoleMode(ConsoleMode.Narrative);
                 }
-                else if (Keyboard.current.digit2Key.wasPressedThisFrame || Keyboard.current.numpad2Key.wasPressedThisFrame || Keyboard.current.tabKey.wasPressedThisFrame || Keyboard.current.pKey.wasPressedThisFrame)
-                {
-                    SwitchConsoleMode(ConsoleMode.PDA);
-                }
-                else if (Keyboard.current.digit3Key.wasPressedThisFrame || Keyboard.current.numpad3Key.wasPressedThisFrame || Keyboard.current.iKey.wasPressedThisFrame)
-                {
-                    SwitchConsoleMode(ConsoleMode.Gear);
-                }
-                else if (Keyboard.current.escapeKey.wasPressedThisFrame && currentConsoleMode != ConsoleMode.Narrative)
+                else if (currentConsoleMode != ConsoleMode.Narrative && (Keyboard.current.digit1Key.wasPressedThisFrame || Keyboard.current.numpad1Key.wasPressedThisFrame))
                 {
                     SwitchConsoleMode(ConsoleMode.Narrative);
                 }
             }
 #else
-            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.P) || Input.GetKeyDown(KeyCode.F2))
+            {
+                SwitchConsoleMode(currentConsoleMode == ConsoleMode.PDA ? ConsoleMode.Narrative : ConsoleMode.PDA);
+            }
+            else if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.F3))
+            {
+                SwitchConsoleMode(currentConsoleMode == ConsoleMode.Gear ? ConsoleMode.Narrative : ConsoleMode.Gear);
+            }
+            else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.F1)) && currentConsoleMode != ConsoleMode.Narrative)
             {
                 SwitchConsoleMode(ConsoleMode.Narrative);
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2) || Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.P))
-            {
-                SwitchConsoleMode(ConsoleMode.PDA);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3) || Input.GetKeyDown(KeyCode.I))
-            {
-                SwitchConsoleMode(ConsoleMode.Gear);
-            }
-            else if (Input.GetKeyDown(KeyCode.Escape) && currentConsoleMode != ConsoleMode.Narrative)
+            else if (currentConsoleMode != ConsoleMode.Narrative && (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)))
             {
                 SwitchConsoleMode(ConsoleMode.Narrative);
             }
@@ -1811,12 +2043,65 @@ namespace SundayLastBreath.UI
             EvaluateHubButtonStates();
         }
 
+        private bool IsChoiceHotkeyPressed(int number)
+        {
+#if ENABLE_INPUT_SYSTEM
+            var kb = Keyboard.current;
+            if (kb != null)
+            {
+                switch (number)
+                {
+                    case 1: return kb.digit1Key.wasPressedThisFrame || kb.numpad1Key.wasPressedThisFrame;
+                    case 2: return kb.digit2Key.wasPressedThisFrame || kb.numpad2Key.wasPressedThisFrame;
+                    case 3: return kb.digit3Key.wasPressedThisFrame || kb.numpad3Key.wasPressedThisFrame;
+                    case 4: return kb.digit4Key.wasPressedThisFrame || kb.numpad4Key.wasPressedThisFrame;
+                    case 5: return kb.digit5Key.wasPressedThisFrame || kb.numpad5Key.wasPressedThisFrame;
+                    case 6: return kb.digit6Key.wasPressedThisFrame || kb.numpad6Key.wasPressedThisFrame;
+                    case 7: return kb.digit7Key.wasPressedThisFrame || kb.numpad7Key.wasPressedThisFrame;
+                    case 8: return kb.digit8Key.wasPressedThisFrame || kb.numpad8Key.wasPressedThisFrame;
+                    case 9: return kb.digit9Key.wasPressedThisFrame || kb.numpad9Key.wasPressedThisFrame;
+                }
+            }
+#endif
+            KeyCode alpha = (KeyCode)((int)KeyCode.Alpha0 + number);
+            KeyCode pad = (KeyCode)((int)KeyCode.Keypad0 + number);
+            return Input.GetKeyDown(alpha) || Input.GetKeyDown(pad);
+        }
+
+        private void ReindexActiveChoiceHotkeys()
+        {
+            activeChoiceButtons.Clear();
+            if (hubMenuContainer == null) return;
+
+            ScrollRect sr = hubMenuContainer.GetComponentInChildren<ScrollRect>(true);
+            Transform parent = sr != null && sr.content != null ? sr.content.transform : hubMenuContainer.transform;
+
+            int index = 1;
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                Transform child = parent.GetChild(i);
+                if (child.gameObject.activeSelf)
+                {
+                    TacticalChoiceButton tcb = child.GetComponent<TacticalChoiceButton>();
+                    if (tcb != null)
+                    {
+                        tcb.SetChoiceNumber(index);
+                        activeChoiceButtons.Add(tcb);
+                        index++;
+                    }
+                }
+            }
+        }
+
         private void EvaluateHubButtonStates()
         {
             // 1. Pack Gear Button
-            if (packGearButton != null && packedSuccessBanner != null)
+            if (packGearButton != null)
             {
                 packGearButton.gameObject.SetActive(!hasPacked);
+            }
+            if (packedSuccessBanner != null)
+            {
                 packedSuccessBanner.SetActive(hasPacked);
             }
 
@@ -1842,20 +2127,20 @@ namespace SundayLastBreath.UI
                     if (isPolice)
                     {
                         listenRadioButton.interactable = true;
-                        if (listenRadioLabel != null) listenRadioLabel.text = "LISTEN TO EMERGENCY BAND [POLICE]";
-                        if (listenRadioSub != null) listenRadioSub.text = "<color=#f39c12>[JOB: POLICE]</color> 3 Minutes | Monitor encrypted dispatch channels. Find out where lines are breaking.";
+                        if (listenRadioLabel != null) listenRadioLabel.text = "<color=#F59E0B>[POLICE]</color> LISTEN TO EMERGENCY BAND";
+                        if (listenRadioSub != null) listenRadioSub.text = "— 3 Minutes | Monitor encrypted dispatch channels";
                     }
                     else if (hasTech1)
                     {
                         listenRadioButton.interactable = true;
-                        if (listenRadioLabel != null) listenRadioLabel.text = "HACK LOCAL POLICE CHATTER [TECH 1]";
-                        if (listenRadioSub != null) listenRadioSub.text = "<color=#f39c12>[TECH 1 / INT 4]</color> 5 Minutes | Intercept dispatch frequency and bypass local scramblers.";
+                        if (listenRadioLabel != null) listenRadioLabel.text = "<color=#38BDF8>[TECH 1]</color> HACK LOCAL POLICE CHATTER";
+                        if (listenRadioSub != null) listenRadioSub.text = "— 5 Minutes | Intercept dispatch frequency and bypass scramblers";
                     }
                     else
                     {
                         listenRadioButton.interactable = false;
                         if (listenRadioLabel != null) listenRadioLabel.text = "<s>ACCESS EMERGENCY BAND</s>";
-                        if (listenRadioSub != null) listenRadioSub.text = "<color=#777777>[REQUIRES POLICE OR TECH 1 & INT 4] You lack the hardware or expertise to intercept encrypted radio traffic.</color>";
+                        if (listenRadioSub != null) listenRadioSub.text = "<color=#EF4444>[LOCKED: REQ POLICE OR TECH 1 & TACTICS 4]</color>";
                     }
                 }
             }
@@ -1875,14 +2160,14 @@ namespace SundayLastBreath.UI
                     if (hasTech3)
                     {
                         hackTerminalButton.interactable = true;
-                        if (hackTerminalLabel != null) hackTerminalLabel.text = "BYPASS GOV FIREWALL [TECH 3]";
-                        if (hackTerminalSub != null) hackTerminalSub.text = "<color=#f39c12>[TECH 3 / INT 6]</color> 8 Minutes | Breach military-grade encryption to extract classified directives.";
+                        if (hackTerminalLabel != null) hackTerminalLabel.text = "<color=#10B981>[TECH 3]</color> BYPASS GOV FIREWALL";
+                        if (hackTerminalSub != null) hackTerminalSub.text = "— 8 Minutes | Breach military encryption to extract directives";
                     }
                     else
                     {
                         hackTerminalButton.interactable = false;
                         if (hackTerminalLabel != null) hackTerminalLabel.text = "<s>BYPASS GOV FIREWALL</s>";
-                        if (hackTerminalSub != null) hackTerminalSub.text = "<color=#777777>[REQUIRES TECH 3 & INT 6] You lack the high-level expertise to breach military node encryption.</color>";
+                        if (hackTerminalSub != null) hackTerminalSub.text = "<color=#EF4444>[LOCKED: REQ TECH 3 & TACTICS 6]</color>";
                     }
                 }
             }
@@ -1897,14 +2182,14 @@ namespace SundayLastBreath.UI
                     if (searchKitchenLabel != null)
                     {
                         searchKitchenLabel.text = kitchenSearched
-                            ? "<s>KITCHENETTE (PICKED CLEAN)</s>"
-                            : "SEARCH KITCHENETTE FOR PROVISIONS";
+                            ? "<s>KITCHENETTE (CLEARED)</s>"
+                            : "<color=#F59E0B>[3 MIN]</color> SEARCH KITCHENETTE FOR PROVISIONS";
                     }
                     if (searchKitchenSub != null)
                     {
                         searchKitchenSub.text = kitchenSearched
-                            ? "<color=#64748B>Cupboards and fridge stripped bare. Faucet spits brown sludge.</color>"
-                            : "<color=#F59E0B>[3 MINUTES]</color> Scrounge cupboards and fridge for preserved food and clean water.";
+                            ? "— <color=#64748B>Cupboards and fridge stripped bare</color>"
+                            : "— Scrounge cupboards and fridge for preserved food and clean water";
                     }
                 }
             }
@@ -1918,14 +2203,14 @@ namespace SundayLastBreath.UI
                     if (searchBathroomLabel != null)
                     {
                         searchBathroomLabel.text = bathroomSearched
-                            ? "<s>MEDICINE CABINET (PICKED CLEAN)</s>"
-                            : "RAID BATHROOM MEDICINE CABINET";
+                            ? "<s>MEDICINE CABINET (CLEARED)</s>"
+                            : "<color=#10B981>[2 MIN]</color> RAID BATHROOM MEDICINE CABINET";
                     }
                     if (searchBathroomSub != null)
                     {
                         searchBathroomSub.text = bathroomSearched
-                            ? "<color=#64748B>Medicine cabinet stripped bare. Mirrored glass cracked.</color>"
-                            : "<color=#F59E0B>[2 MINUTES]</color> Grab painkillers, sterile bandages, and first-aid supplies.";
+                            ? "— <color=#64748B>Medicine cabinet stripped bare</color>"
+                            : "— Grab painkillers, sterile bandages, and first-aid supplies";
                     }
                 }
             }
@@ -1939,24 +2224,33 @@ namespace SundayLastBreath.UI
                     if (searchClosetLabel != null)
                     {
                         searchClosetLabel.text = closetSearched
-                            ? "<s>HALLWAY CLOSET (PICKED CLEAN)</s>"
-                            : "PULL WEATHER GEAR FROM CLOSET";
+                            ? "<s>HALLWAY CLOSET (CLEARED)</s>"
+                            : "<color=#38BDF8>[2 MIN]</color> PULL WEATHER GEAR FROM CLOSET";
                     }
                     if (searchClosetSub != null)
                     {
                         searchClosetSub.text = closetSearched
-                            ? "<color=#64748B>Closet shelves and coat rack are empty.</color>"
-                            : "<color=#F59E0B>[2 MINUTES]</color> Retrieve weather protection, duct tape, and utility gear.";
+                            ? "— <color=#64748B>Closet shelves and coat rack are empty</color>"
+                            : "— Retrieve weather protection, duct tape, and utility gear";
                     }
                 }
             }
-            UpdateFloorItemsNotification();
 
             // 6. Leave Apartment (unlocked only after packing!)
             if (leaveApartmentButton != null)
             {
                 leaveApartmentButton.gameObject.SetActive(hasPacked);
+                TextMeshProUGUI leaveLbl = leaveApartmentButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (leaveLbl != null && leaveLbl.gameObject.name == "MainLabel")
+                {
+                    leaveLbl.text = "<color=#EF4444>[EXIT]</color> STEP INTO 4TH FLOOR CORRIDOR";
+                }
             }
+
+            UpdateFloorItemsNotification();
+
+            // 7. Dynamic Numbering & Hotkey Indexing (Contiguous [ 1 ], [ 2 ], [ 3 ]...)
+            ReindexActiveChoiceHotkeys();
         }
 
         private void OnPackGearClicked()
@@ -1970,23 +2264,37 @@ namespace SundayLastBreath.UI
             gameClock.AddTime(2);
 
             // Move table stash into player inventory
+            int gatheredCount = 0;
             if (currentPlayer != null)
             {
-                foreach (var item in tableStash)
+                if (tableStash.Count == 0)
                 {
-                    currentPlayer.AddItem(item.itemId, item.quantity);
+                    currentPlayer.AddItem("Glock 19", 1);
+                    currentPlayer.AddItem("9mm Ammo", 24);
+                    currentPlayer.AddItem("Multi-Tool", 1);
+                    currentPlayer.AddItem("Flashlight", 1);
+                    currentPlayer.AddItem("Bandages", 2);
+                    gatheredCount = 5;
                 }
-                tableStash.Clear();
+                else
+                {
+                    foreach (var item in tableStash)
+                    {
+                        currentPlayer.AddItem(item.itemId, item.quantity);
+                        gatheredCount += item.quantity;
+                    }
+                    tableStash.Clear();
+                }
             }
 
             hasPacked = true;
             floorItems.Clear();
 
             AppendStoryLog(gameClock.GetTimeString(), "ACTION // WORK EQUIPMENT SECURED",
-                "You geared up. You strapped on your primary equipment and weapons. Sirens wail outside across the Ascott district corridor.");
+                $"You geared up. You strapped on your primary equipment and weapons. Sirens wail outside across the Ascott district corridor.");
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"Your primary equipment is secured. Outside, emergency sirens wail across the Ascott district. Do you scavenge the rest of your apartment before heading into the corridor?\"";
+                situationBoxText.text = $"\"<color=#10B981>✓ PRIMARY GEAR SECURED.</color> Holster strapped, boots laced, and {gatheredCount} items secured into tactical vest. Outside, sirens wail across the Ascott district. Scavenge the remaining rooms before stepping into the corridor.\"";
             }
 
             if (packedSuccessBanner != null)
@@ -1995,7 +2303,7 @@ namespace SundayLastBreath.UI
             }
             if (packedSuccessText != null)
             {
-                packedSuccessText.text = "<color=#10B981>✓ Primary gear and equipment secured into your pack.\n<color=#38BDF8>[!] You can scavenge your apartment rooms below before stepping into the corridor.</color></color>";
+                packedSuccessText.text = $"<color=#10B981>✓ Primary gear secured ({gatheredCount} items packed).\n<color=#38BDF8>[!] You can scavenge your apartment rooms below before stepping into the corridor.</color></color>";
             }
 
             // Objectives
@@ -2027,7 +2335,7 @@ namespace SundayLastBreath.UI
 
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"Kitchen cupboards scavenged: clean water, canned rations, and a can opener secured into your backpack. Time is slipping away.\"";
+                situationBoxText.text = "\"<color=#F59E0B>✓ KITCHENETTE RAIDED.</color> Bottled Water (x2), Canned Tuna (x1), Can Opener (x1), and Stale Coffee (x1) secured into your pack. The tap sputters brown sediment.\"";
             }
 
             RefreshRightGearPanel();
@@ -2052,7 +2360,7 @@ namespace SundayLastBreath.UI
 
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"Medicine cabinet stripped bare: sterile bandages, painkillers, and rubbing alcohol secured into your medical pouch.\"";
+                situationBoxText.text = "\"<color=#10B981>✓ MEDICINE CABINET CLEARED.</color> Smashed mirror cabinet. Painkillers (x1), Sterile Bandages (x2), and Rubbing Alcohol (x1) secured into first-aid pouch.\"";
             }
 
             RefreshRightGearPanel();
@@ -2077,7 +2385,7 @@ namespace SundayLastBreath.UI
 
             if (situationBoxText != null)
             {
-                situationBoxText.text = "\"Hallway closet checked: heavy rain poncho, duct tape, and waterproof matches secured.\"";
+                situationBoxText.text = "\"<color=#38BDF8>✓ WEATHER GEAR RETRIEVED.</color> Heavy Rain Poncho, industrial Duct Tape, and waterproof Matches secured from the top shelf.\"";
             }
 
             RefreshRightGearPanel();
