@@ -21,10 +21,6 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI clockText;
         [SerializeField] private TextMeshProUGUI batteryText;
 
-        [Header("Network Alert Toast")]
-        [SerializeField] private RectTransform disconnectToast;
-        [SerializeField] private GameObject connectionLostCard;
-
         [Header("Audio SFX")]
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private AudioClip screenWakeClip;
@@ -60,15 +56,14 @@ namespace SundayLastBreath.UI
                 feedScrollRect.velocity = Vector2.zero;
             }
 
-            // 2. Hide disconnect toast above viewport
-            if (disconnectToast != null)
+            // 2. Reset Status Readouts
+            if (carrierStatusText != null)
             {
-                disconnectToast.anchoredPosition = new Vector2(0f, 40f);
+                carrierStatusText.text = "<color=#EF4444><b>[!] NO SIGNAL</b></color>";
             }
-
-            if (connectionLostCard != null)
+            if (batteryText != null)
             {
-                connectionLostCard.SetActive(true);
+                batteryText.text = "<color=#EF4444><b>12%</b></color> <color=#EF4444>[■□]</color>";
             }
 
             // 3. Play subtle screen wake audio
@@ -126,27 +121,14 @@ namespace SundayLastBreath.UI
                 audioSource.PlayOneShot(alertBeepClip, 0.5f);
             }
 
-            // 2. Slide down crimson disconnect banner
-            if (disconnectToast != null)
+            if (carrierStatusText != null)
             {
-                float duration = 0.35f;
-                float elapsed = 0f;
-                Vector2 startPos = new Vector2(0f, 40f);
-                Vector2 endPos = new Vector2(0f, -4f);
-
-                while (elapsed < duration)
-                {
-                    elapsed += Time.unscaledDeltaTime;
-                    float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
-                    disconnectToast.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
-                    yield return null;
-                }
-                disconnectToast.anchoredPosition = endPos;
+                carrierStatusText.text = "<color=#EF4444><b>[X] SEVERED</b></color>";
             }
 
-            yield return new WaitForSecondsRealtime(1.2f);
+            yield return new WaitForSecondsRealtime(1.0f);
 
-            // 3. Audio static pop & battery drop from 12% to 11%
+            // 2. Audio static pop & battery drop from 12% to 11%
             if (audioSource != null && staticBurstClip != null)
             {
                 audioSource.PlayOneShot(staticBurstClip, 0.4f);

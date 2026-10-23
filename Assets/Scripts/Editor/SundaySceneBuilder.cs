@@ -28,7 +28,7 @@ namespace SundayLastBreath.Editor
 
         private static void CheckAutoBuild()
         {
-            string flagPath = "Temp/scene_v55_auto.flag";
+            string flagPath = "Temp/scene_v56_auto.flag";
             if (File.Exists(flagPath))
             {
                 EditorApplication.update -= CheckAutoBuild;
@@ -2904,7 +2904,7 @@ namespace SundayLastBreath.Editor
             StretchFull(rect);
 
             Image backdrop = modalObj.AddComponent<Image>();
-            backdrop.color = new Color(0.015f, 0.02f, 0.03f, 0.94f);
+            backdrop.color = new Color(0.015f, 0.02f, 0.03f, 1f); // 100% Solid Opaque - zero background bleed
             backdrop.raycastTarget = true;
 
             // Center Column Container (Contains: Intro prose -> Smartphone device -> Outro prose -> Action button)
@@ -2914,32 +2914,34 @@ namespace SundayLastBreath.Editor
             colRect.anchorMin = new Vector2(0.5f, 0.5f);
             colRect.anchorMax = new Vector2(0.5f, 0.5f);
             colRect.pivot = new Vector2(0.5f, 0.5f);
-            colRect.sizeDelta = new Vector2(560f, 960f);
+            colRect.sizeDelta = new Vector2(460f, 740f);
             colRect.anchoredPosition = Vector2.zero;
 
             VerticalLayoutGroup colVlg = centerCol.AddComponent<VerticalLayoutGroup>();
-            colVlg.padding = new RectOffset(0, 0, 10, 10);
-            colVlg.spacing = 12f;
-            colVlg.childAlignment = TextAnchor.MiddleCenter;
-            colVlg.childControlWidth = false;
+            colVlg.padding = new RectOffset(0, 0, 0, 0);
+            colVlg.spacing = 10f;
+            colVlg.childAlignment = TextAnchor.UpperCenter;
+            colVlg.childControlWidth = true; // Stretches all children to fill the full 460px width
             colVlg.childControlHeight = true;
-            colVlg.childForceExpandWidth = false;
+            colVlg.childForceExpandWidth = true;
             colVlg.childForceExpandHeight = false;
 
             // 1. TOP INTRO NARRATIVE PROSE (Twine faithful)
             GameObject introObj = new GameObject("IntroProse", typeof(RectTransform));
             introObj.transform.SetParent(centerCol.transform, false);
+            RectTransform ir = introObj.GetComponent<RectTransform>();
+            ir.sizeDelta = new Vector2(460f, 48f);
             LayoutElement introLe = introObj.AddComponent<LayoutElement>();
-            introLe.preferredWidth = 540f;
-            introLe.preferredHeight = 58f;
-            introLe.minHeight = 58f;
+            introLe.preferredWidth = 460f;
+            introLe.preferredHeight = 48f;
+            introLe.minHeight = 48f;
             introLe.flexibleHeight = 0f;
 
             TextMeshProUGUI introTmp = introObj.AddComponent<TextMeshProUGUI>();
-            introTmp.fontSize = 12.5f;
+            introTmp.fontSize = 12f;
             introTmp.fontStyle = FontStyles.Italic;
-            introTmp.color = new Color(0.78f, 0.82f, 0.88f, 0.95f);
-            introTmp.lineSpacing = 4f;
+            introTmp.color = new Color(0.80f, 0.84f, 0.90f, 0.95f);
+            introTmp.lineSpacing = 3f;
             introTmp.alignment = TextAlignmentOptions.Center;
             introTmp.text = "You pull your phone from your pocket. The screen is cracked, glowing harshly in the dim room. You open the feed. The timeline is refreshing so fast it's making you dizzy.";
             introTmp.textWrappingMode = TextWrappingModes.Normal;
@@ -2948,16 +2950,18 @@ namespace SundayLastBreath.Editor
             // 2. SMARTPHONE DEVICE CHASSIS
             GameObject phoneChassis = new GameObject("PhoneChassis", typeof(RectTransform));
             phoneChassis.transform.SetParent(centerCol.transform, false);
+            RectTransform pcr = phoneChassis.GetComponent<RectTransform>();
+            pcr.sizeDelta = new Vector2(440f, 530f);
             LayoutElement chassisLe = phoneChassis.AddComponent<LayoutElement>();
-            chassisLe.preferredWidth = 430f;
-            chassisLe.preferredHeight = 510f;
-            chassisLe.minHeight = 510f;
+            chassisLe.preferredWidth = 440f;
+            chassisLe.preferredHeight = 530f;
+            chassisLe.minHeight = 530f;
             chassisLe.flexibleHeight = 0f;
 
             Image chassisBg = phoneChassis.AddComponent<Image>();
-            chassisBg.color = new Color(0.09f, 0.11f, 0.14f, 1f); // Dark titanium frame
+            chassisBg.color = new Color(0.08f, 0.10f, 0.13f, 1f); // Dark titanium frame
             Outline chassisOl = phoneChassis.AddComponent<Outline>();
-            chassisOl.effectColor = new Color(0.24f, 0.28f, 0.36f, 0.85f); // 1px specular bevel highlight
+            chassisOl.effectColor = new Color(0.24f, 0.28f, 0.36f, 0.9f); // 1px specular bevel highlight
             chassisOl.effectDistance = new Vector2(1f, -1f);
 
             // Top Hardware Slit (Speaker)
@@ -2966,8 +2970,8 @@ namespace SundayLastBreath.Editor
             RectTransform spRect = speakerObj.GetComponent<RectTransform>();
             spRect.anchorMin = new Vector2(0.5f, 1f); spRect.anchorMax = new Vector2(0.5f, 1f);
             spRect.pivot = new Vector2(0.5f, 1f);
-            spRect.sizeDelta = new Vector2(52f, 4f);
-            spRect.anchoredPosition = new Vector2(0f, -8f);
+            spRect.sizeDelta = new Vector2(50f, 4f);
+            spRect.anchoredPosition = new Vector2(0f, -7f);
             Image spImg = speakerObj.AddComponent<Image>();
             spImg.color = new Color(0.03f, 0.04f, 0.05f, 1f);
 
@@ -2977,8 +2981,8 @@ namespace SundayLastBreath.Editor
             RectTransform camRect = camObj.GetComponent<RectTransform>();
             camRect.anchorMin = new Vector2(0.5f, 1f); camRect.anchorMax = new Vector2(0.5f, 1f);
             camRect.pivot = new Vector2(0.5f, 1f);
-            camRect.sizeDelta = new Vector2(7f, 7f);
-            camRect.anchoredPosition = new Vector2(-42f, -6.5f);
+            camRect.sizeDelta = new Vector2(6f, 6f);
+            camRect.anchoredPosition = new Vector2(-40f, -6f);
             Image camImg = camObj.AddComponent<Image>();
             camImg.color = new Color(0.02f, 0.03f, 0.06f, 1f);
 
@@ -2987,19 +2991,19 @@ namespace SundayLastBreath.Editor
             displayArea.transform.SetParent(phoneChassis.transform, false);
             RectTransform dispRect = displayArea.GetComponent<RectTransform>();
             dispRect.anchorMin = new Vector2(0f, 0f); dispRect.anchorMax = new Vector2(1f, 1f);
-            dispRect.offsetMin = new Vector2(10f, 18f); // Left 10, Bottom 18
-            dispRect.offsetMax = new Vector2(-10f, -20f); // Right -10, Top -20
+            dispRect.offsetMin = new Vector2(8f, 16f); // Left 8, Bottom 16
+            dispRect.offsetMax = new Vector2(-8f, -18f); // Right -8, Top -18
             Image dispBg = displayArea.AddComponent<Image>();
             dispBg.color = new Color(0.025f, 0.03f, 0.04f, 1f); // Deep OLED Black
             displayArea.AddComponent<RectMask2D>();
 
-            // Status Bar (Top of OLED, height 24px)
+            // Status Bar (Top of OLED, height 22px)
             GameObject sbObj = new GameObject("StatusBar", typeof(RectTransform));
             sbObj.transform.SetParent(displayArea.transform, false);
             RectTransform sbRect = sbObj.GetComponent<RectTransform>();
             sbRect.anchorMin = new Vector2(0f, 1f); sbRect.anchorMax = new Vector2(1f, 1f);
             sbRect.pivot = new Vector2(0.5f, 1f);
-            sbRect.sizeDelta = new Vector2(0f, 24f);
+            sbRect.sizeDelta = new Vector2(0f, 22f);
             sbRect.anchoredPosition = Vector2.zero;
             Image sbBg = sbObj.AddComponent<Image>();
             sbBg.color = new Color(0.04f, 0.05f, 0.07f, 0.95f);
@@ -3019,18 +3023,27 @@ namespace SundayLastBreath.Editor
             batteryTmp.rectTransform.offsetMin = Vector2.zero; batteryTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
             SundayTypography.ApplyFont(batteryTmp, FontRole.Mono);
 
-            // App Header Bar (Height 32px)
+            // Hairline under Status Bar
+            GameObject sbLine = new GameObject("StatusBarLine", typeof(RectTransform));
+            sbLine.transform.SetParent(sbObj.transform, false);
+            RectTransform sblRect = sbLine.GetComponent<RectTransform>();
+            sblRect.anchorMin = new Vector2(0f, 0f); sblRect.anchorMax = new Vector2(1f, 0f);
+            sblRect.sizeDelta = new Vector2(0f, 1f);
+            Image sblImg = sbLine.AddComponent<Image>();
+            sblImg.color = new Color(0.15f, 0.18f, 0.24f, 0.6f);
+
+            // App Header Bar (Height 30px)
             GameObject headerObj = new GameObject("AppHeader", typeof(RectTransform));
             headerObj.transform.SetParent(displayArea.transform, false);
             RectTransform hRect = headerObj.GetComponent<RectTransform>();
             hRect.anchorMin = new Vector2(0f, 1f); hRect.anchorMax = new Vector2(1f, 1f);
             hRect.pivot = new Vector2(0.5f, 1f);
-            hRect.sizeDelta = new Vector2(0f, 32f);
-            hRect.anchoredPosition = new Vector2(0f, -24f);
+            hRect.sizeDelta = new Vector2(0f, 30f);
+            hRect.anchoredPosition = new Vector2(0f, -22f);
             Image hBg = headerObj.AddComponent<Image>();
             hBg.color = new Color(0.06f, 0.075f, 0.10f, 0.98f);
 
-            TextMeshProUGUI hTmp = CreateTMPText(headerObj.transform, "TrendingHeader", "Trending: <color=#ef4444><b>#SeattleLockdown</b></color>", 12.5f, new Color(0.75f, 0.82f, 0.92f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+            TextMeshProUGUI hTmp = CreateTMPText(headerObj.transform, "TrendingHeader", "Trending: <color=#ef4444><b>#SeattleLockdown</b></color>", 12f, new Color(0.75f, 0.82f, 0.92f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             hTmp.rectTransform.anchorMin = new Vector2(0f, 0f); hTmp.rectTransform.anchorMax = new Vector2(0.8f, 1f);
             hTmp.rectTransform.offsetMin = new Vector2(10f, 0f); hTmp.rectTransform.offsetMax = Vector2.zero;
             SundayTypography.ApplyFont(hTmp, FontRole.Display);
@@ -3040,14 +3053,12 @@ namespace SundayLastBreath.Editor
             liveTmp.rectTransform.offsetMin = Vector2.zero; liveTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
             SundayTypography.ApplyFont(liveTmp, FontRole.Mono);
 
-            // Divider under Header
+            // Hairline under App Header
             GameObject divObj = new GameObject("HeaderDivider", typeof(RectTransform));
             divObj.transform.SetParent(headerObj.transform, false);
             RectTransform divRect = divObj.GetComponent<RectTransform>();
             divRect.anchorMin = new Vector2(0f, 0f); divRect.anchorMax = new Vector2(1f, 0f);
-            divRect.pivot = new Vector2(0.5f, 0f);
             divRect.sizeDelta = new Vector2(0f, 1f);
-            divRect.anchoredPosition = Vector2.zero;
             Image divImg = divObj.AddComponent<Image>();
             divImg.color = new Color(0.18f, 0.22f, 0.30f, 0.8f);
 
@@ -3056,8 +3067,8 @@ namespace SundayLastBreath.Editor
             scrollObj.transform.SetParent(displayArea.transform, false);
             RectTransform sRect = scrollObj.GetComponent<RectTransform>();
             sRect.anchorMin = new Vector2(0f, 0f); sRect.anchorMax = new Vector2(1f, 1f);
-            sRect.offsetMin = new Vector2(0f, 14f); // Above home pill
-            sRect.offsetMax = new Vector2(0f, -56f); // Below status bar + app header
+            sRect.offsetMin = new Vector2(0f, 0f);
+            sRect.offsetMax = new Vector2(0f, -52f); // Below status bar (22) + app header (30)
 
             ScrollRect sr = scrollObj.AddComponent<ScrollRect>();
             sr.horizontal = false;
@@ -3086,8 +3097,8 @@ namespace SundayLastBreath.Editor
             fcFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             VerticalLayoutGroup fcVlg = feedContent.AddComponent<VerticalLayoutGroup>();
-            fcVlg.padding = new RectOffset(10, 14, 8, 14);
-            fcVlg.spacing = 9f;
+            fcVlg.padding = new RectOffset(10, 12, 8, 12);
+            fcVlg.spacing = 8f;
             fcVlg.childControlWidth = true;
             fcVlg.childControlHeight = true;
             fcVlg.childForceExpandWidth = true;
@@ -3137,24 +3148,7 @@ namespace SundayLastBreath.Editor
                 null, true, "💬 8.9K   ↺ 21.5K   ♥ 1.1K");
 
             // Feed Post 4: Connection Lost Alert Card
-            GameObject cardLossObj = CreatePhoneDisconnectCard(feedContent.transform);
-
-            // Toast Alert Banner (drops down from top of OLED)
-            GameObject toastObj = new GameObject("DisconnectToast", typeof(RectTransform));
-            toastObj.transform.SetParent(displayArea.transform, false);
-            RectTransform dtRect = toastObj.GetComponent<RectTransform>();
-            dtRect.anchorMin = new Vector2(0f, 1f); dtRect.anchorMax = new Vector2(1f, 1f);
-            dtRect.pivot = new Vector2(0.5f, 1f);
-            dtRect.sizeDelta = new Vector2(0f, 32f);
-            dtRect.anchoredPosition = new Vector2(0f, 40f); // Hidden above initially
-            Image dtBg = toastObj.AddComponent<Image>();
-            dtBg.color = new Color(0.42f, 0.08f, 0.08f, 0.95f);
-            Outline dtOl = toastObj.AddComponent<Outline>();
-            dtOl.effectColor = new Color(0.90f, 0.25f, 0.25f, 0.9f);
-            dtOl.effectDistance = new Vector2(1f, -1f);
-            TextMeshProUGUI dtTmp = CreateTMPText(toastObj.transform, "ToastLabel", "<b>⚠ CELLULAR NETWORK SEVERED</b>  |  0 BARS", 10.5f, new Color(1f, 0.92f, 0.92f), TextAlignmentOptions.Center, FontStyles.Bold);
-            StretchFull(dtTmp.rectTransform);
-            SundayTypography.ApplyFont(dtTmp, FontRole.Mono);
+            CreatePhoneDisconnectCard(feedContent.transform);
 
             // Bottom Hardware Home Pill
             GameObject homePillObj = new GameObject("HomePill", typeof(RectTransform));
@@ -3162,7 +3156,7 @@ namespace SundayLastBreath.Editor
             RectTransform hpRect = homePillObj.GetComponent<RectTransform>();
             hpRect.anchorMin = new Vector2(0.5f, 0f); hpRect.anchorMax = new Vector2(0.5f, 0f);
             hpRect.pivot = new Vector2(0.5f, 0f);
-            hpRect.sizeDelta = new Vector2(80f, 4f);
+            hpRect.sizeDelta = new Vector2(70f, 4f);
             hpRect.anchoredPosition = new Vector2(0f, 6f);
             Image hpImg = homePillObj.AddComponent<Image>();
             hpImg.color = new Color(0.32f, 0.38f, 0.48f, 0.7f);
@@ -3170,17 +3164,19 @@ namespace SundayLastBreath.Editor
             // 3. BOTTOM OUTRO NARRATIVE PROSE (Twine faithful)
             GameObject outroObj = new GameObject("OutroProse", typeof(RectTransform));
             outroObj.transform.SetParent(centerCol.transform, false);
+            RectTransform or = outroObj.GetComponent<RectTransform>();
+            or.sizeDelta = new Vector2(460f, 68f);
             LayoutElement outroLe = outroObj.AddComponent<LayoutElement>();
-            outroLe.preferredWidth = 540f;
-            outroLe.preferredHeight = 72f;
-            outroLe.minHeight = 72f;
+            outroLe.preferredWidth = 460f;
+            outroLe.preferredHeight = 68f;
+            outroLe.minHeight = 68f;
             outroLe.flexibleHeight = 0f;
 
             TextMeshProUGUI outroTmp = outroObj.AddComponent<TextMeshProUGUI>();
             outroTmp.fontSize = 12f;
             outroTmp.fontStyle = FontStyles.Italic;
-            outroTmp.color = new Color(0.78f, 0.82f, 0.88f, 0.95f);
-            outroTmp.lineSpacing = 4f;
+            outroTmp.color = new Color(0.80f, 0.84f, 0.90f, 0.95f);
+            outroTmp.lineSpacing = 3f;
             outroTmp.alignment = TextAlignmentOptions.Center;
             outroTmp.text = "The comments are a storm of denial, prayers, and wild conspiracies. One post catches your eye: a traffic map showing military checkpoints. <i>They are barricading the bridges out of the city.</i>\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. The internet is gone.";
             outroTmp.textWrappingMode = TextWrappingModes.Normal;
@@ -3189,10 +3185,12 @@ namespace SundayLastBreath.Editor
             // 4. ACTION BUTTON
             GameObject btnHolder = new GameObject("ButtonHolder", typeof(RectTransform));
             btnHolder.transform.SetParent(centerCol.transform, false);
+            RectTransform bhr = btnHolder.GetComponent<RectTransform>();
+            bhr.sizeDelta = new Vector2(440f, 38f);
             LayoutElement bhLe = btnHolder.AddComponent<LayoutElement>();
-            bhLe.preferredWidth = 430f;
-            bhLe.preferredHeight = 36f;
-            bhLe.minHeight = 36f;
+            bhLe.preferredWidth = 440f;
+            bhLe.preferredHeight = 38f;
+            bhLe.minHeight = 38f;
             bhLe.flexibleHeight = 0f;
 
             CreateApartmentMenuButton(btnHolder.transform, "Btn_ClosePhone", "LOWER THE PHONE AND GET BACK TO REALITY",
@@ -3206,8 +3204,6 @@ namespace SundayLastBreath.Editor
             soCtrl.FindProperty("carrierStatusText").objectReferenceValue = carrierTmp;
             soCtrl.FindProperty("clockText").objectReferenceValue = clockTmp;
             soCtrl.FindProperty("batteryText").objectReferenceValue = batteryTmp;
-            soCtrl.FindProperty("disconnectToast").objectReferenceValue = dtRect;
-            soCtrl.FindProperty("connectionLostCard").objectReferenceValue = cardLossObj;
 
             AudioClip beepClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
             AudioClip staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/static.mp3");
@@ -3251,7 +3247,7 @@ namespace SundayLastBreath.Editor
             HorizontalLayoutGroup hlg = headerRow.AddComponent<HorizontalLayoutGroup>();
             hlg.spacing = 8f;
             hlg.childAlignment = TextAnchor.MiddleLeft;
-            hlg.childControlWidth = false;
+            hlg.childControlWidth = true;
             hlg.childControlHeight = true;
             hlg.childForceExpandWidth = false;
             hlg.childForceExpandHeight = false;
@@ -3264,6 +3260,7 @@ namespace SundayLastBreath.Editor
             LayoutElement ale = avatarObj.AddComponent<LayoutElement>();
             ale.preferredWidth = 28f; ale.preferredHeight = 28f;
             ale.minWidth = 28f; ale.minHeight = 28f;
+            ale.flexibleWidth = 0f; ale.flexibleHeight = 0f;
 
             Image aBg = avatarObj.AddComponent<Image>();
             aBg.color = avatarBg;
@@ -3274,6 +3271,10 @@ namespace SundayLastBreath.Editor
             // User Info (Name + Handle)
             GameObject userObj = new GameObject("UserInfo", typeof(RectTransform));
             userObj.transform.SetParent(headerRow.transform, false);
+            LayoutElement ule = userObj.AddComponent<LayoutElement>();
+            ule.flexibleWidth = 1f;
+            ule.preferredHeight = 28f;
+
             VerticalLayoutGroup uVlg = userObj.AddComponent<VerticalLayoutGroup>();
             uVlg.spacing = 0f;
             uVlg.childControlWidth = true; uVlg.childControlHeight = true;
