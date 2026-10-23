@@ -253,6 +253,7 @@ namespace SundayLastBreath.UI
 
             InitializeAudioSources();
             InitializeSystems();
+            EnsureHubMenuSanitized();
             HookUIButtons();
         }
 
@@ -480,8 +481,181 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private void EnsureHubMenuSanitized()
+        {
+            if (hubMenuContainer == null) return;
+
+            // 1. Hide any orphaned floor take button inside the narrative choice menu
+            foreach (var t in hubMenuContainer.GetComponentsInChildren<Transform>(true))
+            {
+                if (t != null && t.gameObject.name == "Btn_TakeFloorItems")
+                {
+                    t.gameObject.SetActive(false);
+                }
+            }
+
+            // 2. Wrap in ScrollView if missing (backward compatibility with older scene builds)
+            ScrollRect sr = hubMenuContainer.GetComponentInChildren<ScrollRect>(true);
+            Transform contentParent = hubMenuContainer.transform;
+
+            if (sr == null)
+            {
+                var oldVlg = hubMenuContainer.GetComponent<VerticalLayoutGroup>();
+                if (oldVlg != null) Destroy(oldVlg);
+
+                GameObject scrollObj = new GameObject("ChoiceScrollView", typeof(RectTransform));
+                scrollObj.transform.SetParent(hubMenuContainer.transform, false);
+                RectTransform srt = scrollObj.GetComponent<RectTransform>();
+                srt.anchorMin = Vector2.zero; srt.anchorMax = Vector2.one;
+                srt.offsetMin = Vector2.zero; srt.offsetMax = Vector2.zero;
+
+                sr = scrollObj.AddComponent<ScrollRect>();
+                sr.horizontal = false;
+                sr.vertical = true;
+                sr.movementType = ScrollRect.MovementType.Clamped;
+                sr.scrollSensitivity = 28f;
+
+                GameObject viewport = new GameObject("Viewport", typeof(RectTransform));
+                viewport.transform.SetParent(scrollObj.transform, false);
+                RectTransform vprt = viewport.GetComponent<RectTransform>();
+                vprt.anchorMin = Vector2.zero; vprt.anchorMax = Vector2.one;
+                vprt.offsetMin = Vector2.zero; vprt.offsetMax = Vector2.zero;
+                viewport.AddComponent<RectMask2D>();
+                sr.viewport = vprt;
+
+                GameObject content = new GameObject("Content", typeof(RectTransform));
+                content.transform.SetParent(viewport.transform, false);
+                RectTransform crt = content.GetComponent<RectTransform>();
+                crt.anchorMin = new Vector2(0f, 1f); crt.anchorMax = new Vector2(1f, 1f);
+                crt.pivot = new Vector2(0.5f, 1f);
+                crt.anchoredPosition = Vector2.zero;
+                crt.sizeDelta = Vector2.zero;
+
+                VerticalLayoutGroup vlg = content.AddComponent<VerticalLayoutGroup>();
+                vlg.spacing = 6f;
+                vlg.childControlWidth = true;
+                vlg.childControlHeight = false;
+                vlg.childForceExpandWidth = true;
+                vlg.childForceExpandHeight = false;
+
+                ContentSizeFitter csf = content.AddComponent<ContentSizeFitter>();
+                csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+                sr.content = crt;
+                contentParent = content.transform;
+
+                // Reparent existing buttons
+                List<Transform> childrenToMove = new List<Transform>();
+                for (int i = 0; i < hubMenuContainer.transform.childCount; i++)
+                {
+                    Transform child = hubMenuContainer.transform.GetChild(i);
+                    if (child != scrollObj.transform) childrenToMove.Add(child);
+                }
+                foreach (var c in childrenToMove)
+                {
+                    c.SetParent(contentParent, false);
+                }
+            }
+            else
+            {
+                contentParent = sr.content != null ? sr.content.transform : sr.transform;
+            }
+
+            // 3. Dynamically create missing Scavenge Buttons if null
+            Button templateBtn = packGearButton != null ? packGearButton : leaveApartmentButton;
+            if (templateBtn != null)
+            {
+                if (searchKitchenButton == null)
+                {
+                    searchKitchenButton = CreateScavengeButtonClone(templateBtn, contentParent, "Btn_SearchKitchen",
+                        "SEARCH KITCHENETTE FOR PROVISIONS",
+                        "3 Minutes | Scrounge cupboards and fridge for preserved food and clean water.",
+                        new Color(0.95f, 0.70f, 0.30f), OnSearchKitchenClicked, out searchKitchenLabel, out searchKitchenSub);
+                }
+                if (searchBathroomButton == null)
+                {
+                    searchBathroomButton = CreateScavengeButtonClone(templateBtn, contentParent, "Btn_SearchBathroom",
+                        "RAID BATHROOM MEDICINE CABINET",
+                        "2 Minutes | Grab painkillers, sterile bandages, and first-aid supplies.",
+                        new Color(0.30f, 0.85f, 0.60f), OnSearchBathroomClicked, out searchBathroomLabel, out searchBathroomSub);
+                }
+                if (searchClosetButton == null)
+                {
+                    searchClosetButton = CreateScavengeButtonClone(templateBtn, contentParent, "Btn_SearchCloset",
+                        "PULL WEATHER GEAR FROM CLOSET",
+                        "2 Minutes | Retrieve weather protection, duct tape, and utility gear.",
+                        new Color(0.40f, 0.75f, 0.95f), OnSearchClosetClicked, out searchClosetLabel, out searchClosetSub);
+                }
+            }
+
+            // 4. Ensure logical child order in contentParent so choices flow naturally
+            if (packedSuccessBanner != null) packedSuccessBanner.transform.SetSiblingIndex(0);
+            if (packGearButton != null) packGearButton.transform.SetSiblingIndex(1);
+            if (searchKitchenButton != null) searchKitchenButton.transform.SetSiblingIndex(2);
+            if (searchBathroomButton != null) searchBathroomButton.transform.SetSiblingIndex(3);
+            if (searchClosetButton != null) searchClosetButton.transform.SetSiblingIndex(4);
+            if (checkPhoneButton != null) checkPhoneButton.transform.SetSiblingIndex(5);
+            if (listenRadioButton != null) listenRadioButton.transform.SetSiblingIndex(6);
+            if (hackTerminalButton != null) hackTerminalButton.transform.SetSiblingIndex(7);
+            if (leaveApartmentButton != null) leaveApartmentButton.transform.SetSiblingIndex(8);
+        }
+
+        private Button CreateScavengeButtonClone(Button template, Transform parent, string name, string title, string sub, Color accentColor, UnityEngine.Events.UnityAction action, out TextMeshProUGUI titleTmp, out TextMeshProUGUI subTmp)
+        {
+            GameObject go = Instantiate(template.gameObject, parent);
+            go.name = name;
+            go.SetActive(false);
+
+            Button btn = go.GetComponent<Button>();
+            btn.onClick.RemoveAllListeners();
+            if (action != null) btn.onClick.AddListener(action);
+
+            titleTmp = null;
+            subTmp = null;
+
+            // Find AccentBar
+            Transform bar = go.transform.Find("AccentBar");
+            if (bar != null)
+            {
+                Image barImg = bar.GetComponent<Image>();
+                if (barImg != null) barImg.color = accentColor;
+            }
+
+            // Find labels
+            TextMeshProUGUI[] tmps = go.GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (var t in tmps)
+            {
+                if (t.gameObject.name == "MainLabel" || t.gameObject.name == "Label" || t.gameObject.name == "Title" || t.fontSize > 12f)
+                {
+                    titleTmp = t;
+                    t.text = title;
+                }
+                else if (t.gameObject.name == "SubLabel" || t.gameObject.name == "SubText" || t.fontSize <= 12f)
+                {
+                    subTmp = t;
+                    t.text = sub;
+                }
+            }
+
+            // Re-bind TacticalChoiceButton for hover animation & audio
+            TacticalChoiceButton tcb = go.GetComponent<TacticalChoiceButton>();
+            if (tcb != null)
+            {
+                RectTransform tcRect = go.transform.Find("TextContainer") as RectTransform;
+                Image bg = go.GetComponent<Image>();
+                Outline ol = go.GetComponent<Outline>();
+                RectTransform shineRect = go.transform.Find("ShineSweep") as RectTransform;
+                Image barImg = bar != null ? bar.GetComponent<Image>() : null;
+                tcb.Initialize(btn, tcRect, bg, barImg, ol, shineRect, accentColor);
+            }
+
+            return btn;
+        }
+
         public void InitializeWithCharacter(CharacterData character)
         {
+            EnsureHubMenuSanitized();
             currentPlayer = character;
 
             // In accordance with Twine design:
@@ -1204,7 +1378,7 @@ namespace SundayLastBreath.UI
                 extTmp.fontSize = 7.5f;
                 extTmp.alignment = TextAlignmentOptions.Center;
                 extTmp.color = new Color(0.55f, 0.60f, 0.68f, 0.75f);
-                extTmp.text = "[ ↳ BULKY ]\n<size=6.5><color=#64748B>PART 2/2</color></size>";
+                extTmp.text = "[ >> BULKY ]\n<size=6.5><color=#64748B>PART 2/2</color></size>";
                 extTmp.raycastTarget = false;
                 RectTransform extr = extObj.GetComponent<RectTransform>();
                 extr.anchorMin = Vector2.zero; extr.anchorMax = Vector2.one;

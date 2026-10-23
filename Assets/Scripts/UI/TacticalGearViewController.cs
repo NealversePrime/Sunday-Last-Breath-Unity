@@ -584,7 +584,7 @@ namespace SundayLastBreath.UI
             extTmp.fontSize = 8.5f;
             extTmp.alignment = TextAlignmentOptions.Center;
             extTmp.color = isSelected ? new Color(0.95f, 0.75f, 0.25f, 0.9f) : new Color(0.55f, 0.60f, 0.68f, 0.75f);
-            extTmp.text = $"[ ↳ BULKY ]\n<size=7.5><color=#64748B>PART 2/2</color></size>";
+            extTmp.text = $"[ >> BULKY ]\n<size=7.5><color=#64748B>PART 2/2</color></size>";
             extTmp.raycastTarget = false;
             RectTransform extr = extObj.GetComponent<RectTransform>();
             extr.anchorMin = Vector2.zero; extr.anchorMax = Vector2.one;
