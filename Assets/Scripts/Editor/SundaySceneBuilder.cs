@@ -1212,12 +1212,12 @@ namespace SundayLastBreath.Editor
 
             GameObject choiceContent = new GameObject("Content", typeof(RectTransform));
             choiceContent.transform.SetParent(choiceViewport.transform, false);
-            RectTransform ccRect = choiceContent.GetComponent<RectTransform>();
-            ccRect.anchorMin = new Vector2(0f, 1f);
-            ccRect.anchorMax = new Vector2(1f, 1f);
-            ccRect.pivot = new Vector2(0.5f, 1f);
-            ccRect.anchoredPosition = Vector2.zero;
-            ccRect.sizeDelta = Vector2.zero;
+            RectTransform choiceContentRect = choiceContent.GetComponent<RectTransform>();
+            choiceContentRect.anchorMin = new Vector2(0f, 1f);
+            choiceContentRect.anchorMax = new Vector2(1f, 1f);
+            choiceContentRect.pivot = new Vector2(0.5f, 1f);
+            choiceContentRect.anchoredPosition = Vector2.zero;
+            choiceContentRect.sizeDelta = Vector2.zero;
 
             VerticalLayoutGroup ccVlg = choiceContent.AddComponent<VerticalLayoutGroup>();
             ccVlg.spacing = 6f;
@@ -1230,17 +1230,17 @@ namespace SundayLastBreath.Editor
             ccCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             ccCsf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
 
-            choiceSr.content = ccRect;
+            choiceSr.content = choiceContentRect;
 
             // Subtle Tactical Scrollbar (Auto-hides when content fits)
             GameObject sbarObj = new GameObject("ChoiceScrollbar", typeof(RectTransform));
             sbarObj.transform.SetParent(choiceScrollObj.transform, false);
-            RectTransform sbRect = sbarObj.GetComponent<RectTransform>();
-            sbRect.anchorMin = new Vector2(1f, 0f);
-            sbRect.anchorMax = new Vector2(1f, 1f);
-            sbRect.pivot = new Vector2(1f, 0.5f);
-            sbRect.sizeDelta = new Vector2(4f, 0f);
-            sbRect.anchoredPosition = Vector2.zero;
+            RectTransform choiceSbRect = sbarObj.GetComponent<RectTransform>();
+            choiceSbRect.anchorMin = new Vector2(1f, 0f);
+            choiceSbRect.anchorMax = new Vector2(1f, 1f);
+            choiceSbRect.pivot = new Vector2(1f, 0.5f);
+            choiceSbRect.sizeDelta = new Vector2(4f, 0f);
+            choiceSbRect.anchoredPosition = Vector2.zero;
 
             Image sbTrackImg = sbarObj.AddComponent<Image>();
             sbTrackImg.color = new Color(0.08f, 0.10f, 0.14f, 0.4f);
