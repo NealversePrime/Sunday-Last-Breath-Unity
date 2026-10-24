@@ -589,7 +589,8 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   webProgressiveAssetLoading: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Standalone: ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
