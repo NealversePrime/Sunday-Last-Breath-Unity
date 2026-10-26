@@ -126,9 +126,10 @@ namespace SundayLastBreath.Editor
             apartmentHubScreen.gameObject.SetActive(false);
             splashScreen.gameObject.SetActive(true);
 
-            // 7. GameManager
+            // 7. GameManager & SaveManager
             GameObject gameMgrObj = new GameObject("GameManager");
             GameManager gameMgr = gameMgrObj.AddComponent<GameManager>();
+            gameMgrObj.AddComponent<SaveManager>();
 
             SerializedObject gameSo = new SerializedObject(gameMgr);
             gameSo.FindProperty("studioSplashScreen").objectReferenceValue = splashScreen;

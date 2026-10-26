@@ -9,8 +9,10 @@ namespace SundayLastBreath.Data
     {
         public string name;
         public string description;
-        public Sprite icon;
+        [System.NonSerialized] public Sprite icon;
         public bool isWeakness;
+
+        public TraitEntry() { }
 
         public TraitEntry(string name, string desc, Sprite icon = null, bool isWeakness = false)
         {
@@ -26,6 +28,8 @@ namespace SundayLastBreath.Data
     {
         public string itemId;
         public int quantity;
+
+        public InventoryEntry() { }
 
         public InventoryEntry(string id, int qty)
         {

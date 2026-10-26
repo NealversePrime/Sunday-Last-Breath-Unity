@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using SundayLastBreath.Core;
 using SundayLastBreath.Data;
+using MoreMountains.Feedbacks;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -244,6 +245,20 @@ namespace SundayLastBreath.UI
         private List<Sprite> cachedAvatarFrames;
         private Coroutine avatarAnimRoutine;
 
+        public static ApartmentHubScreen Instance { get; private set; }
+
+        [Header("FEEL Feedbacks")]
+        [Tooltip("FEEL Camera Shake / Screen Rumble feedback for high tension moments, explosions, or gunfire.")]
+        [SerializeField] private MMF_Player screenShakeFeedback;
+        [Tooltip("FEEL Red Vignette Pulse feedback triggered when Humanity drops below 30%.")]
+        [SerializeField] private MMF_Player lowHumanityPulseFeedback;
+
+        public MMF_Player ScreenShakeFeedback => screenShakeFeedback;
+        public MMF_Player LowHumanityPulseFeedback => lowHumanityPulseFeedback;
+        public CharacterData CurrentPlayer => currentPlayer;
+        public TacticalMapViewController TacticalMap => tacticalMapController;
+        public string CurrentRoomId => currentPlayer?.currentLocationId ?? (tacticalMapController != null ? tacticalMapController.CurrentLocationId : "unit_407");
+
         public GameClock Clock => gameClock;
         public ObjectiveSystem Objectives => objectiveSystem;
         public LoreSystem Lore => loreSystem;
@@ -251,11 +266,17 @@ namespace SundayLastBreath.UI
         protected override void Awake()
         {
             base.Awake();
+            Instance = this;
 
             InitializeAudioSources();
             InitializeSystems();
             EnsureHubMenuSanitized();
             HookUIButtons();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
 
         private void InitializeAudioSources()
@@ -1105,6 +1126,100 @@ namespace SundayLastBreath.UI
             cachedAvatarFrames = CharacterCreationScreen.LoadPlayerFrames();
         }
 
+        /// <summary>
+        /// FEEL Feedback: Triggers Camera Shake / Screen Rumble during high tension events, breach, or gunshots.
+        /// Fully null-checked to ensure runtime safety even if not wired in the Inspector.
+        /// </summary>
+        public void PlayScreenShake()
+        {
+            if (screenShakeFeedback != null)
+            {
+                screenShakeFeedback.PlayFeedbacks();
+                Debug.Log("<color=orange><b>[FEEL] Camera Shake / Screen Rumble Triggered!</b></color>");
+            }
+            else
+            {
+                Debug.Log("<color=yellow>[FEEL] PlayScreenShake called, but screenShakeFeedback is not assigned (null-safe pass).</color>");
+            }
+        }
+
+        /// <summary>
+        /// FEEL Feedback: Checks player humanity and plays the Red Pulse Vignette if humanity < 30%.
+        /// Fully null-checked to ensure runtime safety even if not wired in the Inspector.
+        /// </summary>
+        public void CheckLowHumanityFeedback(int humanity)
+        {
+            if (humanity < 30)
+            {
+                if (lowHumanityPulseFeedback != null)
+                {
+                    if (!lowHumanityPulseFeedback.IsPlaying)
+                    {
+                        lowHumanityPulseFeedback.PlayFeedbacks();
+                        Debug.Log($"<color=red><b>[FEEL] Low Humanity Warning ({humanity}%) - Red Pulse Vignette Triggered!</b></color>");
+                    }
+                }
+            }
+            else
+            {
+                if (lowHumanityPulseFeedback != null && lowHumanityPulseFeedback.IsPlaying)
+                {
+                    lowHumanityPulseFeedback.StopFeedbacks();
+                }
+            }
+        }
+
+        [ContextMenu("FEEL: Test Screen Shake")]
+        public void DebugTestScreenShake()
+        {
+            PlayScreenShake();
+        }
+
+        [ContextMenu("FEEL: Test Low Humanity Pulse (<30%)")]
+        public void DebugTestLowHumanityPulse()
+        {
+            if (currentPlayer != null)
+            {
+                currentPlayer.humanity = 25;
+                UpdateVitalsUI();
+            }
+            else
+            {
+                CheckLowHumanityFeedback(25);
+            }
+        }
+
+        /// <summary>
+        /// Restores and re-binds a loaded CharacterData state into the Apartment Hub UI.
+        /// </summary>
+        public void LoadCharacterState(CharacterData character, string roomId = null)
+        {
+            if (character == null) return;
+            currentPlayer = character;
+
+            UpdateVitalsUI();
+            RefreshAllPDAPanels();
+            EvaluateHubButtonStates();
+
+            string loc = !string.IsNullOrEmpty(roomId) ? roomId : (!string.IsNullOrEmpty(character.currentLocationId) ? character.currentLocationId : "unit_407");
+            SetLocation(loc);
+        }
+
+        /// <summary>
+        /// Updates the in-game clock time and refreshes the HUD clock display.
+        /// </summary>
+        public void SetGameClockTime(int day, int hour, int minute, int date = 25, string month = "OCT", int year = 2025, string dayName = null)
+        {
+            if (gameClock == null)
+            {
+                gameClock = new GameClock(hour, minute, date, month, year, dayName);
+                gameClock.OnTimeAdvanced += (c) => UpdateClockUI();
+            }
+
+            gameClock.SetTime(day, hour, minute, date, month, year, dayName);
+            UpdateClockUI();
+        }
+
         protected override void OnScreenOpened()
         {
             base.OnScreenOpened();
@@ -1290,6 +1405,23 @@ namespace SundayLastBreath.UI
                 SwitchConsoleMode(ConsoleMode.Narrative);
             }
 #endif
+
+            // Debug shortcuts for FEEL Feedback testing (F6: Screen Shake, F7: Low Humanity Pulse)
+            bool testShake = false;
+            bool testLowHum = false;
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null)
+            {
+                testShake = Keyboard.current.f6Key.wasPressedThisFrame;
+                testLowHum = Keyboard.current.f7Key.wasPressedThisFrame;
+            }
+#endif
+#if !ENABLE_INPUT_SYSTEM || ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.F6)) testShake = true;
+            if (Input.GetKeyDown(KeyCode.F7)) testLowHum = true;
+#endif
+            if (testShake) PlayScreenShake();
+            if (testLowHum) DebugTestLowHumanityPulse();
 
             // Debounced multi-input check (Space or Enter to advance awakening dialogue)
             if (!introSeen && awakeningContainer != null && awakeningContainer.activeSelf && currentConsoleMode == ConsoleMode.Narrative)
@@ -2084,6 +2216,8 @@ namespace SundayLastBreath.UI
                         ebsBroadcastSource.Play();
                     }
 
+                    PlayScreenShake();
+
                     StartTypewriter(
                         beat1IntroText,
                         "You turn away from the glass. The silence in your apartment breaks—not with a scream, but with an agonizing, electronic tone pulsing from the television."
@@ -2738,6 +2872,8 @@ namespace SundayLastBreath.UI
                 radioSource.volume = 0.9f;
                 radioSource.Play();
             }
+
+            PlayScreenShake();
         }
 
         private void OnCloseRadioClicked()
@@ -3007,6 +3143,9 @@ namespace SundayLastBreath.UI
             // Legacy HUD fields
             if (vitalsHpText != null) vitalsHpText.text = $"<color=#FF5555><b>HP</b></color> {currentPlayer.hp}/{currentPlayer.hpMax}";
             if (vitalsStaminaText != null) vitalsStaminaText.text = $"<color=#55FF88><b>STM</b></color> {currentPlayer.stamina}/{currentPlayer.staminaMax}";
+
+            // FEEL Low Humanity Feedback check (< 30%)
+            CheckLowHumanityFeedback(currentPlayer.humanity);
         }
 
         private void UpdateObjectiveUI()

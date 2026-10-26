@@ -31,6 +31,10 @@ namespace SundayLastBreath.Core
 
         public event Action<GameClock> OnTimeAdvanced;
 
+        public GameClock() : this(23, 45, 25, "OCT", 2025, "SATURDAY")
+        {
+        }
+
         public GameClock(int hour = 23, int minute = 45, int date = 25, string month = "OCT", int year = 2025, string dayName = "SATURDAY")
         {
             this.hour = hour;
@@ -40,6 +44,22 @@ namespace SundayLastBreath.Core
             this.year = year;
             this.dayName = dayName;
             this.dayCount = 0;
+        }
+
+        /// <summary>
+        /// Explicitly sets or restores the in-game clock time (e.g. from a saved game state).
+        /// </summary>
+        public void SetTime(int dayCount, int hour, int minute, int date = 25, string month = "OCT", int year = 2025, string dayName = null)
+        {
+            this.dayCount = dayCount;
+            this.hour = Mathf.Clamp(hour, 0, 23);
+            this.minute = Mathf.Clamp(minute, 0, 59);
+            this.date = date;
+            this.month = string.IsNullOrEmpty(month) ? "OCT" : month;
+            this.year = year > 0 ? year : 2025;
+            this.dayName = string.IsNullOrEmpty(dayName) ? DaysOfWeek[Mathf.Abs(dayCount) % 7] : dayName;
+
+            OnTimeAdvanced?.Invoke(this);
         }
 
         /// <summary>

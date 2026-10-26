@@ -36,6 +36,12 @@ namespace SundayLastBreath.Core
 
         public GameState CurrentState => currentState;
         public SundayLastBreath.Data.CharacterData CurrentPlayer { get; private set; }
+        public ApartmentHubScreen ApartmentHub => apartmentHubScreen;
+
+        public void SetCurrentPlayer(SundayLastBreath.Data.CharacterData player)
+        {
+            CurrentPlayer = player;
+        }
 
         private void Awake()
         {

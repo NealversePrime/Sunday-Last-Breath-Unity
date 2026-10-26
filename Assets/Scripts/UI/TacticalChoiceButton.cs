@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using SundayLastBreath.Core;
+using MoreMountains.Feedbacks;
 
 namespace SundayLastBreath.UI
 {
@@ -16,6 +17,7 @@ namespace SundayLastBreath.UI
     /// - Tactile scale dip on click
     /// - Audio triggers for hover and click
     /// - Programmatic execution via keyboard hotkeys (1-9)
+    /// - Optional FEEL MMF_Player tactile punch on hover and click
     /// </summary>
     public class TacticalChoiceButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
@@ -30,6 +32,15 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI hotkeyTmp;
         [SerializeField] private TextMeshProUGUI mainLabelTmp;
         [SerializeField] private TextMeshProUGUI subLabelTmp;
+
+        [Header("FEEL Feedbacks")]
+        [Tooltip("Optional FEEL feedback for tactile scale bounce / audio punch on hover.")]
+        [SerializeField] private MMF_Player hoverFeedback;
+        [Tooltip("Optional FEEL feedback for tactile punch / scale dip / haptic pulse on click.")]
+        [SerializeField] private MMF_Player clickFeedback;
+
+        public MMF_Player HoverFeedback { get => hoverFeedback; set => hoverFeedback = value; }
+        public MMF_Player ClickFeedback { get => clickFeedback; set => clickFeedback = value; }
 
         [Header("Colors & Styling")]
         [SerializeField] private Color baseBgColor = new Color(0.04f, 0.06f, 0.09f, 0.65f);
@@ -113,6 +124,24 @@ namespace SundayLastBreath.UI
                 Transform ab = transform.Find("AccentBar");
                 if (ab != null) accentBar = ab.GetComponent<Image>();
             }
+
+            // Auto-detect FEEL Feedbacks if attached on self or children
+            if (hoverFeedback == null || clickFeedback == null)
+            {
+                var feedbacks = GetComponentsInChildren<MMF_Player>(true);
+                foreach (var fb in feedbacks)
+                {
+                    string fbName = fb.gameObject.name.ToLower();
+                    if (hoverFeedback == null && (fbName.Contains("hover") || fbName.Contains("enter")))
+                    {
+                        hoverFeedback = fb;
+                    }
+                    else if (clickFeedback == null && (fbName.Contains("click") || fbName.Contains("punch") || fbName.Contains("press") || fbName.Contains("select")))
+                    {
+                        clickFeedback = fb;
+                    }
+                }
+            }
         }
 
         private void OnEnable()
@@ -138,6 +167,13 @@ namespace SundayLastBreath.UI
         {
             if (button == null || !button.interactable || !gameObject.activeInHierarchy) return;
             AudioManager.Instance?.PlayButtonClick();
+
+            // FEEL Tactile Punch on trigger
+            if (clickFeedback != null)
+            {
+                clickFeedback.PlayFeedbacks();
+            }
+
             button.onClick.Invoke();
         }
 
@@ -233,6 +269,12 @@ namespace SundayLastBreath.UI
             // High-frequency CRT phosphor tick SFX
             AudioManager.Instance?.PlayButtonHover();
 
+            // FEEL Tactile Bounce Punch on hover
+            if (hoverFeedback != null)
+            {
+                hoverFeedback.PlayFeedbacks();
+            }
+
             // Trigger sweeping sheen reflection
             if (shineSweep != null)
             {
@@ -269,6 +311,12 @@ namespace SundayLastBreath.UI
             if (button != null && !button.interactable) return;
             transform.localScale = new Vector3(0.99f, 0.99f, 1f);
             AudioManager.Instance?.PlayButtonClick();
+
+            // FEEL Tactile Punch on click
+            if (clickFeedback != null)
+            {
+                clickFeedback.PlayFeedbacks();
+            }
         }
 
         public void OnPointerUp(PointerEventData eventData)
