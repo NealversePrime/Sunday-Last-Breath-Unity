@@ -473,7 +473,7 @@ namespace SundayLastBreath.UI
             if (pdaSaveSettingsBtn != null)
             {
                 pdaSaveSettingsBtn.onClick.RemoveAllListeners();
-                pdaSaveSettingsBtn.onClick.AddListener(PlayClickSFX);
+                pdaSaveSettingsBtn.onClick.AddListener(OnPDASaveClicked);
             }
 
 
@@ -1170,58 +1170,36 @@ namespace SundayLastBreath.UI
             screenShakeRoutine = null;
         }
 
+        private Coroutine damageFlashRoutine;
+        private Image damageVignetteOverlay;
+
         /// <summary>
-        /// FEEL Feedback: Checks player humanity and plays the Red Pulse Vignette if humanity < 30%.
-        /// Guaranteed visual feedback even if MMF_Player component has not yet been dragged in Inspector.
+        /// FEEL Feedback: Triggers an intense red impact flash & trauma jolt when the player is attacked, injured, or fails a dangerous skill check.
         /// </summary>
-        public void CheckLowHumanityFeedback(int humanity)
+        public void PlayDamageFeedback(int damageAmount = 0)
         {
-            if (humanity < 30)
+            EnsureDamageVignetteExists();
+            if (damageFlashRoutine != null) StopCoroutine(damageFlashRoutine);
+            damageFlashRoutine = StartCoroutine(DoDamageFlash());
+
+            // Impact jolt
+            if (screenShakeRoutine != null) StopCoroutine(screenShakeRoutine);
+            screenShakeRoutine = StartCoroutine(DoScreenShakeRumble(0.28f, 14f));
+
+            if (lowHumanityPulseFeedback != null)
             {
-                if (lowHumanityPulseFeedback != null)
-                {
-                    if (!lowHumanityPulseFeedback.IsPlaying)
-                    {
-                        lowHumanityPulseFeedback.PlayFeedbacks();
-                    }
-                }
-
-                EnsureLowHumanityVignetteExists();
-                if (lowHumanityPulseRoutine == null)
-                {
-                    lowHumanityPulseRoutine = StartCoroutine(DoLowHumanityVignettePulse());
-                    Debug.Log($"<color=red><b>[FEEL] Low Humanity Alert ({humanity}%) - Red Pulse Vignette Active! (F7)</b></color>");
-                }
+                lowHumanityPulseFeedback.PlayFeedbacks();
             }
-            else
-            {
-                if (lowHumanityPulseFeedback != null && lowHumanityPulseFeedback.IsPlaying)
-                {
-                    lowHumanityPulseFeedback.StopFeedbacks();
-                }
 
-                if (lowHumanityPulseRoutine != null)
-                {
-                    StopCoroutine(lowHumanityPulseRoutine);
-                    lowHumanityPulseRoutine = null;
-                }
-
-                if (lowHumanityVignetteOverlay != null)
-                {
-                    lowHumanityVignetteOverlay.gameObject.SetActive(false);
-                }
-            }
+            string dmgInfo = damageAmount > 0 ? $" (-{damageAmount} HP)" : "";
+            Debug.Log($"<color=red><b>[FEEL] Player Damage Impact Feedback Triggered!{dmgInfo} (F7)</b></color>");
         }
 
-        private void EnsureLowHumanityVignetteExists()
+        private void EnsureDamageVignetteExists()
         {
-            if (lowHumanityVignetteOverlay != null)
-            {
-                lowHumanityVignetteOverlay.gameObject.SetActive(true);
-                return;
-            }
+            if (damageVignetteOverlay != null) return;
 
-            GameObject vigObj = new GameObject("LowHumanityPulseVignette");
+            GameObject vigObj = new GameObject("DamageImpactVignette");
             vigObj.transform.SetParent(transform, false);
             RectTransform vr = vigObj.AddComponent<RectTransform>();
             vr.anchorMin = Vector2.zero;
@@ -1229,25 +1207,49 @@ namespace SundayLastBreath.UI
             vr.offsetMin = Vector2.zero;
             vr.offsetMax = Vector2.zero;
 
-            lowHumanityVignetteOverlay = vigObj.AddComponent<Image>();
-            lowHumanityVignetteOverlay.color = new Color(0.9f, 0.05f, 0.05f, 0f);
-            lowHumanityVignetteOverlay.raycastTarget = false;
-
-            // Ensure behind popups
+            damageVignetteOverlay = vigObj.AddComponent<Image>();
+            damageVignetteOverlay.color = new Color(0.95f, 0.05f, 0.05f, 0f);
+            damageVignetteOverlay.raycastTarget = false;
             vigObj.transform.SetAsLastSibling();
+            vigObj.SetActive(false);
         }
 
-        private IEnumerator DoLowHumanityVignettePulse()
+        private IEnumerator DoDamageFlash()
         {
-            while (true)
-            {
-                if (lowHumanityVignetteOverlay == null) yield break;
+            if (damageVignetteOverlay == null) yield break;
 
-                // Heartbeat pulsating alpha between 0.06 and 0.28
-                float t = (Mathf.Sin(Time.unscaledTime * 4.5f) + 1f) * 0.5f;
-                float alpha = Mathf.Lerp(0.06f, 0.28f, t);
-                lowHumanityVignetteOverlay.color = new Color(0.9f, 0.05f, 0.05f, alpha);
+            damageVignetteOverlay.gameObject.SetActive(true);
+            float duration = 0.50f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                // Sharp initial flash, smooth decay
+                float alpha = Mathf.Lerp(0.55f, 0f, t);
+                damageVignetteOverlay.color = new Color(0.95f, 0.05f, 0.05f, alpha);
                 yield return null;
+            }
+
+            damageVignetteOverlay.gameObject.SetActive(false);
+            damageFlashRoutine = null;
+        }
+
+        /// <summary>
+        /// Public helper for skill checks and encounters to apply damage and trigger the red hit feedback.
+        /// </summary>
+        public void ApplyDamage(int amount, string source = null)
+        {
+            if (currentPlayer == null) return;
+            currentPlayer.hp = Mathf.Max(0, currentPlayer.hp - amount);
+            UpdateVitalsUI();
+            PlayDamageFeedback(amount);
+
+            if (!string.IsNullOrEmpty(source))
+            {
+                AppendStoryLog(gameClock != null ? gameClock.GetTimeString() : "23:45", "INJURY SUSTAINED",
+                    $"Sustained {amount} trauma damage from {source}. Current Vital State: {currentPlayer.hp}/{currentPlayer.hpMax} HP.");
             }
         }
 
@@ -1257,28 +1259,10 @@ namespace SundayLastBreath.UI
             PlayScreenShake();
         }
 
-        [ContextMenu("FEEL: Test Low Humanity Pulse Toggle (F7)")]
-        public void DebugTestLowHumanityPulse()
+        [ContextMenu("FEEL: Test Damage Hit Flash (F7)")]
+        public void DebugTestDamageFeedback()
         {
-            if (currentPlayer != null)
-            {
-                // Toggle between low humanity (20%) and normal humanity (60%)
-                if (currentPlayer.humanity < 30)
-                {
-                    currentPlayer.humanity = 60;
-                    Debug.Log("<color=green><b>[FEEL] Humanity restored to 60% - Red Pulse Stopped! (F7)</b></color>");
-                }
-                else
-                {
-                    currentPlayer.humanity = 20;
-                    Debug.Log("<color=red><b>[FEEL] Humanity lowered to 20% - Red Pulse Triggered! (F7)</b></color>");
-                }
-                UpdateVitalsUI();
-            }
-            else
-            {
-                CheckLowHumanityFeedback(20);
-            }
+            PlayDamageFeedback(15);
         }
 
         /// <summary>
@@ -1513,7 +1497,7 @@ namespace SundayLastBreath.UI
             if (Input.GetKeyDown(KeyCode.F7)) testLowHum = true;
 #endif
             if (testShake) PlayScreenShake();
-            if (testLowHum) DebugTestLowHumanityPulse();
+            if (testLowHum) DebugTestDamageFeedback();
 
             // Debounced multi-input check (Space or Enter to advance awakening dialogue)
             if (!introSeen && awakeningContainer != null && awakeningContainer.activeSelf && currentConsoleMode == ConsoleMode.Narrative)
@@ -2308,8 +2292,6 @@ namespace SundayLastBreath.UI
                         ebsBroadcastSource.Play();
                     }
 
-                    PlayScreenShake();
-
                     StartTypewriter(
                         beat1IntroText,
                         "You turn away from the glass. The silence in your apartment breaks—not with a scream, but with an agonizing, electronic tone pulsing from the television."
@@ -2317,7 +2299,7 @@ namespace SundayLastBreath.UI
                     break;
 
                 case 2:
-                    // Beat 2: The Reaction
+                    // Beat 2: The Reaction (EAS cuts abruptly into TV static hiss)
                     if (continuePrompt != null) continuePrompt.SetActive(true);
                     if (beat2Container != null) beat2Container.SetActive(true);
                     if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // INTERNAL MONOLOGUE ]</color>";
@@ -2338,6 +2320,9 @@ namespace SundayLastBreath.UI
                             staticSource.Stop();
                         }
                     }
+
+                    // Dramatic Screen Shake: TV signal dies into harsh static
+                    PlayScreenShake();
 
                     if (monologueBox != null)
                     {
@@ -2944,6 +2929,61 @@ namespace SundayLastBreath.UI
             EvaluateHubButtonStates();
         }
 
+        private Coroutine pdaSaveFeedbackRoutine;
+
+        private void OnPDASaveClicked()
+        {
+            PlayClickSFX();
+
+            bool success = SaveManager.Instance != null && SaveManager.Instance.SaveGame();
+
+            if (success)
+            {
+                AppendStoryLog(gameClock != null ? gameClock.GetTimeString() : "23:45", "MANUAL ARCHIVE",
+                    "Survivor vitals, tactical inventory, and sector telemetry successfully committed to pocket device storage.");
+
+                if (pdaSaveFeedbackRoutine != null) StopCoroutine(pdaSaveFeedbackRoutine);
+                pdaSaveFeedbackRoutine = StartCoroutine(AnimateSaveButtonSuccess());
+            }
+            else
+            {
+                Debug.LogWarning("[ApartmentHub] Manual Save failed.");
+            }
+        }
+
+        private IEnumerator AnimateSaveButtonSuccess()
+        {
+            if (pdaSaveSettingsBtn == null) yield break;
+
+            TextMeshProUGUI btnText = pdaSaveSettingsBtn.GetComponentInChildren<TextMeshProUGUI>();
+            Image btnImg = pdaSaveSettingsBtn.GetComponent<Image>();
+
+            string originalText = btnText != null ? btnText.text : "SAVE / LOAD / SETTINGS";
+            Color originalColor = btnImg != null ? btnImg.color : new Color(0.08f, 0.09f, 0.11f, 0.98f);
+
+            if (btnText != null)
+            {
+                btnText.text = "<color=#10B981><b>✓ RECORD ARCHIVED</b></color>";
+            }
+            if (btnImg != null)
+            {
+                btnImg.color = new Color(0.05f, 0.22f, 0.12f, 0.98f);
+            }
+
+            yield return new WaitForSecondsRealtime(2.5f);
+
+            if (btnText != null)
+            {
+                btnText.text = originalText;
+            }
+            if (btnImg != null)
+            {
+                btnImg.color = originalColor;
+            }
+
+            pdaSaveFeedbackRoutine = null;
+        }
+
         private void OnListenRadioClicked()
         {
             PlayClickSFX();
@@ -3235,9 +3275,6 @@ namespace SundayLastBreath.UI
             // Legacy HUD fields
             if (vitalsHpText != null) vitalsHpText.text = $"<color=#FF5555><b>HP</b></color> {currentPlayer.hp}/{currentPlayer.hpMax}";
             if (vitalsStaminaText != null) vitalsStaminaText.text = $"<color=#55FF88><b>STM</b></color> {currentPlayer.stamina}/{currentPlayer.staminaMax}";
-
-            // FEEL Low Humanity Feedback check (< 30%)
-            CheckLowHumanityFeedback(currentPlayer.humanity);
         }
 
         private void UpdateObjectiveUI()
