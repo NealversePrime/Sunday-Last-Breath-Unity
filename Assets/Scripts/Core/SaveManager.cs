@@ -345,6 +345,76 @@ namespace SundayLastBreath.Core
                 Debug.Log($"<color=yellow>[Easy Save 3] Deleted save file '{file}' from disk.</color>");
             }
         }
+
+        [Serializable]
+        public struct SaveSummary
+        {
+            public bool exists;
+            public string survivorName;
+            public string job;
+            public int hp;
+            public int hpMax;
+            public int stamina;
+            public int staminaMax;
+            public int humanity;
+            public string roomId;
+            public int day;
+            public int hour;
+            public int minute;
+            public string dateString;
+            public int traitCount;
+            public int itemCount;
+        }
+
+        /// <summary>
+        /// Reads high-level meta telemetry of the save file without loading full game state into memory.
+        /// </summary>
+        public SaveSummary GetSaveSummary(string fileName = null)
+        {
+            string file = string.IsNullOrEmpty(fileName) ? defaultSaveFileName : fileName;
+            SaveSummary summary = new SaveSummary();
+
+            if (!ES3.FileExists(file))
+            {
+                summary.exists = false;
+                return summary;
+            }
+
+            summary.exists = true;
+
+            try
+            {
+                if (ES3.KeyExists("character_data", file))
+                {
+                    CharacterData cd = ES3.Load<CharacterData>("character_data", file);
+                    if (cd != null)
+                    {
+                        summary.survivorName = cd.FullName;
+                        summary.job = cd.job;
+                        summary.hp = cd.hp;
+                        summary.hpMax = cd.hpMax;
+                        summary.stamina = cd.stamina;
+                        summary.staminaMax = cd.staminaMax;
+                        summary.humanity = cd.humanity;
+                        summary.traitCount = cd.traits?.Count ?? 0;
+                        summary.itemCount = cd.inventory?.Count ?? 0;
+                    }
+                }
+
+                summary.roomId = ES3.KeyExists("current_room_id", file) ? ES3.Load<string>("current_room_id", file) : "unit_407";
+                summary.day = ES3.KeyExists("clock_day", file) ? ES3.Load<int>("clock_day", file) : 0;
+                summary.hour = ES3.KeyExists("clock_hour", file) ? ES3.Load<int>("clock_hour", file) : 23;
+                summary.minute = ES3.KeyExists("clock_minute", file) ? ES3.Load<int>("clock_minute", file) : 45;
+                string dayName = ES3.KeyExists("clock_day_name", file) ? ES3.Load<string>("clock_day_name", file) : "SATURDAY";
+                summary.dateString = $"DAY {summary.day} ({dayName}) // {summary.hour:D2}:{summary.minute:D2}";
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[SaveManager] Failed to read save summary: {ex.Message}");
+            }
+
+            return summary;
+        }
     }
 }
 

@@ -1126,26 +1126,53 @@ namespace SundayLastBreath.UI
             cachedAvatarFrames = CharacterCreationScreen.LoadPlayerFrames();
         }
 
+        private Coroutine screenShakeRoutine;
+        private Image lowHumanityVignetteOverlay;
+        private Coroutine lowHumanityPulseRoutine;
+
         /// <summary>
         /// FEEL Feedback: Triggers Camera Shake / Screen Rumble during high tension events, breach, or gunshots.
-        /// Fully null-checked to ensure runtime safety even if not wired in the Inspector.
+        /// Guaranteed visual rumble even if MMF_Player component has not yet been dragged in Inspector.
         /// </summary>
         public void PlayScreenShake()
         {
             if (screenShakeFeedback != null)
             {
                 screenShakeFeedback.PlayFeedbacks();
-                Debug.Log("<color=orange><b>[FEEL] Camera Shake / Screen Rumble Triggered!</b></color>");
             }
-            else
+
+            if (screenShakeRoutine != null) StopCoroutine(screenShakeRoutine);
+            screenShakeRoutine = StartCoroutine(DoScreenShakeRumble(0.40f, 16f));
+
+            Debug.Log("<color=orange><b>[FEEL] Camera Shake / Screen Rumble Triggered! (F6)</b></color>");
+        }
+
+        private IEnumerator DoScreenShakeRumble(float duration, float maxMagnitude)
+        {
+            RectTransform target = transform as RectTransform;
+            if (target == null) yield break;
+
+            Vector2 originalPos = target.anchoredPosition;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
             {
-                Debug.Log("<color=yellow>[FEEL] PlayScreenShake called, but screenShakeFeedback is not assigned (null-safe pass).</color>");
+                elapsed += Time.unscaledDeltaTime;
+                float damper = 1f - Mathf.Clamp01(elapsed / duration);
+                float x = (UnityEngine.Random.value * 2f - 1f) * maxMagnitude * damper;
+                float y = (UnityEngine.Random.value * 2f - 1f) * maxMagnitude * damper;
+
+                target.anchoredPosition = originalPos + new Vector2(x, y);
+                yield return null;
             }
+
+            target.anchoredPosition = originalPos;
+            screenShakeRoutine = null;
         }
 
         /// <summary>
         /// FEEL Feedback: Checks player humanity and plays the Red Pulse Vignette if humanity < 30%.
-        /// Fully null-checked to ensure runtime safety even if not wired in the Inspector.
+        /// Guaranteed visual feedback even if MMF_Player component has not yet been dragged in Inspector.
         /// </summary>
         public void CheckLowHumanityFeedback(int humanity)
         {
@@ -1156,8 +1183,14 @@ namespace SundayLastBreath.UI
                     if (!lowHumanityPulseFeedback.IsPlaying)
                     {
                         lowHumanityPulseFeedback.PlayFeedbacks();
-                        Debug.Log($"<color=red><b>[FEEL] Low Humanity Warning ({humanity}%) - Red Pulse Vignette Triggered!</b></color>");
                     }
+                }
+
+                EnsureLowHumanityVignetteExists();
+                if (lowHumanityPulseRoutine == null)
+                {
+                    lowHumanityPulseRoutine = StartCoroutine(DoLowHumanityVignettePulse());
+                    Debug.Log($"<color=red><b>[FEEL] Low Humanity Alert ({humanity}%) - Red Pulse Vignette Active! (F7)</b></color>");
                 }
             }
             else
@@ -1166,26 +1199,85 @@ namespace SundayLastBreath.UI
                 {
                     lowHumanityPulseFeedback.StopFeedbacks();
                 }
+
+                if (lowHumanityPulseRoutine != null)
+                {
+                    StopCoroutine(lowHumanityPulseRoutine);
+                    lowHumanityPulseRoutine = null;
+                }
+
+                if (lowHumanityVignetteOverlay != null)
+                {
+                    lowHumanityVignetteOverlay.gameObject.SetActive(false);
+                }
             }
         }
 
-        [ContextMenu("FEEL: Test Screen Shake")]
+        private void EnsureLowHumanityVignetteExists()
+        {
+            if (lowHumanityVignetteOverlay != null)
+            {
+                lowHumanityVignetteOverlay.gameObject.SetActive(true);
+                return;
+            }
+
+            GameObject vigObj = new GameObject("LowHumanityPulseVignette");
+            vigObj.transform.SetParent(transform, false);
+            RectTransform vr = vigObj.AddComponent<RectTransform>();
+            vr.anchorMin = Vector2.zero;
+            vr.anchorMax = Vector2.one;
+            vr.offsetMin = Vector2.zero;
+            vr.offsetMax = Vector2.zero;
+
+            lowHumanityVignetteOverlay = vigObj.AddComponent<Image>();
+            lowHumanityVignetteOverlay.color = new Color(0.9f, 0.05f, 0.05f, 0f);
+            lowHumanityVignetteOverlay.raycastTarget = false;
+
+            // Ensure behind popups
+            vigObj.transform.SetAsLastSibling();
+        }
+
+        private IEnumerator DoLowHumanityVignettePulse()
+        {
+            while (true)
+            {
+                if (lowHumanityVignetteOverlay == null) yield break;
+
+                // Heartbeat pulsating alpha between 0.06 and 0.28
+                float t = (Mathf.Sin(Time.unscaledTime * 4.5f) + 1f) * 0.5f;
+                float alpha = Mathf.Lerp(0.06f, 0.28f, t);
+                lowHumanityVignetteOverlay.color = new Color(0.9f, 0.05f, 0.05f, alpha);
+                yield return null;
+            }
+        }
+
+        [ContextMenu("FEEL: Test Screen Shake (F6)")]
         public void DebugTestScreenShake()
         {
             PlayScreenShake();
         }
 
-        [ContextMenu("FEEL: Test Low Humanity Pulse (<30%)")]
+        [ContextMenu("FEEL: Test Low Humanity Pulse Toggle (F7)")]
         public void DebugTestLowHumanityPulse()
         {
             if (currentPlayer != null)
             {
-                currentPlayer.humanity = 25;
+                // Toggle between low humanity (20%) and normal humanity (60%)
+                if (currentPlayer.humanity < 30)
+                {
+                    currentPlayer.humanity = 60;
+                    Debug.Log("<color=green><b>[FEEL] Humanity restored to 60% - Red Pulse Stopped! (F7)</b></color>");
+                }
+                else
+                {
+                    currentPlayer.humanity = 20;
+                    Debug.Log("<color=red><b>[FEEL] Humanity lowered to 20% - Red Pulse Triggered! (F7)</b></color>");
+                }
                 UpdateVitalsUI();
             }
             else
             {
-                CheckLowHumanityFeedback(25);
+                CheckLowHumanityFeedback(20);
             }
         }
 
