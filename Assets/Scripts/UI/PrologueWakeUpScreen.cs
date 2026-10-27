@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using MoreMountains.Feedbacks;
 using SundayLastBreath.Core;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -57,12 +58,17 @@ namespace SundayLastBreath.UI
         [Tooltip("Minimum time (in seconds) between clicks to prevent accidental double-clicks or faulty mouse switches from skipping text.")]
         [SerializeField] private float clickDebounceDelay = 0.35f;
 
+        [Header("FEEL Feedbacks (Optional)")]
+        [Tooltip("Optional MMF_Player for screen shake when the TV broadcast dies into static and jolts the player awake.")]
+        [SerializeField] private MMF_Player screenShakeFeedback;
+
         // Sequence State
         private int currentStep = 0;
         private bool isTyping = false;
         private bool isTransitioning = false;
         private string currentFullText = "";
         private Coroutine typeRoutine;
+        private Coroutine screenShakeRoutine;
         private float lastClickTime = -999f;
 
         private static readonly string[] NarrativeSteps = new string[]
@@ -344,6 +350,9 @@ namespace SundayLastBreath.UI
                     {
                         tvStaticAnimPlayer.Play();
                     }
+
+                    // Screen Shake: Player is jolted awake from sleep on the couch as the TV violently cuts to harsh static!
+                    PlayScreenShake(0.60f, 24f);
                     break;
 
                 case 3:
@@ -362,6 +371,9 @@ namespace SundayLastBreath.UI
                     {
                         tvStaticAnimPlayer.Play();
                     }
+
+                    // Secondary jolt as the player's eyes snap open and they jolt upright
+                    PlayScreenShake(0.35f, 14f);
                     break;
 
                 case 4:
@@ -539,6 +551,41 @@ namespace SundayLastBreath.UI
             if (staticSource != null) { staticSource.Stop(); staticSource.clip = null; }
             if (sirensSource != null) { sirensSource.Stop(); sirensSource.clip = null; }
             if (sfxSource != null) { sfxSource.Stop(); }
+        }
+
+        public void PlayScreenShake(float duration = 0.55f, float maxMagnitude = 22f)
+        {
+            if (screenShakeFeedback != null)
+            {
+                screenShakeFeedback.PlayFeedbacks();
+            }
+
+            if (screenShakeRoutine != null) StopCoroutine(screenShakeRoutine);
+            screenShakeRoutine = StartCoroutine(DoScreenShakeRumble(duration, maxMagnitude));
+            Debug.Log("<color=cyan><b>[FEEL] Prologue TV Static Awakening Screen Shake Triggered!</b></color>");
+        }
+
+        private IEnumerator DoScreenShakeRumble(float duration, float maxMagnitude)
+        {
+            RectTransform target = transform as RectTransform;
+            if (target == null) yield break;
+
+            Vector2 originalPos = target.anchoredPosition;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float damper = 1f - Mathf.Clamp01(elapsed / duration);
+                float x = (UnityEngine.Random.value * 2f - 1f) * maxMagnitude * damper;
+                float y = (UnityEngine.Random.value * 2f - 1f) * maxMagnitude * damper;
+
+                target.anchoredPosition = originalPos + new Vector2(x, y);
+                yield return null;
+            }
+
+            target.anchoredPosition = originalPos;
+            screenShakeRoutine = null;
         }
     }
 }

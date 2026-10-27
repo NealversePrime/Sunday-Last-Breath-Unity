@@ -1400,6 +1400,33 @@ namespace SundayLastBreath.UI
 
         private void Update()
         {
+            // 0a. Hotkey (Escape) to dismiss System Menu Modal if open
+            if (systemMenuModal != null && systemMenuModal.activeSelf)
+            {
+                bool escSys = false;
+#if ENABLE_INPUT_SYSTEM
+                if (Keyboard.current != null) escSys = Keyboard.current.escapeKey.wasPressedThisFrame;
+#else
+                escSys = Input.GetKeyDown(KeyCode.Escape);
+#endif
+                if (escSys)
+                {
+                    if (sysExitConfirmPanel != null && sysExitConfirmPanel.activeSelf)
+                    {
+                        SwitchSystemMenuView(SystemMenuView.Main);
+                    }
+                    else if (sysSettingsPanel != null && sysSettingsPanel.activeSelf)
+                    {
+                        SwitchSystemMenuView(SystemMenuView.Main);
+                    }
+                    else
+                    {
+                        CloseSystemMenuModal();
+                    }
+                    return;
+                }
+            }
+
             // 0. Hotkey to dismiss Phone Modal if open (1, Escape, Space, Enter)
             if (phoneModal != null && phoneModal.activeSelf)
             {
@@ -2321,9 +2348,6 @@ namespace SundayLastBreath.UI
                         }
                     }
 
-                    // Dramatic Screen Shake: TV signal dies into harsh static
-                    PlayScreenShake();
-
                     if (monologueBox != null)
                     {
                         monologueBox.SetActive(true);
@@ -2929,60 +2953,672 @@ namespace SundayLastBreath.UI
             EvaluateHubButtonStates();
         }
 
-        private Coroutine pdaSaveFeedbackRoutine;
+        #region System Menu Modal (Save / Load / Settings / Exit Confirmation)
+        private enum SystemMenuView { Main, Settings, ExitConfirm }
+
+        private GameObject systemMenuModal;
+        private GameObject sysMainPanel;
+        private GameObject sysSettingsPanel;
+        private GameObject sysExitConfirmPanel;
+
+        private TextMeshProUGUI sysHeaderSubText;
+        private TextMeshProUGUI sysTelemetryStatusText;
+        private TextMeshProUGUI sysSaveBtnLabel;
+        private Button sysLoadGameBtn;
+        private TextMeshProUGUI sysLoadBtnLabel;
+        private TextMeshProUGUI sysExitWarningDetailText;
+
+        private Slider sysMasterVolSlider;
+        private Slider sysBgmVolSlider;
+        private Slider sysSfxVolSlider;
+        private TextMeshProUGUI sysMasterVolValueText;
+        private TextMeshProUGUI sysBgmVolValueText;
+        private TextMeshProUGUI sysSfxVolValueText;
+
+        private Coroutine sysSaveFeedbackRoutine;
 
         private void OnPDASaveClicked()
         {
             PlayClickSFX();
+            OpenSystemMenuModal();
+        }
 
+        public void OpenSystemMenuModal()
+        {
+            EnsureSystemMenuModalBuilt();
+            RefreshSystemMenuTelemetry();
+            SwitchSystemMenuView(SystemMenuView.Main);
+            systemMenuModal.transform.SetAsLastSibling();
+            systemMenuModal.SetActive(true);
+        }
+
+        public void CloseSystemMenuModal()
+        {
+            PlayClickSFX();
+            if (systemMenuModal != null)
+            {
+                systemMenuModal.SetActive(false);
+            }
+        }
+
+        private void SwitchSystemMenuView(SystemMenuView view)
+        {
+            PlayClickSFX();
+            if (sysMainPanel != null) sysMainPanel.SetActive(view == SystemMenuView.Main);
+            if (sysSettingsPanel != null) sysSettingsPanel.SetActive(view == SystemMenuView.Settings);
+            if (sysExitConfirmPanel != null) sysExitConfirmPanel.SetActive(view == SystemMenuView.ExitConfirm);
+
+            if (sysHeaderSubText != null)
+            {
+                switch (view)
+                {
+                    case SystemMenuView.Main:
+                        sysHeaderSubText.text = "SYSTEM // ARCHIVE, AUDIO CONFIGURATION & SESSION CONTROL";
+                        break;
+                    case SystemMenuView.Settings:
+                        sysHeaderSubText.text = "SETTINGS // AUDIO MIXER & VOLUME CALIBRATION";
+                        SyncSettingsSlidersFromAudio();
+                        break;
+                    case SystemMenuView.ExitConfirm:
+                        sysHeaderSubText.text = "WARNING // CONFIRM SESSION TERMINATION";
+                        UpdateExitWarningDetails();
+                        break;
+                }
+            }
+        }
+
+        private void RefreshSystemMenuTelemetry(string customBanner = null)
+        {
+            bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
+
+            if (sysLoadGameBtn != null)
+            {
+                sysLoadGameBtn.interactable = hasSave;
+            }
+
+            if (sysLoadBtnLabel != null)
+            {
+                sysLoadBtnLabel.text = hasSave
+                    ? "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Restore last recorded checkpoint</color></size>"
+                    : "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#64748B>[NO SAVE DATA RECORDED]</color></size>";
+            }
+
+            if (sysTelemetryStatusText != null)
+            {
+                if (!string.IsNullOrEmpty(customBanner))
+                {
+                    sysTelemetryStatusText.text = customBanner;
+                }
+                else if (hasSave && SaveManager.Instance != null)
+                {
+                    var s = SaveManager.Instance.GetSaveSummary();
+                    string roomStr = string.IsNullOrEmpty(s.roomId) ? "UNIT 407" : s.roomId.Replace("_", " ").ToUpperInvariant();
+                    sysTelemetryStatusText.text =
+                        $"<color=#38BDF8><b>LAST ARCHIVE:</b></color> {s.dateString}   |   <color=#F8FAFC>{s.survivorName} ({s.job})</color>   |   <color=#F59E0B>{roomStr} (HP {s.hp}/{s.hpMax})</color>";
+                }
+                else
+                {
+                    sysTelemetryStatusText.text = "<color=#EF4444><b>ARCHIVE STATUS:</b> No manual or quick save recorded in this session yet.</color>";
+                }
+            }
+        }
+
+        private void UpdateExitWarningDetails()
+        {
+            if (sysExitWarningDetailText == null) return;
+
+            bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
+            if (hasSave && SaveManager.Instance != null)
+            {
+                var s = SaveManager.Instance.GetSaveSummary();
+                string roomStr = string.IsNullOrEmpty(s.roomId) ? "UNIT 407" : s.roomId.Replace("_", " ").ToUpperInvariant();
+                sysExitWarningDetailText.text =
+                    "Are you sure you want to exit the game?\n" +
+                    "Any unsaved progress since your last save will be lost.\n\n" +
+                    $"<color=#38BDF8><b>Last Recorded Save:</b></color> {s.dateString}\n" +
+                    $"<color=#94A3B8>Citizen: {s.survivorName} ({s.job})  |  Location: {roomStr}  |  HP: {s.hp}/{s.hpMax}</color>";
+            }
+            else
+            {
+                sysExitWarningDetailText.text =
+                    "Are you sure you want to exit the game?\n" +
+                    "<color=#EF4444><b>You have not saved your game yet!</b></color> If you exit without saving, all current progress will be lost.";
+            }
+        }
+
+        private void OnSystemMenuSaveClicked()
+        {
+            PlayClickSFX();
             bool success = SaveManager.Instance != null && SaveManager.Instance.SaveGame();
 
             if (success)
             {
                 AppendStoryLog(gameClock != null ? gameClock.GetTimeString() : "23:45", "MANUAL ARCHIVE",
-                    "Survivor vitals, tactical inventory, and sector telemetry successfully committed to pocket device storage.");
+                    "Survivor vitals, backpack items, and room progress saved to storage.");
 
-                if (pdaSaveFeedbackRoutine != null) StopCoroutine(pdaSaveFeedbackRoutine);
-                pdaSaveFeedbackRoutine = StartCoroutine(AnimateSaveButtonSuccess());
+                var s = SaveManager.Instance.GetSaveSummary();
+                string roomStr = string.IsNullOrEmpty(s.roomId) ? "UNIT 407" : s.roomId.Replace("_", " ").ToUpperInvariant();
+                RefreshSystemMenuTelemetry(
+                    $"<color=#10B981><b>✓ GAME SAVED SUCCESSFULLY</b></color>  [{s.dateString}]  —  {s.survivorName} | {roomStr}");
+
+                if (sysSaveFeedbackRoutine != null) StopCoroutine(sysSaveFeedbackRoutine);
+                sysSaveFeedbackRoutine = StartCoroutine(AnimateSysSaveButtonConfirmation());
+            }
+        }
+
+        private IEnumerator AnimateSysSaveButtonConfirmation()
+        {
+            if (sysSaveBtnLabel == null) yield break;
+            string normal = "<b>[ 1 ]  SAVE GAME</b>   <size=11><color=#94A3B8>Record current progress & inventory</color></size>";
+            sysSaveBtnLabel.text = "<color=#10B981><b>✓  PROGRESS SAVED TO ARCHIVE!</b></color>";
+            yield return new WaitForSecondsRealtime(2.0f);
+            if (sysSaveBtnLabel != null) sysSaveBtnLabel.text = normal;
+            sysSaveFeedbackRoutine = null;
+        }
+
+        private void OnSystemMenuLoadClicked()
+        {
+            PlayClickSFX();
+            if (SaveManager.Instance == null || !SaveManager.Instance.HasSave()) return;
+
+            bool loaded = SaveManager.Instance.LoadGame();
+            if (loaded)
+            {
+                RefreshSystemMenuTelemetry("<color=#38BDF8><b>✓ CHECKPOINT RESTORED SUCCESSFULLY</b></color>");
+                CloseSystemMenuModal();
+            }
+        }
+
+        private void OnSystemMenuSaveAndExitClicked()
+        {
+            PlayClickSFX();
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.SaveGame();
+            }
+            ExecuteExitToMainMenu();
+        }
+
+        private void OnSystemMenuExitWithoutSavingClicked()
+        {
+            PlayClickSFX();
+            ExecuteExitToMainMenu();
+        }
+
+        private void ExecuteExitToMainMenu()
+        {
+            if (systemMenuModal != null) systemMenuModal.SetActive(false);
+            StopAllAudioSources();
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.GoToTitle();
             }
             else
             {
-                Debug.LogWarning("[ApartmentHub] Manual Save failed.");
+                Application.Quit();
             }
         }
 
-        private IEnumerator AnimateSaveButtonSuccess()
+        private void SyncSettingsSlidersFromAudio()
         {
-            if (pdaSaveSettingsBtn == null) yield break;
+            float master = AudioManager.Instance != null ? AudioManager.Instance.MasterVolume : AudioListener.volume;
+            float bgm = AudioManager.Instance != null ? AudioManager.Instance.BgmVolume : 0.75f;
+            float sfx = AudioManager.Instance != null ? AudioManager.Instance.SfxVolume : 0.85f;
 
-            TextMeshProUGUI btnText = pdaSaveSettingsBtn.GetComponentInChildren<TextMeshProUGUI>();
-            Image btnImg = pdaSaveSettingsBtn.GetComponent<Image>();
+            if (sysMasterVolSlider != null) sysMasterVolSlider.SetValueWithoutNotify(master);
+            if (sysBgmVolSlider != null) sysBgmVolSlider.SetValueWithoutNotify(bgm);
+            if (sysSfxVolSlider != null) sysSfxVolSlider.SetValueWithoutNotify(sfx);
 
-            string originalText = btnText != null ? btnText.text : "SAVE / LOAD / SETTINGS";
-            Color originalColor = btnImg != null ? btnImg.color : new Color(0.08f, 0.09f, 0.11f, 0.98f);
-
-            if (btnText != null)
-            {
-                btnText.text = "<color=#10B981><b>✓ RECORD ARCHIVED</b></color>";
-            }
-            if (btnImg != null)
-            {
-                btnImg.color = new Color(0.05f, 0.22f, 0.12f, 0.98f);
-            }
-
-            yield return new WaitForSecondsRealtime(2.5f);
-
-            if (btnText != null)
-            {
-                btnText.text = originalText;
-            }
-            if (btnImg != null)
-            {
-                btnImg.color = originalColor;
-            }
-
-            pdaSaveFeedbackRoutine = null;
+            UpdateVolumeLabels(master, bgm, sfx);
         }
+
+        private void OnMasterVolumeChanged(float val)
+        {
+            AudioListener.volume = Mathf.Clamp01(val);
+            if (AudioManager.Instance != null) AudioManager.Instance.SetMasterVolume(val);
+            ApplyLocalAudioVolumes();
+            UpdateVolumeLabels(
+                val,
+                sysBgmVolSlider != null ? sysBgmVolSlider.value : 0.75f,
+                sysSfxVolSlider != null ? sysSfxVolSlider.value : 0.85f);
+        }
+
+        private void OnBgmVolumeChanged(float val)
+        {
+            if (AudioManager.Instance != null) AudioManager.Instance.SetBGMVolume(val);
+            ApplyLocalAudioVolumes();
+            UpdateVolumeLabels(
+                sysMasterVolSlider != null ? sysMasterVolSlider.value : 1f,
+                val,
+                sysSfxVolSlider != null ? sysSfxVolSlider.value : 0.85f);
+        }
+
+        private void OnSfxVolumeChanged(float val)
+        {
+            if (AudioManager.Instance != null) AudioManager.Instance.SetSFXVolume(val);
+            ApplyLocalAudioVolumes();
+            UpdateVolumeLabels(
+                sysMasterVolSlider != null ? sysMasterVolSlider.value : 1f,
+                sysBgmVolSlider != null ? sysBgmVolSlider.value : 0.75f,
+                val);
+        }
+
+        private void ApplyLocalAudioVolumes()
+        {
+            float master = sysMasterVolSlider != null ? sysMasterVolSlider.value : (AudioManager.Instance != null ? AudioManager.Instance.MasterVolume : 1f);
+            float bgm = sysBgmVolSlider != null ? sysBgmVolSlider.value : (AudioManager.Instance != null ? AudioManager.Instance.BgmVolume : 0.75f);
+            float sfx = sysSfxVolSlider != null ? sysSfxVolSlider.value : (AudioManager.Instance != null ? AudioManager.Instance.SfxVolume : 0.85f);
+
+            if (atmosphereSource != null) atmosphereSource.volume = 0.5f * bgm * master;
+            if (ebsBroadcastSource != null) ebsBroadcastSource.volume = 0.65f * sfx * master;
+            if (staticSource != null) staticSource.volume = 0.25f * sfx * master;
+            if (radioSource != null) radioSource.volume = 0.75f * sfx * master;
+            if (sfxSource != null) sfxSource.volume = 0.85f * sfx * master;
+        }
+
+        private void UpdateVolumeLabels(float master, float bgm, float sfx)
+        {
+            if (sysMasterVolValueText != null) sysMasterVolValueText.text = $"{Mathf.RoundToInt(master * 100f)}%";
+            if (sysBgmVolValueText != null) sysBgmVolValueText.text = $"{Mathf.RoundToInt(bgm * 100f)}%";
+            if (sysSfxVolValueText != null) sysSfxVolValueText.text = $"{Mathf.RoundToInt(sfx * 100f)}%";
+        }
+
+        private void EnsureSystemMenuModalBuilt()
+        {
+            if (systemMenuModal != null) return;
+
+            TMP_FontAsset sharedFont = dockHeaderLocation != null ? dockHeaderLocation.font : null;
+
+            // 1. Fullscreen Backdrop Dimmer
+            systemMenuModal = new GameObject("SystemMenuModal");
+            systemMenuModal.transform.SetParent(transform, false);
+            RectTransform overlayRect = systemMenuModal.AddComponent<RectTransform>();
+            overlayRect.anchorMin = Vector2.zero;
+            overlayRect.anchorMax = Vector2.one;
+            overlayRect.offsetMin = Vector2.zero;
+            overlayRect.offsetMax = Vector2.zero;
+
+            Image overlayImg = systemMenuModal.AddComponent<Image>();
+            overlayImg.color = new Color(0.01f, 0.02f, 0.04f, 0.88f);
+            overlayImg.raycastTarget = true;
+
+            // 2. Center Window Card (560 x 430)
+            GameObject card = new GameObject("SystemWindowCard");
+            card.transform.SetParent(systemMenuModal.transform, false);
+            RectTransform cardRect = card.AddComponent<RectTransform>();
+            cardRect.anchorMin = new Vector2(0.5f, 0.5f);
+            cardRect.anchorMax = new Vector2(0.5f, 0.5f);
+            cardRect.pivot = new Vector2(0.5f, 0.5f);
+            cardRect.sizeDelta = new Vector2(560f, 430f);
+
+            Image cardBg = card.AddComponent<Image>();
+            cardBg.color = new Color(0.05f, 0.07f, 0.10f, 0.99f);
+
+            Outline cardOutline = card.AddComponent<Outline>();
+            cardOutline.effectColor = new Color(0.95f, 0.62f, 0.05f, 0.85f);
+            cardOutline.effectDistance = new Vector2(1.5f, -1.5f);
+
+            // Top Header Bar
+            GameObject headerBar = new GameObject("HeaderBar");
+            headerBar.transform.SetParent(card.transform, false);
+            RectTransform hbRect = headerBar.AddComponent<RectTransform>();
+            hbRect.anchorMin = new Vector2(0f, 1f);
+            hbRect.anchorMax = new Vector2(1f, 1f);
+            hbRect.pivot = new Vector2(0.5f, 1f);
+            hbRect.anchoredPosition = Vector2.zero;
+            hbRect.sizeDelta = new Vector2(0f, 52f);
+            Image hbImg = headerBar.AddComponent<Image>();
+            hbImg.color = new Color(0.09f, 0.12f, 0.17f, 1f);
+
+            sysHeaderSubText = CreateSysTMP(headerBar.transform, "HeaderTitle",
+                "SYSTEM // ARCHIVE, AUDIO CONFIGURATION & SESSION CONTROL",
+                13.5f, FontStyles.Bold, new Color(0.96f, 0.65f, 0.14f), TextAlignmentOptions.MidlineLeft, sharedFont);
+            RectTransform hTitleRect = sysHeaderSubText.rectTransform;
+            hTitleRect.anchorMin = Vector2.zero;
+            hTitleRect.anchorMax = Vector2.one;
+            hTitleRect.offsetMin = new Vector2(20f, 0f);
+            hTitleRect.offsetMax = new Vector2(-100f, 0f);
+
+            // Close [X] Button in Header
+            Button closeTopBtn = CreateSysActionButton(headerBar.transform, "CloseTopBtn", "[ ESC ]",
+                new Color(0.16f, 0.19f, 0.24f, 1f), new Color(0.85f, 0.88f, 0.92f), sharedFont, out _);
+            RectTransform ctbRect = closeTopBtn.GetComponent<RectTransform>();
+            ctbRect.anchorMin = new Vector2(1f, 0.5f);
+            ctbRect.anchorMax = new Vector2(1f, 0.5f);
+            ctbRect.pivot = new Vector2(1f, 0.5f);
+            ctbRect.anchoredPosition = new Vector2(-14f, 0f);
+            ctbRect.sizeDelta = new Vector2(72f, 30f);
+            closeTopBtn.onClick.AddListener(CloseSystemMenuModal);
+
+            // Telemetry Strip under Header
+            GameObject teleStrip = new GameObject("TelemetryStrip");
+            teleStrip.transform.SetParent(card.transform, false);
+            RectTransform tsRect = teleStrip.AddComponent<RectTransform>();
+            tsRect.anchorMin = new Vector2(0f, 1f);
+            tsRect.anchorMax = new Vector2(1f, 1f);
+            tsRect.pivot = new Vector2(0.5f, 1f);
+            tsRect.anchoredPosition = new Vector2(0f, -52f);
+            tsRect.sizeDelta = new Vector2(0f, 34f);
+            Image tsImg = teleStrip.AddComponent<Image>();
+            tsImg.color = new Color(0.03f, 0.05f, 0.08f, 1f);
+
+            sysTelemetryStatusText = CreateSysTMP(teleStrip.transform, "TelemetryText",
+                "ARCHIVE STATUS: READY", 11.5f, FontStyles.Normal, new Color(0.82f, 0.86f, 0.92f), TextAlignmentOptions.MidlineLeft, sharedFont);
+            RectTransform ttRect = sysTelemetryStatusText.rectTransform;
+            ttRect.anchorMin = Vector2.zero;
+            ttRect.anchorMax = Vector2.one;
+            ttRect.offsetMin = new Vector2(20f, 0f);
+            ttRect.offsetMax = new Vector2(-20f, 0f);
+
+            // =========================================================================
+            // VIEW 1: MAIN 4-BUTTON SYSTEM MENU (SAVE, LOAD, SETTINGS, EXIT GAME)
+            // =========================================================================
+            sysMainPanel = CreateSubPanelRoot(card.transform, "MainPanel");
+
+            // 1. SAVE GAME
+            Button saveBtn = CreateSysActionButton(sysMainPanel.transform, "BtnSaveGame",
+                "<b>[ 1 ]  SAVE GAME</b>   <size=11><color=#94A3B8>Record current progress & inventory</color></size>",
+                new Color(0.06f, 0.22f, 0.14f, 0.98f), new Color(0.25f, 0.95f, 0.58f), sharedFont, out sysSaveBtnLabel);
+            PositionMenuRow(saveBtn.GetComponent<RectTransform>(), 0);
+            saveBtn.onClick.AddListener(OnSystemMenuSaveClicked);
+
+            // 2. LOAD GAME
+            sysLoadGameBtn = CreateSysActionButton(sysMainPanel.transform, "BtnLoadGame",
+                "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Restore last recorded checkpoint</color></size>",
+                new Color(0.07f, 0.17f, 0.26f, 0.98f), new Color(0.35f, 0.78f, 0.98f), sharedFont, out sysLoadBtnLabel);
+            PositionMenuRow(sysLoadGameBtn.GetComponent<RectTransform>(), 1);
+            sysLoadGameBtn.onClick.AddListener(OnSystemMenuLoadClicked);
+
+            // 3. SETTINGS (BGM, SFX, Master Volume)
+            Button settingsBtn = CreateSysActionButton(sysMainPanel.transform, "BtnSettings",
+                "<b>[ 3 ]  SETTINGS</b>   <size=11><color=#94A3B8>Configure Master, BGM & SFX audio levels</color></size>",
+                new Color(0.14f, 0.15f, 0.20f, 0.98f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _);
+            PositionMenuRow(settingsBtn.GetComponent<RectTransform>(), 2);
+            settingsBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Settings));
+
+            // 4. EXIT GAME (Opens Unsaved Progress Confirmation Window)
+            Button exitBtn = CreateSysActionButton(sysMainPanel.transform, "BtnExitGame",
+                "<b>[ 4 ]  EXIT GAME</b>   <size=11><color=#FCA5A5>Return to Main Menu / Quit session</color></size>",
+                new Color(0.25f, 0.07f, 0.08f, 0.98f), new Color(0.98f, 0.42f, 0.42f), sharedFont, out _);
+            PositionMenuRow(exitBtn.GetComponent<RectTransform>(), 3);
+            exitBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.ExitConfirm));
+
+            // Bottom Resume Button
+            Button resumeBtn = CreateSysActionButton(sysMainPanel.transform, "BtnResume",
+                "<b>[ RESUME GAME ]</b>",
+                new Color(0.10f, 0.12f, 0.16f, 1f), new Color(0.82f, 0.86f, 0.92f), sharedFont, out _);
+            RectTransform resRect = resumeBtn.GetComponent<RectTransform>();
+            resRect.anchorMin = new Vector2(0.5f, 0f);
+            resRect.anchorMax = new Vector2(0.5f, 0f);
+            resRect.pivot = new Vector2(0.5f, 0f);
+            resRect.anchoredPosition = new Vector2(0f, 14f);
+            resRect.sizeDelta = new Vector2(512f, 38f);
+            resumeBtn.onClick.AddListener(CloseSystemMenuModal);
+
+            // =========================================================================
+            // VIEW 2: SETTINGS SUB-WINDOW (Master, BGM, SFX Sliders)
+            // =========================================================================
+            sysSettingsPanel = CreateSubPanelRoot(card.transform, "SettingsPanel");
+
+            sysMasterVolSlider = CreateVolumeSliderRow(sysSettingsPanel.transform, "MasterVolumeRow",
+                "MASTER VOLUME", "Global output level for all game audio", -18f, sharedFont, out sysMasterVolValueText);
+            sysMasterVolSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
+
+            sysBgmVolSlider = CreateVolumeSliderRow(sysSettingsPanel.transform, "BgmVolumeRow",
+                "BGM & AMBIENCE", "Background music & apartment atmospheric drone", -96f, sharedFont, out sysBgmVolValueText);
+            sysBgmVolSlider.onValueChanged.AddListener(OnBgmVolumeChanged);
+
+            sysSfxVolSlider = CreateVolumeSliderRow(sysSettingsPanel.transform, "SfxVolumeRow",
+                "SFX & BROADCASTS", "UI clicks, emergency broadcasts, radio & alarms", -174f, sharedFont, out sysSfxVolValueText);
+            sysSfxVolSlider.onValueChanged.AddListener(OnSfxVolumeChanged);
+
+            Button settingsBackBtn = CreateSysActionButton(sysSettingsPanel.transform, "BtnSettingsBack",
+                "<b>[ < BACK TO SYSTEM MENU ]</b>",
+                new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _);
+            RectTransform sbRect = settingsBackBtn.GetComponent<RectTransform>();
+            sbRect.anchorMin = new Vector2(0.5f, 0f);
+            sbRect.anchorMax = new Vector2(0.5f, 0f);
+            sbRect.pivot = new Vector2(0.5f, 0f);
+            sbRect.anchoredPosition = new Vector2(0f, 16f);
+            sbRect.sizeDelta = new Vector2(512f, 42f);
+            settingsBackBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main));
+
+            // =========================================================================
+            // VIEW 3: EXIT GAME CONFIRMATION WINDOW (Unsaved Progress Check)
+            // =========================================================================
+            sysExitConfirmPanel = CreateSubPanelRoot(card.transform, "ExitConfirmPanel");
+
+            GameObject warnBox = new GameObject("WarningBox");
+            warnBox.transform.SetParent(sysExitConfirmPanel.transform, false);
+            RectTransform wbRect = warnBox.AddComponent<RectTransform>();
+            wbRect.anchorMin = new Vector2(0f, 1f);
+            wbRect.anchorMax = new Vector2(1f, 1f);
+            wbRect.pivot = new Vector2(0.5f, 1f);
+            wbRect.anchoredPosition = new Vector2(0f, -14f);
+            wbRect.sizeDelta = new Vector2(-48f, 132f);
+            Image wbBg = warnBox.AddComponent<Image>();
+            wbBg.color = new Color(0.16f, 0.05f, 0.06f, 0.95f);
+            Outline wbOl = warnBox.AddComponent<Outline>();
+            wbOl.effectColor = new Color(0.85f, 0.22f, 0.22f, 0.75f);
+
+            TextMeshProUGUI warnHeader = CreateSysTMP(warnBox.transform, "WarnHeader",
+                "⚠  UNSAVED PROGRESS WARNING — CONFIRM EXIT",
+                13.5f, FontStyles.Bold, new Color(0.98f, 0.42f, 0.42f), TextAlignmentOptions.TopLeft, sharedFont);
+            RectTransform whRect = warnHeader.rectTransform;
+            whRect.anchorMin = Vector2.zero;
+            whRect.anchorMax = Vector2.one;
+            whRect.offsetMin = new Vector2(16f, 10f);
+            whRect.offsetMax = new Vector2(-16f, -12f);
+
+            sysExitWarningDetailText = CreateSysTMP(warnBox.transform, "WarnDetails",
+                "Are you sure you want to exit? Any unsaved progress will be lost.",
+                12f, FontStyles.Normal, new Color(0.90f, 0.92f, 0.95f), TextAlignmentOptions.TopLeft, sharedFont);
+            sysExitWarningDetailText.textWrappingMode = TextWrappingModes.Normal;
+            RectTransform wdRect = sysExitWarningDetailText.rectTransform;
+            wdRect.anchorMin = Vector2.zero;
+            wdRect.anchorMax = Vector2.one;
+            wdRect.offsetMin = new Vector2(16f, 10f);
+            wdRect.offsetMax = new Vector2(-16f, -38f);
+
+            // Option A: SAVE & EXIT TO MAIN MENU
+            Button saveAndExitBtn = CreateSysActionButton(sysExitConfirmPanel.transform, "BtnSaveAndExit",
+                "<b>[ SAVE & EXIT TO MAIN MENU ]</b>   <size=11><color=#A7F3D0>Save progress first, then exit</color></size>",
+                new Color(0.06f, 0.24f, 0.15f, 0.98f), new Color(0.28f, 0.95f, 0.60f), sharedFont, out _);
+            RectTransform saeRect = saveAndExitBtn.GetComponent<RectTransform>();
+            saeRect.anchorMin = new Vector2(0.5f, 1f);
+            saeRect.anchorMax = new Vector2(0.5f, 1f);
+            saeRect.pivot = new Vector2(0.5f, 1f);
+            saeRect.anchoredPosition = new Vector2(0f, -160f);
+            saeRect.sizeDelta = new Vector2(512f, 48f);
+            saveAndExitBtn.onClick.AddListener(OnSystemMenuSaveAndExitClicked);
+
+            // Option B: EXIT WITHOUT SAVING
+            Button exitNoSaveBtn = CreateSysActionButton(sysExitConfirmPanel.transform, "BtnExitWithoutSaving",
+                "<b>[ EXIT WITHOUT SAVING ]</b>   <size=11><color=#FECACA>Discard unsaved changes & return to Title</color></size>",
+                new Color(0.28f, 0.07f, 0.08f, 0.98f), new Color(0.98f, 0.45f, 0.45f), sharedFont, out _);
+            RectTransform ensRect = exitNoSaveBtn.GetComponent<RectTransform>();
+            ensRect.anchorMin = new Vector2(0.5f, 1f);
+            ensRect.anchorMax = new Vector2(0.5f, 1f);
+            ensRect.pivot = new Vector2(0.5f, 1f);
+            ensRect.anchoredPosition = new Vector2(0f, -218f);
+            ensRect.sizeDelta = new Vector2(512f, 48f);
+            exitNoSaveBtn.onClick.AddListener(OnSystemMenuExitWithoutSavingClicked);
+
+            // Option C: CANCEL (Return to System Menu)
+            Button cancelExitBtn = CreateSysActionButton(sysExitConfirmPanel.transform, "BtnCancelExit",
+                "<b>[ CANCEL — RETURN TO GAME ]</b>",
+                new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.85f, 0.88f, 0.92f), sharedFont, out _);
+            RectTransform ceRect = cancelExitBtn.GetComponent<RectTransform>();
+            ceRect.anchorMin = new Vector2(0.5f, 0f);
+            ceRect.anchorMax = new Vector2(0.5f, 0f);
+            ceRect.pivot = new Vector2(0.5f, 0f);
+            ceRect.anchoredPosition = new Vector2(0f, 16f);
+            ceRect.sizeDelta = new Vector2(512f, 42f);
+            cancelExitBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main));
+        }
+
+        private GameObject CreateSubPanelRoot(Transform parent, string name)
+        {
+            GameObject panel = new GameObject(name);
+            panel.transform.SetParent(parent, false);
+            RectTransform rt = panel.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = new Vector2(0f, 0f);
+            rt.offsetMax = new Vector2(0f, -86f);
+            return panel;
+        }
+
+        private void PositionMenuRow(RectTransform rt, int index)
+        {
+            rt.anchorMin = new Vector2(0.5f, 1f);
+            rt.anchorMax = new Vector2(0.5f, 1f);
+            rt.pivot = new Vector2(0.5f, 1f);
+            rt.anchoredPosition = new Vector2(0f, -14f - (index * 64f));
+            rt.sizeDelta = new Vector2(512f, 54f);
+        }
+
+        private Button CreateSysActionButton(Transform parent, string name, string labelText, Color bgColor, Color borderAndTextColor, TMP_FontAsset font, out TextMeshProUGUI labelOut)
+        {
+            GameObject btnObj = new GameObject(name);
+            btnObj.transform.SetParent(parent, false);
+            btnObj.AddComponent<RectTransform>();
+
+            Image bg = btnObj.AddComponent<Image>();
+            bg.color = bgColor;
+
+            Outline ol = btnObj.AddComponent<Outline>();
+            ol.effectColor = new Color(borderAndTextColor.r, borderAndTextColor.g, borderAndTextColor.b, 0.65f);
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            Button btn = btnObj.AddComponent<Button>();
+            btn.targetGraphic = bg;
+
+            labelOut = CreateSysTMP(btnObj.transform, "Label", labelText, 13.5f, FontStyles.Normal, borderAndTextColor, TextAlignmentOptions.MidlineLeft, font);
+            labelOut.raycastTarget = false;
+            RectTransform lr = labelOut.rectTransform;
+            lr.anchorMin = Vector2.zero;
+            lr.anchorMax = Vector2.one;
+            lr.offsetMin = new Vector2(18f, 0f);
+            lr.offsetMax = new Vector2(-18f, 0f);
+
+            return btn;
+        }
+
+        private Slider CreateVolumeSliderRow(Transform parent, string name, string title, string subtitle, float topOffset, TMP_FontAsset font, out TextMeshProUGUI pctLabel)
+        {
+            GameObject row = new GameObject(name);
+            row.transform.SetParent(parent, false);
+            RectTransform rr = row.AddComponent<RectTransform>();
+            rr.anchorMin = new Vector2(0.5f, 1f);
+            rr.anchorMax = new Vector2(0.5f, 1f);
+            rr.pivot = new Vector2(0.5f, 1f);
+            rr.anchoredPosition = new Vector2(0f, topOffset);
+            rr.sizeDelta = new Vector2(512f, 68f);
+
+            Image rowBg = row.AddComponent<Image>();
+            rowBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
+
+            Outline rowOl = row.AddComponent<Outline>();
+            rowOl.effectColor = new Color(0.22f, 0.28f, 0.36f, 0.7f);
+
+            TextMeshProUGUI titleTmp = CreateSysTMP(row.transform, "Title", $"<b>{title}</b>  <size=10.5><color=#64748B>{subtitle}</color></size>",
+                12.5f, FontStyles.Normal, new Color(0.92f, 0.95f, 0.98f), TextAlignmentOptions.MidlineLeft, font);
+            RectTransform tr = titleTmp.rectTransform;
+            tr.anchorMin = new Vector2(0f, 0.5f);
+            tr.anchorMax = new Vector2(1f, 1f);
+            tr.offsetMin = new Vector2(14f, 2f);
+            tr.offsetMax = new Vector2(-70f, -4f);
+
+            pctLabel = CreateSysTMP(row.transform, "PctValue", "100%", 13f, FontStyles.Bold, new Color(0.22f, 0.74f, 0.97f), TextAlignmentOptions.MidlineRight, font);
+            RectTransform pr = pctLabel.rectTransform;
+            pr.anchorMin = new Vector2(1f, 0.5f);
+            pr.anchorMax = new Vector2(1f, 1f);
+            pr.pivot = new Vector2(1f, 1f);
+            pr.offsetMin = new Vector2(-70f, 2f);
+            pr.offsetMax = new Vector2(-14f, -4f);
+
+            // Interactive Slider Control
+            GameObject sliderObj = new GameObject("Slider");
+            sliderObj.transform.SetParent(row.transform, false);
+            RectTransform sr = sliderObj.AddComponent<RectTransform>();
+            sr.anchorMin = new Vector2(0f, 0f);
+            sr.anchorMax = new Vector2(1f, 0.5f);
+            sr.offsetMin = new Vector2(14f, 10f);
+            sr.offsetMax = new Vector2(-14f, -4f);
+
+            GameObject bgTrack = new GameObject("Background");
+            bgTrack.transform.SetParent(sliderObj.transform, false);
+            RectTransform bgr = bgTrack.AddComponent<RectTransform>();
+            bgr.anchorMin = new Vector2(0f, 0.25f);
+            bgr.anchorMax = new Vector2(1f, 0.75f);
+            bgr.offsetMin = Vector2.zero;
+            bgr.offsetMax = Vector2.zero;
+            Image bgImg = bgTrack.AddComponent<Image>();
+            bgImg.color = new Color(0.03f, 0.04f, 0.06f, 1f);
+
+            GameObject fillArea = new GameObject("Fill Area");
+            fillArea.transform.SetParent(sliderObj.transform, false);
+            RectTransform far = fillArea.AddComponent<RectTransform>();
+            far.anchorMin = new Vector2(0f, 0.25f);
+            far.anchorMax = new Vector2(1f, 0.75f);
+            far.offsetMin = Vector2.zero;
+            far.offsetMax = Vector2.zero;
+
+            GameObject fill = new GameObject("Fill");
+            fill.transform.SetParent(fillArea.transform, false);
+            RectTransform fr = fill.AddComponent<RectTransform>();
+            fr.anchorMin = Vector2.zero;
+            fr.anchorMax = Vector2.one;
+            fr.offsetMin = Vector2.zero;
+            fr.offsetMax = Vector2.zero;
+            Image fillImg = fill.AddComponent<Image>();
+            fillImg.color = new Color(0.95f, 0.62f, 0.08f, 0.95f);
+
+            GameObject handleArea = new GameObject("Handle Slide Area");
+            handleArea.transform.SetParent(sliderObj.transform, false);
+            RectTransform har = handleArea.AddComponent<RectTransform>();
+            har.anchorMin = Vector2.zero;
+            har.anchorMax = Vector2.one;
+            har.offsetMin = new Vector2(6f, 0f);
+            har.offsetMax = new Vector2(-6f, 0f);
+
+            GameObject handle = new GameObject("Handle");
+            handle.transform.SetParent(handleArea.transform, false);
+            RectTransform hr = handle.AddComponent<RectTransform>();
+            hr.sizeDelta = new Vector2(14f, 20f);
+            Image handleImg = handle.AddComponent<Image>();
+            handleImg.color = new Color(0.98f, 0.98f, 1f, 1f);
+
+            Slider slider = sliderObj.AddComponent<Slider>();
+            slider.minValue = 0f;
+            slider.maxValue = 1f;
+            slider.wholeNumbers = false;
+            slider.fillRect = fr;
+            slider.handleRect = hr;
+            slider.targetGraphic = handleImg;
+            slider.direction = Slider.Direction.LeftToRight;
+
+            return slider;
+        }
+
+        private TextMeshProUGUI CreateSysTMP(Transform parent, string name, string text, float size, FontStyles style, Color color, TextAlignmentOptions align, TMP_FontAsset font)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.SetParent(parent, false);
+            obj.AddComponent<RectTransform>();
+            TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
+            if (font != null) tmp.font = font;
+            tmp.text = text;
+            tmp.fontSize = size;
+            tmp.fontStyle = style;
+            tmp.color = color;
+            tmp.alignment = align;
+            tmp.textWrappingMode = TextWrappingModes.NoWrap;
+            return tmp;
+        }
+        #endregion
 
         private void OnListenRadioClicked()
         {
