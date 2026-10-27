@@ -2695,9 +2695,9 @@ namespace SundayLastBreath.UI
             int gatheredCount = 0;
             if (currentPlayer != null)
             {
-                if (!currentPlayer.HasItem("Apartment Key") && !currentPlayer.HasItem("Apartment 407 Key"))
+                if (!currentPlayer.HasKeyItem("Apartment Key", true) && !currentPlayer.HasKeyItem("Apartment 407 Key", true) && !currentPlayer.HasItem("Apartment Key") && !currentPlayer.HasItem("Apartment 407 Key"))
                 {
-                    currentPlayer.AddItem("Apartment Key", 1);
+                    currentPlayer.AddKeyItem("Apartment Key", "Apartment 407 Key", "Brass tumbler key labeled 'Room 407'. Required once to unlock the front door deadbolt.", gameClock.GetTimeString());
                     gatheredCount++;
                 }
 
@@ -4025,6 +4025,8 @@ namespace SundayLastBreath.UI
             // One-time use: consume the Apartment Key when unlocking the deadbolt and stepping out
             if (currentPlayer != null)
             {
+                currentPlayer.MarkKeyItemUsed("Apartment Key", "Unit 407 Front Deadbolt (The Ascott Residency [4th Floor])");
+                currentPlayer.MarkKeyItemUsed("Apartment 407 Key", "Unit 407 Front Deadbolt (The Ascott Residency [4th Floor])");
                 currentPlayer.RemoveItem("Apartment Key", 1);
                 currentPlayer.RemoveItem("Apartment 407 Key", 1);
             }

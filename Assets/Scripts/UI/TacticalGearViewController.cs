@@ -31,6 +31,13 @@ namespace SundayLastBreath.UI
             Floor
         }
 
+        public enum RightTabMode
+        {
+            Dossier,
+            Floor,
+            KeyItems
+        }
+
         [Header("Paper Doll Active Loadout Slots")]
         [SerializeField] private Button slotHeadBtn;
         [SerializeField] private Image slotHeadIcon;
@@ -76,6 +83,13 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI tabFloorCountText;
         [SerializeField] private GameObject dossierPanel;
         [SerializeField] private GameObject floorPanel;
+
+        [Header("Resident Evil 4 - Key Items & Treasures")]
+        [SerializeField] private Button tabBtnKeyItems;
+        [SerializeField] private TextMeshProUGUI tabKeyItemsCountText;
+        [SerializeField] private GameObject keyItemsPanel;
+        private Transform _keyItemsContent;
+        private RightTabMode _currentRightTab = RightTabMode.Dossier;
 
         [Header("Item Dossier Inspector Elements")]
         [SerializeField] private GameObject dossierEmptyState;
@@ -134,6 +148,7 @@ namespace SundayLastBreath.UI
         {
             if (_listenersHooked) return;
             _listenersHooked = true;
+            EnsureKeyItemsUI();
             SetupSlotListeners();
             SetupFilterListeners();
             SetupTabListeners();
@@ -169,8 +184,9 @@ namespace SundayLastBreath.UI
 
         private void SetupTabListeners()
         {
-            if (tabBtnDossier != null) { tabBtnDossier.onClick.RemoveAllListeners(); tabBtnDossier.onClick.AddListener(() => SwitchRightTab(true)); }
-            if (tabBtnFloor != null) { tabBtnFloor.onClick.RemoveAllListeners(); tabBtnFloor.onClick.AddListener(() => SwitchRightTab(false)); }
+            if (tabBtnDossier != null) { tabBtnDossier.onClick.RemoveAllListeners(); tabBtnDossier.onClick.AddListener(() => SwitchRightTab(RightTabMode.Dossier)); }
+            if (tabBtnFloor != null) { tabBtnFloor.onClick.RemoveAllListeners(); tabBtnFloor.onClick.AddListener(() => SwitchRightTab(RightTabMode.Floor)); }
+            if (tabBtnKeyItems != null) { tabBtnKeyItems.onClick.RemoveAllListeners(); tabBtnKeyItems.onClick.AddListener(() => SwitchRightTab(RightTabMode.KeyItems)); }
             if (btnTakeAllFloor != null) { btnTakeAllFloor.onClick.RemoveAllListeners(); btnTakeAllFloor.onClick.AddListener(TakeAllFloorItems); }
         }
 
@@ -216,11 +232,11 @@ namespace SundayLastBreath.UI
             // default to showing the Room Items tab so floor stash is immediately visible!
             if (_floorItems != null && _floorItems.Count > 0 && string.IsNullOrEmpty(_selectedItemId))
             {
-                SwitchRightTab(false);
+                SwitchRightTab(RightTabMode.Floor);
             }
             else
             {
-                SwitchRightTab(true);
+                SwitchRightTab(RightTabMode.Dossier);
             }
 
             RefreshAll();
@@ -232,9 +248,10 @@ namespace SundayLastBreath.UI
             RefreshBackpackGrid();
             RefreshFloorGrid();
             RefreshDossier();
+            RefreshKeyItemsTab();
             RefreshCapacityAndWeight();
             UpdateFilterButtonVisuals();
-            UpdateTabButtonVisuals(dossierPanel != null && dossierPanel.activeSelf);
+            UpdateTabButtonVisuals();
         }
 
         #region Active Loadout Paper Doll
@@ -327,6 +344,11 @@ namespace SundayLastBreath.UI
         {
             if (_currentFilter == InventoryFilter.All) return true;
 
+            if (string.IsNullOrEmpty(itemId)) return false;
+
+            // RE4 Key Items & Valuables are stored exclusively in the Key Items compartment
+            if (ItemDatabase.IsKeyItem(itemId)) return false;
+
             var def = ItemDatabase.GetDefinition(itemId);
             if (def == null) return true;
 
@@ -346,8 +368,7 @@ namespace SundayLastBreath.UI
                            def.category == ItemCategory.WearableLegs ||
                            def.category == ItemCategory.WearableFeet;
                 case InventoryFilter.Tools:
-                    return def.category == ItemCategory.ToolUtility ||
-                           def.category == ItemCategory.ValuableKey;
+                    return def.category == ItemCategory.ToolUtility;
                 default:
                     return true;
             }
@@ -362,6 +383,21 @@ namespace SundayLastBreath.UI
                 Destroy(backpackGridRoot.GetChild(i).gameObject);
             }
 
+            // Auto-migrate any stray key items out of backpack inventory into dedicated key items pocket
+            if (_player != null && _player.inventory != null)
+            {
+                for (int m = _player.inventory.Count - 1; m >= 0; m--)
+                {
+                    var itm = _player.inventory[m];
+                    if (ItemDatabase.IsKeyItem(itm.itemId))
+                    {
+                        var kdef = ItemDatabase.GetDefinition(itm.itemId);
+                        _player.AddKeyItem(itm.itemId, kdef != null ? kdef.displayName : itm.itemId, kdef != null ? kdef.description : "");
+                        _player.inventory.RemoveAt(m);
+                    }
+                }
+            }
+
             List<InventoryEntry> inv = _player != null && _player.inventory != null
                 ? _player.inventory
                 : new List<InventoryEntry>();
@@ -372,6 +408,8 @@ namespace SundayLastBreath.UI
             for (int i = 0; i < inv.Count; i++)
             {
                 var entry = inv[i];
+                if (ItemDatabase.IsKeyItem(entry.itemId)) continue; // Safety skip: never occupy backpack slots
+
                 bool matches = MatchesFilter(entry.itemId);
                 int capturedIndex = i;
                 var def = ItemDatabase.GetDefinition(entry.itemId);
@@ -908,11 +946,25 @@ namespace SundayLastBreath.UI
         #endregion
 
         #region Tactical Item Dossier Inspector
+        public void SwitchRightTab(RightTabMode mode)
+        {
+            EnsureKeyItemsUI();
+            _currentRightTab = mode;
+            if (dossierPanel != null) dossierPanel.SetActive(mode == RightTabMode.Dossier);
+            if (floorPanel != null) floorPanel.SetActive(mode == RightTabMode.Floor);
+            if (keyItemsPanel != null) keyItemsPanel.SetActive(mode == RightTabMode.KeyItems);
+
+            UpdateTabButtonVisuals();
+
+            if (mode == RightTabMode.KeyItems)
+            {
+                RefreshKeyItemsPanel();
+            }
+        }
+
         public void SwitchRightTab(bool showDossier)
         {
-            if (dossierPanel != null) dossierPanel.SetActive(showDossier);
-            if (floorPanel != null) floorPanel.SetActive(!showDossier);
-            UpdateTabButtonVisuals(showDossier);
+            SwitchRightTab(showDossier ? RightTabMode.Dossier : RightTabMode.Floor);
         }
 
         private void UpdateFilterButtonVisuals()
@@ -936,11 +988,357 @@ namespace SundayLastBreath.UI
             if (tmp != null) tmp.color = isActive ? Color.white : new Color(0.65f, 0.70f, 0.75f);
         }
 
-        private void UpdateTabButtonVisuals(bool showingDossier)
+        private void UpdateTabButtonVisuals()
         {
             bool hasFloorItems = _floorItems != null && _floorItems.Count > 0;
-            UpdateTabBtnVisual(tabBtnDossier, showingDossier, false);
-            UpdateTabBtnVisual(tabBtnFloor, !showingDossier, hasFloorItems && showingDossier);
+            int activeKeys = 0;
+            if (_player != null && _player.keyItems != null)
+            {
+                for (int i = 0; i < _player.keyItems.Count; i++)
+                {
+                    if (!_player.keyItems[i].isUsed) activeKeys++;
+                }
+            }
+
+            UpdateTabBtnVisual(tabBtnDossier, _currentRightTab == RightTabMode.Dossier, false);
+            UpdateTabBtnVisual(tabBtnFloor, _currentRightTab == RightTabMode.Floor, hasFloorItems && _currentRightTab != RightTabMode.Floor);
+            UpdateTabBtnVisual(tabBtnKeyItems, _currentRightTab == RightTabMode.KeyItems, activeKeys > 0 && _currentRightTab != RightTabMode.KeyItems);
+        }
+
+        private void RefreshKeyItemsTab()
+        {
+            EnsureKeyItemsUI();
+
+            int activeCount = 0;
+            if (_player != null && _player.keyItems != null)
+            {
+                for (int i = 0; i < _player.keyItems.Count; i++)
+                {
+                    if (!_player.keyItems[i].isUsed) activeCount++;
+                }
+            }
+
+            if (tabKeyItemsCountText != null)
+            {
+                tabKeyItemsCountText.text = activeCount > 0 
+                    ? $"KEY ITEMS <color=#38BDF8>({activeCount})</color>" 
+                    : "KEY ITEMS";
+            }
+
+            if (_currentRightTab == RightTabMode.KeyItems)
+            {
+                RefreshKeyItemsPanel();
+            }
+        }
+
+        private void EnsureKeyItemsUI()
+        {
+            // 1. Ensure tabBtnKeyItems exists
+            if (tabBtnKeyItems == null && tabBtnFloor != null && tabBtnFloor.transform.parent != null)
+            {
+                var existing = tabBtnFloor.transform.parent.Find("Tab_KeyItems");
+                if (existing != null)
+                {
+                    tabBtnKeyItems = existing.GetComponent<Button>();
+                    tabKeyItemsCountText = existing.GetComponentInChildren<TextMeshProUGUI>();
+                }
+                else
+                {
+                    GameObject tabObj = Instantiate(tabBtnFloor.gameObject, tabBtnFloor.transform.parent);
+                    tabObj.name = "Tab_KeyItems";
+                    tabBtnKeyItems = tabObj.GetComponent<Button>();
+                    tabKeyItemsCountText = tabObj.GetComponentInChildren<TextMeshProUGUI>();
+                    if (tabKeyItemsCountText != null)
+                    {
+                        tabKeyItemsCountText.text = "KEY ITEMS";
+                    }
+                }
+            }
+
+            if (tabBtnKeyItems != null)
+            {
+                tabBtnKeyItems.onClick.RemoveAllListeners();
+                tabBtnKeyItems.onClick.AddListener(() => SwitchRightTab(RightTabMode.KeyItems));
+            }
+
+            // 2. Ensure keyItemsPanel exists
+            if (keyItemsPanel == null && dossierPanel != null && dossierPanel.transform.parent != null)
+            {
+                var existingPanel = dossierPanel.transform.parent.Find("Panel_KeyItems");
+                if (existingPanel != null)
+                {
+                    keyItemsPanel = existingPanel.gameObject;
+                    var contentTr = keyItemsPanel.transform.Find("ScrollView/Viewport/Content");
+                    if (contentTr != null) _keyItemsContent = contentTr;
+                }
+                else
+                {
+                    CreateKeyItemsPanel(dossierPanel.transform.parent);
+                }
+            }
+        }
+
+        private void CreateKeyItemsPanel(Transform parent)
+        {
+            keyItemsPanel = new GameObject("Panel_KeyItems");
+            keyItemsPanel.transform.SetParent(parent, false);
+
+            RectTransform prt = keyItemsPanel.AddComponent<RectTransform>();
+            prt.anchorMin = new Vector2(0f, 0f);
+            prt.anchorMax = new Vector2(1f, 1f);
+            prt.anchoredPosition = new Vector2(0f, -14f);
+            prt.sizeDelta = new Vector2(0f, -28f);
+            prt.pivot = new Vector2(0.5f, 0.5f);
+
+            // Header Banner
+            GameObject headerObj = new GameObject("HeaderBanner");
+            headerObj.transform.SetParent(keyItemsPanel.transform, false);
+            RectTransform hrt = headerObj.AddComponent<RectTransform>();
+            hrt.anchorMin = new Vector2(0f, 1f);
+            hrt.anchorMax = new Vector2(1f, 1f);
+            hrt.pivot = new Vector2(0.5f, 1f);
+            hrt.anchoredPosition = new Vector2(0f, -4f);
+            hrt.sizeDelta = new Vector2(-16f, 30f);
+
+            Image hbg = headerObj.AddComponent<Image>();
+            hbg.color = new Color(0.06f, 0.10f, 0.16f, 0.95f);
+            Outline hol = headerObj.AddComponent<Outline>();
+            hol.effectColor = new Color(0.22f, 0.74f, 0.97f, 0.55f);
+            hol.effectDistance = new Vector2(1f, -1f);
+
+            GameObject htxtObj = new GameObject("HeaderText");
+            htxtObj.transform.SetParent(headerObj.transform, false);
+            TextMeshProUGUI htmp = htxtObj.AddComponent<TextMeshProUGUI>();
+            htmp.fontSize = 9.5f;
+            htmp.alignment = TextAlignmentOptions.Center;
+            htmp.text = "<b><color=#F59E0B>KEY ITEMS & TREASURES</color></b>  <color=#64748B>|</color>  <color=#38BDF8>RE4 VALUABLES POUCH (0 SLOTS)</color>";
+            RectTransform htr = htxtObj.GetComponent<RectTransform>();
+            htr.anchorMin = Vector2.zero; htr.anchorMax = Vector2.one;
+            htr.offsetMin = Vector2.zero; htr.offsetMax = Vector2.zero;
+
+            // Scroll View Root
+            GameObject scrollObj = new GameObject("ScrollView");
+            scrollObj.transform.SetParent(keyItemsPanel.transform, false);
+            RectTransform srt = scrollObj.AddComponent<RectTransform>();
+            srt.anchorMin = new Vector2(0f, 0f);
+            srt.anchorMax = new Vector2(1f, 1f);
+            srt.offsetMin = new Vector2(8f, 8f);
+            srt.offsetMax = new Vector2(-8f, -40f);
+
+            ScrollRect sr = scrollObj.AddComponent<ScrollRect>();
+            sr.horizontal = false;
+            sr.vertical = true;
+            sr.movementType = ScrollRect.MovementType.Clamped;
+            sr.scrollSensitivity = 25f;
+
+            // Viewport
+            GameObject viewportObj = new GameObject("Viewport");
+            viewportObj.transform.SetParent(scrollObj.transform, false);
+            RectTransform vprt = viewportObj.AddComponent<RectTransform>();
+            vprt.anchorMin = Vector2.zero;
+            vprt.anchorMax = Vector2.one;
+            vprt.offsetMin = Vector2.zero;
+            vprt.offsetMax = Vector2.zero;
+            vprt.pivot = new Vector2(0f, 1f);
+            viewportObj.AddComponent<RectMask2D>();
+
+            // Content
+            GameObject contentObj = new GameObject("Content");
+            contentObj.transform.SetParent(viewportObj.transform, false);
+            RectTransform crt = contentObj.AddComponent<RectTransform>();
+            crt.anchorMin = new Vector2(0f, 1f);
+            crt.anchorMax = new Vector2(1f, 1f);
+            crt.pivot = new Vector2(0.5f, 1f);
+            crt.anchoredPosition = Vector2.zero;
+            crt.sizeDelta = new Vector2(0f, 0f);
+
+            var vlg = contentObj.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = 6f;
+            vlg.padding = new RectOffset(4, 4, 4, 4);
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+
+            var csf = contentObj.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            sr.viewport = vprt;
+            sr.content = crt;
+            _keyItemsContent = crt;
+
+            keyItemsPanel.SetActive(false);
+        }
+
+        private void RefreshKeyItemsPanel()
+        {
+            if (_keyItemsContent == null)
+            {
+                if (keyItemsPanel != null)
+                {
+                    var c = keyItemsPanel.transform.Find("ScrollView/Viewport/Content");
+                    if (c != null) _keyItemsContent = c;
+                }
+                if (_keyItemsContent == null) return;
+            }
+
+            for (int i = _keyItemsContent.childCount - 1; i >= 0; i--)
+            {
+                Destroy(_keyItemsContent.GetChild(i).gameObject);
+            }
+
+            var list = _player != null && _player.keyItems != null ? _player.keyItems : new List<KeyItemEntry>();
+
+            if (list.Count == 0)
+            {
+                GameObject emptyObj = new GameObject("EmptyState");
+                emptyObj.transform.SetParent(_keyItemsContent, false);
+                RectTransform ert = emptyObj.AddComponent<RectTransform>();
+                ert.sizeDelta = new Vector2(0f, 140f);
+
+                var le = emptyObj.AddComponent<LayoutElement>();
+                le.minHeight = 140f;
+                le.preferredHeight = 140f;
+                le.flexibleWidth = 1f;
+
+                TextMeshProUGUI tmp = emptyObj.AddComponent<TextMeshProUGUI>();
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.fontSize = 11f;
+                tmp.text = "\n<color=#38BDF8><b>[ NO KEY ITEMS ACQUIRED ]</b></color>\n\n" +
+                           "<color=#94A3B8>Keys, clearance cards, access codes, and story documents\n" +
+                           "will be stored in this dedicated valuables pocket.\n" +
+                           "<color=#64748B><i>Key items do not consume any of your 12 backpack slots.</i></color></color>";
+                return;
+            }
+
+            foreach (var keyEntry in list)
+            {
+                CreateKeyItemCard(_keyItemsContent, keyEntry);
+            }
+        }
+
+        private void CreateKeyItemCard(Transform parent, KeyItemEntry entry)
+        {
+            if (entry == null) return;
+
+            GameObject card = new GameObject("KeyItemCard_" + entry.itemId);
+            card.transform.SetParent(parent, false);
+
+            RectTransform crt = card.AddComponent<RectTransform>();
+            crt.sizeDelta = new Vector2(0f, 68f);
+
+            var le = card.AddComponent<LayoutElement>();
+            le.minHeight = 68f;
+            le.preferredHeight = 68f;
+            le.flexibleWidth = 1f;
+
+            Image bg = card.AddComponent<Image>();
+            bg.color = entry.isUsed 
+                ? new Color(0.05f, 0.06f, 0.08f, 0.88f) 
+                : new Color(0.08f, 0.12f, 0.18f, 0.96f);
+
+            Outline ol = card.AddComponent<Outline>();
+            ol.effectColor = entry.isUsed
+                ? new Color(0.16f, 0.50f, 0.35f, 0.55f) // Muted emerald outline for completed items
+                : new Color(0.22f, 0.74f, 0.97f, 0.75f); // Crisp cyan border for active key items
+            ol.effectDistance = new Vector2(1f, -1f);
+
+            // Icon Frame (Left)
+            GameObject iconFrame = new GameObject("IconFrame");
+            iconFrame.transform.SetParent(card.transform, false);
+            RectTransform ifrt = iconFrame.AddComponent<RectTransform>();
+            ifrt.anchorMin = new Vector2(0f, 0.5f);
+            ifrt.anchorMax = new Vector2(0f, 0.5f);
+            ifrt.pivot = new Vector2(0f, 0.5f);
+            ifrt.anchoredPosition = new Vector2(8f, 0f);
+            ifrt.sizeDelta = new Vector2(52f, 52f);
+
+            Image fbg = iconFrame.AddComponent<Image>();
+            fbg.color = new Color(0.03f, 0.04f, 0.06f, 0.95f);
+            Outline fol = iconFrame.AddComponent<Outline>();
+            fol.effectColor = entry.isUsed ? new Color(0.20f, 0.30f, 0.25f, 0.6f) : new Color(0.30f, 0.40f, 0.50f, 0.7f);
+            fol.effectDistance = new Vector2(1f, -1f);
+
+            GameObject iconObj = new GameObject("Icon");
+            iconObj.transform.SetParent(iconFrame.transform, false);
+            RectTransform irt = iconObj.AddComponent<RectTransform>();
+            irt.anchorMin = Vector2.zero; irt.anchorMax = Vector2.one;
+            irt.offsetMin = new Vector2(4f, 4f); irt.offsetMax = new Vector2(-4f, -4f);
+
+            Image iconImg = iconObj.AddComponent<Image>();
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+            Sprite s = ItemDatabase.GetItemIcon(entry.itemId);
+            if (s != null) iconImg.sprite = s;
+            if (entry.isUsed) iconImg.color = new Color(0.6f, 0.75f, 0.65f, 0.55f);
+
+            // Used overlay check badge
+            if (entry.isUsed)
+            {
+                GameObject chkObj = new GameObject("Checkmark");
+                chkObj.transform.SetParent(iconFrame.transform, false);
+                RectTransform chkRt = chkObj.AddComponent<RectTransform>();
+                chkRt.anchorMin = new Vector2(1f, 1f); chkRt.anchorMax = new Vector2(1f, 1f);
+                chkRt.pivot = new Vector2(1f, 1f);
+                chkRt.anchoredPosition = new Vector2(4f, 4f);
+                chkRt.sizeDelta = new Vector2(18f, 18f);
+
+                Image chkBg = chkObj.AddComponent<Image>();
+                chkBg.color = new Color(0.06f, 0.35f, 0.18f, 0.95f);
+                Outline chkOl = chkObj.AddComponent<Outline>();
+                chkOl.effectColor = new Color(0.20f, 0.85f, 0.45f, 0.9f);
+
+                GameObject chkTxt = new GameObject("T");
+                chkTxt.transform.SetParent(chkObj.transform, false);
+                TextMeshProUGUI chkTmp = chkTxt.AddComponent<TextMeshProUGUI>();
+                chkTmp.fontSize = 11f;
+                chkTmp.fontStyle = FontStyles.Bold;
+                chkTmp.alignment = TextAlignmentOptions.Center;
+                chkTmp.color = Color.white;
+                chkTmp.text = "✓";
+                RectTransform ctr = chkTxt.GetComponent<RectTransform>();
+                ctr.anchorMin = Vector2.zero; ctr.anchorMax = Vector2.one;
+                ctr.offsetMin = Vector2.zero; ctr.offsetMax = Vector2.zero;
+            }
+
+            // Info Container (Right)
+            GameObject infoObj = new GameObject("InfoContainer");
+            infoObj.transform.SetParent(card.transform, false);
+            RectTransform infort = infoObj.AddComponent<RectTransform>();
+            infort.anchorMin = Vector2.zero;
+            infort.anchorMax = Vector2.one;
+            infort.offsetMin = new Vector2(68f, 6f);
+            infort.offsetMax = new Vector2(-10f, -6f);
+
+            TextMeshProUGUI txt = infoObj.AddComponent<TextMeshProUGUI>();
+            txt.fontSize = 9.5f;
+            txt.lineSpacing = -10f;
+            txt.overflowMode = TextOverflowModes.Ellipsis;
+
+            string nameColor = entry.isUsed ? "#34D399" : "#FBBF24";
+            string statusBadge = entry.isUsed
+                ? "<color=#10B981><b>[✓ PURPOSE FULFILLED]</b></color> <color=#94A3B8>[Used]</color>"
+                : "<color=#38BDF8><b>[● IN POSSESSION]</b></color> <color=#64748B><i>(0 Slots)</i></color>";
+
+            string subLine = "";
+            if (entry.isUsed)
+            {
+                subLine = $"<color=#F59E0B><b>Used At:</b></color> <color=#E2E8F0>{(string.IsNullOrEmpty(entry.usedLocation) ? "Ascott Residency" : entry.usedLocation)}</color>";
+            }
+            else
+            {
+                subLine = !string.IsNullOrEmpty(entry.acquiredTime) 
+                    ? $"<color=#64748B>Acquired: {entry.acquiredTime}</color>" 
+                    : "<color=#64748B>Dedicated RE4 Key Compartment</color>";
+            }
+
+            string desc = string.IsNullOrEmpty(entry.description)
+                ? (ItemDatabase.GetDefinition(entry.itemId)?.description ?? "Important key valuable.")
+                : entry.description;
+
+            txt.text = $"<color={nameColor}><b>{entry.displayName.ToUpper()}</b></color>   {statusBadge}\n" +
+                       $"<color=#94A3B8>{desc}</color>\n" +
+                       $"{subLine}";
         }
 
         private void UpdateTabBtnVisual(Button btn, bool isActive, bool hasAlert)

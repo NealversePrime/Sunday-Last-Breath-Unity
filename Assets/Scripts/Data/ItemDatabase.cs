@@ -206,8 +206,9 @@ namespace SundayLastBreath.Data
             RegisterDef(new ItemDefinition { id = "Compass", displayName = "Compass", category = ItemCategory.ToolUtility, weight = 0.15f, description = "Fluid-damped magnetic compass for land navigation when GPS grids collapse." });
             RegisterDef(new ItemDefinition { id = "Lighter", displayName = "Lighter", category = ItemCategory.ToolUtility, weight = 0.1f, description = "Refillable butane flip lighter. Reliable flame source." });
             RegisterDef(new ItemDefinition { id = "Jerry Can", displayName = "Jerry Can", category = ItemCategory.ToolUtility, weight = 2.5f, description = "Steel 20-liter canister for gasoline fuel storage." });
-            RegisterDef(new ItemDefinition { id = "Apartment Key", displayName = "Apartment 407 Key", category = ItemCategory.ValuableKey, weight = 0.05f, description = "Brass tumbler key on a keychain labeled 'Room 407'. Required once to unlock the front door deadbolt and step out into the hallway." });
-            RegisterDef(new ItemDefinition { id = "Car Keys", displayName = "Car Keys", category = ItemCategory.ValuableKey, weight = 0.1f, description = "Key fob for an old sedan parked down in the Ascott basement lot." });
+            RegisterDef(new ItemDefinition { id = "Apartment Key", displayName = "Apartment 407 Key", category = ItemCategory.ValuableKey, slotSize = 0, weight = 0.05f, description = "Brass tumbler key on a keychain labeled 'Room 407'. Required once to unlock the front door deadbolt and step out into the hallway." });
+            RegisterDef(new ItemDefinition { id = "Apartment 407 Key", displayName = "Apartment 407 Key", category = ItemCategory.ValuableKey, slotSize = 0, weight = 0.05f, description = "Brass tumbler key on a keychain labeled 'Room 407'. Required once to unlock the front door deadbolt and step out into the hallway." });
+            RegisterDef(new ItemDefinition { id = "Car Keys", displayName = "Car Keys", category = ItemCategory.ValuableKey, slotSize = 0, weight = 0.1f, description = "Key fob for an old sedan parked down in the Ascott basement lot." });
             RegisterDef(new ItemDefinition { id = "Bluetooth Speaker", displayName = "Bluetooth Speaker", category = ItemCategory.ToolUtility, weight = 0.5f, description = "Portable speaker. Can be paired and activated remotely to distract hostiles." });
             RegisterDef(new ItemDefinition { id = "Ceramic Mug", displayName = "Ceramic Mug", category = ItemCategory.ToolUtility, weight = 0.4f, description = "Heavy stoneware coffee cup. Can be thrown to lure stalkers toward the noise." });
             RegisterDef(new ItemDefinition { id = "Hand Sanitizer", displayName = "Hand Sanitizer", category = ItemCategory.ToolUtility, weight = 0.3f, description = "Ethyl alcohol gel antiseptic for personal hygiene and fire acceleration." });
@@ -596,13 +597,25 @@ namespace SundayLastBreath.Data
         }
 
         /// <summary>
-        /// Returns the tactical slot size of an item (1 = standard compact item, 2 = bulky/long weapon or equipment).
+        /// Returns the tactical slot size of an item (0 = key item/treasure taking no bag slots, 1 = standard compact item, 2 = bulky/long weapon).
         /// </summary>
         public static int GetItemSlotSize(string itemId)
         {
             if (string.IsNullOrEmpty(itemId)) return 1;
             var def = GetDefinition(itemId);
-            return def != null ? Mathf.Max(1, def.slotSize) : 1;
+            if (def == null) return 1;
+            if (def.category == ItemCategory.ValuableKey || def.slotSize == 0) return 0;
+            return Mathf.Max(1, def.slotSize);
+        }
+
+        /// <summary>
+        /// Returns true if the item is an RE4-style Key Item, Quest Item, or Valuable that does not consume backpack slots.
+        /// </summary>
+        public static bool IsKeyItem(string itemId)
+        {
+            if (string.IsNullOrEmpty(itemId)) return false;
+            var def = GetDefinition(itemId);
+            return def != null && (def.category == ItemCategory.ValuableKey || def.slotSize == 0);
         }
     }
 }

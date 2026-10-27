@@ -39,6 +39,34 @@ namespace SundayLastBreath.Data
     }
 
     /// <summary>
+    /// Resident Evil style Key Item & Treasure/Valuable model.
+    /// Key items (Keys, Passkeys, Badges, Keycards, Artifacts) do NOT consume backpack grid slots.
+    /// Tracks active state, when and where the item was used, and if its purpose has been fulfilled.
+    /// </summary>
+    [Serializable]
+    public class KeyItemEntry
+    {
+        public string itemId;
+        public string displayName;
+        public string description;
+        public bool isUsed;
+        public string usedLocation;
+        public string acquiredTime;
+
+        public KeyItemEntry() { }
+
+        public KeyItemEntry(string id, string name = null, string desc = null, bool used = false, string location = null, string time = null)
+        {
+            this.itemId = id;
+            this.displayName = string.IsNullOrEmpty(name) ? id : name;
+            this.description = desc;
+            this.isUsed = used;
+            this.usedLocation = location;
+            this.acquiredTime = time;
+        }
+    }
+
+    /// <summary>
     /// Master data model for the survivor player character.
     /// Standardized to the M.O.R.T.A.L. attribute system:
     /// [M] Might (str)
@@ -117,8 +145,12 @@ namespace SundayLastBreath.Data
         public List<string> selectedDrawbacks = new List<string>();
         public List<InventoryEntry> inventory = new List<InventoryEntry>();
 
+        [Header("Key Items & Important Valuables (RE4 Style — 0 Bag Slots)")]
+        public List<KeyItemEntry> keyItems = new List<KeyItemEntry>();
+
         /// <summary>
         /// Calculates the total number of tactical backpack slots used (accounting for 1-slot and 2-slot bulky items).
+        /// Key items and quest items take 0 slots.
         /// </summary>
         public int GetTotalSlotsUsed()
         {
@@ -152,10 +184,76 @@ namespace SundayLastBreath.Data
             return traits.Exists(t => t.name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Adds a key item to the survivor's dedicated Key Items pocket (0 bag slots consumed).
+        /// </summary>
+        public void AddKeyItem(string id, string name = null, string desc = null, string time = null)
+        {
+            if (string.IsNullOrEmpty(id)) return;
+            if (keyItems == null) keyItems = new List<KeyItemEntry>();
+
+            var existing = keyItems.Find(k => string.Equals(k.itemId, id, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+            {
+                if (!string.IsNullOrEmpty(name)) existing.displayName = name;
+                if (!string.IsNullOrEmpty(desc)) existing.description = desc;
+                return;
+            }
+
+            var def = ItemDatabase.GetDefinition(id);
+            string disp = !string.IsNullOrEmpty(name) ? name : (def != null ? def.displayName : id);
+            string d = !string.IsNullOrEmpty(desc) ? desc : (def != null ? def.description : "");
+            keyItems.Add(new KeyItemEntry(id, disp, d, false, null, time));
+        }
+
+        public bool HasKeyItem(string id, bool includeUsed = false)
+        {
+            if (string.IsNullOrEmpty(id) || keyItems == null) return false;
+            var entry = keyItems.Find(k => string.Equals(k.itemId, id, StringComparison.OrdinalIgnoreCase) ||
+                                           string.Equals(k.displayName, id, StringComparison.OrdinalIgnoreCase));
+            if (entry == null) return false;
+            return includeUsed || !entry.isUsed;
+        }
+
+        public KeyItemEntry GetKeyItem(string id)
+        {
+            if (string.IsNullOrEmpty(id) || keyItems == null) return null;
+            return keyItems.Find(k => string.Equals(k.itemId, id, StringComparison.OrdinalIgnoreCase) ||
+                                      string.Equals(k.displayName, id, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void MarkKeyItemUsed(string id, string usedLocationDescription = "Ascott District")
+        {
+            if (string.IsNullOrEmpty(id)) return;
+            if (keyItems == null) keyItems = new List<KeyItemEntry>();
+
+            var entry = GetKeyItem(id);
+            if (entry != null)
+            {
+                entry.isUsed = true;
+                entry.usedLocation = usedLocationDescription;
+            }
+            else
+            {
+                // Register it as used
+                var def = ItemDatabase.GetDefinition(id);
+                string disp = def != null ? def.displayName : id;
+                string d = def != null ? def.description : "";
+                keyItems.Add(new KeyItemEntry(id, disp, d, true, usedLocationDescription, null));
+            }
+
+            // Also clean up from regular inventory if it happened to be there
+            RemoveItem(id, 1);
+        }
+
         public bool HasItem(string itemId)
         {
-            if (string.IsNullOrEmpty(itemId) || inventory == null) return false;
-            return inventory.Exists(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrEmpty(itemId)) return false;
+            if (inventory != null && inventory.Exists(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase)))
+                return true;
+
+            // Also check Key Items pocket
+            return HasKeyItem(itemId, includeUsed: false);
         }
 
         public string GetEquippedInSlot(string slot)
@@ -197,6 +295,14 @@ namespace SundayLastBreath.Data
         {
             if (string.IsNullOrEmpty(itemId) || qty <= 0) return false;
 
+            // RE4-Style Key Items / Valuables: Automatically route to Key Items pocket (0 slots consumed)
+            if (ItemDatabase.IsKeyItem(itemId))
+            {
+                var keyDef = ItemDatabase.GetDefinition(itemId);
+                AddKeyItem(itemId, keyDef != null ? keyDef.displayName : itemId, keyDef != null ? keyDef.description : "");
+                return true;
+            }
+
             var def = ItemDatabase.GetDefinition(itemId);
             bool isStackable = def != null && def.stackable;
 
@@ -228,7 +334,16 @@ namespace SundayLastBreath.Data
             if (string.IsNullOrEmpty(itemId)) return false;
 
             var found = inventory.Find(i => i.itemId.Equals(itemId, StringComparison.OrdinalIgnoreCase));
-            if (found == null) return false;
+            if (found == null)
+            {
+                // If it's a key item, mark it used instead of failing
+                if (HasKeyItem(itemId, includeUsed: false))
+                {
+                    MarkKeyItemUsed(itemId);
+                    return true;
+                }
+                return false;
+            }
 
             found.quantity -= qty;
             if (found.quantity <= 0)
