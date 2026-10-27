@@ -340,6 +340,12 @@ namespace SundayLastBreath.UI
             PlaySFX(lootSFX);
         }
 
+        private const float BACKPACK_CELL_WIDTH = 124f;
+        private const float BACKPACK_CELL_HEIGHT = 90f;
+        private const float BACKPACK_SPACING_X = 12f;
+        private const float BACKPACK_SPACING_Y = 10f;
+        private const int BACKPACK_COLUMNS = 4;
+
         private bool MatchesFilter(string itemId)
         {
             if (_currentFilter == InventoryFilter.All) return true;
@@ -377,6 +383,17 @@ namespace SundayLastBreath.UI
         private void RefreshBackpackGrid()
         {
             if (backpackGridRoot == null) return;
+
+            // Automatically configure the grid for larger, highly-visible 4-column x 3-row layout (12 slots)
+            var glg = backpackGridRoot.GetComponent<GridLayoutGroup>();
+            if (glg != null)
+            {
+                glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                glg.constraintCount = BACKPACK_COLUMNS;
+                glg.cellSize = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
+                glg.spacing = new Vector2(BACKPACK_SPACING_X, BACKPACK_SPACING_Y);
+                glg.childAlignment = TextAnchor.MiddleCenter;
+            }
 
             for (int i = backpackGridRoot.childCount - 1; i >= 0; i--)
             {
@@ -417,9 +434,9 @@ namespace SundayLastBreath.UI
 
                 if (size == 2)
                 {
-                    // If a 2-slot item starts at the end of a 5-column row (slotsRendered % 5 == 4),
+                    // If a 2-slot item starts at the end of a 4-column row (slotsRendered % 4 == 3),
                     // insert an empty slot first so the bulky item cleanly spans 2 slots on the same row!
-                    if (slotsRendered % 5 == 4 && slotsRendered < maxSlots)
+                    if (slotsRendered % BACKPACK_COLUMNS == (BACKPACK_COLUMNS - 1) && slotsRendered < maxSlots)
                     {
                         CreateEmptyCell(backpackGridRoot);
                         slotsRendered++;
@@ -453,7 +470,7 @@ namespace SundayLastBreath.UI
             GameObject cell = new GameObject("Slot_" + itemId);
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(74f, 74f);
+            rt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
 
             bool isSelected = _selectedSource == SelectedSource.Backpack && _selectedBackpackIndex == index;
             var def = ItemDatabase.GetDefinition(itemId);
@@ -463,7 +480,7 @@ namespace SundayLastBreath.UI
             GameObject visualRoot;
             if (isTwoSlot)
             {
-                // Base cell in GridLayoutGroup remains 74x74, but visualRoot spans 2 cells + 10px spacing = 158px!
+                // Base cell in GridLayoutGroup remains 124x90, but visualRoot spans 2 cells + 12px spacing = 260px!
                 visualRoot = new GameObject("SpanRoot");
                 visualRoot.transform.SetParent(cell.transform, false);
                 RectTransform vrt = visualRoot.AddComponent<RectTransform>();
@@ -471,7 +488,7 @@ namespace SundayLastBreath.UI
                 vrt.anchorMax = new Vector2(0f, 1f);
                 vrt.pivot = new Vector2(0f, 0.5f);
                 vrt.anchoredPosition = Vector2.zero;
-                vrt.sizeDelta = new Vector2(158f, 0f); // 74 * 2 + 10 spacing = 158px
+                vrt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH * 2f + BACKPACK_SPACING_X, 0f); // 124 * 2 + 12 = 260px
             }
             else
             {
@@ -502,13 +519,13 @@ namespace SundayLastBreath.UI
             GameObject wellObj = new GameObject("WellHalo");
             wellObj.transform.SetParent(visualRoot.transform, false);
             Image wellImg = wellObj.AddComponent<Image>();
-            wellImg.color = new Color(0.18f, 0.24f, 0.32f, 0.30f);
+            wellImg.color = new Color(0.18f, 0.24f, 0.32f, 0.25f);
             wellImg.raycastTarget = false;
             RectTransform wrt = wellObj.GetComponent<RectTransform>();
             wrt.anchorMin = Vector2.zero; wrt.anchorMax = Vector2.one;
-            wrt.offsetMin = new Vector2(6f, 14f); wrt.offsetMax = new Vector2(-6f, -4f);
+            wrt.offsetMin = new Vector2(6f, 18f); wrt.offsetMax = new Vector2(-6f, -4f);
 
-            // Category Pip: Sleek 3x12 indicator on top-left of slot
+            // Category Pip: Sleek 3x14 indicator on top-left of slot
             if (def != null && matchesFilter)
             {
                 GameObject pipObj = new GameObject("CatPip");
@@ -519,11 +536,11 @@ namespace SundayLastBreath.UI
                 RectTransform prt = pipObj.GetComponent<RectTransform>();
                 prt.anchorMin = new Vector2(0f, 1f); prt.anchorMax = new Vector2(0f, 1f);
                 prt.pivot = new Vector2(0f, 1f);
-                prt.anchoredPosition = new Vector2(4f, -4f);
-                prt.sizeDelta = new Vector2(3f, 12f);
+                prt.anchoredPosition = new Vector2(5f, -5f);
+                prt.sizeDelta = new Vector2(3f, 14f);
             }
 
-            // 2-Slot Tactical Badge (Top Right of 158px container)
+            // 2-Slot Tactical Badge (Top Right of 260px container)
             if (isTwoSlot && matchesFilter)
             {
                 GameObject slotBadge = new GameObject("SlotBadge");
@@ -531,8 +548,8 @@ namespace SundayLastBreath.UI
                 RectTransform sbr = slotBadge.AddComponent<RectTransform>();
                 sbr.anchorMin = new Vector2(1f, 1f); sbr.anchorMax = new Vector2(1f, 1f);
                 sbr.pivot = new Vector2(1f, 1f);
-                sbr.anchoredPosition = new Vector2(-4f, -4f);
-                sbr.sizeDelta = new Vector2(36f, 13f);
+                sbr.anchoredPosition = new Vector2(-5f, -5f);
+                sbr.sizeDelta = new Vector2(42f, 15f);
                 Image sbBg = slotBadge.AddComponent<Image>();
                 sbBg.color = new Color(0.85f, 0.55f, 0.10f, 0.32f);
                 sbBg.raycastTarget = false;
@@ -540,7 +557,7 @@ namespace SundayLastBreath.UI
                 GameObject sbtObj = new GameObject("Text");
                 sbtObj.transform.SetParent(slotBadge.transform, false);
                 TextMeshProUGUI sbTmp = sbtObj.AddComponent<TextMeshProUGUI>();
-                sbTmp.fontSize = 7.5f;
+                sbTmp.fontSize = 8f;
                 sbTmp.fontStyle = FontStyles.Bold;
                 sbTmp.alignment = TextAlignmentOptions.Center;
                 sbTmp.color = new Color(0.95f, 0.75f, 0.25f);
@@ -551,7 +568,7 @@ namespace SundayLastBreath.UI
                 sbtr.offsetMin = Vector2.zero; sbtr.offsetMax = Vector2.zero;
             }
 
-            // Icon - Centered horizontally across the full visual area with preserveAspect
+            // Icon - Much larger visual area with preserveAspect
             GameObject iconObj = new GameObject("Icon");
             iconObj.transform.SetParent(visualRoot.transform, false);
             Image iconImg = iconObj.AddComponent<Image>();
@@ -559,8 +576,8 @@ namespace SundayLastBreath.UI
             iconImg.raycastTarget = false;
             RectTransform ir = iconObj.GetComponent<RectTransform>();
             ir.anchorMin = Vector2.zero; ir.anchorMax = Vector2.one;
-            ir.offsetMin = new Vector2(isTwoSlot ? 10f : 8f, 16f);
-            ir.offsetMax = new Vector2(isTwoSlot ? -10f : -8f, -4f);
+            ir.offsetMin = new Vector2(isTwoSlot ? 12f : 8f, 20f);
+            ir.offsetMax = new Vector2(isTwoSlot ? -12f : -8f, -6f);
 
             Sprite s = ItemDatabase.GetItemIcon(itemId);
             if (s != null)
@@ -573,16 +590,16 @@ namespace SundayLastBreath.UI
             GameObject nameObj = new GameObject("Name");
             nameObj.transform.SetParent(visualRoot.transform, false);
             TextMeshProUGUI nameTmp = nameObj.AddComponent<TextMeshProUGUI>();
-            nameTmp.fontSize = 8.5f;
+            nameTmp.fontSize = 9.5f;
             nameTmp.alignment = TextAlignmentOptions.Center;
             nameTmp.color = matchesFilter ? (isSelected ? Color.white : new Color(0.85f, 0.88f, 0.92f)) : new Color(0.4f, 0.4f, 0.4f);
-            nameTmp.text = isTwoSlot ? itemId : (itemId.Length > 11 ? itemId.Substring(0, 10) + "." : itemId);
+            nameTmp.text = isTwoSlot ? itemId : (itemId.Length > 16 ? itemId.Substring(0, 15) + "." : itemId);
             nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
             nameTmp.raycastTarget = false;
             RectTransform nr = nameObj.GetComponent<RectTransform>();
             nr.anchorMin = new Vector2(0f, 0f); nr.anchorMax = new Vector2(1f, 0f);
             nr.pivot = new Vector2(0.5f, 0f);
-            nr.sizeDelta = new Vector2(0f, 15f);
+            nr.sizeDelta = new Vector2(0f, 18f);
             nr.anchoredPosition = new Vector2(0f, 2f);
 
             // Quantity Badge
@@ -593,8 +610,8 @@ namespace SundayLastBreath.UI
                 RectTransform qr = qBadge.AddComponent<RectTransform>();
                 qr.anchorMin = new Vector2(1f, 0f); qr.anchorMax = new Vector2(1f, 0f);
                 qr.pivot = new Vector2(1f, 0f);
-                qr.anchoredPosition = new Vector2(-2f, 14f);
-                qr.sizeDelta = new Vector2(28f, 14f);
+                qr.anchoredPosition = new Vector2(-4f, 18f);
+                qr.sizeDelta = new Vector2(32f, 15f);
                 Image qBg = qBadge.AddComponent<Image>();
                 qBg.color = new Color(0.04f, 0.06f, 0.04f, 0.95f);
                 qBg.raycastTarget = false;
@@ -602,7 +619,7 @@ namespace SundayLastBreath.UI
                 GameObject qtObj = new GameObject("Text");
                 qtObj.transform.SetParent(qBadge.transform, false);
                 TextMeshProUGUI qTmp = qtObj.AddComponent<TextMeshProUGUI>();
-                qTmp.fontSize = 9.5f;
+                qTmp.fontSize = 10f;
                 qTmp.fontStyle = FontStyles.Bold;
                 qTmp.alignment = TextAlignmentOptions.Center;
                 qTmp.color = new Color(0.35f, 0.95f, 0.45f);
@@ -630,7 +647,7 @@ namespace SundayLastBreath.UI
             GameObject cell = new GameObject("Slot_" + itemId + "_Ext");
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(74f, 74f);
+            rt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
 
             // Transparent image to receive clicks on the right half of the 2-slot weapon
             Image bg = cell.AddComponent<Image>();
@@ -652,13 +669,13 @@ namespace SundayLastBreath.UI
             GameObject cell = new GameObject("EmptySlot");
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(74f, 74f);
+            rt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
 
             Image bg = cell.AddComponent<Image>();
-            bg.color = new Color(0.04f, 0.05f, 0.07f, 0.75f);
+            bg.color = new Color(0.06f, 0.08f, 0.11f, 0.85f);
 
             Outline ol = cell.AddComponent<Outline>();
-            ol.effectColor = new Color(0.14f, 0.16f, 0.20f, 0.6f);
+            ol.effectColor = new Color(0.16f, 0.20f, 0.26f, 0.50f);
             ol.effectDistance = new Vector2(1f, -1f);
         }
 
