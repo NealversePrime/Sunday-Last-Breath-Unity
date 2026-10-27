@@ -86,6 +86,9 @@ namespace SundayLastBreath.Editor
 
             canvasObj.AddComponent<GraphicRaycaster>();
 
+            // Ensure Act 1 textures are configured as Sprites
+            ConfigureAct1Sprites();
+
             // 5. AudioManager
             GameObject audioMgrObj = new GameObject("AudioManager");
             AudioManager audioMgr = audioMgrObj.AddComponent<AudioManager>();
@@ -3719,6 +3722,28 @@ namespace SundayLastBreath.Editor
                 {
                     string idName = Path.GetFileNameWithoutExtension(f);
                     ItemDatabase.RegisterIcon(idName, s);
+                }
+            }
+        }
+
+        public static void ConfigureAct1Sprites()
+        {
+            string[] folders = new string[] { "Assets/Resources/Act1", "Assets/Sprites/Act1" };
+            foreach (var folder in folders)
+            {
+                if (!Directory.Exists(folder)) continue;
+                string[] files = Directory.GetFiles(folder, "*.png");
+                foreach (string f in files)
+                {
+                    string relPath = f.Replace("\\", "/");
+                    TextureImporter ti = AssetImporter.GetAtPath(relPath) as TextureImporter;
+                    if (ti != null && (ti.textureType != TextureImporterType.Sprite || ti.spriteImportMode != SpriteImportMode.Single))
+                    {
+                        ti.textureType = TextureImporterType.Sprite;
+                        ti.spriteImportMode = SpriteImportMode.Single;
+                        ti.alphaIsTransparency = true;
+                        ti.SaveAndReimport();
+                    }
                 }
             }
         }

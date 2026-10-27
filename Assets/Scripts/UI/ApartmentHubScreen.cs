@@ -318,6 +318,62 @@ namespace SundayLastBreath.UI
         private TextMeshProUGUI activeTypewriterTarget;
         private string activeFullText = "";
 
+        #region Hallway & Exploration State
+        [Header("Hallway & Room Exploration State")]
+        private bool isInHallway = false;
+        private int hallwaySection = 1; // 1: Upper, 2: Mid, 3: Lower, 4: End
+        private string currentInspectedRoom = null;
+
+        // Room 408 (Harmon)
+        private bool room408_opened = false;
+        private int failed_408_attempts = 0;
+        private bool room408_locked_out = false;
+        private bool studied_408_mechanics = false;
+        private bool studied_408_anatomy = false;
+        private bool read_408_journal = false;
+        private bool looted_408_kitchen = false;
+        private bool looted_408 = false;
+
+        // Room 405 (Marcus)
+        private bool room405_opened = false;
+        private bool room405_trap_triggered = false;
+        private bool read_marcus_log = false;
+        private bool looted_405_bench = false;
+        private bool looted_405_safe = false;
+
+        // Room 402 (The Andersons)
+        private bool room402_opened = false;
+        private string room402_entry_method = "silent";
+        private bool looted_402_weapon = false;
+        private bool looted_402_kitchen = false;
+        private bool looted_402_bathroom = false;
+        private bool looted_402_ring = false;
+        private bool took_402_photo = false;
+        private bool read_402_note = false;
+
+        // Room 401 (Party Flat)
+        private bool shelf_lifted = false;
+        private bool turned_off_music = false;
+        private bool looted_401_kitchen = false;
+        private bool looted_401_bathroom = false;
+        private bool looted_401_alcohol = false;
+        private bool looted_401_pockets = false;
+
+        // Utility Closet
+        private bool utility_opened = false;
+        private bool read_utility_log = false;
+        private bool looted_utility_bleach = false;
+        private bool looted_utility_tape = false;
+        private bool looted_utility_flashlight = false;
+
+        // Stairwell
+        private int stair_phase = 1;
+        private string descentMethod = "slow";
+        private bool barricade_pushed = false;
+
+        private readonly List<TacticalChoiceButton> hallwayChoiceButtons = new List<TacticalChoiceButton>();
+        #endregion
+
         // Cached frames for player avatar animation
         private List<Sprite> cachedAvatarFrames;
         private Coroutine avatarAnimRoutine;
@@ -339,6 +395,9 @@ namespace SundayLastBreath.UI
         public GameClock Clock => gameClock;
         public ObjectiveSystem Objectives => objectiveSystem;
         public LoreSystem Lore => loreSystem;
+        public bool IsInHallway => isInHallway;
+        public int HallwaySection => hallwaySection;
+        public string CurrentInspectedRoom => currentInspectedRoom;
 
         protected override void Awake()
         {
@@ -2436,10 +2495,10 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 1. Hotkeys for Choice Selection (1-8) when in Narrative Choice Hub Mode
+            // 1. Hotkeys for Choice Selection (1-9) when in Narrative Choice Hub Mode
             if (currentConsoleMode == ConsoleMode.Narrative && hubMenuContainer != null && hubMenuContainer.activeInHierarchy)
             {
-                for (int i = 0; i < Mathf.Min(activeChoiceButtons.Count, 8); i++)
+                for (int i = 0; i < Mathf.Min(activeChoiceButtons.Count, 9); i++)
                 {
                     if (IsChoiceHotkeyPressed(i + 1))
                     {
@@ -3596,6 +3655,8 @@ namespace SundayLastBreath.UI
 
         private void EvaluateHubButtonStates()
         {
+            if (isInHallway) return;
+
             // 1. Pack Gear Button (Coffee Table)
             if (packGearButton != null)
             {
@@ -5406,19 +5467,8 @@ namespace SundayLastBreath.UI
             objectiveSystem.CompleteObjective("leave_apt");
             objectiveSystem.AddObjective("escape_building", "Find a way down to the ground floor", ObjectiveStatus.Active);
 
-            // Fade atmosphere audio
-            if (atmosphereSource != null)
-            {
-                StartCoroutine(FadeOutAudio(atmosphereSource, 1.2f));
-            }
-
-            Hide(0.8f, () =>
-            {
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.TransitionFromApartmentToHallway();
-                }
-            });
+            // Transition to Hallway Mode
+            EnterHallwayMode(1);
         }
 
         private IEnumerator FadeOutAudio(AudioSource src, float duration)
@@ -5431,6 +5481,1472 @@ namespace SundayLastBreath.UI
             }
             src.Stop();
         }
+
+        #region Hallway & Exploration Implementation
+        public void EnterHallwayMode(int section = 1)
+        {
+            isInHallway = true;
+            hallwaySection = Mathf.Clamp(section, 1, 4);
+            currentInspectedRoom = null;
+
+            // Stop living room animated backdrop
+            if (livingRoomAnimPlayer != null)
+            {
+                livingRoomAnimPlayer.Stop();
+                livingRoomAnimPlayer.enabled = false;
+            }
+
+            if (stageBackdropImage != null)
+            {
+                stageBackdropImage.enabled = true;
+                stageBackdropImage.color = Color.white;
+            }
+
+            // Hide apartment buttons
+            SetApartmentButtonsVisible(false);
+
+            // Ensure situation box preferred height accommodates rich corridor narration
+            if (situationBox != null)
+            {
+                LayoutElement sle = situationBox.GetComponent<LayoutElement>();
+                if (sle != null) sle.preferredHeight = 110f;
+            }
+
+            // Ensure console is in narrative mode
+            currentConsoleMode = ConsoleMode.Narrative;
+            if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.TransitionFromApartmentToHallway();
+            }
+
+            UpdateHallwayView();
+        }
+
+        private void SetApartmentButtonsVisible(bool visible)
+        {
+            if (packGearButton != null) packGearButton.gameObject.SetActive(visible);
+            if (searchKitchenButton != null) searchKitchenButton.gameObject.SetActive(visible);
+            if (searchBathroomButton != null) searchBathroomButton.gameObject.SetActive(visible);
+            if (searchClosetButton != null) searchClosetButton.gameObject.SetActive(visible);
+            if (checkPhoneButton != null) checkPhoneButton.gameObject.SetActive(visible);
+            if (listenRadioButton != null) listenRadioButton.gameObject.SetActive(visible);
+            if (hackTerminalButton != null) hackTerminalButton.gameObject.SetActive(visible);
+            if (leaveApartmentButton != null) leaveApartmentButton.gameObject.SetActive(visible);
+            if (packedSuccessBanner != null) packedSuccessBanner.SetActive(visible && hasPacked);
+        }
+
+        private void ClearHallwayChoices()
+        {
+            for (int i = 0; i < hallwayChoiceButtons.Count; i++)
+            {
+                if (hallwayChoiceButtons[i] != null)
+                {
+                    hallwayChoiceButtons[i].gameObject.SetActive(false);
+                }
+            }
+        }
+
+        private TacticalChoiceButton SetHallwayChoice(int index, string mainText, System.Action onClick, bool interactable = true, Color? accent = null)
+        {
+            TacticalChoiceButton btn = GetOrCreateHallwayChoiceButton(index);
+            if (btn != null)
+            {
+                btn.SetChoiceNumber(index + 1);
+                btn.SetChoice(mainText, onClick, interactable, accent);
+            }
+            return btn;
+        }
+
+        private TacticalChoiceButton GetOrCreateHallwayChoiceButton(int index)
+        {
+            if (index < hallwayChoiceButtons.Count && hallwayChoiceButtons[index] != null)
+            {
+                return hallwayChoiceButtons[index];
+            }
+
+            Transform parent = leaveApartmentButton != null ? leaveApartmentButton.transform.parent : null;
+            if (parent == null && hubMenuContainer != null)
+            {
+                ScrollRect sr = hubMenuContainer.GetComponentInChildren<ScrollRect>(true);
+                if (sr != null && sr.content != null) parent = sr.content;
+            }
+
+            if (leaveApartmentButton != null && parent != null)
+            {
+                GameObject clone = Instantiate(leaveApartmentButton.gameObject, parent);
+                clone.name = $"HallwayChoice_{index + 1}";
+                TacticalChoiceButton tcb = clone.GetComponent<TacticalChoiceButton>();
+                if (tcb != null)
+                {
+                    tcb.SetChoiceNumber(index + 1);
+                    hallwayChoiceButtons.Add(tcb);
+                    return tcb;
+                }
+            }
+            return null;
+        }
+
+        public void UpdateHallwayView()
+        {
+            currentInspectedRoom = null;
+            ClearHallwayChoices();
+            PlayHubBGM("Audio/BGM/hallway_drone", 0.5f);
+
+            int choiceIdx = 0;
+
+            switch (hallwaySection)
+            {
+                case 1:
+                    SetLocation("hallway_1", "CORRIDOR N // UPPER HALLWAY (SEC 1)");
+                    tacticalMapController?.DiscoverAdjacentRooms("hallway_1");
+                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_406_407");
+
+                    if (situationBoxText != null)
+                    {
+                        situationBoxText.text = "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> The emergency lights above are failing, casting long, twitching shadows across the cheap carpet. It's too quiet here, making every distant scream outside echo through the vents. To your right is your unit (407). To your left is <b>Unit 408</b>.";
+                    }
+
+                    SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 408 <color=#9CA3AF>— The Professor's door. Electronic lock. Total silence inside.</color>", () => InspectUnit408());
+                    SetHallwayChoice(choiceIdx++, "▼ ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Mid-Hallway.</color>", () => AdvanceDownHall());
+                    break;
+
+                case 2:
+                    SetLocation("hallway_2", "CORRIDOR M // MID-HALLWAY (SEC 2)");
+                    tacticalMapController?.DiscoverAdjacentRooms("hallway_2");
+                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_404_405");
+
+                    if (situationBoxText != null)
+                    {
+                        situationBoxText.text = "<color=#93C5FD><b>MID-HALLWAY.</b></color> Dust motes dance in the flickering light. You can hear a dog barking relentlessly from behind door 404, its claws scratching desperately against the wood. Across the hall, the reinforced door of <b>Unit 405</b> stands silent. The air here smells faintly of gunpowder.";
+                    }
+
+                    SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 405 <color=#9CA3AF>— The Hunter's door. Heavy steel frame. Faint cordite.</color>", () => InspectUnit405());
+                    SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Upper Hallway & Unit 407.</color>", () => RetreatUpHall());
+                    SetHallwayChoice(choiceIdx++, "▼ ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Lower Hallway.</color>", () => AdvanceDownHall());
+                    break;
+
+                case 3:
+                    SetLocation("hallway_3", "CORRIDOR S // LOWER HALLWAY (SEC 3)");
+                    tacticalMapController?.DiscoverAdjacentRooms("hallway_3");
+                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_402_403");
+
+                    if (situationBoxText != null)
+                    {
+                        situationBoxText.text = "<color=#93C5FD><b>LOWER HALLWAY.</b></color> The lights are completely dead in this section. The metallic, coppery tang of blood mixes with the smell of ozone. Jarringly, soft classical music plays from behind the chained door of <b>Unit 402</b>. Across from it is <b>Unit 403</b>.";
+                    }
+
+                    SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 402 <color=#9CA3AF>— The Andersons' door. Chained from the inside. Classical music.</color>", () => InspectUnit402());
+                    SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Mid-Hallway.</color>", () => RetreatUpHall());
+                    SetHallwayChoice(choiceIdx++, "▼ ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Hallway End.</color>", () => AdvanceDownHall());
+                    break;
+
+                case 4:
+                    SetLocation("hallway_4", "CORRIDOR E // HALLWAY END (SEC 4)");
+                    tacticalMapController?.DiscoverAdjacentRooms("hallway_4");
+                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_end");
+
+                    if (situationBoxText != null)
+                    {
+                        situationBoxText.text = "<color=#93C5FD><b>HALLWAY END.</b></color> The corridor terminates at the heavy fire doors leading to the stairwell. Bloody handprints smear the glass viewing pane. From <b>Unit 401</b>, loud, obnoxious pop music thumps through the wood, completely masking the sounds of the nightmare happening outside.";
+                    }
+
+                    SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 401 <color=#9CA3AF>— The Party door. Slightly ajar. Music is loud.</color>", () => InspectUnit401());
+                    SetHallwayChoice(choiceIdx++, "CHECK UTILITY CLOSET <color=#9CA3AF>— Maintenance room. The handle feels jammed.</color>", () => InspectUtilityCloset());
+                    SetHallwayChoice(choiceIdx++, "<color=#EF4444>ENTER STAIRWELL (EXIT)</color> <color=#FCA5A5>— Point of no return. Push through bloody fire doors.</color>", () => InspectStairwell(), true, new Color(0.95f, 0.25f, 0.25f));
+                    SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Lower Hallway.</color>", () => RetreatUpHall());
+                    break;
+            }
+
+            ReindexActiveChoiceHotkeys();
+        }
+
+        private void AdvanceDownHall()
+        {
+            if (hallwaySection < 4)
+            {
+                hallwaySection++;
+                gameClock?.AddTime(1);
+                PlayClickSFX();
+                UpdateHallwayView();
+            }
+        }
+
+        private void RetreatUpHall()
+        {
+            if (hallwaySection > 1)
+            {
+                hallwaySection--;
+                gameClock?.AddTime(1);
+                PlayClickSFX();
+                UpdateHallwayView();
+            }
+        }
+
+        public void InspectUnit408()
+        {
+            currentInspectedRoom = "408";
+            ClearHallwayChoices();
+            int choiceIdx = 0;
+
+            if (!room408_opened)
+            {
+                SetLocation("unit_408", "UNIT 408 // THE KEYPAD");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_406_407");
+                PlaySFX("Audio/SFX/tick", 0.4f);
+
+                string lockoutMsg = room408_locked_out 
+                    ? "\n\n<color=#EF4444><b>⛔ PERMANENTLY LOCKED OUT.</b> The keypad triggered its security failsafe. The software is sealed. You will have to bypass it physically.</color>"
+                    : (failed_408_attempts > 0 ? $"\n\n<color=#F59E0B>⚠️ WRONG CODE. Attempts remaining: {3 - failed_408_attempts}.</color>" : "");
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = $"Professor Harmon taught history and behavioral sociology at the university. He talked about the psychology of collapsing civilizations as inevitable and fascinating.\n\nThe door is sealed with a heavy electronic lock. A small keypad glows faintly in the dark hallway, its LEDs casting a cold blue light. Four blank digits. Waiting.\n\nTaped above the scanner is a note: <i>\"If I'm not answering, I'm either dead or I finally took my own advice and ran. Either way, you're not getting in.\"</i>{lockoutMsg}";
+                }
+
+                if (!room408_locked_out)
+                {
+                    SetHallwayChoice(choiceIdx++, "📱 Enter the code from your phone (8445) <color=#9CA3AF>— You saw his text earlier.</color>", () =>
+                    {
+                        room408_opened = true;
+                        gameClock?.AddTime(1);
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+
+                    SetHallwayChoice(choiceIdx++, "🔢 Enter keypad code manually [8445] <color=#9CA3AF>— Four digits. 3 attempts limit.</color>", () =>
+                    {
+                        room408_opened = true;
+                        gameClock?.AddTime(1);
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+                }
+
+                bool isBurglar = currentPlayer != null && string.Equals(currentPlayer.job, "Burglar", StringComparison.OrdinalIgnoreCase);
+                bool hasLocksmith = currentPlayer != null && currentPlayer.HasTrait("LOCKSMITH");
+                bool hasTech2 = currentPlayer != null && currentPlayer.tech >= 2;
+                bool hasMultiTool = currentPlayer != null && currentPlayer.HasItem("Multi-Tool");
+                int perVal = currentPlayer != null ? currentPlayer.per : 5;
+                int strVal = currentPlayer != null ? currentPlayer.str : 5;
+
+                if (isBurglar)
+                {
+                    SetHallwayChoice(choiceIdx++, "Override electronic latch [BURGLAR] <color=#F59E0B>(-7 Stamina, ~2 min)</color>", () =>
+                    {
+                        ExertStamina(7);
+                        gameClock?.AddTime(2);
+                        room408_opened = true;
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+                }
+
+                if (hasLocksmith)
+                {
+                    SetHallwayChoice(choiceIdx++, "Exploit mechanical failsafe [LOCKSMITH] <color=#F59E0B>(-7 Stamina, ~3 min)</color>", () =>
+                    {
+                        ExertStamina(7);
+                        gameClock?.AddTime(3);
+                        room408_opened = true;
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+                }
+
+                if (hasTech2)
+                {
+                    SetHallwayChoice(choiceIdx++, "Bypass keypad circuit [TECH 2] <color=#F59E0B>(-7 Stamina, ~4 min)</color>", () =>
+                    {
+                        ExertStamina(7);
+                        gameClock?.AddTime(4);
+                        room408_opened = true;
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+                }
+
+                if (hasMultiTool)
+                {
+                    SetHallwayChoice(choiceIdx++, "Disassemble the housing [MULTI-TOOL] <color=#F59E0B>(-7 Stamina, ~3 min)</color>", () =>
+                    {
+                        ExertStamina(7);
+                        gameClock?.AddTime(3);
+                        room408_opened = true;
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+                }
+
+                if (perVal >= 6 && !room408_locked_out)
+                {
+                    SetHallwayChoice(choiceIdx++, "Read finger smudges [PER 6] <color=#10B981>(0 Stamina, instant)</color>", () =>
+                    {
+                        room408_opened = true;
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+                }
+
+                if (strVal >= 6)
+                {
+                    SetHallwayChoice(choiceIdx++, $"Smash keypad housing [STR {strVal}/6] <color=#F59E0B>(-15 Stamina, ~3 min)</color>", () =>
+                    {
+                        ExertStamina(15);
+                        gameClock?.AddTime(3);
+                        room408_opened = true;
+                        PlayClickSFX();
+                        InspectUnit408();
+                    });
+                }
+                else
+                {
+                    int chance = Mathf.Clamp(strVal * 15, 25, 75);
+                    SetHallwayChoice(choiceIdx++, $"Force keypad housing [STR {strVal}/6 — {chance}% Chance] <color=#EF4444>(-15 Stamina)</color>", () =>
+                    {
+                        ExertStamina(15);
+                        gameClock?.AddTime(3);
+                        if (UnityEngine.Random.Range(1, 101) <= chance)
+                        {
+                            room408_opened = true;
+                            PlayClickSFX();
+                            InspectUnit408();
+                        }
+                        else
+                        {
+                            PlayBeepSFX();
+                            TakeDamage(5, "Blunt trauma to hands");
+                            if (situationBoxText != null)
+                            {
+                                situationBoxText.text = "<color=#EF4444><b>BRUTE FORCE FAILED.</b></color> You battered the housing, but the internal deadbolt didn't budge. Your hands are bruised and bleeding.";
+                            }
+                        }
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Give up and return to the hallway", () => EnterHallwayMode(1));
+            }
+            else
+            {
+                SetLocation("unit_408", "UNIT 408 // PROFESSOR'S STUDY");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit408");
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "The heavy door swings open into darkness. The smell reaches you first: old paper, dust, and peppermint. Drawers are pulled open. His heavy coat and hiking backpack are gone.\n\nFloor-to-ceiling shelves line all four walls. His reading glasses sit folded on an open book — <i>The Fall of Rome</i>, marked with a yellow sticky note:\n\n<i>\"Every empire ends. We're just living in the intermission. Take what you need.\"</i>";
+                }
+
+                if (!studied_408_mechanics)
+                {
+                    SetHallwayChoice(choiceIdx++, "📖 Skim 'Advanced Mechanics' notes <color=#10B981>[TECH +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
+                    {
+                        studied_408_mechanics = true;
+                        gameClock?.AddTime(20);
+                        if (currentPlayer != null) currentPlayer.tech += 1;
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit408();
+                    });
+                }
+
+                if (!studied_408_anatomy)
+                {
+                    SetHallwayChoice(choiceIdx++, "📖 Skim 'Gray's Anatomy' notes <color=#10B981>[MEDICINE +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
+                    {
+                        studied_408_anatomy = true;
+                        gameClock?.AddTime(20);
+                        if (currentPlayer != null) currentPlayer.medicine += 1;
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit408();
+                    });
+                }
+
+                if (!read_408_journal)
+                {
+                    SetHallwayChoice(choiceIdx++, "📓 Read his personal journal <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~10 min)</color>", () =>
+                    {
+                        read_408_journal = true;
+                        gameClock?.AddTime(10);
+                        if (currentPlayer != null) currentPlayer.per += 1;
+                        loreSystem?.AddLore("Professor Harmon's Journal", "His handwriting degrades into a frantic scrawl toward the end. He documented unmarked FEMA transports operating at night and the CDC's total blackout protocols: 'The state lies because panic moves faster than infection. But cognitive dissonance is the real plague.'", gameClock?.GetTimeString() ?? "00:15");
+                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:15", "UNIT 408 // HARMON'S JOURNAL", "Read Professor Harmon's field notes on the collapse. Gained +1 Perception.");
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit408();
+                    });
+                }
+
+                if (!looted_408_kitchen)
+                {
+                    SetHallwayChoice(choiceIdx++, "🍵 Search the abandoned kitchen <color=#9CA3AF>(Canned Food x1, Energy Bar x1, Bottled Water x2)</color>", () =>
+                    {
+                        looted_408_kitchen = true;
+                        gameClock?.AddTime(5);
+                        currentPlayer?.AddItem("Canned Food", 1);
+                        currentPlayer?.AddItem("Energy Bar", 1);
+                        currentPlayer?.AddItem("Bottled Water", 2);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit408();
+                    });
+                }
+
+                if (!looted_408)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔍 Raid the desk drawers <color=#9CA3AF>(Encyclopedia x1, Flashlight x1)</color>", () =>
+                    {
+                        looted_408 = true;
+                        gameClock?.AddTime(5);
+                        currentPlayer?.AddItem("Encyclopedia", 1);
+                        currentPlayer?.AddItem("Flashlight", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit408();
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Leave the study and return to the hallway", () => EnterHallwayMode(1));
+            }
+
+            ReindexActiveChoiceHotkeys();
+        }
+
+        public void InspectUnit405()
+        {
+            currentInspectedRoom = "405";
+            ClearHallwayChoices();
+            int choiceIdx = 0;
+
+            if (!room405_opened)
+            {
+                SetLocation("unit_405", "UNIT 405 // THE BOOBY TRAP");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_404_405");
+                PlayHubBGM("Audio/BGM/tension_drone", 0.4f);
+
+                string trapStatus = room405_trap_triggered 
+                    ? "\n\n<color=#EF4444><b>❌ TRAP TRIGGERED.</b> Your ears are ringing. The blank shell detonated, echoing down the floor. The wire is burned away.</color>" 
+                    : "";
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = $"This is Marcus's place. An ex-military survivalist who reinforced his walls. The door is unlocked, sitting ajar by a fraction of an inch. The sharp smell of cordite and gun oil leaks into the hallway.\n\nYou push the door gently. It stops with a faint metallic <i>*clink*</i>.\n\nA monofilament fishing line is tied from the doorknob to the pin of a flashbang grenade and a makeshift 12-gauge blank shell. Opening this normally will blow your eardrums out and alert every infected on this floor.{trapStatus}";
+                }
+
+                bool isBurglar = currentPlayer != null && string.Equals(currentPlayer.job, "Burglar", StringComparison.OrdinalIgnoreCase);
+                bool hasLocksmith = currentPlayer != null && currentPlayer.HasTrait("LOCKSMITH");
+                bool hasTech2 = currentPlayer != null && currentPlayer.tech >= 2;
+                bool hasMultiTool = currentPlayer != null && currentPlayer.HasItem("Multi-Tool");
+                int perVal = currentPlayer != null ? currentPlayer.per : 5;
+
+                if (isBurglar || hasLocksmith)
+                {
+                    SetHallwayChoice(choiceIdx++, "Block the firing pin [BURGLAR/LOCKSMITH] <color=#F59E0B>(-10 Stamina, ~2 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(2);
+                        room405_opened = true;
+                        PlayClickSFX();
+                        InspectUnit405();
+                    });
+                }
+
+                if (hasTech2)
+                {
+                    SetHallwayChoice(choiceIdx++, "Release the tension spring [TECH 2] <color=#F59E0B>(-10 Stamina, ~3 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(3);
+                        room405_opened = true;
+                        PlayClickSFX();
+                        InspectUnit405();
+                    });
+                }
+
+                if (hasMultiTool)
+                {
+                    SetHallwayChoice(choiceIdx++, "Cut and hold the wire [MULTI-TOOL] <color=#F59E0B>(-10 Stamina, ~2 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(2);
+                        room405_opened = true;
+                        PlayClickSFX();
+                        InspectUnit405();
+                    });
+                }
+
+                if (perVal >= 6)
+                {
+                    SetHallwayChoice(choiceIdx++, $"Squeeze through the gap [PER {perVal}/6] <color=#F59E0B>(-20 Stamina, ~4 min)</color>", () =>
+                    {
+                        ExertStamina(20);
+                        gameClock?.AddTime(4);
+                        room405_opened = true;
+                        PlayClickSFX();
+                        InspectUnit405();
+                    });
+                }
+                else
+                {
+                    int chance = Mathf.Clamp(perVal * 15, 20, 75);
+                    SetHallwayChoice(choiceIdx++, $"Squeeze through the gap [PER {perVal}/6 — {chance}% Chance] <color=#EF4444>(-20 Stamina)</color>", () =>
+                    {
+                        ExertStamina(20);
+                        gameClock?.AddTime(4);
+                        if (UnityEngine.Random.Range(1, 101) <= chance)
+                        {
+                            room405_opened = true;
+                            PlayClickSFX();
+                            InspectUnit405();
+                        }
+                        else
+                        {
+                            room405_trap_triggered = true;
+                            room405_opened = true;
+                            PlaySFX("Audio/SFX/firedoor_slam", 0.8f);
+                            TakeDamage(15, "12-gauge blank blast & flashbang detonation");
+                            InspectUnit405();
+                        }
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Step back and return to the hallway", () => EnterHallwayMode(2));
+            }
+            else
+            {
+                SetLocation("unit_405", "UNIT 405 // THE HUNTER'S SANCTUARY");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit405");
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "You step into Marcus's apartment. It looks like a staging ground. A heavy wooden reloading bench is dusted with gunpowder and brass shavings. In the corner, a massive steel gun safe sits wide open — completely stripped of rifles.\n\nOn the wall is a topographical map tracing a route avoiding highways to <i>'Oakhaven Cabin'</i>. Underneath is a HAM radio with a notepad on the mic. Near the safe, a small wooden toy car lies forgotten on the rug.";
+                }
+
+                if (!read_marcus_log)
+                {
+                    SetHallwayChoice(choiceIdx++, "📝 Read the notepad by the radio <color=#EF4444>[LORE]</color> <color=#9CA3AF>(~5 min)</color>", () =>
+                    {
+                        read_marcus_log = true;
+                        gameClock?.AddTime(5);
+                        loreSystem?.AddLore("Marcus's Final Log", "Diane... I emptied the safe. I rigged the door for looters. But on the stairs... one bit my arm. It burns. I won't bring this to Oakhaven. I won't bring this to you and the boys. I'm going to end it outside. I love you.", gameClock?.GetTimeString() ?? "00:20");
+                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:20", "UNIT 405 // MARCUS'S LOG", "Read Marcus's tragic goodbye letter. He was bitten on the stairwell and chose to die alone in the streets to protect his family at Oakhaven Cabin.");
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit405();
+                    });
+                }
+
+                if (!looted_405_bench)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔍 Sweep the reloading bench <color=#9CA3AF>(Pistol Ammo x12, Scrap Metal x3)</color>", () =>
+                    {
+                        looted_405_bench = true;
+                        gameClock?.AddTime(5);
+                        currentPlayer?.AddItem("Pistol Ammo", 12);
+                        currentPlayer?.AddItem("Scrap Metal", 3);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit405();
+                    });
+                }
+
+                if (!looted_405_safe)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔪 Check the bottom of the gun safe <color=#9CA3AF>(Hunting Knife x1)</color>", () =>
+                    {
+                        looted_405_safe = true;
+                        gameClock?.AddTime(3);
+                        currentPlayer?.AddItem("Hunting Knife", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit405();
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Leave the apartment and return to the hallway", () => EnterHallwayMode(2));
+            }
+
+            ReindexActiveChoiceHotkeys();
+        }
+
+        public void InspectUnit402()
+        {
+            currentInspectedRoom = "402";
+            ClearHallwayChoices();
+            int choiceIdx = 0;
+
+            if (!room402_opened)
+            {
+                SetLocation("unit_402", "UNIT 402 // THE CHAIN");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_402_403");
+                PlayHubBGM("Audio/BGM/chopin", 0.45f);
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "The Andersons. A middle-aged couple and their teenage daughter. The door is unlocked. You push it open two inches before it catches on a heavy steel chain lock.\n\nThrough the gap, the lights are on. A turntable spins in the corner playing Chopin — slow, mournful piano. And there's a sharp chemical smell: clinical bleach, like a hospital scrubbed too clean.";
+                }
+
+                bool isBurglar = currentPlayer != null && string.Equals(currentPlayer.job, "Burglar", StringComparison.OrdinalIgnoreCase);
+                bool hasLocksmithOrGhost = currentPlayer != null && (currentPlayer.HasTrait("LOCKSMITH") || currentPlayer.HasTrait("GHOST"));
+                bool hasMultiTool = currentPlayer != null && currentPlayer.HasItem("Multi-Tool");
+                bool hasTech1 = currentPlayer != null && currentPlayer.tech >= 1;
+                bool hasKnife = currentPlayer != null && (currentPlayer.HasItem("Combat Knife") || currentPlayer.HasItem("Kitchen Knife") || currentPlayer.HasItem("Hunting Knife"));
+                int agiVal = currentPlayer != null ? currentPlayer.agi : 5;
+                int strVal = currentPlayer != null ? currentPlayer.str : 5;
+
+                if (isBurglar)
+                {
+                    SetHallwayChoice(choiceIdx++, "Slip the chain lock [BURGLAR] <color=#F59E0B>(-5 Stamina, ~1 min, SILENT)</color>", () =>
+                    {
+                        ExertStamina(5);
+                        gameClock?.AddTime(1);
+                        room402_entry_method = "silent";
+                        room402_opened = true;
+                        PlayClickSFX();
+                        InspectUnit402();
+                    });
+                }
+
+                if (hasLocksmithOrGhost)
+                {
+                    SetHallwayChoice(choiceIdx++, "Work the gap [LOCKSMITH/GHOST] <color=#F59E0B>(-5 Stamina, ~2 min, SILENT)</color>", () =>
+                    {
+                        ExertStamina(5);
+                        gameClock?.AddTime(2);
+                        room402_entry_method = "silent";
+                        room402_opened = true;
+                        PlayClickSFX();
+                        InspectUnit402();
+                    });
+                }
+
+                if (hasTech1 && hasMultiTool)
+                {
+                    SetHallwayChoice(choiceIdx++, "Unscrew the mount [TECH 1 + TOOL] <color=#F59E0B>(-5 Stamina, ~9 min, SILENT)</color>", () =>
+                    {
+                        ExertStamina(5);
+                        gameClock?.AddTime(9);
+                        room402_entry_method = "silent";
+                        room402_opened = true;
+                        PlayClickSFX();
+                        InspectUnit402();
+                    });
+                }
+
+                if (agiVal >= 5 && hasKnife)
+                {
+                    SetHallwayChoice(choiceIdx++, "Slide the chain [AGI 5 + KNIFE] <color=#F59E0B>(-5 Stamina, ~4 min, SILENT)</color>", () =>
+                    {
+                        ExertStamina(5);
+                        gameClock?.AddTime(4);
+                        room402_entry_method = "silent";
+                        room402_opened = true;
+                        PlayClickSFX();
+                        InspectUnit402();
+                    });
+                }
+
+                if (strVal >= 4)
+                {
+                    SetHallwayChoice(choiceIdx++, $"Kick the door mount [STR {strVal}/4] <color=#EF4444>(-5 Stamina, ~1 min, LOUD ENTRY)</color>", () =>
+                    {
+                        ExertStamina(5);
+                        gameClock?.AddTime(1);
+                        room402_entry_method = "loud";
+                        room402_opened = true;
+                        PlayClickSFX();
+                        InspectUnit402();
+                    });
+                }
+                else
+                {
+                    SetHallwayChoice(choiceIdx++, "Throw your weight against door [70% Chance] <color=#EF4444>(-10 Stamina, LOUD)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(3);
+                        if (UnityEngine.Random.Range(1, 101) <= 70)
+                        {
+                            room402_entry_method = "loud";
+                            room402_opened = true;
+                            PlayClickSFX();
+                            InspectUnit402();
+                        }
+                        else
+                        {
+                            PlayBeepSFX();
+                            TakeDamage(5, "Shoulder slam against steel chain");
+                            if (situationBoxText != null)
+                            {
+                                situationBoxText.text = "<color=#EF4444><b>BRUTE FORCE FAILED.</b></color> You slammed your shoulder into the door, but the steel chain held firm. You made a massive racket and bruised yourself for nothing.";
+                            }
+                        }
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Leave it and walk away", () => EnterHallwayMode(3));
+            }
+            else
+            {
+                SetLocation("unit_402", "UNIT 402 // THE QUIET ROOM");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit402");
+                PlayHubBGM("Audio/BGM/chopin", 0.45f);
+
+                string loudNotice = room402_entry_method == "loud" 
+                    ? "<color=#EF4444><i>The chain bracket tore from the wall with a loud CRACK that echoed through the building. Somewhere below, something stirred.</i></color>\n\n" 
+                    : "";
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = $"{loudNotice}You step inside. The piano swells — Chopin, <i>Nocturne in E-flat major</i>. The apartment is immaculate. No struggle. No blood. Every surface is dusted.\n\nThe Anderson family is sitting at the dining table: Mr. and Mrs. Anderson, and their teenage daughter Emma. Three empty wine glasses sit before them with white powder residue.\n\nOn the center of the table is a note: they believed a broadcast claiming the military was gassing the building. They chose peace over suffocating in the dark. Misinformation killed them.\n\nA .38 revolver lies on the floor near Mr. Anderson's foot.";
+                }
+
+                if (!looted_402_weapon)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔫 Take the revolver from the floor <color=#9CA3AF>(Revolver .38, .38 Ammo x5)</color>", () =>
+                    {
+                        looted_402_weapon = true;
+                        gameClock?.AddTime(1);
+                        currentPlayer?.AddItem("Revolver .38", 1);
+                        currentPlayer?.AddItem(".38 Ammo", 5);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit402();
+                    });
+                }
+
+                if (!looted_402_kitchen)
+                {
+                    SetHallwayChoice(choiceIdx++, "🍽️ Search the kitchen pantry <color=#9CA3AF>(Canned Food x2, Bottled Water x1)</color>", () =>
+                    {
+                        looted_402_kitchen = true;
+                        gameClock?.AddTime(2);
+                        currentPlayer?.AddItem("Canned Food", 2);
+                        currentPlayer?.AddItem("Bottled Water", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit402();
+                    });
+                }
+
+                if (!looted_402_bathroom)
+                {
+                    SetHallwayChoice(choiceIdx++, "💊 Check the medicine cabinet <color=#9CA3AF>(Painkillers x2, Antiseptic x1)</color>", () =>
+                    {
+                        looted_402_bathroom = true;
+                        gameClock?.AddTime(1);
+                        currentPlayer?.AddItem("Painkillers", 2);
+                        currentPlayer?.AddItem("Antiseptic", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit402();
+                    });
+                }
+
+                if (!looted_402_ring)
+                {
+                    SetHallwayChoice(choiceIdx++, "💍 Take Mrs. Anderson's wedding ring <color=#EF4444>[HUMANITY −10]</color> <color=#9CA3AF>(Gold Ring x1)</color>", () =>
+                    {
+                        looted_402_ring = true;
+                        gameClock?.AddTime(1);
+                        if (currentPlayer != null) currentPlayer.humanity = Mathf.Max(0, currentPlayer.humanity - 10);
+                        currentPlayer?.AddItem("Gold Ring", 1);
+                        PlayClickSFX();
+                        UpdateVitalsUI();
+                        RefreshAllPDAPanels();
+                        InspectUnit402();
+                    });
+                }
+
+                if (!took_402_photo)
+                {
+                    SetHallwayChoice(choiceIdx++, "📷 Take the family photo from the mantle <color=#9CA3AF>(Family Photo x1)</color>", () =>
+                    {
+                        took_402_photo = true;
+                        gameClock?.AddTime(1);
+                        currentPlayer?.AddItem("Family Photo", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit402();
+                    });
+                }
+
+                if (!read_402_note)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔍 Keep the suicide note <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~1 min)</color>", () =>
+                    {
+                        read_402_note = true;
+                        gameClock?.AddTime(1);
+                        if (currentPlayer != null) currentPlayer.per += 1;
+                        loreSystem?.AddLore("The Andersons' Note", "They killed themselves after hearing a fake radio broadcast claiming the military was gassing the building. Misinformation travels faster than the virus.", gameClock?.GetTimeString() ?? "00:25");
+                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:25", "UNIT 402 // ANDERSON SUICIDE NOTE", "Logged the Anderson suicide note. A grim reminder: fear kills just as fast as the infected.");
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit402();
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Leave them in peace — return to the hallway", () => EnterHallwayMode(3));
+            }
+
+            ReindexActiveChoiceHotkeys();
+        }
+
+        public void InspectUnit401()
+        {
+            currentInspectedRoom = "401";
+            ClearHallwayChoices();
+            int choiceIdx = 0;
+
+            if (!shelf_lifted)
+            {
+                SetLocation("unit_401", "UNIT 401 // THE FALLEN SHELF");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_end");
+                if (!turned_off_music) PlayHubBGM("Audio/SFX/bestsongeversample", 0.6f);
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "The door is wide open. Loud pop music blares from within: <i>'...and we danced all night to the best song ever...'</i>\n\nRed solo cups litter the floor. In the living room, a massive 300-pound oak entertainment center has toppled forward, crushing a young man flat to the floor. His outstretched fingers are loosely curled around a set of <b>Car Keys</b>.\n\nA stampede of panicked partiers crushed him as they scrambled for the door. The scratched CD keeps looping endlessly.";
+                }
+
+                bool isConstruction = currentPlayer != null && string.Equals(currentPlayer.job, "Construction Worker", StringComparison.OrdinalIgnoreCase);
+                bool hasBreacherOrGrip = currentPlayer != null && (currentPlayer.HasTrait("BREACHER") || currentPlayer.HasTrait("IRON GRIP"));
+                bool hasTech2 = currentPlayer != null && currentPlayer.tech >= 2;
+                bool hasPryTool = currentPlayer != null && (currentPlayer.HasItem("Crowbar") || currentPlayer.HasItem("Tire Iron"));
+                int strVal = currentPlayer != null ? currentPlayer.str : 5;
+
+                if (isConstruction)
+                {
+                    SetHallwayChoice(choiceIdx++, "Leverage weak points [CONSTRUCTION] <color=#F59E0B>(-10 Stamina, ~1 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(1);
+                        shelf_lifted = true;
+                        currentPlayer?.AddItem("Car Keys", 1);
+                        PlayClickSFX();
+                        InspectUnit401();
+                    });
+                }
+
+                if (hasBreacherOrGrip)
+                {
+                    SetHallwayChoice(choiceIdx++, "Lift it clean [TRAIT] <color=#F59E0B>(-10 Stamina, ~1 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(1);
+                        shelf_lifted = true;
+                        currentPlayer?.AddItem("Car Keys", 1);
+                        PlayClickSFX();
+                        InspectUnit401();
+                    });
+                }
+
+                if (hasTech2)
+                {
+                    SetHallwayChoice(choiceIdx++, "Dismantle the joints [TECH 2] <color=#F59E0B>(-10 Stamina, ~4 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(4);
+                        shelf_lifted = true;
+                        currentPlayer?.AddItem("Car Keys", 1);
+                        PlayClickSFX();
+                        InspectUnit401();
+                    });
+                }
+
+                if (hasPryTool)
+                {
+                    SetHallwayChoice(choiceIdx++, "Pry it up with prying tool <color=#F59E0B>(-10 Stamina, ~2 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(2);
+                        shelf_lifted = true;
+                        currentPlayer?.AddItem("Car Keys", 1);
+                        PlayClickSFX();
+                        InspectUnit401();
+                    });
+                }
+
+                if (strVal >= 6)
+                {
+                    SetHallwayChoice(choiceIdx++, $"Deadlift with raw strength [STR {strVal}/6] <color=#F59E0B>(-10 Stamina, ~1 min)</color>", () =>
+                    {
+                        ExertStamina(10);
+                        gameClock?.AddTime(1);
+                        shelf_lifted = true;
+                        currentPlayer?.AddItem("Car Keys", 1);
+                        PlayClickSFX();
+                        InspectUnit401();
+                    });
+                }
+                else
+                {
+                    int chance = Mathf.Clamp(strVal * 15, 20, 75);
+                    SetHallwayChoice(choiceIdx++, $"Throw body weight into it [STR {strVal}/6 — {chance}% Chance] <color=#EF4444>(-20 Stamina)</color>", () =>
+                    {
+                        ExertStamina(20);
+                        gameClock?.AddTime(3);
+                        if (UnityEngine.Random.Range(1, 101) <= chance)
+                        {
+                            shelf_lifted = true;
+                            currentPlayer?.AddItem("Car Keys", 1);
+                            PlayClickSFX();
+                            InspectUnit401();
+                        }
+                        else
+                        {
+                            PlayBeepSFX();
+                            TakeDamage(15, "Oak shelf collapse on back");
+                            if (situationBoxText != null)
+                            {
+                                situationBoxText.text = "<color=#EF4444><b>LIFT FAILED.</b></color> The oak shelf slipped from your grip and slammed back down. You tore a muscle in your back.";
+                            }
+                        }
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Leave — the keys aren't worth the injury", () =>
+                {
+                    StopHubBGM();
+                    EnterHallwayMode(4);
+                });
+            }
+            else
+            {
+                SetLocation("unit_401", "UNIT 401 // THE PARTY THAT ENDED");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit401");
+                if (!turned_off_music) PlayHubBGM("Audio/SFX/bestsongeversample", 0.6f);
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "The heavy oak shelf is off him. The <b>Car Keys</b> are safely in your pocket. The music loops endlessly from the player.\n\n<i>'...danced all night to the best song ever...'</i>\n\nThe apartment smells like beer, grief, and stale panic. You are the only living thing left here.";
+                }
+
+                if (!looted_401_kitchen)
+                {
+                    SetHallwayChoice(choiceIdx++, "🍕 Raid the kitchen <color=#9CA3AF>(Energy Bar x2, Bottled Water x1)</color>", () =>
+                    {
+                        looted_401_kitchen = true;
+                        gameClock?.AddTime(2);
+                        currentPlayer?.AddItem("Energy Bar", 2);
+                        currentPlayer?.AddItem("Bottled Water", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit401();
+                    });
+                }
+
+                if (!looted_401_bathroom)
+                {
+                    SetHallwayChoice(choiceIdx++, "🪥 Check medicine cabinet <color=#9CA3AF>(Painkillers x2, Bandage x1)</color>", () =>
+                    {
+                        looted_401_bathroom = true;
+                        gameClock?.AddTime(2);
+                        currentPlayer?.AddItem("Painkillers", 2);
+                        currentPlayer?.AddItem("Bandage", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit401();
+                    });
+                }
+
+                if (!looted_401_alcohol)
+                {
+                    SetHallwayChoice(choiceIdx++, "🍺 Take alcohol from counter <color=#9CA3AF>(Bottle of Vodka x1, Whiskey x1)</color>", () =>
+                    {
+                        looted_401_alcohol = true;
+                        gameClock?.AddTime(2);
+                        currentPlayer?.AddItem("Bottle of Vodka", 1);
+                        currentPlayer?.AddItem("Whiskey", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit401();
+                    });
+                }
+
+                if (!looted_401_pockets)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔍 Go through his jacket pockets <color=#9CA3AF>(Lighter x1)</color>", () =>
+                    {
+                        looted_401_pockets = true;
+                        gameClock?.AddTime(1);
+                        currentPlayer?.AddItem("Lighter", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUnit401();
+                    });
+                }
+
+                if (!turned_off_music)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔇 Turn off the blaring stereo music", () =>
+                    {
+                        turned_off_music = true;
+                        gameClock?.AddTime(1);
+                        StopHubBGM();
+                        PlayClickSFX();
+                        InspectUnit401();
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Leave the apartment and return to hallway", () =>
+                {
+                    StopHubBGM();
+                    EnterHallwayMode(4);
+                });
+            }
+
+            ReindexActiveChoiceHotkeys();
+        }
+
+        public void InspectUtilityCloset()
+        {
+            currentInspectedRoom = "utility";
+            ClearHallwayChoices();
+            int choiceIdx = 0;
+
+            if (!utility_opened)
+            {
+                SetLocation("utility", "4TH FLOOR // UTILITY ROOM");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_end");
+                PlayHubBGM("Audio/BGM/neon_flicker_buzz", 0.45f);
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "At the end of the corridor, the carpet transitions to bare concrete. Ahead is a heavy, industrial steel door: <b>MAINTENANCE - AUTHORIZED PERSONNEL ONLY</b>.\n\nThe reinforced door has a heavy-duty magnetic swipe lock. Bleach and raw copper seep from underneath. Inside, a failing fluorescent light buzzes erratically.";
+                }
+
+                bool isBurglar = currentPlayer != null && string.Equals(currentPlayer.job, "Burglar", StringComparison.OrdinalIgnoreCase);
+                bool hasTech2 = currentPlayer != null && currentPlayer.tech >= 2;
+                bool hasPryTool = currentPlayer != null && (currentPlayer.HasItem("Crowbar") || currentPlayer.HasItem("Tire Iron"));
+                int strVal = currentPlayer != null ? currentPlayer.str : 5;
+
+                if (isBurglar)
+                {
+                    SetHallwayChoice(choiceIdx++, "Pick manual override cylinder [BURGLAR] <color=#F59E0B>(-7 Stamina, ~2 min)</color>", () =>
+                    {
+                        ExertStamina(7);
+                        gameClock?.AddTime(2);
+                        utility_opened = true;
+                        PlayClickSFX();
+                        InspectUtilityCloset();
+                    });
+                }
+
+                if (hasTech2)
+                {
+                    SetHallwayChoice(choiceIdx++, "Hotwire magnetic reader [TECH 2] <color=#F59E0B>(-7 Stamina, ~3 min)</color>", () =>
+                    {
+                        ExertStamina(7);
+                        gameClock?.AddTime(3);
+                        utility_opened = true;
+                        PlayClickSFX();
+                        InspectUtilityCloset();
+                    });
+                }
+
+                if (hasPryTool)
+                {
+                    SetHallwayChoice(choiceIdx++, "Pry steel door with tool <color=#F59E0B>(-7 Stamina, ~2 min)</color>", () =>
+                    {
+                        ExertStamina(7);
+                        gameClock?.AddTime(2);
+                        utility_opened = true;
+                        PlayClickSFX();
+                        InspectUtilityCloset();
+                    });
+                }
+
+                if (strVal >= 7)
+                {
+                    SetHallwayChoice(choiceIdx++, $"Shoulder ram the steel door [STR {strVal}/7] <color=#F59E0B>(-15 Stamina, ~1 min)</color>", () =>
+                    {
+                        ExertStamina(15);
+                        gameClock?.AddTime(1);
+                        utility_opened = true;
+                        PlayClickSFX();
+                        InspectUtilityCloset();
+                    });
+                }
+                else
+                {
+                    int chance = Mathf.Clamp(strVal * 12, 15, 65);
+                    SetHallwayChoice(choiceIdx++, $"Shoulder ram steel door [STR {strVal}/7 — {chance}% Chance] <color=#EF4444>(-15 Stamina)</color>", () =>
+                    {
+                        ExertStamina(15);
+                        gameClock?.AddTime(3);
+                        if (UnityEngine.Random.Range(1, 101) <= chance)
+                        {
+                            utility_opened = true;
+                            PlayClickSFX();
+                            InspectUtilityCloset();
+                        }
+                        else
+                        {
+                            PlayBeepSFX();
+                            TakeDamage(10, "Blunt impact against industrial steel door");
+                            if (situationBoxText != null)
+                            {
+                                situationBoxText.text = "<color=#EF4444><b>BRUTE FORCE FAILED.</b></color> You threw your weight against the heavy steel, but the magnetic lock didn't flinch. Your shoulder is badly bruised.";
+                            }
+                        }
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Step back into the hallway", () =>
+                {
+                    StopHubBGM();
+                    EnterHallwayMode(4);
+                });
+            }
+            else
+            {
+                SetLocation("utility", "4TH FLOOR // UTILITY ROOM");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("utility_room");
+                PlayHubBGM("Audio/BGM/neon_flicker_buzz", 0.45f);
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "The heavy door gives way. The air is thick and stinging with industrial bleach. A single failing fluorescent tube flickers on bare concrete.\n\nHeavy metal racks line the room, packed with maintenance supplies. In the center, a yellow mop bucket is tipped over, a dark smear leading toward the back corner. A metal desk sits buried under blueprints and a logbook.";
+                }
+
+                if (!read_utility_log)
+                {
+                    SetHallwayChoice(choiceIdx++, "📓 Read the maintenance logbook <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~2 min)</color>", () =>
+                    {
+                        read_utility_log = true;
+                        gameClock?.AddTime(2);
+                        if (currentPlayer != null) currentPlayer.per += 1;
+                        loreSystem?.AddLore("Maintenance Log - 4th Floor", "Tenants in 402 complaining about a chemical smell again. Feeling feverish today. My joints are burning. Taking some aspirin and locking myself in here to sleep it off until shift ends.", gameClock?.GetTimeString() ?? "00:30");
+                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:30", "UTILITY ROOM // JANITOR'S LOG", "Read the janitor's final log. He locked himself in here after coming down with the burning fever.");
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUtilityCloset();
+                    });
+                }
+
+                if (!looted_utility_bleach)
+                {
+                    SetHallwayChoice(choiceIdx++, "🧽 Search the tipped cleaning cart <color=#9CA3AF>(Bleach x1, Work Gloves x1)</color>", () =>
+                    {
+                        looted_utility_bleach = true;
+                        gameClock?.AddTime(2);
+                        currentPlayer?.AddItem("Bleach", 1);
+                        currentPlayer?.AddItem("Work Gloves", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUtilityCloset();
+                    });
+                }
+
+                if (!looted_utility_tape)
+                {
+                    SetHallwayChoice(choiceIdx++, "🧰 Scavenge metal shelves <color=#9CA3AF>(Duct Tape x1, Rope x1)</color>", () =>
+                    {
+                        looted_utility_tape = true;
+                        gameClock?.AddTime(3);
+                        currentPlayer?.AddItem("Duct Tape", 1);
+                        currentPlayer?.AddItem("Rope", 1);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUtilityCloset();
+                    });
+                }
+
+                if (!looted_utility_flashlight)
+                {
+                    SetHallwayChoice(choiceIdx++, "🔦 Check drawers of the metal desk <color=#9CA3AF>(Flashlight x1, Batteries x2)</color>", () =>
+                    {
+                        looted_utility_flashlight = true;
+                        gameClock?.AddTime(2);
+                        currentPlayer?.AddItem("Flashlight", 1);
+                        currentPlayer?.AddItem("Batteries", 2);
+                        PlayClickSFX();
+                        RefreshAllPDAPanels();
+                        InspectUtilityCloset();
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "🚪 Return to the hallway", () =>
+                {
+                    StopHubBGM();
+                    EnterHallwayMode(4);
+                });
+            }
+
+            ReindexActiveChoiceHotkeys();
+        }
+
+        public void InspectStairwell()
+        {
+            currentInspectedRoom = "stairs";
+            ClearHallwayChoices();
+            int choiceIdx = 0;
+
+            if (stair_phase == 1)
+            {
+                SetLocation("stairs", "4TH FLOOR // STAIRWELL DESCENT");
+                tacticalMapController?.DiscoverAdjacentRooms("stairs");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell4F");
+                PlaySFX("Audio/SFX/firedoor_slam", 0.9f);
+                PlayHubBGM("Audio/SFX/generator_hum", 0.45f);
+
+                objectiveSystem?.CompleteObjective("escape_building");
+                objectiveSystem?.AddObjective("descend_stairs", "Descend through the stairwell to ground floor", ObjectiveStatus.Active);
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "The heavy fire door slams shut behind you, sealing off the 4th floor with a final, echoing <b>*BOOM*</b>.\n\nThe stairwell is bathed in the pulsing, dim red glow of emergency backup lights. It's hard to see the bottom of the steps. The silence is broken only by the distant, vibrating hum of a struggling generator.\n\nYou need to get down to the ground floor.";
+                }
+
+                bool hasFlashlight = currentPlayer != null && currentPlayer.HasItem("Flashlight");
+                bool hasLighter = currentPlayer != null && currentPlayer.HasItem("Lighter");
+                int agiVal = currentPlayer != null ? currentPlayer.agi : 5;
+
+                if (hasFlashlight)
+                {
+                    SetHallwayChoice(choiceIdx++, "Use your Flashlight <color=#F59E0B>[GEAR]</color> <color=#9CA3AF>(Fast & safe, ~4 min)</color>", () =>
+                    {
+                        descentMethod = "flashlight";
+                        gameClock?.AddTime(4);
+                        stair_phase = 2;
+                        PlayClickSFX();
+                        InspectStairwell();
+                    });
+                }
+
+                if (hasLighter)
+                {
+                    SetHallwayChoice(choiceIdx++, "Use your Lighter <color=#F59E0B>[GEAR]</color> <color=#9CA3AF>(Flickering flame, ~6 min)</color>", () =>
+                    {
+                        descentMethod = "lighter";
+                        gameClock?.AddTime(6);
+                        stair_phase = 2;
+                        PlayClickSFX();
+                        InspectStairwell();
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "Move Slowly and Carefully in dark <color=#10B981>[SAFE]</color> <color=#9CA3AF>(Feel walls, ~10 min)</color>", () =>
+                {
+                    descentMethod = "slow";
+                    gameClock?.AddTime(10);
+                    stair_phase = 2;
+                    PlayClickSFX();
+                    InspectStairwell();
+                });
+
+                if (agiVal >= 5)
+                {
+                    SetHallwayChoice(choiceIdx++, $"Move Quickly down the steps [AGI {agiVal}/5] <color=#F59E0B>(Sprint down, ~1 min)</color>", () =>
+                    {
+                        descentMethod = "quick";
+                        gameClock?.AddTime(1);
+                        stair_phase = 2;
+                        PlayClickSFX();
+                        InspectStairwell();
+                    });
+                }
+                else
+                {
+                    int chance = Mathf.Clamp(agiVal * 18, 20, 75);
+                    SetHallwayChoice(choiceIdx++, $"Sprint down the steps [AGI {agiVal}/5 — {chance}% Chance] <color=#EF4444>(High risk stumble)</color>", () =>
+                    {
+                        gameClock?.AddTime(1);
+                        if (UnityEngine.Random.Range(1, 101) <= chance)
+                        {
+                            descentMethod = "quick";
+                        }
+                        else
+                        {
+                            descentMethod = "quick_fail";
+                            TakeDamage(15, "Catastrophic stumble down concrete stairs");
+                            ExertStamina(20);
+                        }
+                        stair_phase = 2;
+                        PlayClickSFX();
+                        InspectStairwell();
+                    });
+                }
+            }
+            else if (stair_phase == 2)
+            {
+                SetLocation("stairs", "STAIRWELL // THE DESCENT");
+                if (descentMethod == "quick_fail")
+                {
+                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell_tumble");
+                }
+                else if (descentMethod == "flashlight" || descentMethod == "lighter")
+                {
+                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell_flashlight");
+                }
+                else
+                {
+                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell4F");
+                }
+
+                string descText = "";
+                if (descentMethod == "quick")
+                {
+                    descText = "<color=#10B981><b>[AGILITY SUCCESS]</b></color> You take the stairs two at a time. In the flickering strobe light, your boot hovers over a slick dark patch on the concrete. Your reflexes kick in — you grab the iron handrail, vaulting over the mess and landing safely on the landing below.";
+                }
+                else if (descentMethod == "slow")
+                {
+                    descText = "<color=#10B981><b>[SAFE DESCENT]</b></color> You grip the cold handrail, taking it one agonizing step at a time. As the light flares, something wet and dark glistens on the steps. You press your back against the wall and carefully step wide, avoiding the puddle entirely.";
+                }
+                else if (descentMethod == "quick_fail")
+                {
+                    descText = "<color=#EF4444><b>[AGILITY FAILED - LOUD NOISE]</b></color> In the dark, your heel slides out on a thick slick puddle. You violently tumble forward into concrete and slam against the iron railing with a loud echoing <i>CLANG</i>.\n\nYour palms are coated in thick, sticky, arterial blood. Someone was dragged down these stairs recently.";
+                }
+                else
+                {
+                    descText = "<color=#10B981><b>[LIGHT SOURCE]</b></color> Your light sweeps down the stairs and catches a thick dark reflection. A pool of arterial blood coats the middle of the flight. Keeping the beam steady, you safely navigate around the mess.";
+                }
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = descText;
+                }
+
+                SetHallwayChoice(choiceIdx++, "Turn the corner to the next landing", () =>
+                {
+                    stair_phase = 3;
+                    PlayClickSFX();
+                    InspectStairwell();
+                });
+            }
+            else if (stair_phase == 3)
+            {
+                SetLocation("stairs", "STAIRWELL // THE BARRICADE");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell_barricade");
+
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = "You continue your descent, hoping to reach the ground floor. But halfway between the 2nd and 1st floors, the stairs simply end.\n\n<color=#F59E0B><b>The way down is completely blocked.</b></color>\n\nHeavy oak desks, folding chairs, and a massive glass-front vending machine are wedged together into an impassable wall of junk. The dented, buckling steel shows whatever was trying to come up was monstrously strong.";
+                }
+
+                if (!barricade_pushed)
+                {
+                    SetHallwayChoice(choiceIdx++, "Try to push the barricade out of the way <color=#EF4444>[RISK: NOISE]</color>", () =>
+                    {
+                        barricade_pushed = true;
+                        gameClock?.AddTime(1);
+                        PlaySFX("Audio/SFX/firedoor_slam", 0.8f);
+                        if (situationBoxText != null)
+                        {
+                            situationBoxText.text = "<color=#EF4444><b>[FAILED - IMPASSABLE]</b></color> You throw your shoulder against the vending machine. The metal shrieks violently against concrete, echoing like a gunshot. The barricade doesn't budge an inch. But that shriek definitely woke something up below.";
+                        }
+                        InspectStairwell();
+                    });
+                }
+
+                SetHallwayChoice(choiceIdx++, "Open the fire door to the 2nd Floor <color=#10B981>[DETOUR]</color>", () =>
+                {
+                    PlayClickSFX();
+                    objectiveSystem?.CompleteObjective("descend_stairs");
+                    objectiveSystem?.AddObjective("detour_2f", "Cross the 2nd Floor to find the East Wing stairs", ObjectiveStatus.Active);
+                    AppendStoryLog(gameClock?.GetTimeString() ?? "00:40", "STAIRWELL // 2ND FLOOR DETOUR", "The 1st floor descent was completely barricaded with heavy office furniture. Forced to take the fire door into the 2nd Floor corridor.");
+                    if (situationBoxText != null)
+                    {
+                        situationBoxText.text = "<color=#10B981><b>FIRE DOOR UNLATCHED.</b></color> You step through the heavy emergency door onto the 2nd Floor corridor. The air is cold and smells of wet plaster. Ahead, the corridor stretches into darkness.";
+                    }
+                    ClearHallwayChoices();
+                    SetHallwayChoice(0, "Proceed into 2nd Floor Corridor...", () =>
+                    {
+                        EnterHallwayMode(1);
+                    });
+                    ReindexActiveChoiceHotkeys();
+                });
+            }
+
+            ReindexActiveChoiceHotkeys();
+        }
+
+        private void ExertStamina(int amount)
+        {
+            if (currentPlayer != null)
+            {
+                currentPlayer.stamina = Mathf.Max(0, currentPlayer.stamina - amount);
+                UpdateVitalsUI();
+                RefreshAllPDAPanels();
+            }
+        }
+
+        private void TakeDamage(int amount, string source)
+        {
+            if (currentPlayer != null)
+            {
+                currentPlayer.hp = Mathf.Max(0, currentPlayer.hp - amount);
+                UpdateVitalsUI();
+                RefreshAllPDAPanels();
+                AppendStoryLog(gameClock != null ? gameClock.GetTimeString() : "00:00", "INJURY SUSTAINED",
+                    $"Sustained {amount} trauma damage from {source}. Current Vital State: {currentPlayer.hp}/{currentPlayer.hpMax} HP.");
+            }
+        }
+
+        private Sprite GetAct1Sprite(string spriteName)
+        {
+            Sprite sp = Resources.Load<Sprite>("Act1/" + spriteName);
+            if (sp != null) return sp;
+
+#if UNITY_EDITOR
+            string path = "Assets/Resources/Act1/" + spriteName + ".png";
+            sp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sp != null) return sp;
+            path = "Assets/Sprites/Act1/" + spriteName + ".png";
+            sp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sp != null) return sp;
+#endif
+            return null;
+        }
+
+        private void PlayHubBGM(string relPath, float volume = 0.5f, bool loop = true)
+        {
+            AudioClip clip = Resources.Load<AudioClip>(relPath);
+            if (clip == null)
+            {
+#if UNITY_EDITOR
+                string fullPath = "Assets/" + relPath;
+                if (!fullPath.EndsWith(".mp3") && !fullPath.EndsWith(".wav")) fullPath += ".mp3";
+                clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(fullPath);
+#endif
+            }
+            if (clip != null && atmosphereSource != null)
+            {
+                if (atmosphereSource.clip == clip && atmosphereSource.isPlaying) return;
+                atmosphereSource.Stop();
+                atmosphereSource.clip = clip;
+                atmosphereSource.loop = loop;
+                atmosphereSource.volume = volume;
+                atmosphereSource.Play();
+            }
+        }
+
+        private void StopHubBGM()
+        {
+            if (atmosphereSource != null && atmosphereSource.isPlaying)
+            {
+                atmosphereSource.Stop();
+            }
+        }
+
+        private void PlaySFX(string relPath, float volume = 0.8f)
+        {
+            AudioClip clip = Resources.Load<AudioClip>(relPath);
+            if (clip == null)
+            {
+#if UNITY_EDITOR
+                string fullPath = "Assets/" + relPath;
+                if (!fullPath.EndsWith(".mp3") && !fullPath.EndsWith(".wav")) fullPath += ".mp3";
+                clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(fullPath);
+#endif
+            }
+            if (clip != null)
+            {
+                AudioManager.Instance?.PlaySFX(clip, volume);
+            }
+        }
+        #endregion
         #endregion
 
         #region Dynamic Location Management

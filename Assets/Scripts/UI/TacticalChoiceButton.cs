@@ -163,6 +163,29 @@ namespace SundayLastBreath.UI
             }
         }
 
+        public void SetChoice(string mainText, System.Action onClickAction, bool interactable = true, Color? accent = null)
+        {
+            if (mainLabelTmp != null)
+            {
+                mainLabelTmp.text = mainText;
+            }
+            if (button != null)
+            {
+                button.interactable = interactable;
+                button.onClick.RemoveAllListeners();
+                if (onClickAction != null)
+                {
+                    button.onClick.AddListener(() => onClickAction());
+                }
+            }
+            if (accent.HasValue)
+            {
+                baseAccentColor = accent.Value;
+                if (accentBar != null) accentBar.color = accent.Value;
+            }
+            gameObject.SetActive(true);
+        }
+
         public void TriggerClick()
         {
             if (button == null || !button.interactable || !gameObject.activeInHierarchy) return;
