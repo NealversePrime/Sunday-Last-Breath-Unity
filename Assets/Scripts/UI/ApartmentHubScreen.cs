@@ -5629,7 +5629,7 @@ namespace SundayLastBreath.UI
             doorTransitionDescTmp.text = "You slide the heavy brass key into the deadbolt cylinder.\n<color=#94A3B8>Your hands tremble slightly in the dark, silent room.</color>";
             PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/Keys1.wav", 0.9f);
 
-            float fadeTime = 0.65f;
+            float fadeTime = 0.8f;
             for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
             {
                 doorTransitionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, t / fadeTime);
@@ -5637,7 +5637,7 @@ namespace SundayLastBreath.UI
             }
             doorTransitionCanvasGroup.alpha = 1f;
 
-            yield return new WaitForSecondsRealtime(0.5f);
+            yield return new WaitForSecondsRealtime(1.8f);
 
             // Step 2: Handle turn & deadbolt disengagement
             doorTransitionTitleTmp.text = "[ UNIT 407 // DISENGAGING DEADBOLT ]";
@@ -5649,23 +5649,23 @@ namespace SundayLastBreath.UI
                 StartCoroutine(FadeOutAudio(atmosphereSource, 0.8f));
             }
 
-            yield return new WaitForSecondsRealtime(0.9f);
+            yield return new WaitForSecondsRealtime(2.2f);
 
             // Step 3: Stepping out into the hallway & door latching shut
             doorTransitionTitleTmp.text = "[ 4TH FLOOR CORRIDOR // THE THRESHOLD ]";
             doorTransitionDescTmp.text = "You take a breath of freezing, copper-scented air and step across the threshold.\nBehind you, the heavy door swings shut.\n\n<color=#EF4444><b>*CLICK*</b></color>\n<color=#94A3B8>The lock engages automatically. You are locked out into the hallway.</color>";
             PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
 
-            yield return new WaitForSecondsRealtime(0.6f);
+            yield return new WaitForSecondsRealtime(1.0f);
             PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
 
-            yield return new WaitForSecondsRealtime(1.0f);
+            yield return new WaitForSecondsRealtime(2.5f);
 
             // Perform Hallway setup behind the curtain
             EnterHallwayMode(1);
 
             // Step 4: Fade in from black to reveal the red hallway
-            fadeTime = 0.8f;
+            fadeTime = 1.0f;
             for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
             {
                 doorTransitionCanvasGroup.alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
