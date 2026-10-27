@@ -340,11 +340,11 @@ namespace SundayLastBreath.UI
             PlaySFX(lootSFX);
         }
 
-        private const float BACKPACK_CELL_WIDTH = 124f;
-        private const float BACKPACK_CELL_HEIGHT = 90f;
-        private const float BACKPACK_SPACING_X = 12f;
-        private const float BACKPACK_SPACING_Y = 10f;
-        private const int BACKPACK_COLUMNS = 4;
+        private float _backpackCellWidth = 124f;
+        private float _backpackCellHeight = 86f;
+        private float _backpackSpacingX = 12f;
+        private float _backpackSpacingY = 8f;
+        private int _backpackColumns = 4;
 
         private bool MatchesFilter(string itemId)
         {
@@ -380,20 +380,17 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private struct PendingGridItem
+        {
+            public InventoryEntry entry;
+            public int originalIndex;
+            public int slotSize;
+            public bool matches;
+        }
+
         private void RefreshBackpackGrid()
         {
             if (backpackGridRoot == null) return;
-
-            // Automatically configure the grid for larger, highly-visible 4-column x 3-row layout (12 slots)
-            var glg = backpackGridRoot.GetComponent<GridLayoutGroup>();
-            if (glg != null)
-            {
-                glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-                glg.constraintCount = BACKPACK_COLUMNS;
-                glg.cellSize = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
-                glg.spacing = new Vector2(BACKPACK_SPACING_X, BACKPACK_SPACING_Y);
-                glg.childAlignment = TextAnchor.MiddleCenter;
-            }
 
             for (int i = backpackGridRoot.childCount - 1; i >= 0; i--)
             {
@@ -420,47 +417,134 @@ namespace SundayLastBreath.UI
                 : new List<InventoryEntry>();
 
             int maxSlots = _player != null ? Mathf.Max(6, _player.bagLimit) : 12;
-            int slotsRendered = 0;
+
+            // Dynamically adapt grid columns & cell size so 12 slots (4x3) and 14 slots (Hiker trait: 5x3)
+            // both fill the card cleanly in 3 rows without ever overflowing the filter header or bottom border!
+            if (maxSlots <= 12)
+            {
+                _backpackColumns = 4;
+                _backpackCellWidth = 128f;
+                _backpackCellHeight = 86f;
+                _backpackSpacingX = 12f;
+                _backpackSpacingY = 8f;
+            }
+            else
+            {
+                _backpackColumns = 5;
+                _backpackCellWidth = 112f;
+                _backpackCellHeight = 86f;
+                _backpackSpacingX = 10f;
+                _backpackSpacingY = 8f;
+            }
+
+            int expectedRows = Mathf.CeilToInt((float)maxSlots / _backpackColumns);
+            if (expectedRows > 3)
+            {
+                _backpackSpacingY = 6f;
+                _backpackCellHeight = Mathf.Floor((276f - (expectedRows - 1) * _backpackSpacingY) / expectedRows);
+            }
+
+            RectTransform gridRt = backpackGridRoot as RectTransform;
+            if (gridRt != null)
+            {
+                gridRt.offsetMin = new Vector2(16f, 32f);
+                gridRt.offsetMax = new Vector2(-16f, -74f);
+            }
+
+            var glg = backpackGridRoot.GetComponent<GridLayoutGroup>();
+            if (glg != null)
+            {
+                glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                glg.constraintCount = _backpackColumns;
+                glg.cellSize = new Vector2(_backpackCellWidth, _backpackCellHeight);
+                glg.spacing = new Vector2(_backpackSpacingX, _backpackSpacingY);
+                glg.childAlignment = TextAnchor.MiddleCenter;
+            }
+
+            List<PendingGridItem> pending = new List<PendingGridItem>();
+            int totalUsedSlots = 0;
 
             for (int i = 0; i < inv.Count; i++)
             {
                 var entry = inv[i];
-                if (ItemDatabase.IsKeyItem(entry.itemId)) continue; // Safety skip: never occupy backpack slots
+                if (ItemDatabase.IsKeyItem(entry.itemId)) continue;
 
-                bool matches = MatchesFilter(entry.itemId);
-                int capturedIndex = i;
                 var def = ItemDatabase.GetDefinition(entry.itemId);
                 int size = def != null ? Mathf.Max(1, def.slotSize) : 1;
+                totalUsedSlots += size;
 
-                if (size == 2)
+                pending.Add(new PendingGridItem
                 {
-                    // If a 2-slot item starts at the end of a 4-column row (slotsRendered % 4 == 3),
-                    // insert an empty slot first so the bulky item cleanly spans 2 slots on the same row!
-                    if (slotsRendered % BACKPACK_COLUMNS == (BACKPACK_COLUMNS - 1) && slotsRendered < maxSlots)
+                    entry = entry,
+                    originalIndex = i,
+                    slotSize = size,
+                    matches = MatchesFilter(entry.itemId)
+                });
+            }
+
+            int emptySlotsRemaining = Mathf.Max(0, maxSlots - totalUsedSlots);
+            int slotsRendered = 0;
+
+            while (pending.Count > 0)
+            {
+                int col = slotsRendered % _backpackColumns;
+                if (pending[0].slotSize == 2 && col == (_backpackColumns - 1))
+                {
+                    // A 2-slot item landed on the last column of the row.
+                    // First, look ahead for a 1-slot item to fill this column cleanly without wasting a slot!
+                    int oneSlotIdx = -1;
+                    for (int k = 1; k < pending.Count; k++)
                     {
-                        CreateEmptyCell(backpackGridRoot);
-                        slotsRendered++;
+                        if (pending[k].slotSize == 1)
+                        {
+                            oneSlotIdx = k;
+                            break;
+                        }
                     }
 
+                    if (oneSlotIdx >= 0)
+                    {
+                        var filler = pending[oneSlotIdx];
+                        pending.RemoveAt(oneSlotIdx);
+                        CreateBackpackCell(backpackGridRoot, filler.entry.itemId, filler.entry.quantity, filler.originalIndex, filler.matches, isTwoSlot: false);
+                        slotsRendered++;
+                        continue;
+                    }
+                    else if (emptySlotsRemaining > 0)
+                    {
+                        // Use one of the bag's remaining empty slots so total rendered cells never exceeds maxSlots
+                        CreateEmptyCell(backpackGridRoot);
+                        emptySlotsRemaining--;
+                        slotsRendered++;
+                        continue;
+                    }
+                }
+
+                var current = pending[0];
+                pending.RemoveAt(0);
+
+                if (current.slotSize == 2)
+                {
                     // Primary Cell (Slot 1 of 2) spanning across 2 columns (Resident Evil Remake style)
-                    CreateBackpackCell(backpackGridRoot, entry.itemId, entry.quantity, capturedIndex, matches, isTwoSlot: true);
+                    CreateBackpackCell(backpackGridRoot, current.entry.itemId, current.entry.quantity, current.originalIndex, current.matches, isTwoSlot: true);
                     slotsRendered++;
 
                     // Connected Companion Cell (Slot 2 of 2) - invisible layout placeholder
-                    CreateBackpackCompanionCell(backpackGridRoot, entry.itemId, capturedIndex, matches);
+                    CreateBackpackCompanionCell(backpackGridRoot, current.entry.itemId, current.originalIndex, current.matches);
                     slotsRendered++;
                 }
                 else
                 {
-                    CreateBackpackCell(backpackGridRoot, entry.itemId, entry.quantity, capturedIndex, matches, isTwoSlot: false);
+                    CreateBackpackCell(backpackGridRoot, current.entry.itemId, current.entry.quantity, current.originalIndex, current.matches, isTwoSlot: false);
                     slotsRendered++;
                 }
             }
 
-            // Fill remaining empty slots
-            while (slotsRendered < maxSlots)
+            // Fill remaining empty slots up to maxSlots
+            while (emptySlotsRemaining > 0 && slotsRendered < maxSlots)
             {
                 CreateEmptyCell(backpackGridRoot);
+                emptySlotsRemaining--;
                 slotsRendered++;
             }
         }
@@ -470,7 +554,7 @@ namespace SundayLastBreath.UI
             GameObject cell = new GameObject("Slot_" + itemId);
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
+            rt.sizeDelta = new Vector2(_backpackCellWidth, _backpackCellHeight);
 
             bool isSelected = _selectedSource == SelectedSource.Backpack && _selectedBackpackIndex == index;
             var def = ItemDatabase.GetDefinition(itemId);
@@ -480,7 +564,6 @@ namespace SundayLastBreath.UI
             GameObject visualRoot;
             if (isTwoSlot)
             {
-                // Base cell in GridLayoutGroup remains 124x90, but visualRoot spans 2 cells + 12px spacing = 260px!
                 visualRoot = new GameObject("SpanRoot");
                 visualRoot.transform.SetParent(cell.transform, false);
                 RectTransform vrt = visualRoot.AddComponent<RectTransform>();
@@ -488,7 +571,7 @@ namespace SundayLastBreath.UI
                 vrt.anchorMax = new Vector2(0f, 1f);
                 vrt.pivot = new Vector2(0f, 0.5f);
                 vrt.anchoredPosition = Vector2.zero;
-                vrt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH * 2f + BACKPACK_SPACING_X, 0f); // 124 * 2 + 12 = 260px
+                vrt.sizeDelta = new Vector2(_backpackCellWidth * 2f + _backpackSpacingX, 0f);
             }
             else
             {
@@ -647,7 +730,7 @@ namespace SundayLastBreath.UI
             GameObject cell = new GameObject("Slot_" + itemId + "_Ext");
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
+            rt.sizeDelta = new Vector2(_backpackCellWidth, _backpackCellHeight);
 
             // Transparent image to receive clicks on the right half of the 2-slot weapon
             Image bg = cell.AddComponent<Image>();
@@ -669,7 +752,7 @@ namespace SundayLastBreath.UI
             GameObject cell = new GameObject("EmptySlot");
             cell.transform.SetParent(parent, false);
             RectTransform rt = cell.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(BACKPACK_CELL_WIDTH, BACKPACK_CELL_HEIGHT);
+            rt.sizeDelta = new Vector2(_backpackCellWidth, _backpackCellHeight);
 
             Image bg = cell.AddComponent<Image>();
             bg.color = new Color(0.06f, 0.08f, 0.11f, 0.85f);

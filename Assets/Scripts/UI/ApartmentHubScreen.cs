@@ -512,17 +512,27 @@ namespace SundayLastBreath.UI
 
             if (pdaVolumeSlider != null)
             {
-                pdaVolumeSlider.onValueChanged.RemoveAllListeners();
-                pdaVolumeSlider.onValueChanged.AddListener((val) =>
+                // Hide redundant outer VOL slider since full audio mixer lives inside SAVE / LOAD / SETTINGS modal
+                if (pdaVolumeSlider.transform.parent != null && pdaVolumeSlider.transform.parent.name == "VolRow")
                 {
-                    AudioListener.volume = Mathf.Clamp01(val);
-                });
+                    pdaVolumeSlider.transform.parent.gameObject.SetActive(false);
+                }
+                else
+                {
+                    pdaVolumeSlider.gameObject.SetActive(false);
+                }
             }
 
             if (pdaSaveSettingsBtn != null)
             {
                 pdaSaveSettingsBtn.onClick.RemoveAllListeners();
                 pdaSaveSettingsBtn.onClick.AddListener(OnPDASaveClicked);
+
+                // Clean tactical button frame at the bottom of the PDA left sidebar
+                Outline btnOl = pdaSaveSettingsBtn.GetComponent<Outline>();
+                if (btnOl == null) btnOl = pdaSaveSettingsBtn.gameObject.AddComponent<Outline>();
+                btnOl.effectColor = new Color(0.28f, 0.34f, 0.44f, 0.85f);
+                btnOl.effectDistance = new Vector2(1f, -1f);
             }
 
 
