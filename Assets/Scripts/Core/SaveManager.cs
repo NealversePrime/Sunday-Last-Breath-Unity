@@ -445,7 +445,7 @@ namespace SundayLastBreath.Core
                         GameManager.Instance.SetPlayerLocation(loadedRoomId);
                     }
 
-                    if (hub != null && hub.gameObject.activeInHierarchy)
+                    if (hub != null)
                     {
                         hub.LoadCharacterState(loadedChar, loadedRoomId);
                     }

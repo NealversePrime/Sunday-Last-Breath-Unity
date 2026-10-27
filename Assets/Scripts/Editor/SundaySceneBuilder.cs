@@ -3420,60 +3420,92 @@ namespace SundayLastBreath.Editor
             StretchFull(rect);
 
             Image backdrop = modalObj.AddComponent<Image>();
-            backdrop.color = new Color(0f, 0f, 0f, 0.88f);
+            backdrop.color = new Color(0.015f, 0.02f, 0.035f, 0.985f);
             backdrop.raycastTarget = true;
 
             GameObject radioPanel = new GameObject("RadioPanel");
             radioPanel.transform.SetParent(modalObj.transform, false);
             RectTransform pRect = radioPanel.AddComponent<RectTransform>();
-            pRect.sizeDelta = new Vector2(560f, 480f);
+            pRect.sizeDelta = new Vector2(680f, 620f);
             pRect.anchoredPosition = Vector2.zero;
             Image pBg = radioPanel.AddComponent<Image>();
-            pBg.color = new Color(0.04f, 0.05f, 0.07f, 0.98f);
+            pBg.color = new Color(0.035f, 0.048f, 0.068f, 0.98f);
+
+            Outline pOl = radioPanel.AddComponent<Outline>();
+            pOl.effectColor = new Color(0.95f, 0.65f, 0.18f, 0.65f);
+            pOl.effectDistance = new Vector2(1.5f, -1.5f);
 
             VerticalLayoutGroup vlg = radioPanel.AddComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(18, 18, 14, 14);
+            vlg.padding = new RectOffset(24, 24, 20, 20);
             vlg.spacing = 10f;
             vlg.childControlWidth = true;
             vlg.childForceExpandWidth = true;
 
-            // Freq Header
+            // 1. Intro Prose
+            GameObject iObj = new GameObject("Intro");
+            iObj.transform.SetParent(radioPanel.transform, false);
+            TextMeshProUGUI iTmp = iObj.AddComponent<TextMeshProUGUI>();
+            iTmp.fontSize = 11.5f;
+            iTmp.color = new Color(0.85f, 0.88f, 0.92f);
+            iTmp.lineSpacing = 5f;
+            iTmp.text = "You pull your emergency-band scanner from your gear bag. Your hands are shaking slightly as you dial into the encrypted precinct frequency. The speaker hisses with white noise before a voice breaks through.";
+            SundayTypography.ApplyFont(iTmp, FontRole.Body);
+
+            LayoutElement iLe = iObj.AddComponent<LayoutElement>();
+            iLe.preferredHeight = 44f;
+            iLe.minHeight = 38f;
+
+            // 2. Freq Header
             GameObject hObj = new GameObject("FreqHeader");
             hObj.transform.SetParent(radioPanel.transform, false);
             TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
-            hTmp.fontSize = 13f;
+            hTmp.fontSize = 12f;
             hTmp.fontStyle = FontStyles.Bold;
             hTmp.color = new Color(0.95f, 0.75f, 0.35f);
-            hTmp.text = "FREQ: 154.790 MHz                     <color=#ff4444>● REC</color>";
+            hTmp.text = "FREQ: 154.790 MHz                                    <color=#ef4444>● REC</color>";
+            SundayTypography.ApplyFont(hTmp, FontRole.Mono);
 
-            // Transcript Body
+            LayoutElement hLe = hObj.AddComponent<LayoutElement>();
+            hLe.preferredHeight = 22f;
+
+            // 3. Transcript Body
             GameObject tObj = new GameObject("Transcript");
             tObj.transform.SetParent(radioPanel.transform, false);
             LayoutElement tle = tObj.AddComponent<LayoutElement>();
-            tle.preferredHeight = 260f;
+            tle.preferredHeight = 310f;
+            tle.minHeight = 280f;
             tle.flexibleHeight = 1f;
             TextMeshProUGUI tTmp = tObj.AddComponent<TextMeshProUGUI>();
-            tTmp.fontSize = 12f;
+            tTmp.fontSize = 11.5f;
             tTmp.color = new Color(0.65f, 0.85f, 0.85f);
-            tTmp.lineSpacing = 12f;
-            tTmp.text = "<color=#888888>[STATIC HISS]</color>\n\n" +
-                        "<b>UNIT 4-CHARLIE:</b>\n" +
+            tTmp.lineSpacing = 6f;
+            tTmp.text = "<color=#94A3B8>[STATIC HISS]</color>\n\n" +
+                        "<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>\n" +
                         "<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing! They just keep coming!\"</i>\n\n" +
-                        "<color=#888888>[HEAVY STRUGGLE / THUD]</color>\n\n" +
-                        "<b>DISPATCH (CALM):</b>\n" +
-                        "<i>\"4-Charlie, unrestricted lethal force is authorized. All units: Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. Aim for the head. Avoid all physical contact.\"</i>\n\n" +
-                        "<color=#888888>[SIGNAL CUTS OUT]</color>";
+                        "<color=#EF4444><b>[HEAVY STRUGGLE / THUD]</b></color>\n\n" +
+                        "<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>\n" +
+                        "<i>\"God damn it, get off the damn car! Dispatch, standard protocol is useless! Requesting authorization for unrestricted lethal force!\"</i>\n\n" +
+                        "<color=#F59E0B><b>[RADIO SQUELCH]</b></color>\n\n" +
+                        "<b><color=#F59E0B>DISPATCH (CALM):</color></b>\n" +
+                        "<i>\"4-Charlie, unrestricted lethal force is authorized. All units, listen carefully. Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#EF4444>Aim for the head.</color> I repeat... <color=#EF4444>aim for the head.</color> Avoid all physical contact.\"</i>\n\n" +
+                        "<color=#EF4444><b>[SIGNAL CUTS OUT]</b></color>";
+            SundayTypography.ApplyFont(tTmp, FontRole.Mono);
 
-            // Outro
+            // 4. Outro
             GameObject oObj = new GameObject("Outro");
             oObj.transform.SetParent(radioPanel.transform, false);
+            LayoutElement oLe = oObj.AddComponent<LayoutElement>();
+            oLe.preferredHeight = 46f;
+            oLe.minHeight = 42f;
             TextMeshProUGUI oTmp = oObj.AddComponent<TextMeshProUGUI>();
-            oTmp.fontSize = 11f;
-            oTmp.color = new Color(0.7f, 0.7f, 0.7f);
-            oTmp.text = "<color=#ff5555>'Aim for the head.'</color> Total lethal force. Standard body shots are useless. Whatever is outside, the law is officially dead.";
+            oTmp.fontSize = 11.5f;
+            oTmp.lineSpacing = 5f;
+            oTmp.color = new Color(0.85f, 0.85f, 0.88f);
+            oTmp.text = "<color=#ef4444><b>'Standard rules of engagement are suspended.'</b></color> Total lethal force. No warnings, no arrests, no hesitation. They only issue that for active warzones. You stare at the radio. Whatever is out there, the law is officially dead.";
+            SundayTypography.ApplyFont(oTmp, FontRole.Body);
 
-            // Close Button
-            CreateApartmentMenuButton(radioPanel.transform, "Btn_CloseRadio", "<b>Turn off the radio and return to the living room.</b>",
+            // 5. Close Button
+            CreateApartmentMenuButton(radioPanel.transform, "Btn_CloseRadio", "<b>TURN OFF THE RADIO & RETURN TO LIVING ROOM</b>   <color=#F59E0B><b>[ESC / SPACE]</b></color>",
                 "", new Color(0.95f, 0.75f, 0.35f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
 
             return modalObj;

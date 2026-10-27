@@ -1100,7 +1100,7 @@ namespace SundayLastBreath.UI
                     RectTransform rpRect = radioPanel.GetComponent<RectTransform>();
                     if (rpRect != null)
                     {
-                        rpRect.sizeDelta = new Vector2(640f, 540f);
+                        rpRect.sizeDelta = new Vector2(680f, 620f);
                     }
 
                     Image rpBg = radioPanel.GetComponent<Image>();
@@ -1118,13 +1118,34 @@ namespace SundayLastBreath.UI
                     if (vlg != null)
                     {
                         vlg.padding = new RectOffset(24, 24, 20, 20);
-                        vlg.spacing = 12f;
+                        vlg.spacing = 10f;
                         vlg.childControlWidth = true;
                         vlg.childControlHeight = true;
                         vlg.childForceExpandWidth = true;
                         vlg.childForceExpandHeight = false;
                     }
 
+                    // 1. Intro Prose text matching canonical Twine narrative
+                    Transform introTr = radioPanel.Find("Intro");
+                    if (introTr == null)
+                    {
+                        GameObject introObj = new GameObject("Intro", typeof(RectTransform));
+                        introObj.transform.SetParent(radioPanel, false);
+                        introObj.transform.SetSiblingIndex(0);
+
+                        TextMeshProUGUI iTmp = introObj.AddComponent<TextMeshProUGUI>();
+                        iTmp.fontSize = 11.5f;
+                        iTmp.color = new Color(0.85f, 0.88f, 0.92f);
+                        iTmp.lineSpacing = 5f;
+                        iTmp.text = "You pull your emergency-band scanner from your gear bag. Your hands are shaking slightly as you dial into the encrypted precinct frequency. The speaker hisses with white noise before a voice breaks through.";
+                        SundayTypography.ApplyFont(iTmp, FontRole.Body);
+
+                        LayoutElement iLe = introObj.AddComponent<LayoutElement>();
+                        iLe.preferredHeight = 44f;
+                        iLe.minHeight = 38f;
+                    }
+
+                    // 2. Freq Header
                     Transform fhTr = radioPanel.Find("FreqHeader");
                     if (fhTr != null)
                     {
@@ -1132,15 +1153,20 @@ namespace SundayLastBreath.UI
                         LayoutElement fhLe = fhTr.GetComponent<LayoutElement>() ?? fhTr.gameObject.AddComponent<LayoutElement>();
                         fhLe.preferredHeight = 22f;
                         fhLe.minHeight = 22f;
+                        if (radioFreqHeaderText != null)
+                        {
+                            radioFreqHeaderText.text = "FREQ: 154.790 MHz                                    <color=#ef4444>● REC</color>";
+                            SundayTypography.ApplyFont(radioFreqHeaderText, FontRole.Mono);
+                        }
                     }
 
-                    // Add Live RF Signal & Waveform Visualizer Bar right under FreqHeader
+                    // 3. Add Live RF Signal & Waveform Visualizer Bar right under FreqHeader
                     Transform sigTr = radioPanel.Find("SignalMeterBar");
                     if (sigTr == null)
                     {
                         GameObject sigObj = new GameObject("SignalMeterBar", typeof(RectTransform));
                         sigObj.transform.SetParent(radioPanel, false);
-                        sigObj.transform.SetSiblingIndex(1);
+                        sigObj.transform.SetSiblingIndex(2);
 
                         Image sigBg = sigObj.AddComponent<Image>();
                         sigBg.color = new Color(0.02f, 0.03f, 0.045f, 0.95f);
@@ -1149,8 +1175,8 @@ namespace SundayLastBreath.UI
                         sigOl.effectColor = new Color(0.20f, 0.30f, 0.42f, 0.75f);
 
                         LayoutElement sigLe = sigObj.AddComponent<LayoutElement>();
-                        sigLe.preferredHeight = 28f;
-                        sigLe.minHeight = 28f;
+                        sigLe.preferredHeight = 26f;
+                        sigLe.minHeight = 26f;
 
                         GameObject sigTxtObj = new GameObject("MeterText", typeof(RectTransform));
                         sigTxtObj.transform.SetParent(sigObj.transform, false);
@@ -1176,8 +1202,15 @@ namespace SundayLastBreath.UI
                     {
                         radioTranscriptText = transTr.GetComponent<TextMeshProUGUI>();
                         LayoutElement tLe = transTr.GetComponent<LayoutElement>() ?? transTr.gameObject.AddComponent<LayoutElement>();
-                        tLe.preferredHeight = 290f;
+                        tLe.preferredHeight = 310f;
+                        tLe.minHeight = 280f;
                         tLe.flexibleHeight = 1f;
+                        if (radioTranscriptText != null)
+                        {
+                            radioTranscriptText.fontSize = 11.5f;
+                            radioTranscriptText.lineSpacing = 6f;
+                            SundayTypography.ApplyFont(radioTranscriptText, FontRole.Mono);
+                        }
                     }
 
                     Transform outroTr = radioPanel.Find("Outro");
@@ -1185,8 +1218,17 @@ namespace SundayLastBreath.UI
                     {
                         radioOutroObj = outroTr.gameObject;
                         LayoutElement oLe = outroTr.GetComponent<LayoutElement>() ?? outroTr.gameObject.AddComponent<LayoutElement>();
-                        oLe.preferredHeight = 44f;
-                        oLe.minHeight = 44f;
+                        oLe.preferredHeight = 46f;
+                        oLe.minHeight = 42f;
+                        TextMeshProUGUI oTmp = outroTr.GetComponent<TextMeshProUGUI>();
+                        if (oTmp != null)
+                        {
+                            oTmp.fontSize = 11.5f;
+                            oTmp.lineSpacing = 5f;
+                            oTmp.color = new Color(0.85f, 0.85f, 0.88f);
+                            oTmp.text = "<color=#ef4444><b>'Standard rules of engagement are suspended.'</b></color> Total lethal force. No warnings, no arrests, no hesitation. They only issue that for active warzones. You stare at the radio. Whatever is out there, the law is officially dead.";
+                            SundayTypography.ApplyFont(oTmp, FontRole.Body);
+                        }
                     }
                 }
 
@@ -1693,6 +1735,8 @@ namespace SundayLastBreath.UI
         /// </summary>
         public void PlayScreenShake()
         {
+            if (!gameObject.activeInHierarchy) return;
+
             if (screenShakeFeedback != null)
             {
                 screenShakeFeedback.PlayFeedbacks();
@@ -1735,6 +1779,8 @@ namespace SundayLastBreath.UI
         /// </summary>
         public void PlayDamageFeedback(int damageAmount = 0)
         {
+            if (!gameObject.activeInHierarchy) return;
+
             EnsureDamageVignetteExists();
             if (damageFlashRoutine != null) StopCoroutine(damageFlashRoutine);
             damageFlashRoutine = StartCoroutine(DoDamageFlash());
@@ -1945,42 +1991,49 @@ namespace SundayLastBreath.UI
 
             if (currentPlayer == null)
             {
-                // Fallback default Police Officer character if tested directly in Editor
-                CharacterData fallback = new CharacterData
+                if (GameManager.Instance != null && GameManager.Instance.CurrentPlayer != null)
                 {
-                    firstName = "James",
-                    lastName = "Smith",
-                    gender = "Male",
-                    job = "Police Officer",
-                    hp = 100,
-                    hpMax = 100,
-                    stamina = 80,
-                    staminaMax = 80,
-                    hunger = 100,
-                    thirst = 100,
-                    humanity = 35,
-                    str = 6,
-                    per = 8,
-                    agi = 6,
-                    intl = 5,
-                    cha = 3,
-                    lck = 4,
-                    shooting = 3,
-                    melee = 2,
-                    tech = 2
-                };
-                fallback.AddTrait("HUNTER", "Spot ambushes early.");
-                fallback.AddTrait("STEADY HANDS", "+15 Accuracy bonus.");
-                fallback.AddTrait("PYRO", "Fire weapons deal +50% DMG.", null, true);
-                fallback.AddTrait("MECHANIC", "Start cars without keys.");
-                fallback.AddItem("Apartment Key", 1);
-                fallback.AddItem("Glock 19", 1);
-                fallback.AddItem("9mm Ammo", 24);
-                fallback.AddItem("Multi-Tool", 1);
-                fallback.AddItem("Binoculars", 1);
-                fallback.AddItem("Lighter", 1);
-                fallback.AddItem("Jerry Can", 1);
-                InitializeWithCharacter(fallback);
+                    currentPlayer = GameManager.Instance.CurrentPlayer;
+                }
+                else
+                {
+                    // Fallback default Police Officer character if tested directly in Editor
+                    CharacterData fallback = new CharacterData
+                    {
+                        firstName = "James",
+                        lastName = "Smith",
+                        gender = "Male",
+                        job = "Police Officer",
+                        hp = 100,
+                        hpMax = 100,
+                        stamina = 80,
+                        staminaMax = 80,
+                        hunger = 100,
+                        thirst = 100,
+                        humanity = 35,
+                        str = 6,
+                        per = 8,
+                        agi = 6,
+                        intl = 5,
+                        cha = 3,
+                        lck = 4,
+                        shooting = 3,
+                        melee = 2,
+                        tech = 2
+                    };
+                    fallback.AddTrait("HUNTER", "Spot ambushes early.");
+                    fallback.AddTrait("STEADY HANDS", "+15 Accuracy bonus.");
+                    fallback.AddTrait("PYRO", "Fire weapons deal +50% DMG.", null, true);
+                    fallback.AddTrait("MECHANIC", "Start cars without keys.");
+                    fallback.AddItem("Apartment Key", 1);
+                    fallback.AddItem("Glock 19", 1);
+                    fallback.AddItem("9mm Ammo", 24);
+                    fallback.AddItem("Multi-Tool", 1);
+                    fallback.AddItem("Binoculars", 1);
+                    fallback.AddItem("Lighter", 1);
+                    fallback.AddItem("Jerry Can", 1);
+                    InitializeWithCharacter(fallback);
+                }
             }
 
             // Play background atmosphere drone
@@ -2094,12 +2147,40 @@ namespace SundayLastBreath.UI
 #endif
                 if (dismissModal)
                 {
+                    bool isEscape = false;
+#if ENABLE_INPUT_SYSTEM
+                    if (Keyboard.current != null) isEscape = Keyboard.current.escapeKey.wasPressedThisFrame;
+#else
+                    isEscape = Input.GetKeyDown(KeyCode.Escape);
+#endif
+
                     if (phoneModal != null && phoneModal.activeSelf)
-                        OnClosePhoneClicked();
+                    {
+                        var feedCtrl = phoneModal.GetComponentInChildren<SmartphoneFeedController>(true);
+                        if (feedCtrl != null && !feedCtrl.IsNetworkDead && !isEscape)
+                        {
+                            feedCtrl.FastForwardFeed();
+                        }
+                        else
+                        {
+                            OnClosePhoneClicked();
+                        }
+                    }
                     else if (radioModal != null && radioModal.activeSelf)
-                        OnCloseRadioClicked();
+                    {
+                        if (isRadioTransmitting && !isEscape)
+                        {
+                            FastForwardRadio();
+                        }
+                        else
+                        {
+                            OnCloseRadioClicked();
+                        }
+                    }
                     else if (hackingModal != null && hackingModal.activeSelf)
+                    {
                         OnCloseHackingClicked();
+                    }
                     return;
                 }
             }
@@ -2202,6 +2283,22 @@ namespace SundayLastBreath.UI
 
         private void OnDialogueAreaClicked()
         {
+            if (radioModal != null && radioModal.activeSelf && isRadioTransmitting)
+            {
+                FastForwardRadio();
+                return;
+            }
+
+            if (phoneModal != null && phoneModal.activeSelf)
+            {
+                var feedCtrl = phoneModal.GetComponentInChildren<SmartphoneFeedController>(true);
+                if (feedCtrl != null && !feedCtrl.IsNetworkDead)
+                {
+                    feedCtrl.FastForwardFeed();
+                    return;
+                }
+            }
+
             if (introSeen) return;
 
             // Debounce double-clicks
@@ -2949,9 +3046,37 @@ namespace SundayLastBreath.UI
             if (hubMenuContainer != null) hubMenuContainer.SetActive(false);
             if (continuePrompt != null) continuePrompt.SetActive(true);
 
-            if (beat1Container != null) beat1Container.SetActive(false);
-            if (beat2Container != null) beat2Container.SetActive(false);
-            if (beat3Container != null) beat3Container.SetActive(false);
+            if (beat1Container != null) beat1Container.SetActive(step == 1);
+            if (beat2Container != null) beat2Container.SetActive(step == 2);
+            if (beat3Container != null) beat3Container.SetActive(step == 3);
+
+            if (!gameObject.activeInHierarchy)
+            {
+                if (step == 1)
+                {
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // LIVING ROOM ]</color>";
+                    if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#EF4444>CHANNEL: EMERGENCY BROADCAST SYSTEM</color>";
+                    if (beat1IntroText != null) beat1IntroText.text = "You turn away from the glass. The silence in your apartment breaks—not with a scream, but with an agonizing, electronic tone pulsing from the television.";
+                }
+                else if (step == 2)
+                {
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // INTERNAL MONOLOGUE ]</color>";
+                    if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#60A5FA>CHANNEL: NEURAL APPRAISAL</color>";
+                    if (monologueBox != null) monologueBox.SetActive(true);
+                    if (monologueSpeakerText != null) monologueSpeakerText.text = currentPlayer != null ? $"YOU // {currentPlayer.FullName.ToUpper()}" : "YOU";
+                    if (monologueSpeechText != null) monologueSpeechText.text = GetPlayerMonologueText();
+                    if (beat2IntroText != null) beat2IntroText.text = "The robotic voice cuts out. Cold static returns to the TV.";
+                    if (beat2FootnoteText != null) beat2FootnoteText.text = "Through the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens. And closer... the muffled sound of heavy, frantic footsteps pounding down the hallway outside your door.";
+                }
+                else if (step == 3)
+                {
+                    if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // LIVING ROOM ]</color>";
+                    if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#F59E0B>CHANNEL: EQUIPMENT INSPECTION</color>";
+                    if (tableStashDisplay != null) { tableStashDisplay.SetActive(true); PopulateTableStashUI(); }
+                    if (beat3NarrativeText != null) beat3NarrativeText.text = "You stand in the middle of your living room in the pitch-black darkness. Outside, sirens wail across the Seattle skyline.\n\nYour apartment keys, wallet, and belongings are sitting on the coffee table. The front door deadbolt is locked—you cannot step out into the hallway without your keys, or you'll be locked out in the dark.\n\nGrab your apartment keys and belongings off the coffee table, and check what else you can gather around the apartment before unlocking the door.";
+                }
+                return;
+            }
 
             switch (awakeningStep)
             {
@@ -4633,58 +4758,124 @@ namespace SundayLastBreath.UI
 
             if (radioTranscriptText != null)
             {
-                radioTranscriptText.text = "<color=#f59e0b>[ SCANNING EMERGENCY BAND... 154.150 MHz... 154.450 MHz... ]</color>";
+                radioTranscriptText.text = "<color=#94A3B8>[STATIC HISS]</color>";
             }
 
             PlayBeepSFX();
-            yield return new WaitForSecondsRealtime(0.45f);
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.AppendLine("<color=#94a3b8>[ LOCKED: 154.790 MHz // STATIC HISS & SQUELCH BREAK ]</color>\n");
+            sb.AppendLine("<color=#94A3B8>[STATIC HISS]</color>\n");
             if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
 
-            yield return new WaitForSecondsRealtime(0.45f);
+            // 0.0s to 1.6s: Static hiss / frequency lock
+            yield return new WaitForSecondsRealtime(1.6f);
+            if (!isRadioTransmitting) yield break;
 
-            // Segment 1: Unit 4-Charlie
-            sb.AppendLine("<b><color=#38bdf8>UNIT 4-CHARLIE (FRANTIC):</color></b>");
+            // 1.6s to 11.4s: UNIT 4-CHARLIE First Transmission (Barricade lost)
+            sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
             string line1 = "<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing! They just keep coming!\"</i>\n";
             string prefix1 = sb.ToString();
-            for (int i = 1; i <= line1.Length; i += 4)
+
+            float line1Duration = 9.8f;
+            float charDelay1 = line1Duration / line1.Length;
+            for (int i = 1; i <= line1.Length; i += 2)
             {
+                if (!isRadioTransmitting) yield break;
                 int len = Mathf.Min(i, line1.Length);
                 if (radioTranscriptText != null) radioTranscriptText.text = prefix1 + line1.Substring(0, len);
-                yield return new WaitForSecondsRealtime(0.025f);
+                yield return new WaitForSecondsRealtime(charDelay1 * 2);
             }
             sb.AppendLine(line1);
             if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
 
-            // Segment 2: Heavy Struggle & Screen Shake
-            yield return new WaitForSecondsRealtime(0.35f);
+            // 11.5s to 13.3s: Heavy Struggle & Screen Shake
+            if (!isRadioTransmitting) yield break;
+            yield return new WaitForSecondsRealtime(0.2f);
             PlayScreenShake();
-            sb.AppendLine("<color=#ef4444><b>[ HEAVY STRUGGLE // MUFFLED GUNFIRE // MIC DROPPED ]</b></color>\n");
+            sb.AppendLine("<color=#EF4444><b>[HEAVY STRUGGLE / THUD]</b></color>\n");
             if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
 
-            yield return new WaitForSecondsRealtime(0.65f);
+            yield return new WaitForSecondsRealtime(1.7f);
+            if (!isRadioTransmitting) yield break;
 
-            // Segment 3: Dispatch Response
-            sb.AppendLine("<b><color=#f59e0b>DISPATCH (COLD, MONOTONE):</color></b>");
-            string line2 = "<i>\"4-Charlie, unrestricted lethal force is authorized. All units: Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#ef4444>Aim for the head.</color> Avoid all physical contact.\"</i>\n";
+            // 13.4s to 21.4s: UNIT 4-CHARLIE Second Transmission (Get off the car, unrestricted lethal force)
+            sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
+            string line2 = "<i>\"God damn it, get off the damn car! Dispatch, standard protocol is useless! Requesting authorization for unrestricted lethal force!\"</i>\n";
             string prefix2 = sb.ToString();
-            for (int i = 1; i <= line2.Length; i += 4)
+
+            float line2Duration = 7.8f;
+            float charDelay2 = line2Duration / line2.Length;
+            for (int i = 1; i <= line2.Length; i += 2)
             {
+                if (!isRadioTransmitting) yield break;
                 int len = Mathf.Min(i, line2.Length);
                 if (radioTranscriptText != null) radioTranscriptText.text = prefix2 + line2.Substring(0, len);
-                yield return new WaitForSecondsRealtime(0.025f);
+                yield return new WaitForSecondsRealtime(charDelay2 * 2);
             }
             sb.AppendLine(line2);
             if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
 
-            yield return new WaitForSecondsRealtime(0.40f);
+            // 21.5s to 22.1s: Radio Squelch
+            yield return new WaitForSecondsRealtime(0.7f);
+            if (!isRadioTransmitting) yield break;
+            sb.AppendLine("<color=#F59E0B><b>[RADIO SQUELCH]</b></color>\n");
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
 
-            // Segment 4: Signal Cuts Out
+            yield return new WaitForSecondsRealtime(0.6f);
+            if (!isRadioTransmitting) yield break;
+
+            // 22.2s to 35.4s: DISPATCH (CALM)
+            sb.AppendLine("<b><color=#F59E0B>DISPATCH (CALM):</color></b>");
+            string line3 = "<i>\"4-Charlie, unrestricted lethal force is authorized. All units, listen carefully. Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#EF4444>Aim for the head.</color> I repeat... <color=#EF4444>aim for the head.</color> Avoid all physical contact.\"</i>\n";
+            string prefix3 = sb.ToString();
+
+            float line3Duration = 13.0f;
+            float charDelay3 = line3Duration / line3.Length;
+            for (int i = 1; i <= line3.Length; i += 2)
+            {
+                if (!isRadioTransmitting) yield break;
+                int len = Mathf.Min(i, line3.Length);
+                if (radioTranscriptText != null) radioTranscriptText.text = prefix3 + line3.Substring(0, len);
+                yield return new WaitForSecondsRealtime(charDelay3 * 2);
+            }
+            sb.AppendLine(line3);
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+            // 35.5s: Signal Cuts Out
+            yield return new WaitForSecondsRealtime(0.5f);
             isRadioTransmitting = false;
             PlayBeepSFX();
-            sb.AppendLine("<color=#ef4444><b>[ SIGNAL CUTS OUT // REPEATER OFFLINE ]</b></color>");
+            sb.AppendLine("<color=#EF4444><b>[SIGNAL CUTS OUT]</b></color>");
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+            if (radioOutroObj != null)
+            {
+                radioOutroObj.SetActive(true);
+            }
+        }
+
+        /// <summary>
+        /// Fast-forwards the radio transmission to full transcript if the player presses Space or clicks.
+        /// </summary>
+        public void FastForwardRadio()
+        {
+            if (!isRadioTransmitting) return;
+
+            isRadioTransmitting = false;
+            if (radioRoutine != null) StopCoroutine(radioRoutine);
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("<color=#94A3B8>[STATIC HISS]</color>\n");
+            sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
+            sb.AppendLine("<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing! They just keep coming!\"</i>\n");
+            sb.AppendLine("<color=#EF4444><b>[HEAVY STRUGGLE / THUD]</b></color>\n");
+            sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
+            sb.AppendLine("<i>\"God damn it, get off the damn car! Dispatch, standard protocol is useless! Requesting authorization for unrestricted lethal force!\"</i>\n");
+            sb.AppendLine("<color=#F59E0B><b>[RADIO SQUELCH]</b></color>\n");
+            sb.AppendLine("<b><color=#F59E0B>DISPATCH (CALM):</color></b>");
+            sb.AppendLine("<i>\"4-Charlie, unrestricted lethal force is authorized. All units, listen carefully. Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#EF4444>Aim for the head.</color> I repeat... <color=#EF4444>aim for the head.</color> Avoid all physical contact.\"</i>\n");
+            sb.AppendLine("<color=#EF4444><b>[SIGNAL CUTS OUT]</b></color>");
+
             if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
 
             if (radioOutroObj != null)

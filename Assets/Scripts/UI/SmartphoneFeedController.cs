@@ -33,6 +33,8 @@ namespace SundayLastBreath.UI
         private Coroutine liveTickerRoutine;
         private bool isNetworkDead = false;
 
+        public bool IsNetworkDead => isNetworkDead;
+
         private TextMeshProUGUI liveBadgeText;
         private TextMeshProUGUI dossierOutroText;
         private RectTransform phoneChassisRect;
@@ -223,8 +225,11 @@ namespace SundayLastBreath.UI
 
             if (feedContent != null) LayoutRebuilder.ForceRebuildLayoutImmediate(feedContent);
 
+            // Give player ample time (~4.5s) to read Post 1 (@CityScanner_WA - 5th St Hospital)
+            yield return new WaitForSecondsRealtime(4.50f);
+            if (isNetworkDead) yield break;
+
             // Stream in Post 2 (NewsWire Breaking - CDC Bulletin)
-            yield return new WaitForSecondsRealtime(0.75f);
             if (cards.Count > 1 && cards[1] != null)
             {
                 cards[1].SetActive(true);
@@ -233,8 +238,11 @@ namespace SundayLastBreath.UI
                 yield return StartCoroutine(PopInCard(cards[1].transform));
             }
 
+            // Give player ample time (~5.0s) to read Post 2 (CDC Health Bulletin)
+            yield return new WaitForSecondsRealtime(5.00f);
+            if (isNetworkDead) yield break;
+
             // Stream in Post 3 (User_9921 - Blurry Video)
-            yield return new WaitForSecondsRealtime(0.95f);
             if (cards.Count > 2 && cards[2] != null)
             {
                 cards[2].SetActive(true);
@@ -249,8 +257,9 @@ namespace SundayLastBreath.UI
                 dossierOutroText.text = "The comments are a storm of denial, prayers, and wild conspiracies. One post catches your eye: a traffic map showing military checkpoints. <color=#F59E0B><i>They are barricading the bridges out of the city.</i></color>\n\n<color=#94A3B8><i>[ Buffering attached video stream... ]</i></color>";
             }
 
-            // Let player watch the live counters & video buffer for 1.6s before the cell tower dies
-            yield return new WaitForSecondsRealtime(1.60f);
+            // Give player ample time (~5.5s) to read Post 3 and watch video buffer & live ticker
+            yield return new WaitForSecondsRealtime(5.50f);
+            if (isNetworkDead) yield break;
 
             // NETWORK DEATH SEQUENCE
             isNetworkDead = true;
@@ -401,6 +410,57 @@ namespace SundayLastBreath.UI
             if (videoLabel != null)
             {
                 videoLabel.text = "▶ [VIDEO STREAM FROZEN — ERR_503]\n<size=90%><color=#ef4444>0:14 / 0:30 • Packet stream terminated by host</color></size>";
+            }
+        }
+
+        /// <summary>
+        /// Fast-forwards the live feed to the severed network state if the player skips or clicks.
+        /// </summary>
+        public void FastForwardFeed()
+        {
+            if (isNetworkDead) return;
+
+            if (liveStreamRoutine != null) StopCoroutine(liveStreamRoutine);
+
+            isNetworkDead = true;
+
+            // Immediately show all feed cards and reset their alpha
+            if (feedContent != null)
+            {
+                for (int i = 0; i < feedContent.childCount; i++)
+                {
+                    var child = feedContent.GetChild(i);
+                    if (child != null)
+                    {
+                        child.gameObject.SetActive(true);
+                        CanvasGroup cg = child.GetComponent<CanvasGroup>();
+                        if (cg != null) cg.alpha = 1f;
+                    }
+                }
+                LayoutRebuilder.ForceRebuildLayoutImmediate(feedContent);
+            }
+
+            if (carrierStatusText != null)
+            {
+                carrierStatusText.text = "<color=#EF4444><b>[X] NO SIGNAL</b></color>";
+            }
+            if (batteryText != null)
+            {
+                batteryText.text = "<color=#EF4444><b>11%</b></color> <color=#EF4444>[!.]</color>";
+            }
+            if (liveBadgeText != null)
+            {
+                liveBadgeText.text = "<color=#EF4444>● OFFLINE</color>";
+            }
+
+            if (dossierOutroText != null)
+            {
+                dossierOutroText.text = "The comments are a storm of denial, prayers, and wild conspiracies. One post catches your eye: a traffic map showing military checkpoints. <color=#F59E0B><i>They are barricading the bridges out of the city.</i></color>\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. <color=#EF4444>The internet is gone.</color>";
+            }
+
+            if (feedScrollRect != null)
+            {
+                feedScrollRect.verticalNormalizedPosition = 0f;
             }
         }
     }
