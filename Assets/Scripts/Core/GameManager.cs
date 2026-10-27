@@ -170,8 +170,9 @@ namespace SundayLastBreath.Core
 
             if (apartmentHubScreen != null)
             {
-                apartmentHubScreen.InitializeWithCharacter(CurrentPlayer);
+                apartmentHubScreen.gameObject.SetActive(true);
                 apartmentHubScreen.Show(0.8f);
+                apartmentHubScreen.InitializeWithCharacter(CurrentPlayer);
             }
             else
             {
@@ -187,8 +188,9 @@ namespace SundayLastBreath.Core
 
             if (apartmentHubScreen != null)
             {
-                apartmentHubScreen.LoadCharacterState(CurrentPlayer, roomId);
+                apartmentHubScreen.gameObject.SetActive(true);
                 apartmentHubScreen.Show(0.8f);
+                apartmentHubScreen.LoadCharacterState(CurrentPlayer, roomId);
             }
             else
             {

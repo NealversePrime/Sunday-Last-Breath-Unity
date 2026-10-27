@@ -1340,19 +1340,59 @@ namespace SundayLastBreath.UI
             equippedFeet = character.equippedFeet ?? "";
 
             // Safety recovery: If loading at Beat 1/Day 0 and both backpack and tableStash are empty (e.g. from an older save),
-            // auto-restore starting items for the player's job so they are never left empty-handed on the coffee table!
+            // auto-restore starting items for the player's job AND all traits so they are never left empty-handed!
             if (!hasPacked && (tableStash == null || tableStash.Count == 0) && (currentPlayer.inventory == null || currentPlayer.inventory.Count == 0))
             {
+                if (tableStash == null) tableStash = new List<InventoryEntry>();
+
                 var job = System.Array.Find(CharacterCreationDefinitions.Jobs, j => j.title.Equals(currentPlayer.job, StringComparison.OrdinalIgnoreCase) || j.id.Equals(currentPlayer.job, StringComparison.OrdinalIgnoreCase));
                 if (job != null && job.startingItems != null)
                 {
-                    if (tableStash == null) tableStash = new List<InventoryEntry>();
                     foreach (var item in job.startingItems)
                     {
                         tableStash.Add(new InventoryEntry(item.item, item.qty));
                     }
                 }
-                if (tableStash == null) tableStash = new List<InventoryEntry>();
+
+                // Also restore starting items given by character traits / hobbies (e.g. ARCHER -> Compound Bow + Arrows)
+                if (currentPlayer.traits != null)
+                {
+                    foreach (var t in currentPlayer.traits)
+                    {
+                        if (string.Equals(t.name, "ARCHER", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!tableStash.Any(e => e.itemId == "Compound Bow")) tableStash.Add(new InventoryEntry("Compound Bow", 1));
+                            if (!tableStash.Any(e => e.itemId == "Arrows")) tableStash.Add(new InventoryEntry("Arrows", 5));
+                        }
+                        else if (string.Equals(t.name, "HIKER", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!tableStash.Any(e => e.itemId == "Hiking Boots")) tableStash.Add(new InventoryEntry("Hiking Boots", 1));
+                        }
+                        else if (string.Equals(t.name, "RUNNER", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!tableStash.Any(e => e.itemId == "Energy Bar")) tableStash.Add(new InventoryEntry("Energy Bar", 2));
+                            if (!tableStash.Any(e => e.itemId == "Running Shoes")) tableStash.Add(new InventoryEntry("Running Shoes", 1));
+                        }
+                        else if (string.Equals(t.name, "HUNTER", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!tableStash.Any(e => e.itemId == "Binoculars")) tableStash.Add(new InventoryEntry("Binoculars", 1));
+                            if (!tableStash.Any(e => e.itemId == "Combat Knife")) tableStash.Add(new InventoryEntry("Combat Knife", 1));
+                        }
+                        else if (string.Equals(t.name, "BASEBALL", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!tableStash.Any(e => e.itemId == "Baseball Bat")) tableStash.Add(new InventoryEntry("Baseball Bat", 1));
+                        }
+                        else if (string.Equals(t.name, "WATCHMAN", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!tableStash.Any(e => e.itemId == "Flashlight")) tableStash.Add(new InventoryEntry("Flashlight", 1));
+                        }
+                        else if (string.Equals(t.name, "SURVIVALIST", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!tableStash.Any(e => e.itemId == "Multi-Tool")) tableStash.Add(new InventoryEntry("Multi-Tool", 1));
+                        }
+                    }
+                }
+
                 if (!tableStash.Any(entry => string.Equals(entry.itemId, "Apartment Key", StringComparison.OrdinalIgnoreCase) || string.Equals(entry.itemId, "Apartment 407 Key", StringComparison.OrdinalIgnoreCase)))
                 {
                     tableStash.Insert(0, new InventoryEntry("Apartment Key", 1));
@@ -2522,7 +2562,19 @@ namespace SundayLastBreath.UI
             activeTypewriterTarget = target;
             activeFullText = fullText;
 
-            if (typeRoutine != null) StopCoroutine(typeRoutine);
+            if (typeRoutine != null)
+            {
+                StopCoroutine(typeRoutine);
+                typeRoutine = null;
+            }
+
+            if (!gameObject.activeInHierarchy)
+            {
+                if (target != null) target.text = fullText;
+                isTyping = false;
+                return;
+            }
+
             typeRoutine = StartCoroutine(TypewriterRoutine(target, fullText));
         }
 
@@ -2553,7 +2605,14 @@ namespace SundayLastBreath.UI
 
         private void StartAvatarAnimation()
         {
-            if (avatarAnimRoutine != null) StopCoroutine(avatarAnimRoutine);
+            if (avatarAnimRoutine != null)
+            {
+                StopCoroutine(avatarAnimRoutine);
+                avatarAnimRoutine = null;
+            }
+
+            if (!gameObject.activeInHierarchy) return;
+
             if (cachedAvatarFrames != null && cachedAvatarFrames.Count > 0 && monologueAvatar != null)
             {
                 avatarAnimRoutine = StartCoroutine(AvatarAnimRoutine());
@@ -3382,8 +3441,9 @@ namespace SundayLastBreath.UI
             if (SaveManager.Instance != null)
             {
                 int targetSlot = SaveManager.Instance.GetMostRecentPopulatedSlotIndex();
-                if (targetSlot < 0) targetSlot = 1; // Default to Slot 01 if no save exists yet
+                if (targetSlot <= 0) targetSlot = 1; // Default to Slot 01 if no save exists yet or if quicksave was recent
                 SaveManager.Instance.SaveToSlot(targetSlot);
+                SaveManager.Instance.QuickSave(); // Synchronize QuickSave so both buttons on Title Screen restore this exact moment!
             }
             ExecuteExitToMainMenu();
         }
