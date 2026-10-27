@@ -291,6 +291,19 @@ namespace SundayLastBreath.Core
                 ES3.Save<string>("real_save_time", realTimestamp, file);
                 ES3.Save<long>("real_save_ticks", realUtcTicks, file);
 
+                // 4b. Save Apartment Hub World State (tableStash, floorItems, packing & story progress)
+                if (ApartmentHubScreen.Instance != null)
+                {
+                    ES3.Save<List<InventoryEntry>>("apartment_table_stash", ApartmentHubScreen.Instance.TableStash, file);
+                    ES3.Save<List<InventoryEntry>>("apartment_floor_items", ApartmentHubScreen.Instance.FloorItems, file);
+                    ES3.Save<bool>("apartment_has_packed", ApartmentHubScreen.Instance.HasPacked, file);
+                    ES3.Save<bool>("apartment_intro_seen", ApartmentHubScreen.Instance.IntroSeen, file);
+                    ES3.Save<int>("apartment_awakening_step", ApartmentHubScreen.Instance.AwakeningStep, file);
+                    ES3.Save<bool>("apartment_kitchen_searched", ApartmentHubScreen.Instance.KitchenSearched, file);
+                    ES3.Save<bool>("apartment_bathroom_searched", ApartmentHubScreen.Instance.BathroomSearched, file);
+                    ES3.Save<bool>("apartment_closet_searched", ApartmentHubScreen.Instance.ClosetSearched, file);
+                }
+
                 // 5. Rich Console Telemetry Output
                 string traitsList = (character.traits != null && character.traits.Count > 0)
                     ? string.Join(", ", character.traits.ConvertAll(t => t.name))
@@ -364,7 +377,35 @@ namespace SundayLastBreath.Core
                 int loadedYear = ES3.KeyExists("clock_year", file) ? ES3.Load<int>("clock_year", file) : 2025;
                 string loadedDayName = ES3.KeyExists("clock_day_name", file) ? ES3.Load<string>("clock_day_name", file) : "SATURDAY";
 
-                // 4. Apply to Game State
+                // 4. Restore Apartment Hub World State
+                if (ApartmentHubScreen.Instance != null)
+                {
+                    if (ES3.KeyExists("apartment_table_stash", file))
+                        ApartmentHubScreen.Instance.TableStash = ES3.Load<List<InventoryEntry>>("apartment_table_stash", file);
+
+                    if (ES3.KeyExists("apartment_floor_items", file))
+                        ApartmentHubScreen.Instance.FloorItems = ES3.Load<List<InventoryEntry>>("apartment_floor_items", file);
+
+                    if (ES3.KeyExists("apartment_has_packed", file))
+                        ApartmentHubScreen.Instance.HasPacked = ES3.Load<bool>("apartment_has_packed", file);
+
+                    if (ES3.KeyExists("apartment_intro_seen", file))
+                        ApartmentHubScreen.Instance.IntroSeen = ES3.Load<bool>("apartment_intro_seen", file);
+
+                    if (ES3.KeyExists("apartment_awakening_step", file))
+                        ApartmentHubScreen.Instance.AwakeningStep = ES3.Load<int>("apartment_awakening_step", file);
+
+                    if (ES3.KeyExists("apartment_kitchen_searched", file))
+                        ApartmentHubScreen.Instance.KitchenSearched = ES3.Load<bool>("apartment_kitchen_searched", file);
+
+                    if (ES3.KeyExists("apartment_bathroom_searched", file))
+                        ApartmentHubScreen.Instance.BathroomSearched = ES3.Load<bool>("apartment_bathroom_searched", file);
+
+                    if (ES3.KeyExists("apartment_closet_searched", file))
+                        ApartmentHubScreen.Instance.ClosetSearched = ES3.Load<bool>("apartment_closet_searched", file);
+                }
+
+                // 5. Apply to Game State
                 if (loadedChar != null)
                 {
                     loadedChar.currentLocationId = loadedRoomId;
@@ -387,7 +428,7 @@ namespace SundayLastBreath.Core
                     ApartmentHubScreen.Instance.SetLocation(loadedRoomId);
                 }
 
-                // 5. Rich Console Telemetry Output
+                // 6. Rich Console Telemetry Output
                 string traitsList = (loadedChar != null && loadedChar.traits != null && loadedChar.traits.Count > 0)
                     ? string.Join(", ", loadedChar.traits.ConvertAll(t => t.name))
                     : "None";

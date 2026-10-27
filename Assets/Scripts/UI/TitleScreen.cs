@@ -278,7 +278,9 @@ namespace SundayLastBreath.UI
                 {
                     if (GameManager.Instance != null)
                     {
-                        GameManager.Instance.GoToApartmentHub();
+                        var player = GameManager.Instance.CurrentPlayer;
+                        string loc = player != null ? player.currentLocationId : "unit_407";
+                        GameManager.Instance.ResumeFromSave(player, loc);
                     }
                 });
             }

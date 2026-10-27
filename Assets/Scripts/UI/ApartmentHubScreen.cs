@@ -225,6 +225,54 @@ namespace SundayLastBreath.UI
         private string equippedLegs = "";
         private string equippedFeet = "";
 
+        public List<InventoryEntry> TableStash
+        {
+            get => tableStash;
+            set => tableStash = value ?? new List<InventoryEntry>();
+        }
+
+        public List<InventoryEntry> FloorItems
+        {
+            get => floorItems;
+            set => floorItems = value ?? new List<InventoryEntry>();
+        }
+
+        public bool HasPacked
+        {
+            get => hasPacked;
+            set => hasPacked = value;
+        }
+
+        public bool IntroSeen
+        {
+            get => introSeen;
+            set => introSeen = value;
+        }
+
+        public int AwakeningStep
+        {
+            get => awakeningStep;
+            set => awakeningStep = value;
+        }
+
+        public bool KitchenSearched
+        {
+            get => kitchenSearched;
+            set => kitchenSearched = value;
+        }
+
+        public bool BathroomSearched
+        {
+            get => bathroomSearched;
+            set => bathroomSearched = value;
+        }
+
+        public bool ClosetSearched
+        {
+            get => closetSearched;
+            set => closetSearched = value;
+        }
+
         private bool hasPacked = false;
         private bool kitchenSearched = false;
         private bool bathroomSearched = false;
@@ -1274,9 +1322,34 @@ namespace SundayLastBreath.UI
             if (character == null) return;
             currentPlayer = character;
 
+            // Re-sync equipped clothing / weapons from CharacterData
+            equippedHead = character.equippedHead ?? "";
+            equippedBody = character.equippedBody ?? "";
+            equippedWpn = character.equippedWpn ?? "";
+            equippedLegs = character.equippedLegs ?? "";
+            equippedFeet = character.equippedFeet ?? "";
+
             UpdateVitalsUI();
+            UpdateClockUI();
+            UpdateObjectiveUI();
+            PopulateTableStashUI();
+            RefreshRightGearPanel();
             RefreshAllPDAPanels();
             EvaluateHubButtonStates();
+
+            // Restore awakening or hub sequence state
+            if (hasPacked || introSeen)
+            {
+                introSeen = true;
+                if (awakeningContainer != null) awakeningContainer.SetActive(false);
+                if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
+                if (continuePrompt != null) continuePrompt.SetActive(false);
+                ShowHubMenu();
+            }
+            else
+            {
+                ShowAwakeningStep(Mathf.Clamp(awakeningStep, 1, 3));
+            }
 
             string loc = !string.IsNullOrEmpty(roomId) ? roomId : (!string.IsNullOrEmpty(character.currentLocationId) ? character.currentLocationId : "unit_407");
             SetLocation(loc);

@@ -179,6 +179,23 @@ namespace SundayLastBreath.Core
             }
         }
 
+        public void ResumeFromSave(SundayLastBreath.Data.CharacterData loadedChar, string roomId = null)
+        {
+            CurrentPlayer = loadedChar;
+            currentState = GameState.ApartmentHub;
+            HideAllScreensInstant();
+
+            if (apartmentHubScreen != null)
+            {
+                apartmentHubScreen.LoadCharacterState(CurrentPlayer, roomId);
+                apartmentHubScreen.Show(0.8f);
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] ApartmentHubScreen not assigned!");
+            }
+        }
+
         public void TransitionFromApartmentToHallway()
         {
             currentState = GameState.Hallway;
