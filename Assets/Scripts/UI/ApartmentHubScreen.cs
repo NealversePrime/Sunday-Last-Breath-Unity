@@ -3883,6 +3883,20 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private void GiveOrDropItem(string itemId, int quantity)
+        {
+            if (string.IsNullOrEmpty(itemId) || quantity <= 0 || currentPlayer == null) return;
+            if (!currentPlayer.AddItem(itemId, quantity))
+            {
+                AddFloorItem(itemId, quantity);
+                UpdateFloorItemsNotification();
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text += $"\n<color=#F59E0B>[!] Backpack full: {itemId} (x{quantity}) placed in room container.</color>";
+                }
+            }
+        }
+
         private void OnPackGearClicked()
         {
             PlayClickSFX();
@@ -6075,9 +6089,9 @@ namespace SundayLastBreath.UI
                     {
                         looted_408_kitchen = true;
                         gameClock?.AddTime(5);
-                        currentPlayer?.AddItem("Canned Food", 1);
-                        currentPlayer?.AddItem("Energy Bar", 1);
-                        currentPlayer?.AddItem("Bottled Water", 2);
+                        GiveOrDropItem("Canned Food", 1);
+                        GiveOrDropItem("Energy Bar", 1);
+                        GiveOrDropItem("Bottled Water", 2);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit408();
@@ -6090,8 +6104,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_408 = true;
                         gameClock?.AddTime(5);
-                        currentPlayer?.AddItem("Encyclopedia", 1);
-                        currentPlayer?.AddItem("Flashlight", 1);
+                        GiveOrDropItem("Encyclopedia", 1);
+                        GiveOrDropItem("Flashlight", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit408();
@@ -6234,8 +6248,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_405_bench = true;
                         gameClock?.AddTime(5);
-                        currentPlayer?.AddItem("Pistol Ammo", 12);
-                        currentPlayer?.AddItem("Scrap Metal", 3);
+                        GiveOrDropItem("Pistol Ammo", 12);
+                        GiveOrDropItem("Scrap Metal", 3);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit405();
@@ -6248,7 +6262,7 @@ namespace SundayLastBreath.UI
                     {
                         looted_405_safe = true;
                         gameClock?.AddTime(3);
-                        currentPlayer?.AddItem("Hunting Knife", 1);
+                        GiveOrDropItem("Hunting Knife", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit405();
@@ -6398,8 +6412,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_402_weapon = true;
                         gameClock?.AddTime(1);
-                        currentPlayer?.AddItem("Revolver .38", 1);
-                        currentPlayer?.AddItem(".38 Ammo", 5);
+                        GiveOrDropItem("Revolver .38", 1);
+                        GiveOrDropItem(".38 Ammo", 5);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit402();
@@ -6412,8 +6426,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_402_kitchen = true;
                         gameClock?.AddTime(2);
-                        currentPlayer?.AddItem("Canned Food", 2);
-                        currentPlayer?.AddItem("Bottled Water", 1);
+                        GiveOrDropItem("Canned Food", 2);
+                        GiveOrDropItem("Bottled Water", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit402();
@@ -6426,8 +6440,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_402_bathroom = true;
                         gameClock?.AddTime(1);
-                        currentPlayer?.AddItem("Painkillers", 2);
-                        currentPlayer?.AddItem("Antiseptic", 1);
+                        GiveOrDropItem("Painkillers", 2);
+                        GiveOrDropItem("Antiseptic", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit402();
@@ -6441,7 +6455,7 @@ namespace SundayLastBreath.UI
                         looted_402_ring = true;
                         gameClock?.AddTime(1);
                         if (currentPlayer != null) currentPlayer.humanity = Mathf.Max(0, currentPlayer.humanity - 10);
-                        currentPlayer?.AddItem("Gold Ring", 1);
+                        GiveOrDropItem("Gold Ring", 1);
                         PlayClickSFX();
                         UpdateVitalsUI();
                         RefreshAllPDAPanels();
@@ -6455,7 +6469,7 @@ namespace SundayLastBreath.UI
                     {
                         took_402_photo = true;
                         gameClock?.AddTime(1);
-                        currentPlayer?.AddItem("Family Photo", 1);
+                        GiveOrDropItem("Family Photo", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit402();
@@ -6619,8 +6633,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_401_kitchen = true;
                         gameClock?.AddTime(2);
-                        currentPlayer?.AddItem("Energy Bar", 2);
-                        currentPlayer?.AddItem("Bottled Water", 1);
+                        GiveOrDropItem("Energy Bar", 2);
+                        GiveOrDropItem("Bottled Water", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit401();
@@ -6633,8 +6647,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_401_bathroom = true;
                         gameClock?.AddTime(2);
-                        currentPlayer?.AddItem("Painkillers", 2);
-                        currentPlayer?.AddItem("Bandage", 1);
+                        GiveOrDropItem("Painkillers", 2);
+                        GiveOrDropItem("Bandage", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit401();
@@ -6647,8 +6661,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_401_alcohol = true;
                         gameClock?.AddTime(2);
-                        currentPlayer?.AddItem("Bottle of Vodka", 1);
-                        currentPlayer?.AddItem("Whiskey", 1);
+                        GiveOrDropItem("Bottle of Vodka", 1);
+                        GiveOrDropItem("Whiskey", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit401();
@@ -6661,7 +6675,7 @@ namespace SundayLastBreath.UI
                     {
                         looted_401_pockets = true;
                         gameClock?.AddTime(1);
-                        currentPlayer?.AddItem("Lighter", 1);
+                        GiveOrDropItem("Lighter", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUnit401();
@@ -6822,8 +6836,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_utility_bleach = true;
                         gameClock?.AddTime(2);
-                        currentPlayer?.AddItem("Bleach", 1);
-                        currentPlayer?.AddItem("Work Gloves", 1);
+                        GiveOrDropItem("Bleach", 1);
+                        GiveOrDropItem("Work Gloves", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUtilityCloset();
@@ -6836,8 +6850,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_utility_tape = true;
                         gameClock?.AddTime(3);
-                        currentPlayer?.AddItem("Duct Tape", 1);
-                        currentPlayer?.AddItem("Rope", 1);
+                        GiveOrDropItem("Duct Tape", 1);
+                        GiveOrDropItem("Rope", 1);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUtilityCloset();
@@ -6850,8 +6864,8 @@ namespace SundayLastBreath.UI
                     {
                         looted_utility_flashlight = true;
                         gameClock?.AddTime(2);
-                        currentPlayer?.AddItem("Flashlight", 1);
-                        currentPlayer?.AddItem("Batteries", 2);
+                        GiveOrDropItem("Flashlight", 1);
+                        GiveOrDropItem("Batteries", 2);
                         PlayClickSFX();
                         RefreshAllPDAPanels();
                         InspectUtilityCloset();
