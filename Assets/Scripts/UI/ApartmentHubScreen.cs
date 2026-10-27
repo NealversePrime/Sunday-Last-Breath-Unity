@@ -219,6 +219,8 @@ namespace SundayLastBreath.UI
 
         private List<InventoryEntry> tableStash = new List<InventoryEntry>();
         private List<InventoryEntry> floorItems = new List<InventoryEntry>();
+        private readonly Dictionary<string, List<InventoryEntry>> roomFloorStashes = new Dictionary<string, List<InventoryEntry>>(StringComparer.OrdinalIgnoreCase);
+
         private string equippedHead = "";
         private string equippedBody = "";
         private string equippedWpn = "";
@@ -233,8 +235,52 @@ namespace SundayLastBreath.UI
 
         public List<InventoryEntry> FloorItems
         {
-            get => floorItems;
-            set => floorItems = value ?? new List<InventoryEntry>();
+            get => roomFloorStashes.TryGetValue("unit_407", out var list) ? list : floorItems;
+            set
+            {
+                floorItems = value ?? new List<InventoryEntry>();
+                roomFloorStashes["unit_407"] = floorItems;
+            }
+        }
+
+        public Dictionary<string, List<InventoryEntry>> RoomFloorStashes
+        {
+            get => roomFloorStashes;
+            set
+            {
+                if (value != null)
+                {
+                    roomFloorStashes.Clear();
+                    foreach (var kvp in value) roomFloorStashes[kvp.Key] = kvp.Value;
+                    if (roomFloorStashes.TryGetValue("unit_407", out var u407))
+                    {
+                        floorItems = u407;
+                    }
+                }
+            }
+        }
+
+        public string GetCurrentLocationId()
+        {
+            if (!isInHallway) return "unit_407";
+            if (!string.IsNullOrEmpty(currentInspectedRoom))
+            {
+                if (currentInspectedRoom.StartsWith("unit_")) return currentInspectedRoom;
+                if (currentInspectedRoom == "utility" || currentInspectedRoom == "stairs") return currentInspectedRoom;
+                return "unit_" + currentInspectedRoom;
+            }
+            return $"hallway_{hallwaySection}";
+        }
+
+        public List<InventoryEntry> GetCurrentFloorStash()
+        {
+            string loc = GetCurrentLocationId();
+            if (!roomFloorStashes.TryGetValue(loc, out var stash))
+            {
+                stash = new List<InventoryEntry>();
+                roomFloorStashes[loc] = stash;
+            }
+            return stash;
         }
 
         public bool HasPacked
@@ -1955,6 +2001,8 @@ namespace SundayLastBreath.UI
             // Items accumulated during creation are dropped on the tablestash prior to packing!
             tableStash.Clear();
             floorItems.Clear();
+            roomFloorStashes.Clear();
+            roomFloorStashes["unit_407"] = floorItems;
             equippedHead = "";
             equippedBody = "";
             equippedWpn = "";
@@ -2400,6 +2448,8 @@ namespace SundayLastBreath.UI
 
         private void Update()
         {
+            if (isDoorTransitioning || (doorTransitionOverlay != null && doorTransitionOverlay.activeSelf)) return;
+
             // 0a. Hotkey (Escape) to dismiss System Menu Modal if open
             if (systemMenuModal != null && systemMenuModal.activeSelf)
             {
@@ -2659,6 +2709,11 @@ namespace SundayLastBreath.UI
 
             if (tabName == "MAP" && tacticalMapController != null)
             {
+                string targetLoc = !string.IsNullOrEmpty(currentPlayer?.currentLocationId)
+                    ? currentPlayer.currentLocationId
+                    : GetCurrentLocationId();
+                tacticalMapController.SetCurrentLocation(targetLoc);
+                tacticalMapController.SelectNode(targetLoc);
                 tacticalMapController.RefreshAllNodes();
             }
             if (tabName == "SKILLS" && tacticalSkillsController != null && currentPlayer != null)
@@ -2917,7 +2972,8 @@ namespace SundayLastBreath.UI
 
         private void UpdateFloorItemsNotification()
         {
-            int count = floorItems != null ? floorItems.Count : 0;
+            var activeFloor = GetCurrentFloorStash();
+            int count = activeFloor != null ? activeFloor.Count : 0;
             bool hasLoot = count > 0;
 
             if (btnModeGearLabel != null)
@@ -2953,9 +3009,10 @@ namespace SundayLastBreath.UI
         {
             UpdateFloorItemsNotification();
 
+            var activeFloor = GetCurrentFloorStash();
             if (tacticalGearController != null)
             {
-                tacticalGearController.Initialize(currentPlayer, floorItems);
+                tacticalGearController.Initialize(currentPlayer, activeFloor);
                 return;
             }
 
@@ -3026,7 +3083,7 @@ namespace SundayLastBreath.UI
             }
 
             // 3. Update Floor / Room Items in Right Wing
-            bool hasFloorLoot = floorItems != null && floorItems.Count > 0;
+            bool hasFloorLoot = activeFloor != null && activeFloor.Count > 0;
             if (floorItemsCard != null)
             {
                 floorItemsCard.SetActive(hasFloorLoot);
@@ -3053,7 +3110,7 @@ namespace SundayLastBreath.UI
 
                 if (hasFloorLoot)
                 {
-                    foreach (var item in floorItems)
+                    foreach (var item in activeFloor)
                     {
                         CreateFloorItemCell(pdaFloorItemsGrid, item.itemId, item.quantity);
                     }
@@ -3814,14 +3871,15 @@ namespace SundayLastBreath.UI
         private void AddFloorItem(string itemId, int quantity)
         {
             if (string.IsNullOrEmpty(itemId) || quantity <= 0) return;
-            var existing = floorItems.Find(f => string.Equals(f.itemId, itemId, StringComparison.OrdinalIgnoreCase));
+            var currentStash = GetCurrentFloorStash();
+            var existing = currentStash.Find(f => string.Equals(f.itemId, itemId, StringComparison.OrdinalIgnoreCase));
             if (existing != null)
             {
                 existing.quantity += quantity;
             }
             else
             {
-                floorItems.Add(new InventoryEntry(itemId, quantity));
+                currentStash.Add(new InventoryEntry(itemId, quantity));
             }
         }
 
@@ -3994,15 +4052,16 @@ namespace SundayLastBreath.UI
         private void OnTakeAllFloorItemsClicked()
         {
             PlayClickSFX();
-            if (currentPlayer == null || floorItems.Count == 0) return;
+            var currentStash = GetCurrentFloorStash();
+            if (currentPlayer == null || currentStash.Count == 0) return;
 
             int taken = 0;
-            for (int i = floorItems.Count - 1; i >= 0; i--)
+            for (int i = currentStash.Count - 1; i >= 0; i--)
             {
-                var item = floorItems[i];
+                var item = currentStash[i];
                 if (currentPlayer.AddItem(item.itemId, item.quantity))
                 {
-                    floorItems.RemoveAt(i);
+                    currentStash.RemoveAt(i);
                     taken++;
                 }
                 else
@@ -4032,13 +4091,14 @@ namespace SundayLastBreath.UI
             PlayClickSFX();
             if (currentPlayer == null) return;
 
-            int idx = floorItems.FindIndex(i => i.itemId == itemId);
+            var currentStash = GetCurrentFloorStash();
+            int idx = currentStash.FindIndex(i => i.itemId == itemId);
             if (idx >= 0)
             {
-                var item = floorItems[idx];
+                var item = currentStash[idx];
                 if (currentPlayer.AddItem(item.itemId, item.quantity))
                 {
-                    floorItems.RemoveAt(idx);
+                    currentStash.RemoveAt(idx);
 
                     AppendStoryLog(gameClock.GetTimeString(), "LOOT // ITEM SECURED",
                         $"You packed {item.itemId} (x{item.quantity}) into your backpack.");
@@ -5467,8 +5527,139 @@ namespace SundayLastBreath.UI
             objectiveSystem.CompleteObjective("leave_apt");
             objectiveSystem.AddObjective("escape_building", "Find a way down to the ground floor", ObjectiveStatus.Active);
 
-            // Transition to Hallway Mode
+            // Atmospheric transition with sound effects, black screen fade, and narrative suspense
+            StartCoroutine(DoorExitTransitionRoutine());
+        }
+
+        private bool isDoorTransitioning = false;
+        private GameObject doorTransitionOverlay;
+        private CanvasGroup doorTransitionCanvasGroup;
+        private TextMeshProUGUI doorTransitionTitleTmp;
+        private TextMeshProUGUI doorTransitionDescTmp;
+
+        private void EnsureDoorTransitionOverlay()
+        {
+            if (doorTransitionOverlay != null) return;
+
+            doorTransitionOverlay = new GameObject("DoorTransitionOverlay", typeof(RectTransform), typeof(CanvasGroup), typeof(Image));
+            doorTransitionOverlay.transform.SetParent(transform, false);
+            doorTransitionOverlay.transform.SetAsLastSibling();
+
+            RectTransform rt = doorTransitionOverlay.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            Image img = doorTransitionOverlay.GetComponent<Image>();
+            img.color = new Color(0.015f, 0.02f, 0.035f, 1f); // Deep pitch black
+            img.raycastTarget = true;
+
+            doorTransitionCanvasGroup = doorTransitionOverlay.GetComponent<CanvasGroup>();
+            doorTransitionCanvasGroup.alpha = 0f;
+
+            // Centered content box
+            GameObject box = new GameObject("ContentBox", typeof(RectTransform));
+            box.transform.SetParent(doorTransitionOverlay.transform, false);
+            RectTransform boxRt = box.GetComponent<RectTransform>();
+            boxRt.anchorMin = new Vector2(0.12f, 0.30f);
+            boxRt.anchorMax = new Vector2(0.88f, 0.70f);
+            boxRt.offsetMin = Vector2.zero;
+            boxRt.offsetMax = Vector2.zero;
+
+            // Title / Header
+            GameObject titleObj = new GameObject("TitleText", typeof(RectTransform), typeof(TextMeshProUGUI));
+            titleObj.transform.SetParent(box.transform, false);
+            RectTransform titleRt = titleObj.GetComponent<RectTransform>();
+            titleRt.anchorMin = new Vector2(0f, 0.62f);
+            titleRt.anchorMax = new Vector2(1f, 1f);
+            titleRt.offsetMin = Vector2.zero;
+            titleRt.offsetMax = Vector2.zero;
+
+            doorTransitionTitleTmp = titleObj.GetComponent<TextMeshProUGUI>();
+            doorTransitionTitleTmp.fontSize = 20f;
+            doorTransitionTitleTmp.fontStyle = FontStyles.Bold;
+            doorTransitionTitleTmp.alignment = TextAlignmentOptions.Center;
+            doorTransitionTitleTmp.color = new Color(0.0f, 0.92f, 1.0f); // Bright Cyan
+            doorTransitionTitleTmp.text = "[ UNIT 407 // FRONT DEADBOLT ]";
+
+            // Narrative description
+            GameObject descObj = new GameObject("DescText", typeof(RectTransform), typeof(TextMeshProUGUI));
+            descObj.transform.SetParent(box.transform, false);
+            RectTransform descRt = descObj.GetComponent<RectTransform>();
+            descRt.anchorMin = new Vector2(0f, 0f);
+            descRt.anchorMax = new Vector2(1f, 0.62f);
+            descRt.offsetMin = Vector2.zero;
+            descRt.offsetMax = Vector2.zero;
+
+            doorTransitionDescTmp = descObj.GetComponent<TextMeshProUGUI>();
+            doorTransitionDescTmp.fontSize = 16f;
+            doorTransitionDescTmp.lineSpacing = 16f;
+            doorTransitionDescTmp.alignment = TextAlignmentOptions.Center;
+            doorTransitionDescTmp.color = new Color(0.88f, 0.90f, 0.94f);
+            doorTransitionDescTmp.text = "You insert the key into the heavy deadbolt...";
+
+            doorTransitionOverlay.SetActive(false);
+        }
+
+        private IEnumerator DoorExitTransitionRoutine()
+        {
+            isDoorTransitioning = true;
+            EnsureDoorTransitionOverlay();
+            doorTransitionOverlay.SetActive(true);
+            doorTransitionOverlay.transform.SetAsLastSibling();
+            doorTransitionCanvasGroup.alpha = 0f;
+
+            // Step 1: Inserting the brass key & fading to black
+            doorTransitionTitleTmp.text = "[ UNIT 407 // UNLOCKING FRONT DEADBOLT ]";
+            doorTransitionDescTmp.text = "You slide the heavy brass key into the deadbolt cylinder.\n<color=#94A3B8>Your hands tremble slightly in the dark, silent room.</color>";
+            PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/Keys1.wav", 0.9f);
+
+            float fadeTime = 0.65f;
+            for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
+            {
+                doorTransitionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, t / fadeTime);
+                yield return null;
+            }
+            doorTransitionCanvasGroup.alpha = 1f;
+
+            yield return new WaitForSecondsRealtime(0.5f);
+
+            // Step 2: Handle turn & deadbolt disengagement
+            doorTransitionTitleTmp.text = "[ UNIT 407 // DISENGAGING DEADBOLT ]";
+            doorTransitionDescTmp.text = "<i>*CLACK-CHUNK*</i>\n\nThe heavy steel deadbolt disengages with a hollow metallic snap.\nYou grip the cold brass handle and ease the door open.";
+            PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.95f);
+
+            if (atmosphereSource != null && atmosphereSource.isPlaying)
+            {
+                StartCoroutine(FadeOutAudio(atmosphereSource, 0.8f));
+            }
+
+            yield return new WaitForSecondsRealtime(0.9f);
+
+            // Step 3: Stepping out into the hallway & door latching shut
+            doorTransitionTitleTmp.text = "[ 4TH FLOOR CORRIDOR // THE THRESHOLD ]";
+            doorTransitionDescTmp.text = "You take a breath of freezing, copper-scented air and step across the threshold.\nBehind you, the heavy door swings shut.\n\n<color=#EF4444><b>*CLICK*</b></color>\n<color=#94A3B8>The lock engages automatically. You are locked out into the hallway.</color>";
+            PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+
+            yield return new WaitForSecondsRealtime(0.6f);
+            PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
+
+            yield return new WaitForSecondsRealtime(1.0f);
+
+            // Perform Hallway setup behind the curtain
             EnterHallwayMode(1);
+
+            // Step 4: Fade in from black to reveal the red hallway
+            fadeTime = 0.8f;
+            for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
+            {
+                doorTransitionCanvasGroup.alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
+                yield return null;
+            }
+            doorTransitionCanvasGroup.alpha = 0f;
+            doorTransitionOverlay.SetActive(false);
+            isDoorTransitioning = false;
         }
 
         private IEnumerator FadeOutAudio(AudioSource src, float duration)
@@ -6902,13 +7093,15 @@ namespace SundayLastBreath.UI
 
         private void PlayHubBGM(string relPath, float volume = 0.5f, bool loop = true)
         {
+            if (string.IsNullOrEmpty(relPath)) return;
             AudioClip clip = Resources.Load<AudioClip>(relPath);
             if (clip == null)
             {
 #if UNITY_EDITOR
-                string fullPath = "Assets/" + relPath;
-                if (!fullPath.EndsWith(".mp3") && !fullPath.EndsWith(".wav")) fullPath += ".mp3";
-                clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(fullPath);
+                string cleanPath = relPath.Replace("\\", "/");
+                if (!cleanPath.StartsWith("Assets/")) cleanPath = "Assets/" + cleanPath;
+                if (!cleanPath.EndsWith(".mp3") && !cleanPath.EndsWith(".wav") && !cleanPath.EndsWith(".ogg")) cleanPath += ".mp3";
+                clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(cleanPath);
 #endif
             }
             if (clip != null && atmosphereSource != null)
@@ -6932,13 +7125,15 @@ namespace SundayLastBreath.UI
 
         private void PlaySFX(string relPath, float volume = 0.8f)
         {
+            if (string.IsNullOrEmpty(relPath)) return;
             AudioClip clip = Resources.Load<AudioClip>(relPath);
             if (clip == null)
             {
 #if UNITY_EDITOR
-                string fullPath = "Assets/" + relPath;
-                if (!fullPath.EndsWith(".mp3") && !fullPath.EndsWith(".wav")) fullPath += ".mp3";
-                clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(fullPath);
+                string cleanPath = relPath.Replace("\\", "/");
+                if (!cleanPath.StartsWith("Assets/")) cleanPath = "Assets/" + cleanPath;
+                if (!cleanPath.EndsWith(".mp3") && !cleanPath.EndsWith(".wav") && !cleanPath.EndsWith(".ogg")) cleanPath += ".mp3";
+                clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(cleanPath);
 #endif
             }
             if (clip != null)
@@ -6984,6 +7179,13 @@ namespace SundayLastBreath.UI
             {
                 currentPlayer.currentLocationId = roomId;
                 if (locationText != null) currentPlayer.currentLocationName = locationText.text;
+            }
+
+            // Sync room floor items & badges dynamically per location
+            UpdateFloorItemsNotification();
+            if (currentConsoleMode == ConsoleMode.Gear)
+            {
+                RefreshRightGearPanel();
             }
         }
 

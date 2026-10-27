@@ -447,7 +447,7 @@ namespace SundayLastBreath.UI
         {
             EnsureRuntimeBindings();
             RefreshAllNodes();
-            SelectNode(string.IsNullOrEmpty(selectedNodeId) ? currentLocationId : selectedNodeId);
+            SelectNode(string.IsNullOrEmpty(currentLocationId) ? "unit_407" : currentLocationId);
         }
 
         private void EnsureRuntimeBindings()
@@ -692,6 +692,9 @@ namespace SundayLastBreath.UI
 
             var list = new[] { u407, h1, u406, u405, h2, u404, u403, h3, u402, u401, h4, util, stairs, hEnd, blocked };
             foreach (var n in list) nodeRegistry[n.id] = n;
+            // Seamless alias support for narrative/lore variants
+            nodeRegistry["unit_408"] = u406;
+            nodeRegistry["utility_closet"] = util;
         }
 
         private static void ConnectBi(NodeModel a, NodeModel b)
@@ -797,9 +800,32 @@ namespace SundayLastBreath.UI
 
         public string CurrentLocationId => currentLocationId;
 
+        private string NormalizeLocationId(string locId)
+        {
+            if (string.IsNullOrEmpty(locId)) return "unit_407";
+            if (string.Equals(locId, "unit_408", StringComparison.OrdinalIgnoreCase)) return "unit_406";
+            if (string.Equals(locId, "utility_closet", StringComparison.OrdinalIgnoreCase)) return "utility";
+            return locId;
+        }
+
+        private bool TryGetUIHolder(string roomId, out NodeUIHolder holder)
+        {
+            if (string.IsNullOrEmpty(roomId)) { holder = null; return false; }
+            if (uiHolders.TryGetValue(roomId, out holder)) return true;
+            string norm = NormalizeLocationId(roomId);
+            if (!string.Equals(norm, roomId, StringComparison.OrdinalIgnoreCase))
+            {
+                return uiHolders.TryGetValue(norm, out holder);
+            }
+            holder = null;
+            return false;
+        }
+
         public NodeModel GetNode(string roomId)
         {
+            EnsureRuntimeBindings();
             if (string.IsNullOrEmpty(roomId)) return null;
+            roomId = NormalizeLocationId(roomId);
             nodeRegistry.TryGetValue(roomId, out NodeModel model);
             return model;
         }
@@ -808,8 +834,13 @@ namespace SundayLastBreath.UI
 
         public void SetCurrentLocation(string locationId)
         {
+            EnsureRuntimeBindings();
+            locationId = NormalizeLocationId(locationId);
+
             if (!nodeRegistry.ContainsKey(locationId)) return;
             currentLocationId = locationId;
+            selectedNodeId = locationId;
+
             DiscoverRoom(locationId);
             DiscoverAdjacentRooms(locationId);
             RefreshAllNodes();
@@ -819,10 +850,12 @@ namespace SundayLastBreath.UI
 
         public void DiscoverRoom(string roomId)
         {
+            EnsureRuntimeBindings();
+            roomId = NormalizeLocationId(roomId);
             if (nodeRegistry.TryGetValue(roomId, out NodeModel model))
             {
                 model.isDiscovered = true;
-                if (uiHolders.TryGetValue(roomId, out NodeUIHolder holder))
+                if (TryGetUIHolder(roomId, out NodeUIHolder holder))
                 {
                     ApplyVisualState(holder);
                 }
@@ -841,6 +874,8 @@ namespace SundayLastBreath.UI
 
         public void DiscoverAdjacentRooms(string roomId)
         {
+            EnsureRuntimeBindings();
+            roomId = NormalizeLocationId(roomId);
             if (nodeRegistry.TryGetValue(roomId, out NodeModel model))
             {
                 foreach (var connId in model.connectedIds)
@@ -852,10 +887,12 @@ namespace SundayLastBreath.UI
 
         public void SetRoomDiscovered(string roomId, bool discovered)
         {
+            EnsureRuntimeBindings();
+            roomId = NormalizeLocationId(roomId);
             if (nodeRegistry.TryGetValue(roomId, out NodeModel model))
             {
                 model.isDiscovered = discovered;
-                if (uiHolders.TryGetValue(roomId, out NodeUIHolder holder))
+                if (TryGetUIHolder(roomId, out NodeUIHolder holder))
                 {
                     ApplyVisualState(holder);
                 }
@@ -868,6 +905,8 @@ namespace SundayLastBreath.UI
 
         public bool IsRoomDiscovered(string roomId)
         {
+            EnsureRuntimeBindings();
+            roomId = NormalizeLocationId(roomId);
             return nodeRegistry.TryGetValue(roomId, out NodeModel model) && model.isDiscovered;
         }
 
@@ -885,6 +924,8 @@ namespace SundayLastBreath.UI
 
         public void SelectNode(string nodeId)
         {
+            EnsureRuntimeBindings();
+            nodeId = NormalizeLocationId(nodeId);
             if (!nodeRegistry.TryGetValue(nodeId, out NodeModel model)) return;
             selectedNodeId = nodeId;
 
@@ -1120,10 +1161,16 @@ namespace SundayLastBreath.UI
                 holder.beaconObj.SetActive(isCurrent);
             }
 
-            // Hallways: Clean, textless architectural connectors (like Twine)
+            // Hallways: Clean architectural connectors (like Twine)
             if (holder.model.isHallway)
             {
-                if (holder.roomCodeTmp != null) holder.roomCodeTmp.text = "";
+                if (holder.roomCodeTmp != null)
+                {
+                    holder.roomCodeTmp.text = isCurrent ? "▲ YOU" : "";
+                    holder.roomCodeTmp.color = new Color(0.0f, 0.95f, 1.0f, 1.0f);
+                    holder.roomCodeTmp.fontSize = 11f;
+                    holder.roomCodeTmp.alignment = TextAlignmentOptions.Center;
+                }
                 if (holder.subLabelTmp != null) holder.subLabelTmp.text = "";
                 if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
                 if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
@@ -1131,11 +1178,11 @@ namespace SundayLastBreath.UI
 
                 if (isCurrent)
                 {
-                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.04f, 0.08f, 0.12f, 0.98f);
+                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.04f, 0.12f, 0.18f, 0.98f);
                     if (holder.outline != null)
                     {
                         holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 1.0f);
-                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
+                        holder.outline.effectDistance = new Vector2(2f, -2f);
                     }
                 }
                 else if (isSelected)

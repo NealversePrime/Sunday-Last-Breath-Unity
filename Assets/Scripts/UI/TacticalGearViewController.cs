@@ -789,7 +789,14 @@ namespace SundayLastBreath.UI
             int count = _floorItems != null ? _floorItems.Count : 0;
             bool hasItems = count > 0;
 
-            if (floorEmptyNotice != null) floorEmptyNotice.gameObject.SetActive(!hasItems);
+            if (floorEmptyNotice != null)
+            {
+                floorEmptyNotice.gameObject.SetActive(!hasItems);
+                if (!hasItems)
+                {
+                    floorEmptyNotice.text = "<color=#64748B><i>No loose items in this area.</i></color>";
+                }
+            }
             if (btnTakeAllFloor != null) btnTakeAllFloor.gameObject.SetActive(hasItems);
 
             if (tabFloorCountText != null)
