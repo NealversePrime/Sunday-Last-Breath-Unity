@@ -177,7 +177,7 @@ namespace SundayLastBreath.UI
                     {
                         slotDetailTexts[slotIdx].text =
                             $"<color=#FBBF24><b>{s.roomDisplayName}</b></color>   |   <color=#E2E8F0>{s.clockDisplay}</color>   |   " +
-                            $"HP: <color=#EF4444><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#10B981><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#A78BFA><b>{s.humanity}%</b></color>   Items: <b>{s.itemCount}</b>";
+                            $"HP: <color=#EF4444><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#10B981><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#A78BFA><b>{s.humanity}%</b></color>";
                     }
 
                     if (slotLoadButtons[slotIdx] != null)
