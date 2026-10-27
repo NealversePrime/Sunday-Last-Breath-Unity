@@ -364,6 +364,12 @@ namespace SundayLastBreath.Core
             public string dateString;
             public int traitCount;
             public int itemCount;
+
+            // UI helper alias properties
+            public string characterName => !string.IsNullOrEmpty(survivorName) ? survivorName : "Unknown Survivor";
+            public string saveTimestamp => !string.IsNullOrEmpty(dateString) ? dateString : "Recent";
+            public string roomDisplayName => string.IsNullOrEmpty(roomId) ? "Unit 407" : roomId.Replace("_", " ").ToUpperInvariant();
+            public string clockDisplay => $"DAY {day} // {hour:D2}:{minute:D2}";
         }
 
         /// <summary>

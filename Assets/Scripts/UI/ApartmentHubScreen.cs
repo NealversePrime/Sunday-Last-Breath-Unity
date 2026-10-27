@@ -65,6 +65,7 @@ namespace SundayLastBreath.UI
 
         [Header("Left PDA - Status Tab")]
         [SerializeField] private TextMeshProUGUI pdaCharNameText;
+        private TextMeshProUGUI pdaNameJobText => pdaCharNameText;
         [SerializeField] private TextMeshProUGUI pdaCharSubText;
         [SerializeField] private TextMeshProUGUI pdaActiveLogsText;
         [SerializeField] private TextMeshProUGUI pdaLevelText;
@@ -3052,9 +3053,8 @@ namespace SundayLastBreath.UI
                 else if (hasSave && SaveManager.Instance != null)
                 {
                     var s = SaveManager.Instance.GetSaveSummary();
-                    string roomStr = string.IsNullOrEmpty(s.roomId) ? "UNIT 407" : s.roomId.Replace("_", " ").ToUpperInvariant();
                     sysTelemetryStatusText.text =
-                        $"<color=#38BDF8><b>LAST ARCHIVE:</b></color> {s.dateString}   |   <color=#F8FAFC>{s.survivorName} ({s.job})</color>   |   <color=#F59E0B>{roomStr} (HP {s.hp}/{s.hpMax})</color>";
+                        $"<color=#38BDF8><b>LAST ARCHIVE:</b></color> {s.saveTimestamp}   |   <color=#F8FAFC>{s.characterName} ({s.job})</color>   |   <color=#F59E0B>{s.roomDisplayName} ({s.clockDisplay})</color>";
                 }
                 else
                 {
@@ -3071,12 +3071,11 @@ namespace SundayLastBreath.UI
             if (hasSave && SaveManager.Instance != null)
             {
                 var s = SaveManager.Instance.GetSaveSummary();
-                string roomStr = string.IsNullOrEmpty(s.roomId) ? "UNIT 407" : s.roomId.Replace("_", " ").ToUpperInvariant();
                 sysExitWarningDetailText.text =
                     "Are you sure you want to exit the game?\n" +
                     "Any unsaved progress since your last save will be lost.\n\n" +
-                    $"<color=#38BDF8><b>Last Recorded Save:</b></color> {s.dateString}\n" +
-                    $"<color=#94A3B8>Citizen: {s.survivorName} ({s.job})  |  Location: {roomStr}  |  HP: {s.hp}/{s.hpMax}</color>";
+                    $"<color=#38BDF8><b>Last Recorded Save:</b></color> {s.saveTimestamp}\n" +
+                    $"<color=#94A3B8>Citizen: {s.characterName}  |  Location: {s.roomDisplayName} ({s.clockDisplay})</color>";
             }
             else
             {
@@ -3097,9 +3096,8 @@ namespace SundayLastBreath.UI
                     "Survivor vitals, backpack items, and room progress saved to storage.");
 
                 var s = SaveManager.Instance.GetSaveSummary();
-                string roomStr = string.IsNullOrEmpty(s.roomId) ? "UNIT 407" : s.roomId.Replace("_", " ").ToUpperInvariant();
                 RefreshSystemMenuTelemetry(
-                    $"<color=#10B981><b>✓ GAME SAVED SUCCESSFULLY</b></color>  [{s.dateString}]  —  {s.survivorName} | {roomStr}");
+                    $"<color=#10B981><b>✓ GAME SAVED SUCCESSFULLY</b></color>  [{s.saveTimestamp}]  —  {s.characterName} | {s.roomDisplayName}");
 
                 if (sysSaveFeedbackRoutine != null) StopCoroutine(sysSaveFeedbackRoutine);
                 sysSaveFeedbackRoutine = StartCoroutine(AnimateSysSaveButtonConfirmation());
@@ -3228,7 +3226,7 @@ namespace SundayLastBreath.UI
         {
             if (systemMenuModal != null) return;
 
-            TMP_FontAsset sharedFont = dockHeaderLocation != null ? dockHeaderLocation.font : null;
+            TMP_FontAsset sharedFont = pdaCharNameText != null ? pdaCharNameText.font : (dockHeaderLocation != null ? dockHeaderLocation.font : null);
 
             // 1. Fullscreen Backdrop Dimmer
             systemMenuModal = new GameObject("SystemMenuModal");
