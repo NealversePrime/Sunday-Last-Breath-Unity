@@ -3655,14 +3655,17 @@ namespace SundayLastBreath.UI
                 {
                     listenRadioButton.gameObject.SetActive(true);
                     bool isPolice = currentPlayer != null && string.Equals(currentPlayer.job, "Police Officer", StringComparison.OrdinalIgnoreCase);
-                    bool hasTech1 = currentPlayer != null && currentPlayer.tech >= 1 && currentPlayer.Tactics >= 4;
+                    bool hasRadioKnowledge = currentPlayer != null && (
+                        currentPlayer.HasTrait("RADIO OPERATOR") ||
+                        (currentPlayer.tech >= 1 && currentPlayer.Tactics >= 4)
+                    );
 
                     if (isPolice)
                     {
                         listenRadioButton.interactable = true;
                         SetChoiceButtonContent(listenRadioButton, "<b>Turn on the radio and tune in to the emergency police dispatch band.</b>  <color=#64748B><i>(~3 min)</i></color>");
                     }
-                    else if (hasTech1)
+                    else if (hasRadioKnowledge)
                     {
                         listenRadioButton.interactable = true;
                         SetChoiceButtonContent(listenRadioButton, "<b>Tune the portable radio to scan for emergency frequencies.</b>  <color=#64748B><i>(~5 min)</i></color>");
@@ -3685,9 +3688,24 @@ namespace SundayLastBreath.UI
                 else
                 {
                     hackTerminalButton.gameObject.SetActive(true);
-                    bool hasTech3 = currentPlayer != null && currentPlayer.tech >= 3 && currentPlayer.Tactics >= 6;
 
-                    if (hasTech3)
+                    // Dual Synergistic Hacking Check:
+                    // 1. High Tech Specialist: Tech >= 2 & Intelligence (Tactics) >= 5
+                    // 2. High Intellect Cryptanalyst: Intelligence (Tactics) >= 6 & Tech >= 1
+                    // 3. Genius Mind: Intelligence (Tactics) >= 7 (cracks algorithms through pure deduction)
+                    // 4. Hacker/Simulation Trait: GAMER or RADIO OPERATOR with Intelligence (Tactics) >= 5
+                    bool canHack = false;
+                    if (currentPlayer != null)
+                    {
+                        bool techSpecialist = currentPlayer.tech >= 2 && currentPlayer.Tactics >= 5;
+                        bool highIntellect = currentPlayer.Tactics >= 6 && currentPlayer.tech >= 1;
+                        bool geniusIntellect = currentPlayer.Tactics >= 7;
+                        bool traitSynergy = (currentPlayer.HasTrait("GAMER") || currentPlayer.HasTrait("RADIO OPERATOR")) && currentPlayer.Tactics >= 5;
+
+                        canHack = techSpecialist || highIntellect || geniusIntellect || traitSynergy;
+                    }
+
+                    if (canHack)
                     {
                         hackTerminalButton.interactable = true;
                         SetChoiceButtonContent(hackTerminalButton, "<b>Log onto the computer to see if the building network is still responding.</b>  <color=#64748B><i>(~8 min)</i></color>");
@@ -3695,7 +3713,7 @@ namespace SundayLastBreath.UI
                     else
                     {
                         hackTerminalButton.interactable = false;
-                        SetChoiceButtonContent(hackTerminalButton, "<s><color=#64748B>Log onto the computer to inspect encrypted network traffic.</color></s>  <color=#EF4444><i>[Requires Tech knowledge]</i></color>");
+                        SetChoiceButtonContent(hackTerminalButton, "<s><color=#64748B>Log onto the computer to inspect encrypted network traffic.</color></s>  <color=#EF4444><i>[Requires Intelligence (Tactics 6+) or Tech 2+]</i></color>");
                     }
                 }
             }
