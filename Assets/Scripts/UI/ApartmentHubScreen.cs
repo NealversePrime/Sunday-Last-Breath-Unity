@@ -3644,7 +3644,7 @@ namespace SundayLastBreath.UI
                 SetChoiceButtonContent(checkPhoneButton, "<b>Check my phone to see if anyone knows what is happening outside.</b>  <color=#64748B><i>(~1 min)</i></color>");
             }
 
-            // 6. Listen to Emergency Band / Radio (Spider-Man Style Emergency Transceiver Scanner)
+            // 6. Listen to Emergency Band / Radio
             if (listenRadioButton != null)
             {
                 if (radioVisited)
@@ -3654,23 +3654,35 @@ namespace SundayLastBreath.UI
                 else
                 {
                     listenRadioButton.gameObject.SetActive(true);
-                    listenRadioButton.interactable = true;
-
                     bool isPolice = currentPlayer != null && string.Equals(currentPlayer.job, "Police Officer", StringComparison.OrdinalIgnoreCase);
-                    bool isRadioOp = currentPlayer != null && currentPlayer.HasTrait("RADIO OPERATOR");
+                    bool hasTech = currentPlayer != null && currentPlayer.tech >= 1;
+                    bool hasIntl = currentPlayer != null && currentPlayer.Tactics >= 5;
+                    bool hasRadioTrait = currentPlayer != null && currentPlayer.HasTrait("RADIO OPERATOR");
 
                     if (isPolice)
                     {
-                        SetChoiceButtonContent(listenRadioButton, "<b>Turn on the radio and tune in to the emergency police dispatch band.</b>  <color=#64748B><i>(~3 min)</i></color>");
+                        listenRadioButton.interactable = true;
+                        SetChoiceButtonContent(listenRadioButton, "<b>Turn on your department transceiver and listen to Seattle PD dispatch.</b>  <color=#64748B><i>(~3 min) [Police Vocation]</i></color>");
                     }
-                    else if (isRadioOp)
+                    else if (hasRadioTrait)
                     {
-                        SetChoiceButtonContent(listenRadioButton, "<b>Tune the transceiver scanner to intercept tactical precinct airwaves.</b>  <color=#38BDF8><i>[Radio Operator: ~3 min]</i></color>");
+                        listenRadioButton.interactable = true;
+                        SetChoiceButtonContent(listenRadioButton, "<b>Dial into the emergency dispatch band using your scanner.</b>  <color=#64748B><i>(~4 min) [Radio Operator]</i></color>");
+                    }
+                    else if (hasTech)
+                    {
+                        listenRadioButton.interactable = true;
+                        SetChoiceButtonContent(listenRadioButton, "<b>Manually calibrate the radio transceiver to sweep police frequencies.</b>  <color=#64748B><i>(~5 min) [Tech Knowledge]</i></color>");
+                    }
+                    else if (hasIntl)
+                    {
+                        listenRadioButton.interactable = true;
+                        SetChoiceButtonContent(listenRadioButton, "<b>Deduce the encrypted precinct frequencies and tune the scanner.</b>  <color=#64748B><i>(~5 min) [Tactics / Intelligence]</i></color>");
                     }
                     else
                     {
-                        // Spider-Man style: Civilian dialing the emergency scanner dial to listen in on personnel operations
-                        SetChoiceButtonContent(listenRadioButton, "<b>Tune the emergency radio scanner to monitor police & tactical unit traffic.</b>  <color=#64748B><i>(~5 min)</i></color>");
+                        listenRadioButton.interactable = false;
+                        SetChoiceButtonContent(listenRadioButton, "<s><color=#64748B>Tune the radio to emergency dispatch frequencies.</color></s>  <color=#EF4444><i>[Requires Police, Tech, or Intelligence (Tactics 5+)]</i></color>");
                     }
                 }
             }
@@ -3686,31 +3698,29 @@ namespace SundayLastBreath.UI
                 {
                     hackTerminalButton.gameObject.SetActive(true);
 
-                    // Dual Synergistic Hacking Check:
-                    // 1. High Tech Specialist: Tech >= 2 & Intelligence (Tactics) >= 5
-                    // 2. High Intellect Cryptanalyst: Intelligence (Tactics) >= 6 & Tech >= 1
-                    // 3. Genius Mind: Intelligence (Tactics) >= 7 (cracks algorithms through pure deduction)
-                    // 4. Hacker/Simulation Trait: GAMER or RADIO OPERATOR with Intelligence (Tactics) >= 5
-                    bool canHack = false;
-                    if (currentPlayer != null)
-                    {
-                        bool techSpecialist = currentPlayer.tech >= 2 && currentPlayer.Tactics >= 5;
-                        bool highIntellect = currentPlayer.Tactics >= 6 && currentPlayer.tech >= 1;
-                        bool geniusIntellect = currentPlayer.Tactics >= 7;
-                        bool traitSynergy = (currentPlayer.HasTrait("GAMER") || currentPlayer.HasTrait("RADIO OPERATOR")) && currentPlayer.Tactics >= 5;
+                    bool hasTechHacking = currentPlayer != null && currentPlayer.tech >= 2;
+                    bool hasIntlHacking = currentPlayer != null && (currentPlayer.Tactics >= 7 || (currentPlayer.Tactics >= 6 && currentPlayer.tech >= 1));
+                    bool hasTraitHacking = currentPlayer != null && (currentPlayer.HasTrait("GAMER") || currentPlayer.HasTrait("RADIO OPERATOR")) && currentPlayer.Tactics >= 5;
 
-                        canHack = techSpecialist || highIntellect || geniusIntellect || traitSynergy;
-                    }
-
-                    if (canHack)
+                    if (hasTechHacking)
                     {
                         hackTerminalButton.interactable = true;
-                        SetChoiceButtonContent(hackTerminalButton, "<b>Log onto the computer to see if the building network is still responding.</b>  <color=#64748B><i>(~8 min)</i></color>");
+                        SetChoiceButtonContent(hackTerminalButton, "<b>Exploit building network vulnerabilities to inspect military traffic.</b>  <color=#64748B><i>(~8 min) [Tech Knowledge]</i></color>");
+                    }
+                    else if (hasIntlHacking)
+                    {
+                        hackTerminalButton.interactable = true;
+                        SetChoiceButtonContent(hackTerminalButton, "<b>Analyze encrypted network packets to bypass defense protocols.</b>  <color=#64748B><i>(~8 min) [Tactics / Intelligence]</i></color>");
+                    }
+                    else if (hasTraitHacking)
+                    {
+                        hackTerminalButton.interactable = true;
+                        SetChoiceButtonContent(hackTerminalButton, "<b>Use simulation & codebreaking algorithms to penetrate the node.</b>  <color=#64748B><i>(~8 min) [Simulation / Trait]</i></color>");
                     }
                     else
                     {
                         hackTerminalButton.interactable = false;
-                        SetChoiceButtonContent(hackTerminalButton, "<s><color=#64748B>Log onto the computer to inspect encrypted network traffic.</color></s>  <color=#EF4444><i>[Requires Intelligence (Tactics 6+) or Tech 2+]</i></color>");
+                        SetChoiceButtonContent(hackTerminalButton, "<s><color=#64748B>Log onto the computer to inspect encrypted network traffic.</color></s>  <color=#EF4444><i>[Requires Tech 2+ or Intelligence (Tactics 6+)]</i></color>");
                     }
                 }
             }
@@ -4950,8 +4960,7 @@ namespace SundayLastBreath.UI
             PlayClickSFX();
 
             bool isPolice = currentPlayer != null && string.Equals(currentPlayer.job, "Police Officer", StringComparison.OrdinalIgnoreCase);
-            bool isRadioOp = currentPlayer != null && currentPlayer.HasTrait("RADIO OPERATOR");
-            gameClock.AddTime((isPolice || isRadioOp) ? 3 : 5);
+            gameClock.AddTime(isPolice ? 3 : 5);
             radioVisited = true;
 
             EnsureInspectionModalsEnhanced();
