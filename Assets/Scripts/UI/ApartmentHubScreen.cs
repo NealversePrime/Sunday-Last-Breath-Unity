@@ -459,6 +459,13 @@ namespace SundayLastBreath.UI
         protected virtual void OnDestroy()
         {
             if (Instance == this) Instance = null;
+
+            if (doorVideoRenderTexture != null)
+            {
+                doorVideoRenderTexture.Release();
+                Destroy(doorVideoRenderTexture);
+                doorVideoRenderTexture = null;
+            }
         }
 
         private void InitializeAudioSources()
@@ -5550,6 +5557,10 @@ namespace SundayLastBreath.UI
         private CanvasGroup doorTransitionCanvasGroup;
         private TextMeshProUGUI doorTransitionTitleTmp;
         private TextMeshProUGUI doorTransitionDescTmp;
+        private GameObject doorTransitionContentBox;
+        private UnityEngine.Video.VideoPlayer doorVideoPlayer;
+        private RawImage doorVideoRawImage;
+        private RenderTexture doorVideoRenderTexture;
 
         private void EnsureDoorTransitionOverlay()
         {
@@ -5572,26 +5583,70 @@ namespace SundayLastBreath.UI
             doorTransitionCanvasGroup = doorTransitionOverlay.GetComponent<CanvasGroup>();
             doorTransitionCanvasGroup.alpha = 0f;
 
-            // Centered content box
-            GameObject box = new GameObject("ContentBox", typeof(RectTransform));
-            box.transform.SetParent(doorTransitionOverlay.transform, false);
-            RectTransform boxRt = box.GetComponent<RectTransform>();
-            boxRt.anchorMin = new Vector2(0.12f, 0.30f);
-            boxRt.anchorMax = new Vector2(0.88f, 0.70f);
+            // Resident Evil Classic Door Video Player (RawImage + RenderTexture)
+            GameObject vidObj = new GameObject("DoorVideoDisplay", typeof(RectTransform), typeof(RawImage));
+            vidObj.transform.SetParent(doorTransitionOverlay.transform, false);
+            RectTransform vidRt = vidObj.GetComponent<RectTransform>();
+            vidRt.anchorMin = Vector2.zero;
+            vidRt.anchorMax = Vector2.one;
+            vidRt.offsetMin = Vector2.zero;
+            vidRt.offsetMax = Vector2.zero;
+
+            doorVideoRawImage = vidObj.GetComponent<RawImage>();
+            doorVideoRawImage.color = Color.black;
+            doorVideoRawImage.raycastTarget = false;
+
+            if (doorVideoRenderTexture == null)
+            {
+                doorVideoRenderTexture = new RenderTexture(1920, 1080, 0, RenderTextureFormat.ARGB32);
+                doorVideoRenderTexture.Create();
+            }
+            doorVideoRawImage.texture = doorVideoRenderTexture;
+
+            doorVideoPlayer = doorTransitionOverlay.AddComponent<UnityEngine.Video.VideoPlayer>();
+            doorVideoPlayer.playOnAwake = false;
+            doorVideoPlayer.isLooping = false;
+            doorVideoPlayer.renderMode = UnityEngine.Video.VideoRenderMode.RenderTexture;
+            doorVideoPlayer.targetTexture = doorVideoRenderTexture;
+            doorVideoPlayer.audioOutputMode = UnityEngine.Video.VideoAudioOutputMode.Direct;
+
+            // Try loading VideoClip or file path
+            var clip = Resources.Load<UnityEngine.Video.VideoClip>("Videos/room403_door_transition");
+            if (clip != null)
+            {
+                doorVideoPlayer.source = UnityEngine.Video.VideoSource.VideoClip;
+                doorVideoPlayer.clip = clip;
+            }
+            else
+            {
+                string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "room403_door_transition.mp4").Replace("\\", "/");
+                if (System.IO.File.Exists(filePath))
+                {
+                    doorVideoPlayer.source = UnityEngine.Video.VideoSource.Url;
+                    doorVideoPlayer.url = filePath;
+                }
+            }
+
+            // Centered content box (Narrative Subtitle / Fallback)
+            doorTransitionContentBox = new GameObject("ContentBox", typeof(RectTransform));
+            doorTransitionContentBox.transform.SetParent(doorTransitionOverlay.transform, false);
+            RectTransform boxRt = doorTransitionContentBox.GetComponent<RectTransform>();
+            boxRt.anchorMin = new Vector2(0.12f, 0.08f);
+            boxRt.anchorMax = new Vector2(0.88f, 0.28f);
             boxRt.offsetMin = Vector2.zero;
             boxRt.offsetMax = Vector2.zero;
 
             // Title / Header
             GameObject titleObj = new GameObject("TitleText", typeof(RectTransform), typeof(TextMeshProUGUI));
-            titleObj.transform.SetParent(box.transform, false);
+            titleObj.transform.SetParent(doorTransitionContentBox.transform, false);
             RectTransform titleRt = titleObj.GetComponent<RectTransform>();
-            titleRt.anchorMin = new Vector2(0f, 0.62f);
+            titleRt.anchorMin = new Vector2(0f, 0.55f);
             titleRt.anchorMax = new Vector2(1f, 1f);
             titleRt.offsetMin = Vector2.zero;
             titleRt.offsetMax = Vector2.zero;
 
             doorTransitionTitleTmp = titleObj.GetComponent<TextMeshProUGUI>();
-            doorTransitionTitleTmp.fontSize = 20f;
+            doorTransitionTitleTmp.fontSize = 17f;
             doorTransitionTitleTmp.fontStyle = FontStyles.Bold;
             doorTransitionTitleTmp.alignment = TextAlignmentOptions.Center;
             doorTransitionTitleTmp.color = new Color(0.0f, 0.92f, 1.0f); // Bright Cyan
@@ -5599,16 +5654,16 @@ namespace SundayLastBreath.UI
 
             // Narrative description
             GameObject descObj = new GameObject("DescText", typeof(RectTransform), typeof(TextMeshProUGUI));
-            descObj.transform.SetParent(box.transform, false);
+            descObj.transform.SetParent(doorTransitionContentBox.transform, false);
             RectTransform descRt = descObj.GetComponent<RectTransform>();
             descRt.anchorMin = new Vector2(0f, 0f);
-            descRt.anchorMax = new Vector2(1f, 0.62f);
+            descRt.anchorMax = new Vector2(1f, 0.55f);
             descRt.offsetMin = Vector2.zero;
             descRt.offsetMax = Vector2.zero;
 
             doorTransitionDescTmp = descObj.GetComponent<TextMeshProUGUI>();
-            doorTransitionDescTmp.fontSize = 16f;
-            doorTransitionDescTmp.lineSpacing = 16f;
+            doorTransitionDescTmp.fontSize = 14f;
+            doorTransitionDescTmp.lineSpacing = 14f;
             doorTransitionDescTmp.alignment = TextAlignmentOptions.Center;
             doorTransitionDescTmp.color = new Color(0.88f, 0.90f, 0.94f);
             doorTransitionDescTmp.text = "You insert the key into the heavy deadbolt...";
@@ -5623,13 +5678,29 @@ namespace SundayLastBreath.UI
             doorTransitionOverlay.SetActive(true);
             doorTransitionOverlay.transform.SetAsLastSibling();
             doorTransitionCanvasGroup.alpha = 0f;
+            doorTransitionContentBox?.SetActive(true);
 
-            // Step 1: Inserting the brass key & fading to black
+            // Refresh video source in case of dynamic file addition
+            if (doorVideoPlayer != null)
+            {
+                if (doorVideoPlayer.clip == null && string.IsNullOrEmpty(doorVideoPlayer.url))
+                {
+                    string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "room403_door_transition.mp4").Replace("\\", "/");
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        doorVideoPlayer.source = UnityEngine.Video.VideoSource.Url;
+                        doorVideoPlayer.url = filePath;
+                    }
+                }
+                doorVideoPlayer.Prepare();
+            }
+
+            // Step 1: Smooth fade to black with key insertion SFX
             doorTransitionTitleTmp.text = "[ UNIT 407 // UNLOCKING FRONT DEADBOLT ]";
-            doorTransitionDescTmp.text = "You slide the heavy brass key into the deadbolt cylinder.\n<color=#94A3B8>Your hands tremble slightly in the dark, silent room.</color>";
+            doorTransitionDescTmp.text = "You slide the heavy brass key into the cylinder.\n<color=#94A3B8>The mechanical tumblers align with a sharp metallic click.</color>";
             PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/Keys1.wav", 0.9f);
 
-            float fadeTime = 0.8f;
+            float fadeTime = 0.6f;
             for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
             {
                 doorTransitionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, t / fadeTime);
@@ -5637,34 +5708,77 @@ namespace SundayLastBreath.UI
             }
             doorTransitionCanvasGroup.alpha = 1f;
 
-            yield return new WaitForSecondsRealtime(1.8f);
+            yield return new WaitForSecondsRealtime(0.6f);
 
-            // Step 2: Handle turn & deadbolt disengagement
-            doorTransitionTitleTmp.text = "[ UNIT 407 // DISENGAGING DEADBOLT ]";
-            doorTransitionDescTmp.text = "<i>*CLACK-CHUNK*</i>\n\nThe heavy steel deadbolt disengages with a hollow metallic snap.\nYou grip the cold brass handle and ease the door open.";
-            PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.95f);
-
-            if (atmosphereSource != null && atmosphereSource.isPlaying)
+            // Step 2: Play the Resident Evil Door Opening Video!
+            bool playedVideo = false;
+            if (doorVideoPlayer != null && (doorVideoPlayer.clip != null || !string.IsNullOrEmpty(doorVideoPlayer.url)))
             {
-                StartCoroutine(FadeOutAudio(atmosphereSource, 0.8f));
+                // Wait for video prepare if needed (with 1.5s max timeout)
+                float prepTimer = 0f;
+                while (!doorVideoPlayer.isPrepared && prepTimer < 1.5f)
+                {
+                    prepTimer += Time.unscaledDeltaTime;
+                    yield return null;
+                }
+
+                if (doorVideoPlayer.isPrepared)
+                {
+                    playedVideo = true;
+                    doorVideoRawImage.color = Color.white;
+                    doorTransitionContentBox?.SetActive(false); // Clean cinematic presentation
+
+                    PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.95f);
+                    if (atmosphereSource != null && atmosphereSource.isPlaying)
+                    {
+                        StartCoroutine(FadeOutAudio(atmosphereSource, 0.8f));
+                    }
+
+                    doorVideoPlayer.Play();
+
+                    // Track video playback
+                    yield return new WaitForSecondsRealtime(0.3f);
+                    float vidLength = (float)doorVideoPlayer.length;
+                    if (vidLength <= 0.5f) vidLength = 4.5f;
+
+                    // Play footsteps and door shut as the door swings open into darkness
+                    float midTime = vidLength * 0.55f;
+                    yield return new WaitForSecondsRealtime(midTime);
+                    PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+
+                    float remain = Mathf.Max(0.2f, vidLength - midTime - 0.4f);
+                    yield return new WaitForSecondsRealtime(remain);
+                    PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
+
+                    yield return new WaitForSecondsRealtime(0.4f);
+                }
             }
 
-            yield return new WaitForSecondsRealtime(2.2f);
+            // Fallback narrative sequence if video could not play
+            if (!playedVideo)
+            {
+                doorTransitionContentBox?.SetActive(true);
+                doorTransitionTitleTmp.text = "[ UNIT 407 // DISENGAGING DEADBOLT ]";
+                doorTransitionDescTmp.text = "<i>*CLACK-CHUNK*</i>\n\nThe heavy steel deadbolt disengages with a hollow metallic snap.\nYou grip the cold brass handle and ease the door open.";
+                PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.95f);
+                if (atmosphereSource != null && atmosphereSource.isPlaying)
+                {
+                    StartCoroutine(FadeOutAudio(atmosphereSource, 0.8f));
+                }
+                yield return new WaitForSecondsRealtime(2.0f);
 
-            // Step 3: Stepping out into the hallway & door latching shut
-            doorTransitionTitleTmp.text = "[ 4TH FLOOR CORRIDOR // THE THRESHOLD ]";
-            doorTransitionDescTmp.text = "You take a breath of freezing, copper-scented air and step across the threshold.\nBehind you, the heavy door swings shut.\n\n<color=#EF4444><b>*CLICK*</b></color>\n<color=#94A3B8>The lock engages automatically. You are locked out into the hallway.</color>";
-            PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+                doorTransitionTitleTmp.text = "[ 4TH FLOOR CORRIDOR // THE THRESHOLD ]";
+                doorTransitionDescTmp.text = "You take a breath of freezing, copper-scented air and step across the threshold.\nBehind you, the heavy door swings shut.\n\n<color=#EF4444><b>*CLICK*</b></color>\n<color=#94A3B8>The lock engages automatically. You are locked out into the hallway.</color>";
+                PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+                yield return new WaitForSecondsRealtime(1.0f);
+                PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
+                yield return new WaitForSecondsRealtime(2.0f);
+            }
 
-            yield return new WaitForSecondsRealtime(1.0f);
-            PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
-
-            yield return new WaitForSecondsRealtime(2.5f);
-
-            // Perform Hallway setup behind the curtain
+            // Step 3: Switch to Hallway Mode behind the black screen
             EnterHallwayMode(1);
 
-            // Step 4: Fade in from black to reveal the red hallway
+            // Step 4: Fade in from black to reveal the red 4th floor corridor
             fadeTime = 1.0f;
             for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
             {
@@ -5672,6 +5786,10 @@ namespace SundayLastBreath.UI
                 yield return null;
             }
             doorTransitionCanvasGroup.alpha = 0f;
+
+            if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
+            if (doorVideoRawImage != null) doorVideoRawImage.color = Color.black;
+            doorTransitionContentBox?.SetActive(true);
             doorTransitionOverlay.SetActive(false);
             isDoorTransitioning = false;
         }
