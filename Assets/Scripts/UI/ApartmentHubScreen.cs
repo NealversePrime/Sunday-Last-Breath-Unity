@@ -245,13 +245,13 @@ namespace SundayLastBreath.UI
 
         public bool IntroSeen
         {
-            get => introSeen;
+            get => introSeen || hasPacked || awakeningStep > 3 || (hubMenuContainer != null && hubMenuContainer.activeSelf);
             set => introSeen = value;
         }
 
         public int AwakeningStep
         {
-            get => awakeningStep;
+            get => IntroSeen ? 4 : Mathf.Clamp(awakeningStep, 1, 3);
             set => awakeningStep = value;
         }
 
@@ -273,6 +273,24 @@ namespace SundayLastBreath.UI
             set => closetSearched = value;
         }
 
+        public bool PhoneVisited
+        {
+            get => phoneVisited;
+            set => phoneVisited = value;
+        }
+
+        public bool RadioVisited
+        {
+            get => radioVisited;
+            set => radioVisited = value;
+        }
+
+        public bool HackingVisited
+        {
+            get => hackingVisited;
+            set => hackingVisited = value;
+        }
+
         private bool hasPacked = false;
         private bool kitchenSearched = false;
         private bool bathroomSearched = false;
@@ -287,6 +305,13 @@ namespace SundayLastBreath.UI
         private bool isTyping = false;
         private Coroutine typeRoutine;
         private Coroutine hackingRoutine;
+        private Coroutine radioRoutine;
+        private Coroutine radioMeterRoutine;
+        private bool isRadioTransmitting = false;
+        private TextMeshProUGUI radioFreqHeaderText;
+        private TextMeshProUGUI radioSignalMeterText;
+        private TextMeshProUGUI radioTranscriptText;
+        private GameObject radioOutroObj;
         private TextMeshProUGUI activeTypewriterTarget;
         private string activeFullText = "";
 
@@ -353,20 +378,34 @@ namespace SundayLastBreath.UI
             return src;
         }
 
+        public void EnsureSystemsInitialized()
+        {
+            if (gameClock == null)
+            {
+                gameClock = new GameClock(23, 45, 25, "OCT", 2025, "SATURDAY");
+                gameClock.OnTimeAdvanced += (c) => UpdateClockUI();
+            }
+
+            if (objectiveSystem == null)
+            {
+                objectiveSystem = new ObjectiveSystem();
+                objectiveSystem.OnObjectiveUpdated += (o) =>
+                {
+                    UpdateObjectiveUI();
+                    RefreshPDAStatusTab();
+                };
+            }
+
+            if (loreSystem == null)
+            {
+                loreSystem = new LoreSystem();
+                loreSystem.OnLoreAdded += (l) => RefreshPDALoreTab();
+            }
+        }
+
         private void InitializeSystems()
         {
-            gameClock = new GameClock(23, 45, 25, "OCT", 2025, "SATURDAY");
-            gameClock.OnTimeAdvanced += (c) => UpdateClockUI();
-
-            objectiveSystem = new ObjectiveSystem();
-            objectiveSystem.OnObjectiveUpdated += (o) =>
-            {
-                UpdateObjectiveUI();
-                RefreshPDAStatusTab();
-            };
-
-            loreSystem = new LoreSystem();
-            loreSystem.OnLoreAdded += (l) => RefreshPDALoreTab();
+            EnsureSystemsInitialized();
         }
 
         private void HookUIButtons()
@@ -1037,29 +1076,125 @@ namespace SundayLastBreath.UI
                     SetChoiceButtonContent(closePhoneButton,
                         "<b>LOWER THE PHONE & RETURN</b>   <color=#F59E0B><b>[ESC / SPACE]</b></color>");
                 }
+
+                // Pre-sanitize all phone TMP texts while phoneModal is still inactive so zero missing-glyph warnings occur on Enable
+                SmartphoneFeedController feedCtrl = phoneModal.GetComponent<SmartphoneFeedController>();
+                if (feedCtrl != null)
+                {
+                    feedCtrl.SanitizeAllPhoneGlyphs();
+                }
             }
 
-            // B. RADIO MODAL ENHANCEMENT (Ensure full width & high-contrast exit button)
+            // B. RADIO MODAL ENHANCEMENT (Live Tactical VHF Receiver with Signal Spectrum Meter & Dynamic Transcript)
             if (radioModal != null)
             {
+                Image rBackdrop = radioModal.GetComponent<Image>();
+                if (rBackdrop != null)
+                {
+                    rBackdrop.color = new Color(0.015f, 0.02f, 0.035f, 0.985f);
+                }
+
                 Transform radioPanel = radioModal.transform.Find("RadioPanel");
                 if (radioPanel != null)
                 {
+                    RectTransform rpRect = radioPanel.GetComponent<RectTransform>();
+                    if (rpRect != null)
+                    {
+                        rpRect.sizeDelta = new Vector2(640f, 540f);
+                    }
+
+                    Image rpBg = radioPanel.GetComponent<Image>();
+                    if (rpBg != null)
+                    {
+                        rpBg.color = new Color(0.035f, 0.048f, 0.068f, 0.98f);
+                    }
+
+                    Outline rpOl = radioPanel.GetComponent<Outline>();
+                    if (rpOl == null) rpOl = radioPanel.gameObject.AddComponent<Outline>();
+                    rpOl.effectColor = new Color(0.95f, 0.65f, 0.18f, 0.65f);
+                    rpOl.effectDistance = new Vector2(1.5f, -1.5f);
+
                     VerticalLayoutGroup vlg = radioPanel.GetComponent<VerticalLayoutGroup>();
                     if (vlg != null)
                     {
+                        vlg.padding = new RectOffset(24, 24, 20, 20);
+                        vlg.spacing = 12f;
                         vlg.childControlWidth = true;
                         vlg.childControlHeight = true;
                         vlg.childForceExpandWidth = true;
                         vlg.childForceExpandHeight = false;
+                    }
+
+                    Transform fhTr = radioPanel.Find("FreqHeader");
+                    if (fhTr != null)
+                    {
+                        radioFreqHeaderText = fhTr.GetComponent<TextMeshProUGUI>();
+                        LayoutElement fhLe = fhTr.GetComponent<LayoutElement>() ?? fhTr.gameObject.AddComponent<LayoutElement>();
+                        fhLe.preferredHeight = 22f;
+                        fhLe.minHeight = 22f;
+                    }
+
+                    // Add Live RF Signal & Waveform Visualizer Bar right under FreqHeader
+                    Transform sigTr = radioPanel.Find("SignalMeterBar");
+                    if (sigTr == null)
+                    {
+                        GameObject sigObj = new GameObject("SignalMeterBar", typeof(RectTransform));
+                        sigObj.transform.SetParent(radioPanel, false);
+                        sigObj.transform.SetSiblingIndex(1);
+
+                        Image sigBg = sigObj.AddComponent<Image>();
+                        sigBg.color = new Color(0.02f, 0.03f, 0.045f, 0.95f);
+
+                        Outline sigOl = sigObj.AddComponent<Outline>();
+                        sigOl.effectColor = new Color(0.20f, 0.30f, 0.42f, 0.75f);
+
+                        LayoutElement sigLe = sigObj.AddComponent<LayoutElement>();
+                        sigLe.preferredHeight = 28f;
+                        sigLe.minHeight = 28f;
+
+                        GameObject sigTxtObj = new GameObject("MeterText", typeof(RectTransform));
+                        sigTxtObj.transform.SetParent(sigObj.transform, false);
+                        RectTransform stRt = sigTxtObj.GetComponent<RectTransform>();
+                        stRt.anchorMin = Vector2.zero;
+                        stRt.anchorMax = Vector2.one;
+                        stRt.offsetMin = new Vector2(10f, 0f);
+                        stRt.offsetMax = new Vector2(-10f, 0f);
+
+                        radioSignalMeterText = sigTxtObj.AddComponent<TextMeshProUGUI>();
+                        radioSignalMeterText.fontSize = 10.5f;
+                        radioSignalMeterText.alignment = TextAlignmentOptions.MidlineLeft;
+                        radioSignalMeterText.color = new Color(0.38f, 0.85f, 0.65f);
+                        SundayTypography.ApplyFont(radioSignalMeterText, FontRole.Mono);
+                    }
+                    else
+                    {
+                        radioSignalMeterText = sigTr.GetComponentInChildren<TextMeshProUGUI>(true);
+                    }
+
+                    Transform transTr = radioPanel.Find("Transcript");
+                    if (transTr != null)
+                    {
+                        radioTranscriptText = transTr.GetComponent<TextMeshProUGUI>();
+                        LayoutElement tLe = transTr.GetComponent<LayoutElement>() ?? transTr.gameObject.AddComponent<LayoutElement>();
+                        tLe.preferredHeight = 290f;
+                        tLe.flexibleHeight = 1f;
+                    }
+
+                    Transform outroTr = radioPanel.Find("Outro");
+                    if (outroTr != null)
+                    {
+                        radioOutroObj = outroTr.gameObject;
+                        LayoutElement oLe = outroTr.GetComponent<LayoutElement>() ?? outroTr.gameObject.AddComponent<LayoutElement>();
+                        oLe.preferredHeight = 44f;
+                        oLe.minHeight = 44f;
                     }
                 }
 
                 if (closeRadioButton != null)
                 {
                     LayoutElement le = closeRadioButton.GetComponent<LayoutElement>() ?? closeRadioButton.gameObject.AddComponent<LayoutElement>();
-                    le.preferredHeight = 42f;
-                    le.minHeight = 42f;
+                    le.preferredHeight = 44f;
+                    le.minHeight = 44f;
                     le.flexibleWidth = 1f;
 
                     Image bg = closeRadioButton.GetComponent<Image>();
@@ -1510,6 +1645,9 @@ namespace SundayLastBreath.UI
             kitchenSearched = false;
             bathroomSearched = false;
             closetSearched = false;
+            phoneVisited = false;
+            radioVisited = false;
+            hackingVisited = false;
             introSeen = false;
             awakeningStep = 1;
 
@@ -1541,6 +1679,8 @@ namespace SundayLastBreath.UI
 
             // Load player avatar frames
             cachedAvatarFrames = CharacterCreationScreen.LoadPlayerFrames();
+
+            ShowAwakeningStep(1);
         }
 
         private Coroutine screenShakeRoutine;
@@ -1765,10 +1905,11 @@ namespace SundayLastBreath.UI
             RefreshAllPDAPanels();
             EvaluateHubButtonStates();
 
-            // Restore awakening or hub sequence state
-            if (hasPacked || introSeen)
+            // Restore awakening or hub sequence state (Beat 1, Beat 2, Beat 3, or Hub Choices)
+            if (hasPacked || introSeen || awakeningStep > 3)
             {
                 introSeen = true;
+                awakeningStep = 4;
                 if (awakeningContainer != null) awakeningContainer.SetActive(false);
                 if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
                 if (continuePrompt != null) continuePrompt.SetActive(false);
@@ -1843,20 +1984,21 @@ namespace SundayLastBreath.UI
             }
 
             // Play background atmosphere drone
-            if (atmosphereSource != null && atmosphereClip != null)
+            if (atmosphereSource != null && atmosphereClip != null && !atmosphereSource.isPlaying)
             {
                 atmosphereSource.clip = atmosphereClip;
                 atmosphereSource.volume = 0.5f;
                 atmosphereSource.Play();
             }
 
-            if (!introSeen)
-            {
-                ShowAwakeningStep(1);
-            }
-            else
+            // Preserve the exact Beat (1, 2, or 3) or Hub Menu state set by InitializeWithCharacter / LoadCharacterState
+            if (hasPacked || introSeen || awakeningStep > 3)
             {
                 ShowHubMenu();
+            }
+            else if (awakeningContainer != null && !awakeningContainer.activeSelf && (hubMenuContainer == null || !hubMenuContainer.activeSelf))
+            {
+                ShowAwakeningStep(Mathf.Clamp(awakeningStep, 1, 3));
             }
         }
 
@@ -2800,6 +2942,9 @@ namespace SundayLastBreath.UI
         #region Awakening Sequence (Beats 1 - 3)
         private void ShowAwakeningStep(int step)
         {
+            awakeningStep = Mathf.Clamp(step, 1, 3);
+            introSeen = false;
+
             if (awakeningContainer != null) awakeningContainer.SetActive(true);
             if (hubMenuContainer != null) hubMenuContainer.SetActive(false);
             if (continuePrompt != null) continuePrompt.SetActive(true);
@@ -2808,7 +2953,7 @@ namespace SundayLastBreath.UI
             if (beat2Container != null) beat2Container.SetActive(false);
             if (beat3Container != null) beat3Container.SetActive(false);
 
-            switch (step)
+            switch (awakeningStep)
             {
                 case 1:
                     // Beat 1: Civil Danger Warning (EAS Broadcast)
@@ -3004,6 +3149,9 @@ namespace SundayLastBreath.UI
         #region Hub Menu Mode
         private void ShowHubMenu()
         {
+            introSeen = true;
+            awakeningStep = 4;
+
             if (awakeningContainer != null) awakeningContainer.SetActive(false);
             if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
             if (continuePrompt != null) continuePrompt.SetActive(false);
@@ -4423,13 +4571,135 @@ namespace SundayLastBreath.UI
                 radioSource.Play();
             }
 
+            if (radioRoutine != null) StopCoroutine(radioRoutine);
+            radioRoutine = StartCoroutine(RadioTransmissionRoutine());
+
+            if (radioMeterRoutine != null) StopCoroutine(radioMeterRoutine);
+            radioMeterRoutine = StartCoroutine(RadioWaveformMeterRoutine());
+        }
+
+        private IEnumerator RadioWaveformMeterRoutine()
+        {
+            string[] wavePatterns = new string[]
+            {
+                "|| ||||||| |||| ||||||||| ||| ||||||",
+                "||||| ||| |||||||| || ||||||| ||||||",
+                "||| ||||||||| |||| ||||| |||||||| ||",
+                "||||||| || |||||| ||||||||| |||| |||",
+                "|||| |||||||| ||||||| || ||||| |||||"
+            };
+
+            int tick = 0;
+            while (isRadioTransmitting && radioModal != null && radioModal.activeSelf)
+            {
+                if (radioFreqHeaderText != null)
+                {
+                    string recDot = (tick % 2 == 0)
+                        ? "<color=#ef4444>● LIVE RX</color>"
+                        : "<color=#7f1d1d>● LIVE RX</color>";
+                    radioFreqHeaderText.text = $"FREQ: 154.790 MHz // SEATTLE PD DISPATCH [CH-1]          {recDot}";
+                }
+
+                if (radioSignalMeterText != null)
+                {
+                    int dbm = -54 - UnityEngine.Random.Range(0, 12);
+                    string wave = wavePatterns[tick % wavePatterns.Length];
+                    radioSignalMeterText.text = $"<color=#34d399><b>RF SIGNAL:</b></color> <color=#10b981>[ {wave} ]</color>  <color=#94a3b8>{dbm} dBm // VHF ENCRYPTED</color>";
+                }
+
+                tick++;
+                yield return new WaitForSecondsRealtime(0.18f);
+            }
+
+            if (radioFreqHeaderText != null)
+            {
+                radioFreqHeaderText.text = "FREQ: 154.790 MHz // SEATTLE PD DISPATCH [CH-1]          <color=#ef4444>[X] CARRIER LOST</color>";
+            }
+
+            if (radioSignalMeterText != null)
+            {
+                radioSignalMeterText.text = "<color=#ef4444><b>RF SIGNAL:</b> [ ------------------------------------ ]  NO CARRIER // DEAD AIR</color>";
+            }
+        }
+
+        private IEnumerator RadioTransmissionRoutine()
+        {
+            isRadioTransmitting = true;
+
+            if (radioOutroObj != null)
+            {
+                radioOutroObj.SetActive(false);
+            }
+
+            if (radioTranscriptText != null)
+            {
+                radioTranscriptText.text = "<color=#f59e0b>[ SCANNING EMERGENCY BAND... 154.150 MHz... 154.450 MHz... ]</color>";
+            }
+
+            PlayBeepSFX();
+            yield return new WaitForSecondsRealtime(0.45f);
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("<color=#94a3b8>[ LOCKED: 154.790 MHz // STATIC HISS & SQUELCH BREAK ]</color>\n");
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+            yield return new WaitForSecondsRealtime(0.45f);
+
+            // Segment 1: Unit 4-Charlie
+            sb.AppendLine("<b><color=#38bdf8>UNIT 4-CHARLIE (FRANTIC):</color></b>");
+            string line1 = "<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing! They just keep coming!\"</i>\n";
+            string prefix1 = sb.ToString();
+            for (int i = 1; i <= line1.Length; i += 4)
+            {
+                int len = Mathf.Min(i, line1.Length);
+                if (radioTranscriptText != null) radioTranscriptText.text = prefix1 + line1.Substring(0, len);
+                yield return new WaitForSecondsRealtime(0.025f);
+            }
+            sb.AppendLine(line1);
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+            // Segment 2: Heavy Struggle & Screen Shake
+            yield return new WaitForSecondsRealtime(0.35f);
             PlayScreenShake();
+            sb.AppendLine("<color=#ef4444><b>[ HEAVY STRUGGLE // MUFFLED GUNFIRE // MIC DROPPED ]</b></color>\n");
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+            yield return new WaitForSecondsRealtime(0.65f);
+
+            // Segment 3: Dispatch Response
+            sb.AppendLine("<b><color=#f59e0b>DISPATCH (COLD, MONOTONE):</color></b>");
+            string line2 = "<i>\"4-Charlie, unrestricted lethal force is authorized. All units: Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#ef4444>Aim for the head.</color> Avoid all physical contact.\"</i>\n";
+            string prefix2 = sb.ToString();
+            for (int i = 1; i <= line2.Length; i += 4)
+            {
+                int len = Mathf.Min(i, line2.Length);
+                if (radioTranscriptText != null) radioTranscriptText.text = prefix2 + line2.Substring(0, len);
+                yield return new WaitForSecondsRealtime(0.025f);
+            }
+            sb.AppendLine(line2);
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+            yield return new WaitForSecondsRealtime(0.40f);
+
+            // Segment 4: Signal Cuts Out
+            isRadioTransmitting = false;
+            PlayBeepSFX();
+            sb.AppendLine("<color=#ef4444><b>[ SIGNAL CUTS OUT // REPEATER OFFLINE ]</b></color>");
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+            if (radioOutroObj != null)
+            {
+                radioOutroObj.SetActive(true);
+            }
         }
 
         private void OnCloseRadioClicked()
         {
             PlayClickSFX();
 
+            isRadioTransmitting = false;
+            if (radioRoutine != null) StopCoroutine(radioRoutine);
+            if (radioMeterRoutine != null) StopCoroutine(radioMeterRoutine);
             if (radioSource != null) radioSource.Stop();
             if (radioModal != null) radioModal.SetActive(false);
 

@@ -3107,7 +3107,7 @@ namespace SundayLastBreath.Editor
             clockTmp.rectTransform.offsetMin = Vector2.zero; clockTmp.rectTransform.offsetMax = Vector2.zero;
             SundayTypography.ApplyFont(clockTmp, FontRole.Mono);
 
-            TextMeshProUGUI batteryTmp = CreateTMPText(sbObj.transform, "BatteryText", "<color=#ef4444><b>12%</b></color> <color=#ef4444>[■□]</color>", 10f, new Color(0.95f, 0.35f, 0.35f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
+            TextMeshProUGUI batteryTmp = CreateTMPText(sbObj.transform, "BatteryText", "<color=#ef4444><b>12%</b></color> <color=#ef4444>[■.]</color>", 10f, new Color(0.95f, 0.35f, 0.35f), TextAlignmentOptions.MidlineRight, FontStyles.Bold);
             batteryTmp.rectTransform.anchorMin = new Vector2(0.6f, 0f); batteryTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
             batteryTmp.rectTransform.offsetMin = Vector2.zero; batteryTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
             SundayTypography.ApplyFont(batteryTmp, FontRole.Mono);
@@ -3222,19 +3222,19 @@ namespace SundayLastBreath.Editor
             CreatePhonePostCard(feedContent.transform, "C", new Color(0.10f, 0.16f, 0.24f), new Color(0.35f, 0.75f, 0.95f),
                 "CityScanner", "@CityScanner_WA • 2m",
                 "Does anyone know what's happening at the 5th St Hospital? Seeing police in gas masks and riot gear. They aren't letting ambulances through. Stay away!!",
-                null, false, "💬 412   ↺ 1.2K   ♥ 890");
+                null, false, "RE: 412   RT: 1.2K   ♥ 890");
 
-            // Feed Post 2: NewsWire Breaking ☑
+            // Feed Post 2: NewsWire Breaking [VERIFIED]
             CreatePhonePostCard(feedContent.transform, "N", new Color(0.04f, 0.22f, 0.40f), Color.white,
-                "NewsWire Breaking <color=#38bdf8>☑</color>", "@NewsWire_Alerts • 4m",
+                "NewsWire Breaking <color=#38bdf8>[VERIFIED]</color>", "@NewsWire_Alerts • 4m",
                 "EMERGENCY: CDC reporting 'unprecedented neuro-aggressive pathogen' causing extreme psychosis and unprovoked violence. Authorities urge citizens to avoid public spaces.",
-                "[ CDC HEALTH BULLETIN // EMERGENCY ]", false, "💬 3.4K   ↺ 14.8K   ♥ 2.1K");
+                "[ CDC HEALTH BULLETIN // EMERGENCY ]", false, "RE: 3.4K   RT: 14.8K   ♥ 2.1K");
 
             // Feed Post 3: User_9921
             CreatePhonePostCard(feedContent.transform, "U", new Color(0.32f, 0.08f, 0.08f), new Color(0.95f, 0.45f, 0.45f),
                 "User_9921", "@anon_9921 • 11m",
                 "Look at his face! That's not rabies! The cops shot him three times in the chest and he kept running! Oh my god, he's— <i>[VIDEO ENDS]</i>",
-                null, true, "💬 8.9K   ↺ 21.5K   ♥ 1.1K");
+                null, true, "RE: 8.9K   RT: 21.5K   ♥ 1.1K");
 
             // Feed Post 4: Connection Lost Alert Card
             CreatePhoneDisconnectCard(feedContent.transform);
@@ -3403,7 +3403,7 @@ namespace SundayLastBreath.Editor
             dFit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             dFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            TextMeshProUGUI dTitle = CreateTMPText(cardObj.transform, "Title", "<color=#ef4444><b>⚠ CONNECTION LOST // ERROR 503</b></color>", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
+            TextMeshProUGUI dTitle = CreateTMPText(cardObj.transform, "Title", "<color=#ef4444><b>[!] CONNECTION LOST // ERROR 503</b></color>", 10.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold);
             SundayTypography.ApplyFont(dTitle, FontRole.Mono);
 
             TextMeshProUGUI dBody = CreateTMPText(cardObj.transform, "Desc", "Cellular towers offline. Packet stream terminated by host.\n<i>Feed frozen. Signal lost.</i>", 10f, new Color(0.72f, 0.77f, 0.84f), TextAlignmentOptions.Center);

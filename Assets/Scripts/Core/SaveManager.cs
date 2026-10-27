@@ -212,6 +212,14 @@ namespace SundayLastBreath.Core
             return LoadGame(defaultSaveFileName);
         }
 
+        private ApartmentHubScreen ResolveApartmentHub()
+        {
+            if (ApartmentHubScreen.Instance != null) return ApartmentHubScreen.Instance;
+            if (GameManager.Instance != null && GameManager.Instance.ApartmentHub != null) return GameManager.Instance.ApartmentHub;
+            var all = Resources.FindObjectsOfTypeAll<ApartmentHubScreen>();
+            return (all != null && all.Length > 0) ? all[0] : null;
+        }
+
         /// <summary>
         /// Saves CharacterData, Current Room ID, and GameClock into Easy Save 3.
         /// </summary>
@@ -221,15 +229,17 @@ namespace SundayLastBreath.Core
 
             try
             {
+                ApartmentHubScreen hub = ResolveApartmentHub();
+
                 // 1. Resolve Character Data
                 CharacterData character = null;
                 if (GameManager.Instance != null && GameManager.Instance.CurrentPlayer != null)
                 {
                     character = GameManager.Instance.CurrentPlayer;
                 }
-                else if (ApartmentHubScreen.Instance != null && ApartmentHubScreen.Instance.CurrentPlayer != null)
+                else if (hub != null && hub.CurrentPlayer != null)
                 {
-                    character = ApartmentHubScreen.Instance.CurrentPlayer;
+                    character = hub.CurrentPlayer;
                 }
 
                 // Fallback creation for direct test runs
@@ -258,9 +268,9 @@ namespace SundayLastBreath.Core
 
                 // 2. Resolve Current Room ID
                 string roomId = "unit_407";
-                if (ApartmentHubScreen.Instance != null && !string.IsNullOrEmpty(ApartmentHubScreen.Instance.CurrentRoomId))
+                if (hub != null && !string.IsNullOrEmpty(hub.CurrentRoomId))
                 {
-                    roomId = ApartmentHubScreen.Instance.CurrentRoomId;
+                    roomId = hub.CurrentRoomId;
                 }
                 else if (!string.IsNullOrEmpty(character.currentLocationId))
                 {
@@ -269,7 +279,7 @@ namespace SundayLastBreath.Core
                 character.currentLocationId = roomId;
 
                 // 3. Resolve Game Clock
-                GameClock clock = ApartmentHubScreen.Instance != null ? ApartmentHubScreen.Instance.Clock : null;
+                GameClock clock = hub != null ? hub.Clock : null;
                 int day = clock != null ? clock.DayCount : 0;
                 int hour = clock != null ? clock.Hour : 23;
                 int minute = clock != null ? clock.Minute : 45;
@@ -295,16 +305,19 @@ namespace SundayLastBreath.Core
                 ES3.Save<long>("real_save_ticks", realUtcTicks, file);
 
                 // 4b. Save Apartment Hub World State (tableStash, floorItems, packing & story progress)
-                if (ApartmentHubScreen.Instance != null)
+                if (hub != null)
                 {
-                    ES3.Save<List<InventoryEntry>>("apartment_table_stash", ApartmentHubScreen.Instance.TableStash, file);
-                    ES3.Save<List<InventoryEntry>>("apartment_floor_items", ApartmentHubScreen.Instance.FloorItems, file);
-                    ES3.Save<bool>("apartment_has_packed", ApartmentHubScreen.Instance.HasPacked, file);
-                    ES3.Save<bool>("apartment_intro_seen", ApartmentHubScreen.Instance.IntroSeen, file);
-                    ES3.Save<int>("apartment_awakening_step", ApartmentHubScreen.Instance.AwakeningStep, file);
-                    ES3.Save<bool>("apartment_kitchen_searched", ApartmentHubScreen.Instance.KitchenSearched, file);
-                    ES3.Save<bool>("apartment_bathroom_searched", ApartmentHubScreen.Instance.BathroomSearched, file);
-                    ES3.Save<bool>("apartment_closet_searched", ApartmentHubScreen.Instance.ClosetSearched, file);
+                    ES3.Save<List<InventoryEntry>>("apartment_table_stash", hub.TableStash, file);
+                    ES3.Save<List<InventoryEntry>>("apartment_floor_items", hub.FloorItems, file);
+                    ES3.Save<bool>("apartment_has_packed", hub.HasPacked, file);
+                    ES3.Save<bool>("apartment_intro_seen", hub.IntroSeen, file);
+                    ES3.Save<int>("apartment_awakening_step", hub.AwakeningStep, file);
+                    ES3.Save<bool>("apartment_kitchen_searched", hub.KitchenSearched, file);
+                    ES3.Save<bool>("apartment_bathroom_searched", hub.BathroomSearched, file);
+                    ES3.Save<bool>("apartment_closet_searched", hub.ClosetSearched, file);
+                    ES3.Save<bool>("apartment_phone_visited", hub.PhoneVisited, file);
+                    ES3.Save<bool>("apartment_radio_visited", hub.RadioVisited, file);
+                    ES3.Save<bool>("apartment_hacking_visited", hub.HackingVisited, file);
                 }
 
                 // 5. Rich Console Telemetry Output
@@ -345,6 +358,8 @@ namespace SundayLastBreath.Core
 
             try
             {
+                ApartmentHubScreen hub = ResolveApartmentHub();
+
                 // 1. Load Character Data
                 CharacterData loadedChar = null;
                 if (ES3.KeyExists("character_data", file))
@@ -380,32 +395,43 @@ namespace SundayLastBreath.Core
                 int loadedYear = ES3.KeyExists("clock_year", file) ? ES3.Load<int>("clock_year", file) : 2025;
                 string loadedDayName = ES3.KeyExists("clock_day_name", file) ? ES3.Load<string>("clock_day_name", file) : "SATURDAY";
 
-                // 4. Restore Apartment Hub World State
-                if (ApartmentHubScreen.Instance != null)
+                // 4. Restore Apartment Hub World State (Works even when loading from TitleScreen while hub is inactive!)
+                if (hub != null)
                 {
+                    hub.EnsureSystemsInitialized();
+
                     if (ES3.KeyExists("apartment_table_stash", file))
-                        ApartmentHubScreen.Instance.TableStash = ES3.Load<List<InventoryEntry>>("apartment_table_stash", file);
+                        hub.TableStash = ES3.Load<List<InventoryEntry>>("apartment_table_stash", file);
 
                     if (ES3.KeyExists("apartment_floor_items", file))
-                        ApartmentHubScreen.Instance.FloorItems = ES3.Load<List<InventoryEntry>>("apartment_floor_items", file);
+                        hub.FloorItems = ES3.Load<List<InventoryEntry>>("apartment_floor_items", file);
 
                     if (ES3.KeyExists("apartment_has_packed", file))
-                        ApartmentHubScreen.Instance.HasPacked = ES3.Load<bool>("apartment_has_packed", file);
+                        hub.HasPacked = ES3.Load<bool>("apartment_has_packed", file);
 
                     if (ES3.KeyExists("apartment_intro_seen", file))
-                        ApartmentHubScreen.Instance.IntroSeen = ES3.Load<bool>("apartment_intro_seen", file);
+                        hub.IntroSeen = ES3.Load<bool>("apartment_intro_seen", file);
 
                     if (ES3.KeyExists("apartment_awakening_step", file))
-                        ApartmentHubScreen.Instance.AwakeningStep = ES3.Load<int>("apartment_awakening_step", file);
+                        hub.AwakeningStep = ES3.Load<int>("apartment_awakening_step", file);
 
                     if (ES3.KeyExists("apartment_kitchen_searched", file))
-                        ApartmentHubScreen.Instance.KitchenSearched = ES3.Load<bool>("apartment_kitchen_searched", file);
+                        hub.KitchenSearched = ES3.Load<bool>("apartment_kitchen_searched", file);
 
                     if (ES3.KeyExists("apartment_bathroom_searched", file))
-                        ApartmentHubScreen.Instance.BathroomSearched = ES3.Load<bool>("apartment_bathroom_searched", file);
+                        hub.BathroomSearched = ES3.Load<bool>("apartment_bathroom_searched", file);
 
                     if (ES3.KeyExists("apartment_closet_searched", file))
-                        ApartmentHubScreen.Instance.ClosetSearched = ES3.Load<bool>("apartment_closet_searched", file);
+                        hub.ClosetSearched = ES3.Load<bool>("apartment_closet_searched", file);
+
+                    if (ES3.KeyExists("apartment_phone_visited", file))
+                        hub.PhoneVisited = ES3.Load<bool>("apartment_phone_visited", file);
+
+                    if (ES3.KeyExists("apartment_radio_visited", file))
+                        hub.RadioVisited = ES3.Load<bool>("apartment_radio_visited", file);
+
+                    if (ES3.KeyExists("apartment_hacking_visited", file))
+                        hub.HackingVisited = ES3.Load<bool>("apartment_hacking_visited", file);
                 }
 
                 // 5. Apply to Game State
@@ -419,16 +445,16 @@ namespace SundayLastBreath.Core
                         GameManager.Instance.SetPlayerLocation(loadedRoomId);
                     }
 
-                    if (ApartmentHubScreen.Instance != null && ApartmentHubScreen.Instance.gameObject.activeInHierarchy)
+                    if (hub != null && hub.gameObject.activeInHierarchy)
                     {
-                        ApartmentHubScreen.Instance.LoadCharacterState(loadedChar, loadedRoomId);
+                        hub.LoadCharacterState(loadedChar, loadedRoomId);
                     }
                 }
 
-                if (ApartmentHubScreen.Instance != null)
+                if (hub != null)
                 {
-                    ApartmentHubScreen.Instance.SetGameClockTime(loadedDay, loadedHour, loadedMinute, loadedDate, loadedMonth, loadedYear, loadedDayName);
-                    ApartmentHubScreen.Instance.SetLocation(loadedRoomId);
+                    hub.SetGameClockTime(loadedDay, loadedHour, loadedMinute, loadedDate, loadedMonth, loadedYear, loadedDayName);
+                    hub.SetLocation(loadedRoomId);
                 }
 
                 // 6. Rich Console Telemetry Output
