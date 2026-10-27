@@ -2952,11 +2952,11 @@ namespace SundayLastBreath.Editor
             GameObject phoneChassis = new GameObject("PhoneChassis", typeof(RectTransform));
             phoneChassis.transform.SetParent(centerCol.transform, false);
             RectTransform pcr = phoneChassis.GetComponent<RectTransform>();
-            pcr.sizeDelta = new Vector2(440f, 530f);
+            pcr.sizeDelta = new Vector2(440f, 460f);
             LayoutElement chassisLe = phoneChassis.AddComponent<LayoutElement>();
             chassisLe.preferredWidth = 440f;
-            chassisLe.preferredHeight = 530f;
-            chassisLe.minHeight = 530f;
+            chassisLe.preferredHeight = 460f;
+            chassisLe.minHeight = 440f;
             chassisLe.flexibleHeight = 0f;
 
             Image chassisBg = phoneChassis.AddComponent<Image>();
@@ -3187,14 +3187,23 @@ namespace SundayLastBreath.Editor
             GameObject btnHolder = new GameObject("ButtonHolder", typeof(RectTransform));
             btnHolder.transform.SetParent(centerCol.transform, false);
             RectTransform bhr = btnHolder.GetComponent<RectTransform>();
-            bhr.sizeDelta = new Vector2(440f, 38f);
+            bhr.sizeDelta = new Vector2(480f, 44f);
             LayoutElement bhLe = btnHolder.AddComponent<LayoutElement>();
-            bhLe.preferredWidth = 440f;
-            bhLe.preferredHeight = 38f;
-            bhLe.minHeight = 38f;
+            bhLe.preferredWidth = 480f;
+            bhLe.preferredHeight = 44f;
+            bhLe.minHeight = 44f;
             bhLe.flexibleHeight = 0f;
 
-            CreateApartmentMenuButton(btnHolder.transform, "Btn_ClosePhone", "LOWER THE PHONE AND GET BACK TO REALITY",
+            VerticalLayoutGroup bhVlg = btnHolder.AddComponent<VerticalLayoutGroup>();
+            bhVlg.padding = new RectOffset(0, 0, 0, 0);
+            bhVlg.spacing = 0f;
+            bhVlg.childAlignment = TextAnchor.MiddleCenter;
+            bhVlg.childControlWidth = true;
+            bhVlg.childControlHeight = true;
+            bhVlg.childForceExpandWidth = true;
+            bhVlg.childForceExpandHeight = true;
+
+            CreateApartmentMenuButton(btnHolder.transform, "Btn_ClosePhone", "<b>LOWER THE PHONE & GET BACK TO REALITY</b>   <size=90%><color=#94A3B8>[ESC / SPACE]</color></size>",
                 "Add Intel to Lore Database.", new Color(0.95f, 0.55f, 0.20f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
 
             // Wire SmartphoneFeedController
@@ -3381,6 +3390,8 @@ namespace SundayLastBreath.Editor
             VerticalLayoutGroup vlg = radioPanel.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(18, 18, 14, 14);
             vlg.spacing = 10f;
+            vlg.childControlWidth = true;
+            vlg.childForceExpandWidth = true;
 
             // Freq Header
             GameObject hObj = new GameObject("FreqHeader");
@@ -3446,6 +3457,8 @@ namespace SundayLastBreath.Editor
             VerticalLayoutGroup vlg = hackPanel.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(18, 18, 14, 14);
             vlg.spacing = 10f;
+            vlg.childControlWidth = true;
+            vlg.childForceExpandWidth = true;
 
             // Terminal Header
             GameObject hObj = new GameObject("Header");
@@ -3473,6 +3486,8 @@ namespace SundayLastBreath.Editor
             finishContainer.transform.SetParent(hackPanel.transform, false);
             VerticalLayoutGroup fVlg = finishContainer.AddComponent<VerticalLayoutGroup>();
             fVlg.spacing = 8f;
+            fVlg.childControlWidth = true;
+            fVlg.childForceExpandWidth = true;
 
             GameObject foObj = new GameObject("Outro");
             foObj.transform.SetParent(finishContainer.transform, false);

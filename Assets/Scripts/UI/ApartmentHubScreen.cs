@@ -760,6 +760,277 @@ namespace SundayLastBreath.UI
 
             // 8. Sanitize console switcher buttons and legacy baked badges to Day 0 civilian terminology
             SanitizeCivilianTerminology();
+
+            // 9. Ensure Phone, Radio, and Hacking modals have full-width, prominent exit controls
+            EnsureInspectionModalsEnhanced();
+        }
+
+        private void EnsureInspectionModalsEnhanced()
+        {
+            // A. PHONE MODAL ENHANCEMENT (Fixes 0px width on Btn_ClosePhone & adds clear exit affordances)
+            if (phoneModal != null)
+            {
+                Image backdrop = phoneModal.GetComponent<Image>();
+                if (backdrop != null)
+                {
+                    backdrop.color = new Color(0.01f, 0.02f, 0.04f, 0.90f); // Semi-transparent so apartment HUD remains faintly visible behind modal
+                }
+
+                Transform centerCol = phoneModal.transform.Find("PhoneCenterColumn");
+                if (centerCol != null)
+                {
+                    RectTransform colRect = centerCol.GetComponent<RectTransform>();
+                    if (colRect != null)
+                    {
+                        colRect.sizeDelta = new Vector2(480f, 750f);
+                    }
+
+                    VerticalLayoutGroup colVlg = centerCol.GetComponent<VerticalLayoutGroup>();
+                    if (colVlg != null)
+                    {
+                        colVlg.spacing = 8f;
+                        colVlg.childAlignment = TextAnchor.MiddleCenter;
+                        colVlg.childControlWidth = true;
+                        colVlg.childControlHeight = true;
+                        colVlg.childForceExpandWidth = true;
+                        colVlg.childForceExpandHeight = false;
+                    }
+
+                    Transform introObj = centerCol.Find("IntroProse");
+                    if (introObj != null)
+                    {
+                        LayoutElement le = introObj.GetComponent<LayoutElement>();
+                        if (le != null)
+                        {
+                            le.preferredHeight = 42f;
+                            le.minHeight = 42f;
+                        }
+                    }
+
+                    Transform chassis = centerCol.Find("PhoneChassis");
+                    if (chassis != null)
+                    {
+                        LayoutElement cle = chassis.GetComponent<LayoutElement>();
+                        if (cle != null)
+                        {
+                            cle.preferredHeight = 460f;
+                            cle.minHeight = 460f;
+                        }
+
+                        // Make the bottom HomePill clickable to close the phone as well
+                        Transform homePill = chassis.Find("HomePill");
+                        if (homePill != null)
+                        {
+                            RectTransform hpRect = homePill.GetComponent<RectTransform>();
+                            if (hpRect != null)
+                            {
+                                hpRect.sizeDelta = new Vector2(110f, 6f);
+                            }
+                            Image hpImg = homePill.GetComponent<Image>();
+                            if (hpImg != null)
+                            {
+                                hpImg.color = new Color(0.95f, 0.62f, 0.15f, 0.85f);
+                                hpImg.raycastTarget = true;
+                            }
+                            Button hpBtn = homePill.GetComponent<Button>();
+                            if (hpBtn == null) hpBtn = homePill.gameObject.AddComponent<Button>();
+                            hpBtn.targetGraphic = hpImg;
+                            hpBtn.onClick.RemoveAllListeners();
+                            hpBtn.onClick.AddListener(OnClosePhoneClicked);
+                        }
+
+                        // Add a sleek Top-Right [ X PUT AWAY ] pill above the phone chassis if not already present
+                        if (chassis.Find("Btn_TopRightClosePhone") == null)
+                        {
+                            GameObject topCloseObj = new GameObject("Btn_TopRightClosePhone", typeof(RectTransform));
+                            topCloseObj.transform.SetParent(chassis, false);
+                            RectTransform tcRect = topCloseObj.GetComponent<RectTransform>();
+                            tcRect.anchorMin = new Vector2(1f, 1f);
+                            tcRect.anchorMax = new Vector2(1f, 1f);
+                            tcRect.pivot = new Vector2(1f, 0f);
+                            tcRect.anchoredPosition = new Vector2(0f, 6f);
+                            tcRect.sizeDelta = new Vector2(138f, 24f);
+
+                            Image tcBg = topCloseObj.AddComponent<Image>();
+                            tcBg.color = new Color(0.16f, 0.08f, 0.05f, 0.96f);
+                            Outline tcOl = topCloseObj.AddComponent<Outline>();
+                            tcOl.effectColor = new Color(0.95f, 0.55f, 0.20f, 0.85f);
+
+                            Button tcBtn = topCloseObj.AddComponent<Button>();
+                            tcBtn.targetGraphic = tcBg;
+                            tcBtn.onClick.AddListener(OnClosePhoneClicked);
+
+                            GameObject lblObj = new GameObject("Label", typeof(RectTransform));
+                            lblObj.transform.SetParent(topCloseObj.transform, false);
+                            RectTransform lrt = lblObj.GetComponent<RectTransform>();
+                            lrt.anchorMin = Vector2.zero;
+                            lrt.anchorMax = Vector2.one;
+                            lrt.offsetMin = Vector2.zero;
+                            lrt.offsetMax = Vector2.zero;
+
+                            TextMeshProUGUI tcTmp = lblObj.AddComponent<TextMeshProUGUI>();
+                            tcTmp.text = "<b>[ X ]  PUT AWAY PHONE</b>";
+                            tcTmp.fontSize = 10f;
+                            tcTmp.alignment = TextAlignmentOptions.Center;
+                            tcTmp.color = new Color(0.98f, 0.78f, 0.38f);
+                            tcTmp.raycastTarget = false;
+                            SundayTypography.ApplyFont(tcTmp, FontRole.Mono);
+                        }
+                    }
+
+                    Transform outroObj = centerCol.Find("OutroProse");
+                    if (outroObj != null)
+                    {
+                        LayoutElement ole = outroObj.GetComponent<LayoutElement>();
+                        if (ole != null)
+                        {
+                            ole.preferredHeight = 62f;
+                            ole.minHeight = 62f;
+                        }
+                    }
+
+                    Transform btnHolder = centerCol.Find("ButtonHolder");
+                    if (btnHolder != null)
+                    {
+                        LayoutElement bhLe = btnHolder.GetComponent<LayoutElement>();
+                        if (bhLe != null)
+                        {
+                            bhLe.preferredWidth = 480f;
+                            bhLe.preferredHeight = 44f;
+                            bhLe.minHeight = 44f;
+                        }
+
+                        VerticalLayoutGroup bhVlg = btnHolder.GetComponent<VerticalLayoutGroup>();
+                        if (bhVlg == null) bhVlg = btnHolder.gameObject.AddComponent<VerticalLayoutGroup>();
+                        bhVlg.padding = new RectOffset(0, 0, 0, 0);
+                        bhVlg.childControlWidth = true;
+                        bhVlg.childControlHeight = true;
+                        bhVlg.childForceExpandWidth = true;
+                        bhVlg.childForceExpandHeight = true;
+                    }
+                }
+
+                if (closePhoneButton != null)
+                {
+                    RectTransform cbr = closePhoneButton.GetComponent<RectTransform>();
+                    if (cbr != null)
+                    {
+                        cbr.anchorMin = Vector2.zero;
+                        cbr.anchorMax = Vector2.one;
+                        cbr.offsetMin = Vector2.zero;
+                        cbr.offsetMax = Vector2.zero;
+                        cbr.sizeDelta = new Vector2(0f, 44f);
+                    }
+
+                    LayoutElement cle = closePhoneButton.GetComponent<LayoutElement>();
+                    if (cle == null) cle = closePhoneButton.gameObject.AddComponent<LayoutElement>();
+                    cle.preferredHeight = 44f;
+                    cle.minHeight = 44f;
+                    cle.flexibleWidth = 1f;
+
+                    Image bg = closePhoneButton.GetComponent<Image>();
+                    if (bg != null)
+                    {
+                        bg.color = new Color(0.14f, 0.09f, 0.03f, 0.98f);
+                    }
+
+                    Outline ol = closePhoneButton.GetComponent<Outline>();
+                    if (ol == null) ol = closePhoneButton.gameObject.AddComponent<Outline>();
+                    ol.effectColor = new Color(0.96f, 0.62f, 0.12f, 0.95f);
+                    ol.effectDistance = new Vector2(1.5f, -1.5f);
+
+                    Transform barObj = closePhoneButton.transform.Find("AccentBar");
+                    if (barObj != null)
+                    {
+                        barObj.gameObject.SetActive(true);
+                        Image barImg = barObj.GetComponent<Image>();
+                        if (barImg != null) barImg.color = new Color(0.98f, 0.65f, 0.15f, 1f);
+                    }
+
+                    SetChoiceButtonContent(closePhoneButton,
+                        "<b>LOWER THE PHONE & GET BACK TO REALITY</b>   <color=#F59E0B><b>[ESC / SPACE]</b></color>");
+                }
+            }
+
+            // B. RADIO MODAL ENHANCEMENT (Ensure full width & high-contrast exit button)
+            if (radioModal != null)
+            {
+                Transform radioPanel = radioModal.transform.Find("RadioPanel");
+                if (radioPanel != null)
+                {
+                    VerticalLayoutGroup vlg = radioPanel.GetComponent<VerticalLayoutGroup>();
+                    if (vlg != null)
+                    {
+                        vlg.childControlWidth = true;
+                        vlg.childControlHeight = true;
+                        vlg.childForceExpandWidth = true;
+                        vlg.childForceExpandHeight = false;
+                    }
+                }
+
+                if (closeRadioButton != null)
+                {
+                    LayoutElement le = closeRadioButton.GetComponent<LayoutElement>() ?? closeRadioButton.gameObject.AddComponent<LayoutElement>();
+                    le.preferredHeight = 42f;
+                    le.minHeight = 42f;
+                    le.flexibleWidth = 1f;
+
+                    Image bg = closeRadioButton.GetComponent<Image>();
+                    if (bg != null) bg.color = new Color(0.14f, 0.09f, 0.03f, 0.98f);
+
+                    Outline ol = closeRadioButton.GetComponent<Outline>() ?? closeRadioButton.gameObject.AddComponent<Outline>();
+                    ol.effectColor = new Color(0.96f, 0.62f, 0.12f, 0.95f);
+
+                    SetChoiceButtonContent(closeRadioButton,
+                        "<b>TURN OFF THE RADIO & RETURN TO LIVING ROOM</b>   <color=#F59E0B><b>[ESC / SPACE]</b></color>");
+                }
+            }
+
+            // C. HACKING TERMINAL MODAL ENHANCEMENT (Ensure full width & high-contrast exit button)
+            if (hackingModal != null)
+            {
+                Transform hackPanel = hackingModal.transform.Find("HackingPanel");
+                if (hackPanel != null)
+                {
+                    VerticalLayoutGroup vlg = hackPanel.GetComponent<VerticalLayoutGroup>();
+                    if (vlg != null)
+                    {
+                        vlg.childControlWidth = true;
+                        vlg.childControlHeight = true;
+                        vlg.childForceExpandWidth = true;
+                        vlg.childForceExpandHeight = false;
+                    }
+                }
+
+                if (hackingFinishContainer != null)
+                {
+                    VerticalLayoutGroup fvlg = hackingFinishContainer.GetComponent<VerticalLayoutGroup>();
+                    if (fvlg != null)
+                    {
+                        fvlg.childControlWidth = true;
+                        fvlg.childControlHeight = true;
+                        fvlg.childForceExpandWidth = true;
+                        fvlg.childForceExpandHeight = false;
+                    }
+                }
+
+                if (closeHackingButton != null)
+                {
+                    LayoutElement le = closeHackingButton.GetComponent<LayoutElement>() ?? closeHackingButton.gameObject.AddComponent<LayoutElement>();
+                    le.preferredHeight = 42f;
+                    le.minHeight = 42f;
+                    le.flexibleWidth = 1f;
+
+                    Image bg = closeHackingButton.GetComponent<Image>();
+                    if (bg != null) bg.color = new Color(0.03f, 0.14f, 0.07f, 0.98f);
+
+                    Outline ol = closeHackingButton.GetComponent<Outline>() ?? closeHackingButton.gameObject.AddComponent<Outline>();
+                    ol.effectColor = new Color(0.25f, 0.95f, 0.50f, 0.95f);
+
+                    SetChoiceButtonContent(closeHackingButton,
+                        "<b>SHUT DOWN LAPTOP & RETURN TO LIVING ROOM</b>   <color=#34D399><b>[ESC / SPACE]</b></color>");
+                }
+            }
         }
 
         private void SanitizeCivilianTerminology()
@@ -1567,14 +1838,17 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 0. Hotkey to dismiss Phone Modal if open (1, Escape, Space, Enter)
-            if (phoneModal != null && phoneModal.activeSelf)
+            // 0. Hotkey to dismiss Inspection Modals (Phone / Radio / Hacking) if open (1, Escape, Space, Enter)
+            bool anyInspectionModalOpen = (phoneModal != null && phoneModal.activeSelf) ||
+                                          (radioModal != null && radioModal.activeSelf) ||
+                                          (hackingModal != null && hackingModal.activeSelf && hackingFinishContainer != null && hackingFinishContainer.activeSelf);
+            if (anyInspectionModalOpen)
             {
-                bool dismissPhone = false;
+                bool dismissModal = false;
 #if ENABLE_INPUT_SYSTEM
                 if (Keyboard.current != null)
                 {
-                    dismissPhone = Keyboard.current.escapeKey.wasPressedThisFrame ||
+                    dismissModal = Keyboard.current.escapeKey.wasPressedThisFrame ||
                                    Keyboard.current.digit1Key.wasPressedThisFrame ||
                                    Keyboard.current.numpad1Key.wasPressedThisFrame ||
                                    Keyboard.current.spaceKey.wasPressedThisFrame ||
@@ -1582,16 +1856,21 @@ namespace SundayLastBreath.UI
                                    Keyboard.current.numpadEnterKey.wasPressedThisFrame;
                 }
 #else
-                dismissPhone = Input.GetKeyDown(KeyCode.Escape) ||
+                dismissModal = Input.GetKeyDown(KeyCode.Escape) ||
                                Input.GetKeyDown(KeyCode.Alpha1) ||
                                Input.GetKeyDown(KeyCode.Keypad1) ||
                                Input.GetKeyDown(KeyCode.Space) ||
                                Input.GetKeyDown(KeyCode.Return) ||
                                Input.GetKeyDown(KeyCode.KeypadEnter);
 #endif
-                if (dismissPhone)
+                if (dismissModal)
                 {
-                    OnClosePhoneClicked();
+                    if (phoneModal != null && phoneModal.activeSelf)
+                        OnClosePhoneClicked();
+                    else if (radioModal != null && radioModal.activeSelf)
+                        OnCloseRadioClicked();
+                    else if (hackingModal != null && hackingModal.activeSelf)
+                        OnCloseHackingClicked();
                     return;
                 }
             }
@@ -3084,6 +3363,8 @@ namespace SundayLastBreath.UI
             gameClock.AddTime(1);
             phoneVisited = true;
 
+            EnsureInspectionModalsEnhanced();
+
             if (phoneModal != null)
             {
                 phoneModal.SetActive(true);
@@ -4040,6 +4321,8 @@ namespace SundayLastBreath.UI
             gameClock.AddTime(isPolice ? 3 : 5);
             radioVisited = true;
 
+            EnsureInspectionModalsEnhanced();
+
             if (radioModal != null)
             {
                 radioModal.SetActive(true);
@@ -4082,6 +4365,8 @@ namespace SundayLastBreath.UI
 
             gameClock.AddTime(8);
             hackingVisited = true;
+
+            EnsureInspectionModalsEnhanced();
 
             if (hackingModal != null)
             {
