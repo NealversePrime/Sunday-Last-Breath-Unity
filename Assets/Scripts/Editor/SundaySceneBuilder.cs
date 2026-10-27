@@ -3612,20 +3612,28 @@ namespace SundayLastBreath.Editor
             sLe.flexibleHeight = 1f;
 
             // 3. OS Window Header Bar
-            GameObject hObj = new GameObject("Header");
+            GameObject hObj = new GameObject("Header", typeof(RectTransform));
             hObj.transform.SetParent(screenObj.transform, false);
             Image hBg = hObj.AddComponent<Image>();
             hBg.color = new Color(0.05f, 0.08f, 0.14f, 0.95f);
 
-            TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
-            hTmp.fontSize = 10.5f;
-            hTmp.fontStyle = FontStyles.Bold;
-            hTmp.text = "<b><color=#38bdf8>[>]</color> terminal@unit407: ~/recon/defense_grid</b>               <color=#64748b>[ETH0: 1 Gbps]</color>   <color=#10b981>[VPN: ACTIVE]</color>   <color=#94a3b8>[ — ]  [ □ ]  [ ✕ ]</color>";
-            SundayTypography.ApplyFont(hTmp, FontRole.Mono);
-
             LayoutElement hLe = hObj.AddComponent<LayoutElement>();
             hLe.preferredHeight = 24f;
             hLe.minHeight = 24f;
+
+            GameObject hTitleObj = new GameObject("TitleText", typeof(RectTransform));
+            hTitleObj.transform.SetParent(hObj.transform, false);
+            RectTransform htRt = hTitleObj.GetComponent<RectTransform>();
+            StretchFull(htRt);
+            htRt.offsetMin = new Vector2(8f, 0f);
+            htRt.offsetMax = new Vector2(-8f, 0f);
+
+            TextMeshProUGUI hTmp = hTitleObj.AddComponent<TextMeshProUGUI>();
+            hTmp.fontSize = 10.5f;
+            hTmp.fontStyle = FontStyles.Bold;
+            hTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            hTmp.text = "<b><color=#38bdf8>[>]</color> terminal@unit407: ~/recon/defense_grid</b>               <color=#64748b>[ETH0: 1 Gbps]</color>   <color=#10b981>[VPN: ACTIVE]</color>   <color=#94a3b8>[ — ]  [ □ ]  [ ✕ ]</color>";
+            SundayTypography.ApplyFont(hTmp, FontRole.Mono);
 
             // 4. Terminal Text Body
             GameObject tObj = new GameObject("TerminalText");

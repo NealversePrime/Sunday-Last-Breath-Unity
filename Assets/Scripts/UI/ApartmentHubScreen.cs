@@ -1394,10 +1394,54 @@ namespace SundayLastBreath.UI
                     Transform hTr = hackPanel.Find("LaptopScreen/Header") ?? hackPanel.Find("Header");
                     if (hTr != null)
                     {
-                        Image hBg = hTr.GetComponent<Image>() ?? hTr.gameObject.AddComponent<Image>();
-                        hBg.color = new Color(0.05f, 0.08f, 0.14f, 0.95f);
+                        TextMeshProUGUI directTmp = hTr.GetComponent<TextMeshProUGUI>();
+                        if (directTmp != null && hTr.GetComponent<Image>() == null)
+                        {
+                            // Legacy structure: Header itself was TextMeshProUGUI.
+                            // Convert Header into a container with child Text so Image and Text can coexist without Graphic component conflict.
+                            GameObject headerContainer = new GameObject("HeaderBar", typeof(RectTransform));
+                            headerContainer.transform.SetParent(hTr.parent, false);
+                            headerContainer.transform.SetSiblingIndex(hTr.GetSiblingIndex());
 
-                        TextMeshProUGUI hTmp = hTr.GetComponent<TextMeshProUGUI>();
+                            Image newBg = headerContainer.AddComponent<Image>();
+                            newBg.color = new Color(0.05f, 0.08f, 0.14f, 0.95f);
+
+                            LayoutElement newLe = headerContainer.AddComponent<LayoutElement>();
+                            newLe.preferredHeight = 24f;
+                            newLe.minHeight = 24f;
+
+                            hTr.SetParent(headerContainer.transform, false);
+                            hTr.name = "TitleText";
+                            RectTransform directRt = hTr.GetComponent<RectTransform>();
+                            if (directRt != null)
+                            {
+                                directRt.anchorMin = Vector2.zero;
+                                directRt.anchorMax = Vector2.one;
+                                directRt.offsetMin = new Vector2(8f, 0f);
+                                directRt.offsetMax = new Vector2(-8f, 0f);
+                            }
+
+                            headerContainer.name = "Header";
+                            hTr = headerContainer.transform;
+                        }
+                        else
+                        {
+                            Image hBg = hTr.GetComponent<Image>();
+                            if (hBg == null && directTmp == null)
+                            {
+                                hBg = hTr.gameObject.AddComponent<Image>();
+                            }
+                            if (hBg != null)
+                            {
+                                hBg.color = new Color(0.05f, 0.08f, 0.14f, 0.95f);
+                            }
+
+                            LayoutElement hLe = hTr.GetComponent<LayoutElement>() ?? hTr.gameObject.AddComponent<LayoutElement>();
+                            hLe.preferredHeight = 24f;
+                            hLe.minHeight = 24f;
+                        }
+
+                        TextMeshProUGUI hTmp = hTr.GetComponentInChildren<TextMeshProUGUI>(true);
                         if (hTmp != null)
                         {
                             hTmp.fontSize = 10.5f;
@@ -1405,10 +1449,6 @@ namespace SundayLastBreath.UI
                             hTmp.text = "<b><color=#38bdf8>[>]</color> terminal@unit407: ~/recon/defense_grid</b>               <color=#64748b>[ETH0: 1 Gbps]</color>   <color=#10b981>[VPN: ACTIVE]</color>   <color=#94a3b8>[ — ]  [ □ ]  [ ✕ ]</color>";
                             SundayTypography.ApplyFont(hTmp, FontRole.Mono);
                         }
-
-                        LayoutElement hLe = hTr.GetComponent<LayoutElement>() ?? hTr.gameObject.AddComponent<LayoutElement>();
-                        hLe.preferredHeight = 24f;
-                        hLe.minHeight = 24f;
                     }
 
                     // 4. Terminal Text inside LaptopScreen
