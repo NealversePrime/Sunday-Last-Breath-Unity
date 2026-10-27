@@ -52,8 +52,9 @@ namespace SundayLastBreath.Core
         /// Slot 1 = ARCHIVE SLOT 01 ("SaveSlot_1.es3")
         /// Slot 2 = ARCHIVE SLOT 02 ("SaveSlot_2.es3")
         /// Slot 3 = ARCHIVE SLOT 03 ("SaveSlot_3.es3")
+        /// Slot 4 = ARCHIVE SLOT 04 ("SaveSlot_4.es3")
         /// </summary>
-        public const int TotalSlotCount = 4;
+        public const int TotalSlotCount = 5;
 
         public string GetSlotFileName(int slotIndex)
         {
@@ -63,6 +64,7 @@ namespace SundayLastBreath.Core
                 case 1: return "SaveSlot_1.es3";
                 case 2: return "SaveSlot_2.es3";
                 case 3: return "SaveSlot_3.es3";
+                case 4: return "SaveSlot_4.es3";
                 default: return $"SaveSlot_{slotIndex}.es3";
             }
         }
@@ -75,6 +77,7 @@ namespace SundayLastBreath.Core
                 case 1: return "ARCHIVE SLOT 01";
                 case 2: return "ARCHIVE SLOT 02";
                 case 3: return "ARCHIVE SLOT 03";
+                case 4: return "ARCHIVE SLOT 04";
                 default: return $"ARCHIVE SLOT {slotIndex:D2}";
             }
         }

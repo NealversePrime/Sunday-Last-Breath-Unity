@@ -323,11 +323,11 @@ namespace SundayLastBreath.UI
             backdrop.color = new Color(0.015f, 0.02f, 0.03f, 0.92f);
             backdrop.raycastTarget = true;
 
-            // 2. Central Dossier Panel (860 x 550)
+            // 2. Central Dossier Panel (860 x 570)
             GameObject panel = new GameObject("DossierPanel");
             panel.transform.SetParent(loadGameModal.transform, false);
             RectTransform pRect = panel.AddComponent<RectTransform>();
-            pRect.sizeDelta = new Vector2(860f, 550f);
+            pRect.sizeDelta = new Vector2(860f, 570f);
             pRect.anchoredPosition = Vector2.zero;
 
             Image pBg = panel.AddComponent<Image>();
@@ -366,7 +366,7 @@ namespace SundayLastBreath.UI
             modalTitleText.alignment = TextAlignmentOptions.MidlineLeft;
             SundayTypography.ApplyFont(modalTitleText, FontRole.Display);
 
-            // 4. 4 Slot Cards Area
+            // 4. 5 Slot Cards Area (Slot 0 = QuickSave, Slot 1..4 = Manual Archive Slots)
             for (int i = 0; i < SaveManager.TotalSlotCount; i++)
             {
                 int slotIdx = i;
@@ -376,8 +376,8 @@ namespace SundayLastBreath.UI
                 cRect.anchorMin = new Vector2(0.5f, 1f);
                 cRect.anchorMax = new Vector2(0.5f, 1f);
                 cRect.pivot = new Vector2(0.5f, 1f);
-                cRect.anchoredPosition = new Vector2(0f, -66f - (slotIdx * 98f));
-                cRect.sizeDelta = new Vector2(816f, 88f);
+                cRect.anchoredPosition = new Vector2(0f, -60f - (slotIdx * 88f));
+                cRect.sizeDelta = new Vector2(816f, 80f);
 
                 slotCardBgs[slotIdx] = cardObj.AddComponent<Image>();
                 slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);

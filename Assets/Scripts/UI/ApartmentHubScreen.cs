@@ -3679,8 +3679,8 @@ namespace SundayLastBreath.UI
                 scRect.anchorMin = new Vector2(0.5f, 1f);
                 scRect.anchorMax = new Vector2(0.5f, 1f);
                 scRect.pivot = new Vector2(0.5f, 1f);
-                scRect.anchoredPosition = new Vector2(0f, -10f - (slotIdx * 86f));
-                scRect.sizeDelta = new Vector2(710f, 78f);
+                scRect.anchoredPosition = new Vector2(0f, -8f - (slotIdx * 74f));
+                scRect.sizeDelta = new Vector2(710f, 68f);
 
                 sysSlotCardBgs[slotIdx] = sCard.AddComponent<Image>();
                 sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
