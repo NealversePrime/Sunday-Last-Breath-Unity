@@ -46,6 +46,95 @@ namespace SundayLastBreath.Core
         [SerializeField] private string defaultSaveFileName = "QuickSave.es3";
         [SerializeField] private bool enableDebugShortcuts = true;
 
+        /// <summary>
+        /// Total save slots:
+        /// Slot 0 = QUICKSAVE [F5] ("QuickSave.es3")
+        /// Slot 1 = ARCHIVE SLOT 01 ("SaveSlot_1.es3")
+        /// Slot 2 = ARCHIVE SLOT 02 ("SaveSlot_2.es3")
+        /// Slot 3 = ARCHIVE SLOT 03 ("SaveSlot_3.es3")
+        /// </summary>
+        public const int TotalSlotCount = 4;
+
+        public string GetSlotFileName(int slotIndex)
+        {
+            switch (slotIndex)
+            {
+                case 0: return defaultSaveFileName;
+                case 1: return "SaveSlot_1.es3";
+                case 2: return "SaveSlot_2.es3";
+                case 3: return "SaveSlot_3.es3";
+                default: return $"SaveSlot_{slotIndex}.es3";
+            }
+        }
+
+        public string GetSlotTitle(int slotIndex)
+        {
+            switch (slotIndex)
+            {
+                case 0: return "QUICKSAVE [F5]";
+                case 1: return "ARCHIVE SLOT 01";
+                case 2: return "ARCHIVE SLOT 02";
+                case 3: return "ARCHIVE SLOT 03";
+                default: return $"ARCHIVE SLOT {slotIndex:D2}";
+            }
+        }
+
+        public bool SaveToSlot(int slotIndex)
+        {
+            return SaveGame(GetSlotFileName(slotIndex));
+        }
+
+        public bool LoadFromSlot(int slotIndex)
+        {
+            return LoadGame(GetSlotFileName(slotIndex));
+        }
+
+        public bool HasSaveInSlot(int slotIndex)
+        {
+            return ES3.FileExists(GetSlotFileName(slotIndex));
+        }
+
+        public void DeleteSlot(int slotIndex)
+        {
+            DeleteSave(GetSlotFileName(slotIndex));
+        }
+
+        public SaveSummary GetSlotSummary(int slotIndex)
+        {
+            string file = GetSlotFileName(slotIndex);
+            SaveSummary s = GetSaveSummary(file);
+            s.slotIndex = slotIndex;
+            s.slotTitle = GetSlotTitle(slotIndex);
+            s.fileName = file;
+            return s;
+        }
+
+        public bool HasAnySave()
+        {
+            for (int i = 0; i < TotalSlotCount; i++)
+            {
+                if (HasSaveInSlot(i)) return true;
+            }
+            return false;
+        }
+
+        public int GetMostRecentPopulatedSlotIndex()
+        {
+            int bestSlot = -1;
+            long bestTicks = -1;
+            for (int i = 0; i < TotalSlotCount; i++)
+            {
+                if (!HasSaveInSlot(i)) continue;
+                var s = GetSlotSummary(i);
+                if (bestSlot == -1 || s.savedUtcTicks >= bestTicks)
+                {
+                    bestSlot = i;
+                    bestTicks = s.savedUtcTicks;
+                }
+            }
+            return bestSlot;
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInitialize()
         {
@@ -187,6 +276,9 @@ namespace SundayLastBreath.Core
                 string dayName = clock != null ? clock.DayName : "SATURDAY";
 
                 // 4. Easy Save 3 Persistence
+                string realTimestamp = DateTime.Now.ToString("dd MMM yyyy, HH:mm");
+                long realUtcTicks = DateTime.UtcNow.Ticks;
+
                 ES3.Save<CharacterData>("character_data", character, file);
                 ES3.Save<string>("current_room_id", roomId, file);
                 ES3.Save<int>("clock_day", day, file);
@@ -196,6 +288,8 @@ namespace SundayLastBreath.Core
                 ES3.Save<string>("clock_month", month, file);
                 ES3.Save<int>("clock_year", year, file);
                 ES3.Save<string>("clock_day_name", dayName, file);
+                ES3.Save<string>("real_save_time", realTimestamp, file);
+                ES3.Save<long>("real_save_ticks", realUtcTicks, file);
 
                 // 5. Rich Console Telemetry Output
                 string traitsList = (character.traits != null && character.traits.Count > 0)
@@ -325,12 +419,15 @@ namespace SundayLastBreath.Core
         }
 
         /// <summary>
-        /// Checks whether a save file exists on disk.
+        /// Checks whether a save file exists on disk (if fileName is null, returns true if ANY slot has a save).
         /// </summary>
         public bool HasSave(string fileName = null)
         {
-            string file = string.IsNullOrEmpty(fileName) ? defaultSaveFileName : fileName;
-            return ES3.FileExists(file);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return HasAnySave();
+            }
+            return ES3.FileExists(fileName);
         }
 
         /// <summary>
@@ -350,6 +447,9 @@ namespace SundayLastBreath.Core
         public struct SaveSummary
         {
             public bool exists;
+            public int slotIndex;
+            public string slotTitle;
+            public string fileName;
             public string survivorName;
             public string job;
             public int hp;
@@ -362,23 +462,40 @@ namespace SundayLastBreath.Core
             public int hour;
             public int minute;
             public string dateString;
+            public string realSaveTime;
+            public long savedUtcTicks;
             public int traitCount;
             public int itemCount;
 
             // UI helper alias properties
             public string characterName => !string.IsNullOrEmpty(survivorName) ? survivorName : "Unknown Survivor";
-            public string saveTimestamp => !string.IsNullOrEmpty(dateString) ? dateString : "Recent";
+            public string saveTimestamp => !string.IsNullOrEmpty(realSaveTime) ? $"{dateString} (Saved {realSaveTime})" : (!string.IsNullOrEmpty(dateString) ? dateString : "Recent");
             public string roomDisplayName => string.IsNullOrEmpty(roomId) ? "Unit 407" : roomId.Replace("_", " ").ToUpperInvariant();
             public string clockDisplay => $"DAY {day} // {hour:D2}:{minute:D2}";
         }
 
         /// <summary>
         /// Reads high-level meta telemetry of the save file without loading full game state into memory.
+        /// If fileName is omitted, returns the summary of the most recently saved slot.
         /// </summary>
         public SaveSummary GetSaveSummary(string fileName = null)
         {
-            string file = string.IsNullOrEmpty(fileName) ? defaultSaveFileName : fileName;
-            SaveSummary summary = new SaveSummary();
+            string file = fileName;
+            int resolvedSlot = 0;
+
+            if (string.IsNullOrEmpty(file))
+            {
+                int recentSlot = GetMostRecentPopulatedSlotIndex();
+                resolvedSlot = recentSlot >= 0 ? recentSlot : 0;
+                file = GetSlotFileName(resolvedSlot);
+            }
+
+            SaveSummary summary = new SaveSummary
+            {
+                slotIndex = resolvedSlot,
+                slotTitle = GetSlotTitle(resolvedSlot),
+                fileName = file
+            };
 
             if (!ES3.FileExists(file))
             {
@@ -413,6 +530,8 @@ namespace SundayLastBreath.Core
                 summary.minute = ES3.KeyExists("clock_minute", file) ? ES3.Load<int>("clock_minute", file) : 45;
                 string dayName = ES3.KeyExists("clock_day_name", file) ? ES3.Load<string>("clock_day_name", file) : "SATURDAY";
                 summary.dateString = $"DAY {summary.day} ({dayName}) // {summary.hour:D2}:{summary.minute:D2}";
+                summary.realSaveTime = ES3.KeyExists("real_save_time", file) ? ES3.Load<string>("real_save_time", file) : "";
+                summary.savedUtcTicks = ES3.KeyExists("real_save_ticks", file) ? ES3.Load<long>("real_save_ticks", file) : 0L;
             }
             catch (Exception ex)
             {

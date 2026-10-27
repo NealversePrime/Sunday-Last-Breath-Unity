@@ -29,11 +29,15 @@ namespace SundayLastBreath.UI
         [SerializeField] private GameObject settingsModal;
         [SerializeField] private GameObject loadGameModal;
 
-        // Dynamic modal references
+        // Multi-Slot Load Modal UI References
         private TextMeshProUGUI modalTitleText;
-        private TextMeshProUGUI modalBodyText;
-        private Button modalResumeButton;
-        private Button modalCancelButton;
+        private TextMeshProUGUI[] slotTitleTexts = new TextMeshProUGUI[SaveManager.TotalSlotCount];
+        private TextMeshProUGUI[] slotDetailTexts = new TextMeshProUGUI[SaveManager.TotalSlotCount];
+        private Button[] slotLoadButtons = new Button[SaveManager.TotalSlotCount];
+        private TextMeshProUGUI[] slotLoadBtnLabels = new TextMeshProUGUI[SaveManager.TotalSlotCount];
+        private Button[] slotDeleteButtons = new Button[SaveManager.TotalSlotCount];
+        private Image[] slotCardBgs = new Image[SaveManager.TotalSlotCount];
+        private Outline[] slotCardOutlines = new Outline[SaveManager.TotalSlotCount];
 
         protected override void Awake()
         {
@@ -108,9 +112,13 @@ namespace SundayLastBreath.UI
 #if !ENABLE_INPUT_SYSTEM || ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetKeyDown(KeyCode.F9)) pressF9 = true;
 #endif
-            if (pressF9 && SaveManager.Instance != null && SaveManager.Instance.HasSave())
+            if (pressF9 && SaveManager.Instance != null && SaveManager.Instance.HasAnySave())
             {
-                ExecuteResumeSavedGame();
+                int recentSlot = SaveManager.Instance.GetMostRecentPopulatedSlotIndex();
+                if (recentSlot >= 0)
+                {
+                    ExecuteResumeSavedSlot(recentSlot);
+                }
             }
         }
 
@@ -127,70 +135,125 @@ namespace SundayLastBreath.UI
         private void ShowLoadGameModal()
         {
             EnsureLoadGameModalBuilt();
-
-            bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
-
-            if (hasSave)
-            {
-                var summary = SaveManager.Instance.GetSaveSummary();
-
-                if (modalTitleText != null)
-                {
-                    modalTitleText.text = "■ RECOVER SURVIVOR RECORD // ARCHIVED DOSSIER";
-                }
-
-                if (modalBodyText != null)
-                {
-                    string survivorName = !string.IsNullOrEmpty(summary.survivorName) ? summary.survivorName.ToUpper() : "UNKNOWN SURVIVOR";
-                    string vocation = !string.IsNullOrEmpty(summary.job) ? summary.job.ToUpper() : "CIVILIAN";
-                    string location = !string.IsNullOrEmpty(summary.roomId) ? summary.roomId.ToUpper() : "UNIT 407";
-
-                    modalBodyText.text =
-                        $"<color=#94A3B8>FILE:</color> <color=#38BDF8>QuickSave.es3</color>\n\n" +
-                        $"<color=#94A3B8>SURVIVOR:</color> <color=#FFA726><b>{survivorName}</b></color>\n" +
-                        $"<color=#94A3B8>BACKGROUND:</color> <b>{vocation}</b>\n\n" +
-                        $"<color=#94A3B8>VITALS:</color> HP: <color=#EF4444><b>{summary.hp}/{summary.hpMax}</b></color>  |  " +
-                        $"STAMINA: <color=#10B981><b>{summary.stamina}/{summary.staminaMax}</b></color>  |  " +
-                        $"HUMANITY: <color=#8B5CF6><b>{summary.humanity}/100</b></color>\n\n" +
-                        $"<color=#94A3B8>LAST RECORDED POSITION:</color> <color=#FBBF24><b>{location}</b></color>\n" +
-                        $"<color=#94A3B8>TIMESTAMP:</color> <b>{summary.dateString}</b>\n\n" +
-                        $"<color=#64748B>Telemetry confirms biological signals are intact. Ready to synchronize neural link.</color>";
-                }
-
-                if (modalResumeButton != null)
-                {
-                    modalResumeButton.gameObject.SetActive(true);
-                }
-            }
-            else
-            {
-                if (modalTitleText != null)
-                {
-                    modalTitleText.text = "■ SURVIVOR ARCHIVE // RECORD EMPTY";
-                }
-
-                if (modalBodyText != null)
-                {
-                    modalBodyText.text =
-                        $"<color=#EF4444><b>[!] NO ARCHIVED SURVIVOR DOSSIER FOUND</b></color>\n\n" +
-                        $"No saved intake records exist in the current storage terminal.\n\n" +
-                        $"Please return to the main menu and select <b>NEW GAME</b> to initiate your first citizen intake and begin surviving Day Zero.\n\n" +
-                        $"<color=#64748B><i>(During gameplay, press <b>F5</b> at any time to QuickSave your progress.)</i></color>";
-                }
-
-                if (modalResumeButton != null)
-                {
-                    modalResumeButton.gameObject.SetActive(false);
-                }
-            }
+            RefreshLoadSlotCards();
 
             if (loadGameModal != null)
             {
+                loadGameModal.transform.SetAsLastSibling();
                 loadGameModal.SetActive(true);
             }
         }
 
-        private void ExecuteResumeSavedGame()
+        private void RefreshLoadSlotCards()
+        {
+            bool anySave = SaveManager.Instance != null && SaveManager.Instance.HasAnySave();
+            if (modalTitleText != null)
+            {
+                modalTitleText.text = anySave
+                    ? "■ SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER"
+                    : "■ SURVIVOR ARCHIVE // ALL SLOTS EMPTY";
+            }
+
+            for (int i = 0; i < SaveManager.TotalSlotCount; i++)
+            {
+                int slotIdx = i;
+                var s = SaveManager.Instance != null ? SaveManager.Instance.GetSlotSummary(slotIdx) : default;
+                string slotTitle = SaveManager.Instance != null ? SaveManager.Instance.GetSlotTitle(slotIdx) : $"SLOT {slotIdx}";
+
+                if (s.exists)
+                {
+                    string savedTimeBadge = !string.IsNullOrEmpty(s.realSaveTime)
+                        ? $"<color=#64748B>[Saved: {s.realSaveTime}]</color>"
+                        : "<color=#64748B>[Recorded Checkpoint]</color>";
+
+                    if (slotTitleTexts[slotIdx] != null)
+                    {
+                        string titleHex = slotIdx == 0 ? "#38BDF8" : "#F59E0B";
+                        slotTitleTexts[slotIdx].text =
+                            $"<color={titleHex}><b>■ {slotTitle}</b></color>   <color=#F8FAFC><b>{s.characterName.ToUpper()}</b></color> <color=#94A3B8>({s.job})</color>   {savedTimeBadge}";
+                    }
+
+                    if (slotDetailTexts[slotIdx] != null)
+                    {
+                        slotDetailTexts[slotIdx].text =
+                            $"<color=#FBBF24><b>{s.roomDisplayName}</b></color>   |   <color=#E2E8F0>{s.dateString}</color>   |   " +
+                            $"HP: <color=#EF4444><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#10B981><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#A78BFA><b>{s.humanity}/100</b></color>   Items: <b>{s.itemCount}</b>";
+                    }
+
+                    if (slotLoadButtons[slotIdx] != null)
+                    {
+                        slotLoadButtons[slotIdx].interactable = true;
+                        Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
+                        if (btnBg != null) btnBg.color = new Color(0.08f, 0.38f, 0.22f, 0.98f);
+                    }
+
+                    if (slotLoadBtnLabels[slotIdx] != null)
+                    {
+                        slotLoadBtnLabels[slotIdx].text = "<b>► LOAD SLOT</b>";
+                        slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.98f, 0.65f);
+                    }
+
+                    if (slotDeleteButtons[slotIdx] != null)
+                    {
+                        slotDeleteButtons[slotIdx].gameObject.SetActive(true);
+                    }
+
+                    if (slotCardBgs[slotIdx] != null)
+                    {
+                        slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);
+                    }
+                    if (slotCardOutlines[slotIdx] != null)
+                    {
+                        slotCardOutlines[slotIdx].effectColor = slotIdx == 0
+                            ? new Color(0.22f, 0.74f, 0.97f, 0.65f)
+                            : new Color(0.95f, 0.62f, 0.12f, 0.65f);
+                    }
+                }
+                else
+                {
+                    if (slotTitleTexts[slotIdx] != null)
+                    {
+                        slotTitleTexts[slotIdx].text = $"<color=#64748B><b>□ {slotTitle}</b>   —   [ EMPTY ARCHIVE SLOT ]</color>";
+                    }
+
+                    if (slotDetailTexts[slotIdx] != null)
+                    {
+                        slotDetailTexts[slotIdx].text = slotIdx == 0
+                            ? "<color=#475569><i>No QuickSave recorded yet. Press F5 during gameplay to QuickSave.</i></color>"
+                            : "<color=#475569><i>No survivor record stored in this slot. Save via Personal Phone [TAB] in-game.</i></color>";
+                    }
+
+                    if (slotLoadButtons[slotIdx] != null)
+                    {
+                        slotLoadButtons[slotIdx].interactable = false;
+                        Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
+                        if (btnBg != null) btnBg.color = new Color(0.08f, 0.10f, 0.13f, 0.65f);
+                    }
+
+                    if (slotLoadBtnLabels[slotIdx] != null)
+                    {
+                        slotLoadBtnLabels[slotIdx].text = "EMPTY";
+                        slotLoadBtnLabels[slotIdx].color = new Color(0.40f, 0.45f, 0.52f);
+                    }
+
+                    if (slotDeleteButtons[slotIdx] != null)
+                    {
+                        slotDeleteButtons[slotIdx].gameObject.SetActive(false);
+                    }
+
+                    if (slotCardBgs[slotIdx] != null)
+                    {
+                        slotCardBgs[slotIdx].color = new Color(0.03f, 0.04f, 0.06f, 0.85f);
+                    }
+                    if (slotCardOutlines[slotIdx] != null)
+                    {
+                        slotCardOutlines[slotIdx].effectColor = new Color(0.16f, 0.20f, 0.26f, 0.45f);
+                    }
+                }
+            }
+        }
+
+        private void ExecuteResumeSavedSlot(int slotIndex)
         {
             if (AudioManager.Instance != null)
             {
@@ -203,7 +266,7 @@ namespace SundayLastBreath.UI
                 loadGameModal.SetActive(false);
             }
 
-            bool loadSuccess = SaveManager.Instance != null && SaveManager.Instance.QuickLoad();
+            bool loadSuccess = SaveManager.Instance != null && SaveManager.Instance.LoadFromSlot(slotIndex);
 
             if (loadSuccess)
             {
@@ -217,8 +280,23 @@ namespace SundayLastBreath.UI
             }
             else
             {
-                Debug.LogWarning("[TitleScreen] Failed to load save file.");
+                Debug.LogWarning($"[TitleScreen] Failed to load save slot {slotIndex}.");
             }
+        }
+
+        private void OnDeleteSlotClicked(int slotIndex)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayButtonClick();
+            }
+
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.DeleteSlot(slotIndex);
+            }
+
+            RefreshLoadSlotCards();
         }
 
         private void EnsureLoadGameModalBuilt()
@@ -239,11 +317,11 @@ namespace SundayLastBreath.UI
             backdrop.color = new Color(0.015f, 0.02f, 0.03f, 0.92f);
             backdrop.raycastTarget = true;
 
-            // 2. Central Dossier Panel
+            // 2. Central Dossier Panel (760 x 540)
             GameObject panel = new GameObject("DossierPanel");
             panel.transform.SetParent(loadGameModal.transform, false);
             RectTransform pRect = panel.AddComponent<RectTransform>();
-            pRect.sizeDelta = new Vector2(720, 520);
+            pRect.sizeDelta = new Vector2(760f, 540f);
             pRect.anchoredPosition = Vector2.zero;
 
             Image pBg = panel.AddComponent<Image>();
@@ -260,7 +338,7 @@ namespace SundayLastBreath.UI
             hRect.anchorMin = new Vector2(0f, 1f);
             hRect.anchorMax = new Vector2(1f, 1f);
             hRect.pivot = new Vector2(0.5f, 1f);
-            hRect.sizeDelta = new Vector2(0, 52);
+            hRect.sizeDelta = new Vector2(0f, 52f);
             hRect.anchoredPosition = Vector2.zero;
 
             Image hBg = headerObj.AddComponent<Image>();
@@ -271,71 +349,156 @@ namespace SundayLastBreath.UI
             RectTransform ttRect = titleTextObj.AddComponent<RectTransform>();
             ttRect.anchorMin = Vector2.zero;
             ttRect.anchorMax = Vector2.one;
-            ttRect.offsetMin = new Vector2(20, 0);
-            ttRect.offsetMax = new Vector2(-20, 0);
+            ttRect.offsetMin = new Vector2(20f, 0f);
+            ttRect.offsetMax = new Vector2(-20f, 0f);
 
             modalTitleText = titleTextObj.AddComponent<TextMeshProUGUI>();
-            modalTitleText.text = "■ RECOVER SURVIVOR RECORD // CLASSIFIED ARCHIVE";
-            modalTitleText.fontSize = 18;
+            modalTitleText.text = "■ SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER";
+            modalTitleText.fontSize = 16.5f;
             modalTitleText.fontStyle = FontStyles.Bold;
             modalTitleText.color = new Color(1f, 0.75f, 0.35f, 1f);
             modalTitleText.alignment = TextAlignmentOptions.MidlineLeft;
             SundayTypography.ApplyFont(modalTitleText, FontRole.Display);
 
-            // 4. Dossier Content Area
-            GameObject contentObj = new GameObject("ContentArea");
-            contentObj.transform.SetParent(panel.transform, false);
-            RectTransform cRect = contentObj.AddComponent<RectTransform>();
-            cRect.anchorMin = new Vector2(0f, 0f);
-            cRect.anchorMax = new Vector2(1f, 1f);
-            cRect.offsetMin = new Vector2(25, 75);
-            cRect.offsetMax = new Vector2(-25, -60);
+            // 4. 4 Slot Cards Area
+            for (int i = 0; i < SaveManager.TotalSlotCount; i++)
+            {
+                int slotIdx = i;
+                GameObject cardObj = new GameObject($"SlotCard_{slotIdx}");
+                cardObj.transform.SetParent(panel.transform, false);
+                RectTransform cRect = cardObj.AddComponent<RectTransform>();
+                cRect.anchorMin = new Vector2(0.5f, 1f);
+                cRect.anchorMax = new Vector2(0.5f, 1f);
+                cRect.pivot = new Vector2(0.5f, 1f);
+                cRect.anchoredPosition = new Vector2(0f, -66f - (slotIdx * 98f));
+                cRect.sizeDelta = new Vector2(712f, 88f);
 
-            Image cBg = contentObj.AddComponent<Image>();
-            cBg.color = new Color(0.02f, 0.03f, 0.05f, 0.85f);
+                slotCardBgs[slotIdx] = cardObj.AddComponent<Image>();
+                slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);
 
-            Outline cOutline = contentObj.AddComponent<Outline>();
-            cOutline.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.5f);
-            cOutline.effectDistance = new Vector2(1f, -1f);
+                slotCardOutlines[slotIdx] = cardObj.AddComponent<Outline>();
+                slotCardOutlines[slotIdx].effectColor = new Color(0.25f, 0.32f, 0.42f, 0.65f);
+                slotCardOutlines[slotIdx].effectDistance = new Vector2(1.5f, -1.5f);
 
-            GameObject bodyTextObj = new GameObject("BodyText");
-            bodyTextObj.transform.SetParent(contentObj.transform, false);
-            RectTransform btRect = bodyTextObj.AddComponent<RectTransform>();
-            btRect.anchorMin = Vector2.zero;
-            btRect.anchorMax = Vector2.one;
-            btRect.offsetMin = new Vector2(20, 15);
-            btRect.offsetMax = new Vector2(-20, -15);
+                // Top Line: Slot Title + Survivor Name
+                GameObject topObj = new GameObject("SlotTitle");
+                topObj.transform.SetParent(cardObj.transform, false);
+                RectTransform topRect = topObj.AddComponent<RectTransform>();
+                topRect.anchorMin = new Vector2(0f, 0.5f);
+                topRect.anchorMax = new Vector2(1f, 1f);
+                topRect.offsetMin = new Vector2(18f, 2f);
+                topRect.offsetMax = new Vector2(-210f, -8f);
 
-            modalBodyText = bodyTextObj.AddComponent<TextMeshProUGUI>();
-            modalBodyText.fontSize = 15;
-            modalBodyText.lineSpacing = 8;
-            modalBodyText.color = new Color(0.85f, 0.88f, 0.92f, 1f);
-            modalBodyText.alignment = TextAlignmentOptions.TopLeft;
-            SundayTypography.ApplyFont(modalBodyText, FontRole.Body);
+                slotTitleTexts[slotIdx] = topObj.AddComponent<TextMeshProUGUI>();
+                slotTitleTexts[slotIdx].fontSize = 14f;
+                slotTitleTexts[slotIdx].color = Color.white;
+                slotTitleTexts[slotIdx].alignment = TextAlignmentOptions.MidlineLeft;
+                slotTitleTexts[slotIdx].textWrappingMode = TextWrappingModes.NoWrap;
+                SundayTypography.ApplyFont(slotTitleTexts[slotIdx], FontRole.Body);
 
-            // 5. Button Row
-            GameObject btnRow = new GameObject("ButtonRow");
-            btnRow.transform.SetParent(panel.transform, false);
-            RectTransform brRect = btnRow.AddComponent<RectTransform>();
-            brRect.anchorMin = new Vector2(0f, 0f);
-            brRect.anchorMax = new Vector2(1f, 0f);
-            brRect.sizeDelta = new Vector2(0, 60);
-            brRect.anchoredPosition = new Vector2(0, 12);
+                // Bottom Line: Location, Clock, Vitals
+                GameObject botObj = new GameObject("SlotDetails");
+                botObj.transform.SetParent(cardObj.transform, false);
+                RectTransform botRect = botObj.AddComponent<RectTransform>();
+                botRect.anchorMin = new Vector2(0f, 0f);
+                botRect.anchorMax = new Vector2(1f, 0.5f);
+                botRect.offsetMin = new Vector2(18f, 8f);
+                botRect.offsetMax = new Vector2(-210f, -2f);
 
-            // Cancel Button
+                slotDetailTexts[slotIdx] = botObj.AddComponent<TextMeshProUGUI>();
+                slotDetailTexts[slotIdx].fontSize = 12.5f;
+                slotDetailTexts[slotIdx].color = new Color(0.78f, 0.82f, 0.88f);
+                slotDetailTexts[slotIdx].alignment = TextAlignmentOptions.MidlineLeft;
+                slotDetailTexts[slotIdx].textWrappingMode = TextWrappingModes.NoWrap;
+                SundayTypography.ApplyFont(slotDetailTexts[slotIdx], FontRole.Body);
+
+                // Load Slot Button (Right side)
+                GameObject loadBtnObj = new GameObject("LoadButton");
+                loadBtnObj.transform.SetParent(cardObj.transform, false);
+                RectTransform lbRect = loadBtnObj.AddComponent<RectTransform>();
+                lbRect.anchorMin = new Vector2(1f, 0.5f);
+                lbRect.anchorMax = new Vector2(1f, 0.5f);
+                lbRect.pivot = new Vector2(1f, 0.5f);
+                lbRect.anchoredPosition = new Vector2(-58f, 0f);
+                lbRect.sizeDelta = new Vector2(132f, 44f);
+
+                Image lbBg = loadBtnObj.AddComponent<Image>();
+                lbBg.color = new Color(0.08f, 0.38f, 0.22f, 0.98f);
+                Outline lbOl = loadBtnObj.AddComponent<Outline>();
+                lbOl.effectColor = new Color(0.28f, 0.90f, 0.55f, 0.65f);
+
+                slotLoadButtons[slotIdx] = loadBtnObj.AddComponent<Button>();
+                slotLoadButtons[slotIdx].targetGraphic = lbBg;
+                slotLoadButtons[slotIdx].onClick.AddListener(() => ExecuteResumeSavedSlot(slotIdx));
+
+                GameObject lbTxtObj = new GameObject("Label");
+                lbTxtObj.transform.SetParent(loadBtnObj.transform, false);
+                RectTransform lbtRect = lbTxtObj.AddComponent<RectTransform>();
+                lbtRect.anchorMin = Vector2.zero;
+                lbtRect.anchorMax = Vector2.one;
+                lbtRect.offsetMin = Vector2.zero;
+                lbtRect.offsetMax = Vector2.zero;
+
+                slotLoadBtnLabels[slotIdx] = lbTxtObj.AddComponent<TextMeshProUGUI>();
+                slotLoadBtnLabels[slotIdx].text = "<b>► LOAD SLOT</b>";
+                slotLoadBtnLabels[slotIdx].fontSize = 13f;
+                slotLoadBtnLabels[slotIdx].alignment = TextAlignmentOptions.Center;
+                slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.98f, 0.65f);
+                SundayTypography.ApplyFont(slotLoadBtnLabels[slotIdx], FontRole.Mono);
+
+                // Delete Slot Button [DEL]
+                GameObject delBtnObj = new GameObject("DeleteButton");
+                delBtnObj.transform.SetParent(cardObj.transform, false);
+                RectTransform dbRect = delBtnObj.AddComponent<RectTransform>();
+                dbRect.anchorMin = new Vector2(1f, 0.5f);
+                dbRect.anchorMax = new Vector2(1f, 0.5f);
+                dbRect.pivot = new Vector2(1f, 0.5f);
+                dbRect.anchoredPosition = new Vector2(-12f, 0f);
+                dbRect.sizeDelta = new Vector2(38f, 44f);
+
+                Image dbBg = delBtnObj.AddComponent<Image>();
+                dbBg.color = new Color(0.26f, 0.07f, 0.08f, 0.95f);
+                Outline dbOl = delBtnObj.AddComponent<Outline>();
+                dbOl.effectColor = new Color(0.85f, 0.25f, 0.25f, 0.65f);
+
+                slotDeleteButtons[slotIdx] = delBtnObj.AddComponent<Button>();
+                slotDeleteButtons[slotIdx].targetGraphic = dbBg;
+                slotDeleteButtons[slotIdx].onClick.AddListener(() => OnDeleteSlotClicked(slotIdx));
+
+                GameObject dbTxtObj = new GameObject("Label");
+                dbTxtObj.transform.SetParent(delBtnObj.transform, false);
+                RectTransform dbtRect = dbTxtObj.AddComponent<RectTransform>();
+                dbtRect.anchorMin = Vector2.zero;
+                dbtRect.anchorMax = Vector2.one;
+                dbtRect.offsetMin = Vector2.zero;
+                dbtRect.offsetMax = Vector2.zero;
+
+                TextMeshProUGUI dbTmp = dbTxtObj.AddComponent<TextMeshProUGUI>();
+                dbTmp.text = "<b>X</b>";
+                dbTmp.fontSize = 13f;
+                dbTmp.alignment = TextAlignmentOptions.Center;
+                dbTmp.color = new Color(0.98f, 0.45f, 0.45f);
+                SundayTypography.ApplyFont(dbTmp, FontRole.Mono);
+            }
+
+            // 5. Bottom Return Button
             GameObject cancelObj = new GameObject("CancelButton");
-            cancelObj.transform.SetParent(btnRow.transform, false);
+            cancelObj.transform.SetParent(panel.transform, false);
             RectTransform cnRect = cancelObj.AddComponent<RectTransform>();
-            cnRect.anchorMin = new Vector2(0.5f, 0.5f);
-            cnRect.anchorMax = new Vector2(0.5f, 0.5f);
-            cnRect.sizeDelta = new Vector2(180, 42);
-            cnRect.anchoredPosition = new Vector2(-120, 0);
+            cnRect.anchorMin = new Vector2(0.5f, 0f);
+            cnRect.anchorMax = new Vector2(0.5f, 0f);
+            cnRect.pivot = new Vector2(0.5f, 0f);
+            cnRect.sizeDelta = new Vector2(260f, 42f);
+            cnRect.anchoredPosition = new Vector2(0f, 16f);
 
             Image cnBg = cancelObj.AddComponent<Image>();
-            cnBg.color = new Color(0.12f, 0.15f, 0.20f, 0.95f);
-            modalCancelButton = cancelObj.AddComponent<Button>();
-            modalCancelButton.targetGraphic = cnBg;
-            modalCancelButton.onClick.AddListener(() =>
+            cnBg.color = new Color(0.12f, 0.15f, 0.20f, 0.98f);
+            Outline cnOl = cancelObj.AddComponent<Outline>();
+            cnOl.effectColor = new Color(0.35f, 0.42f, 0.52f, 0.7f);
+
+            Button cancelBtn = cancelObj.AddComponent<Button>();
+            cancelBtn.targetGraphic = cnBg;
+            cancelBtn.onClick.AddListener(() =>
             {
                 if (AudioManager.Instance != null) AudioManager.Instance.PlayButtonClick();
                 if (loadGameModal != null) loadGameModal.SetActive(false);
@@ -346,41 +509,14 @@ namespace SundayLastBreath.UI
             RectTransform cntRect = cnTxtObj.AddComponent<RectTransform>();
             cntRect.anchorMin = Vector2.zero;
             cntRect.anchorMax = Vector2.one;
+            cntRect.offsetMin = Vector2.zero;
+            cntRect.offsetMax = Vector2.zero;
             TextMeshProUGUI cnTmp = cnTxtObj.AddComponent<TextMeshProUGUI>();
-            cnTmp.text = "[ RETURN ]";
-            cnTmp.fontSize = 15;
-            cnTmp.fontStyle = FontStyles.Bold;
+            cnTmp.text = "<b>[ < RETURN TO MAIN MENU ]</b>";
+            cnTmp.fontSize = 14f;
             cnTmp.alignment = TextAlignmentOptions.Center;
-            cnTmp.color = new Color(0.75f, 0.80f, 0.85f, 1f);
+            cnTmp.color = new Color(0.85f, 0.88f, 0.92f, 1f);
             SundayTypography.ApplyFont(cnTmp, FontRole.Mono);
-
-            // Resume Button
-            GameObject resumeObj = new GameObject("ResumeButton");
-            resumeObj.transform.SetParent(btnRow.transform, false);
-            RectTransform rmRect = resumeObj.AddComponent<RectTransform>();
-            rmRect.anchorMin = new Vector2(0.5f, 0.5f);
-            rmRect.anchorMax = new Vector2(0.5f, 0.5f);
-            rmRect.sizeDelta = new Vector2(260, 42);
-            rmRect.anchoredPosition = new Vector2(110, 0);
-
-            Image rmBg = resumeObj.AddComponent<Image>();
-            rmBg.color = new Color(0.10f, 0.45f, 0.25f, 0.95f); // Terminal green
-            modalResumeButton = resumeObj.AddComponent<Button>();
-            modalResumeButton.targetGraphic = rmBg;
-            modalResumeButton.onClick.AddListener(ExecuteResumeSavedGame);
-
-            GameObject rmTxtObj = new GameObject("Text");
-            rmTxtObj.transform.SetParent(resumeObj.transform, false);
-            RectTransform rmtRect = rmTxtObj.AddComponent<RectTransform>();
-            rmtRect.anchorMin = Vector2.zero;
-            rmtRect.anchorMax = Vector2.one;
-            TextMeshProUGUI rmTmp = rmTxtObj.AddComponent<TextMeshProUGUI>();
-            rmTmp.text = "► RESUME SURVIVOR";
-            rmTmp.fontSize = 15;
-            rmTmp.fontStyle = FontStyles.Bold;
-            rmTmp.alignment = TextAlignmentOptions.Center;
-            rmTmp.color = Color.white;
-            SundayTypography.ApplyFont(rmTmp, FontRole.Display);
 
             loadGameModal.SetActive(false);
         }

@@ -1412,11 +1412,7 @@ namespace SundayLastBreath.UI
 #endif
                 if (escSys)
                 {
-                    if (sysExitConfirmPanel != null && sysExitConfirmPanel.activeSelf)
-                    {
-                        SwitchSystemMenuView(SystemMenuView.Main);
-                    }
-                    else if (sysSettingsPanel != null && sysSettingsPanel.activeSelf)
+                    if (sysMainPanel != null && !sysMainPanel.activeSelf)
                     {
                         SwitchSystemMenuView(SystemMenuView.Main);
                     }
@@ -2954,13 +2950,23 @@ namespace SundayLastBreath.UI
             EvaluateHubButtonStates();
         }
 
-        #region System Menu Modal (Save / Load / Settings / Exit Confirmation)
-        private enum SystemMenuView { Main, Settings, ExitConfirm }
+        #region System Menu Modal (Multi-Slot Save / Multi-Slot Load / Settings / Exit Confirmation)
+        private enum SystemMenuView { Main, SaveSlots, LoadSlots, Settings, ExitConfirm }
 
         private GameObject systemMenuModal;
         private GameObject sysMainPanel;
+        private GameObject sysSlotsPanel;
         private GameObject sysSettingsPanel;
         private GameObject sysExitConfirmPanel;
+
+        private bool isSlotPickerSaveMode = true;
+        private TextMeshProUGUI[] sysSlotTitles = new TextMeshProUGUI[SaveManager.TotalSlotCount];
+        private TextMeshProUGUI[] sysSlotDetails = new TextMeshProUGUI[SaveManager.TotalSlotCount];
+        private Button[] sysSlotActionBtns = new Button[SaveManager.TotalSlotCount];
+        private TextMeshProUGUI[] sysSlotActionLabels = new TextMeshProUGUI[SaveManager.TotalSlotCount];
+        private Button[] sysSlotDeleteBtns = new Button[SaveManager.TotalSlotCount];
+        private Image[] sysSlotCardBgs = new Image[SaveManager.TotalSlotCount];
+        private Outline[] sysSlotCardOutlines = new Outline[SaveManager.TotalSlotCount];
 
         private TextMeshProUGUI sysHeaderSubText;
         private TextMeshProUGUI sysTelemetryStatusText;
@@ -3006,6 +3012,7 @@ namespace SundayLastBreath.UI
         {
             PlayClickSFX();
             if (sysMainPanel != null) sysMainPanel.SetActive(view == SystemMenuView.Main);
+            if (sysSlotsPanel != null) sysSlotsPanel.SetActive(view == SystemMenuView.SaveSlots || view == SystemMenuView.LoadSlots);
             if (sysSettingsPanel != null) sysSettingsPanel.SetActive(view == SystemMenuView.Settings);
             if (sysExitConfirmPanel != null) sysExitConfirmPanel.SetActive(view == SystemMenuView.ExitConfirm);
 
@@ -3015,6 +3022,17 @@ namespace SundayLastBreath.UI
                 {
                     case SystemMenuView.Main:
                         sysHeaderSubText.text = "SYSTEM // ARCHIVE, AUDIO CONFIGURATION & SESSION CONTROL";
+                        RefreshSystemMenuTelemetry();
+                        break;
+                    case SystemMenuView.SaveSlots:
+                        isSlotPickerSaveMode = true;
+                        sysHeaderSubText.text = "SAVE GAME // SELECT ARCHIVE SLOT TO RECORD PROGRESS";
+                        RefreshSystemSlotCards();
+                        break;
+                    case SystemMenuView.LoadSlots:
+                        isSlotPickerSaveMode = false;
+                        sysHeaderSubText.text = "LOAD GAME // SELECT ARCHIVED SLOT TO RESTORE";
+                        RefreshSystemSlotCards();
                         break;
                     case SystemMenuView.Settings:
                         sysHeaderSubText.text = "SETTINGS // AUDIO MIXER & VOLUME CALIBRATION";
@@ -3028,9 +3046,168 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private void RefreshSystemSlotCards()
+        {
+            for (int i = 0; i < SaveManager.TotalSlotCount; i++)
+            {
+                int slotIdx = i;
+                var s = SaveManager.Instance != null ? SaveManager.Instance.GetSlotSummary(slotIdx) : default;
+                string slotTitle = SaveManager.Instance != null ? SaveManager.Instance.GetSlotTitle(slotIdx) : $"SLOT {slotIdx}";
+
+                if (s.exists)
+                {
+                    string savedBadge = !string.IsNullOrEmpty(s.realSaveTime)
+                        ? $"<color=#64748B>[{s.realSaveTime}]</color>"
+                        : "";
+
+                    if (sysSlotTitles[slotIdx] != null)
+                    {
+                        string titleHex = slotIdx == 0 ? "#38BDF8" : "#F59E0B";
+                        sysSlotTitles[slotIdx].text =
+                            $"<color={titleHex}><b>■ {slotTitle}</b></color>   <color=#F8FAFC><b>{s.characterName}</b></color> <color=#94A3B8>({s.job})</color>  {savedBadge}";
+                    }
+
+                    if (sysSlotDetails[slotIdx] != null)
+                    {
+                        sysSlotDetails[slotIdx].text =
+                            $"<color=#FBBF24>{s.roomDisplayName}</color>  |  <color=#E2E8F0>{s.dateString}</color>  |  " +
+                            $"HP <color=#EF4444>{s.hp}/{s.hpMax}</color>  STM <color=#10B981>{s.stamina}/{s.staminaMax}</color>  HUM <color=#A78BFA>{s.humanity}%</color>";
+                    }
+
+                    if (sysSlotActionBtns[slotIdx] != null)
+                    {
+                        sysSlotActionBtns[slotIdx].interactable = true;
+                        Image btnBg = sysSlotActionBtns[slotIdx].GetComponent<Image>();
+                        if (btnBg != null)
+                        {
+                            btnBg.color = isSlotPickerSaveMode
+                                ? new Color(0.24f, 0.16f, 0.04f, 0.98f)
+                                : new Color(0.07f, 0.25f, 0.36f, 0.98f);
+                        }
+                    }
+
+                    if (sysSlotActionLabels[slotIdx] != null)
+                    {
+                        sysSlotActionLabels[slotIdx].text = isSlotPickerSaveMode ? "<b>OVERWRITE</b>" : "<b>► LOAD</b>";
+                        sysSlotActionLabels[slotIdx].color = isSlotPickerSaveMode
+                            ? new Color(0.98f, 0.78f, 0.28f)
+                            : new Color(0.38f, 0.85f, 0.98f);
+                    }
+
+                    if (sysSlotDeleteBtns[slotIdx] != null)
+                    {
+                        sysSlotDeleteBtns[slotIdx].gameObject.SetActive(true);
+                    }
+
+                    if (sysSlotCardBgs[slotIdx] != null)
+                    {
+                        sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
+                    }
+                    if (sysSlotCardOutlines[slotIdx] != null)
+                    {
+                        sysSlotCardOutlines[slotIdx].effectColor = slotIdx == 0
+                            ? new Color(0.22f, 0.74f, 0.97f, 0.65f)
+                            : new Color(0.95f, 0.62f, 0.12f, 0.65f);
+                    }
+                }
+                else
+                {
+                    if (sysSlotTitles[slotIdx] != null)
+                    {
+                        sysSlotTitles[slotIdx].text = $"<color=#64748B><b>□ {slotTitle}</b>   —   [ EMPTY ARCHIVE SLOT ]</color>";
+                    }
+
+                    if (sysSlotDetails[slotIdx] != null)
+                    {
+                        sysSlotDetails[slotIdx].text = isSlotPickerSaveMode
+                            ? "<color=#64748B><i>Available slot — click SAVE HERE to record current progress.</i></color>"
+                            : "<color=#475569><i>No survivor data recorded in this slot.</i></color>";
+                    }
+
+                    if (sysSlotActionBtns[slotIdx] != null)
+                    {
+                        sysSlotActionBtns[slotIdx].interactable = isSlotPickerSaveMode;
+                        Image btnBg = sysSlotActionBtns[slotIdx].GetComponent<Image>();
+                        if (btnBg != null)
+                        {
+                            btnBg.color = isSlotPickerSaveMode
+                                ? new Color(0.06f, 0.24f, 0.14f, 0.98f)
+                                : new Color(0.08f, 0.10f, 0.13f, 0.60f);
+                        }
+                    }
+
+                    if (sysSlotActionLabels[slotIdx] != null)
+                    {
+                        sysSlotActionLabels[slotIdx].text = isSlotPickerSaveMode ? "<b>SAVE HERE</b>" : "EMPTY";
+                        sysSlotActionLabels[slotIdx].color = isSlotPickerSaveMode
+                            ? new Color(0.28f, 0.95f, 0.58f)
+                            : new Color(0.42f, 0.46f, 0.52f);
+                    }
+
+                    if (sysSlotDeleteBtns[slotIdx] != null)
+                    {
+                        sysSlotDeleteBtns[slotIdx].gameObject.SetActive(false);
+                    }
+
+                    if (sysSlotCardBgs[slotIdx] != null)
+                    {
+                        sysSlotCardBgs[slotIdx].color = new Color(0.04f, 0.05f, 0.08f, 0.88f);
+                    }
+                    if (sysSlotCardOutlines[slotIdx] != null)
+                    {
+                        sysSlotCardOutlines[slotIdx].effectColor = new Color(0.18f, 0.22f, 0.28f, 0.5f);
+                    }
+                }
+            }
+        }
+
+        private void OnSystemSlotActionClicked(int slotIndex)
+        {
+            PlayClickSFX();
+            if (SaveManager.Instance == null) return;
+
+            if (isSlotPickerSaveMode)
+            {
+                bool saved = SaveManager.Instance.SaveToSlot(slotIndex);
+                if (saved)
+                {
+                    string slotTitle = SaveManager.Instance.GetSlotTitle(slotIndex);
+                    AppendStoryLog(gameClock != null ? gameClock.GetTimeString() : "23:45", $"MANUAL ARCHIVE // {slotTitle}",
+                        $"Survivor vitals, backpack items, and room progress saved to {slotTitle}.");
+
+                    var s = SaveManager.Instance.GetSlotSummary(slotIndex);
+                    RefreshSystemSlotCards();
+                    RefreshSystemMenuTelemetry(
+                        $"<color=#10B981><b>✓ SAVED TO {slotTitle}!</b></color>  [{s.saveTimestamp}]  —  {s.characterName} | {s.roomDisplayName}");
+                }
+            }
+            else
+            {
+                if (!SaveManager.Instance.HasSaveInSlot(slotIndex)) return;
+                bool loaded = SaveManager.Instance.LoadFromSlot(slotIndex);
+                if (loaded)
+                {
+                    string slotTitle = SaveManager.Instance.GetSlotTitle(slotIndex);
+                    RefreshSystemMenuTelemetry($"<color=#38BDF8><b>✓ LOADED {slotTitle} SUCCESSFULLY</b></color>");
+                    CloseSystemMenuModal();
+                }
+            }
+        }
+
+        private void OnSystemSlotDeleteClicked(int slotIndex)
+        {
+            PlayClickSFX();
+            if (SaveManager.Instance == null) return;
+
+            string slotTitle = SaveManager.Instance.GetSlotTitle(slotIndex);
+            SaveManager.Instance.DeleteSlot(slotIndex);
+            RefreshSystemSlotCards();
+            RefreshSystemMenuTelemetry($"<color=#F59E0B>Deleted archive data in {slotTitle}.</color>");
+        }
+
         private void RefreshSystemMenuTelemetry(string customBanner = null)
         {
-            bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
+            bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasAnySave();
 
             if (sysLoadGameBtn != null)
             {
@@ -3040,8 +3217,8 @@ namespace SundayLastBreath.UI
             if (sysLoadBtnLabel != null)
             {
                 sysLoadBtnLabel.text = hasSave
-                    ? "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Restore last recorded checkpoint</color></size>"
-                    : "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#64748B>[NO SAVE DATA RECORDED]</color></size>";
+                    ? "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Choose from 4 archive slots to restore</color></size>"
+                    : "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#64748B>[ALL ARCHIVE SLOTS EMPTY]</color></size>";
             }
 
             if (sysTelemetryStatusText != null)
@@ -3054,11 +3231,11 @@ namespace SundayLastBreath.UI
                 {
                     var s = SaveManager.Instance.GetSaveSummary();
                     sysTelemetryStatusText.text =
-                        $"<color=#38BDF8><b>LAST ARCHIVE:</b></color> {s.saveTimestamp}   |   <color=#F8FAFC>{s.characterName} ({s.job})</color>   |   <color=#F59E0B>{s.roomDisplayName} ({s.clockDisplay})</color>";
+                        $"<color=#38BDF8><b>LATEST ({s.slotTitle}):</b></color> {s.saveTimestamp}  |  <color=#F8FAFC>{s.characterName}</color>  |  <color=#F59E0B>{s.roomDisplayName}</color>";
                 }
                 else
                 {
-                    sysTelemetryStatusText.text = "<color=#EF4444><b>ARCHIVE STATUS:</b> No manual or quick save recorded in this session yet.</color>";
+                    sysTelemetryStatusText.text = "<color=#EF4444><b>ARCHIVE STATUS:</b> All 4 save slots are currently empty.</color>";
                 }
             }
         }
@@ -3067,64 +3244,33 @@ namespace SundayLastBreath.UI
         {
             if (sysExitWarningDetailText == null) return;
 
-            bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
+            bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasAnySave();
             if (hasSave && SaveManager.Instance != null)
             {
                 var s = SaveManager.Instance.GetSaveSummary();
                 sysExitWarningDetailText.text =
                     "Are you sure you want to exit the game?\n" +
                     "Any unsaved progress since your last save will be lost.\n\n" +
-                    $"<color=#38BDF8><b>Last Recorded Save:</b></color> {s.saveTimestamp}\n" +
+                    $"<color=#38BDF8><b>Latest Save ({s.slotTitle}):</b></color> {s.saveTimestamp}\n" +
                     $"<color=#94A3B8>Citizen: {s.characterName}  |  Location: {s.roomDisplayName} ({s.clockDisplay})</color>";
             }
             else
             {
                 sysExitWarningDetailText.text =
                     "Are you sure you want to exit the game?\n" +
-                    "<color=#EF4444><b>You have not saved your game yet!</b></color> If you exit without saving, all current progress will be lost.";
+                    "<color=#EF4444><b>You have not saved your game in any slot yet!</b></color> If you exit without saving, all current progress will be lost.";
             }
         }
 
         private void OnSystemMenuSaveClicked()
         {
-            PlayClickSFX();
-            bool success = SaveManager.Instance != null && SaveManager.Instance.SaveGame();
-
-            if (success)
-            {
-                AppendStoryLog(gameClock != null ? gameClock.GetTimeString() : "23:45", "MANUAL ARCHIVE",
-                    "Survivor vitals, backpack items, and room progress saved to storage.");
-
-                var s = SaveManager.Instance.GetSaveSummary();
-                RefreshSystemMenuTelemetry(
-                    $"<color=#10B981><b>✓ GAME SAVED SUCCESSFULLY</b></color>  [{s.saveTimestamp}]  —  {s.characterName} | {s.roomDisplayName}");
-
-                if (sysSaveFeedbackRoutine != null) StopCoroutine(sysSaveFeedbackRoutine);
-                sysSaveFeedbackRoutine = StartCoroutine(AnimateSysSaveButtonConfirmation());
-            }
-        }
-
-        private IEnumerator AnimateSysSaveButtonConfirmation()
-        {
-            if (sysSaveBtnLabel == null) yield break;
-            string normal = "<b>[ 1 ]  SAVE GAME</b>   <size=11><color=#94A3B8>Record current progress & inventory</color></size>";
-            sysSaveBtnLabel.text = "<color=#10B981><b>✓  PROGRESS SAVED TO ARCHIVE!</b></color>";
-            yield return new WaitForSecondsRealtime(2.0f);
-            if (sysSaveBtnLabel != null) sysSaveBtnLabel.text = normal;
-            sysSaveFeedbackRoutine = null;
+            SwitchSystemMenuView(SystemMenuView.SaveSlots);
         }
 
         private void OnSystemMenuLoadClicked()
         {
-            PlayClickSFX();
-            if (SaveManager.Instance == null || !SaveManager.Instance.HasSave()) return;
-
-            bool loaded = SaveManager.Instance.LoadGame();
-            if (loaded)
-            {
-                RefreshSystemMenuTelemetry("<color=#38BDF8><b>✓ CHECKPOINT RESTORED SUCCESSFULLY</b></color>");
-                CloseSystemMenuModal();
-            }
+            if (SaveManager.Instance == null || !SaveManager.Instance.HasAnySave()) return;
+            SwitchSystemMenuView(SystemMenuView.LoadSlots);
         }
 
         private void OnSystemMenuSaveAndExitClicked()
@@ -3132,7 +3278,9 @@ namespace SundayLastBreath.UI
             PlayClickSFX();
             if (SaveManager.Instance != null)
             {
-                SaveManager.Instance.SaveGame();
+                int targetSlot = SaveManager.Instance.GetMostRecentPopulatedSlotIndex();
+                if (targetSlot < 0) targetSlot = 1; // Default to Slot 01 if no save exists yet
+                SaveManager.Instance.SaveToSlot(targetSlot);
             }
             ExecuteExitToMainMenu();
         }
@@ -3241,14 +3389,14 @@ namespace SundayLastBreath.UI
             overlayImg.color = new Color(0.01f, 0.02f, 0.04f, 0.88f);
             overlayImg.raycastTarget = true;
 
-            // 2. Center Window Card (560 x 430)
+            // 2. Center Window Card (640 x 490)
             GameObject card = new GameObject("SystemWindowCard");
             card.transform.SetParent(systemMenuModal.transform, false);
             RectTransform cardRect = card.AddComponent<RectTransform>();
             cardRect.anchorMin = new Vector2(0.5f, 0.5f);
             cardRect.anchorMax = new Vector2(0.5f, 0.5f);
             cardRect.pivot = new Vector2(0.5f, 0.5f);
-            cardRect.sizeDelta = new Vector2(560f, 430f);
+            cardRect.sizeDelta = new Vector2(640f, 490f);
 
             Image cardBg = card.AddComponent<Image>();
             cardBg.color = new Color(0.05f, 0.07f, 0.10f, 0.99f);
@@ -3316,14 +3464,14 @@ namespace SundayLastBreath.UI
 
             // 1. SAVE GAME
             Button saveBtn = CreateSysActionButton(sysMainPanel.transform, "BtnSaveGame",
-                "<b>[ 1 ]  SAVE GAME</b>   <size=11><color=#94A3B8>Record current progress & inventory</color></size>",
+                "<b>[ 1 ]  SAVE GAME</b>   <size=11><color=#94A3B8>Choose from 4 archive slots to save progress</color></size>",
                 new Color(0.06f, 0.22f, 0.14f, 0.98f), new Color(0.25f, 0.95f, 0.58f), sharedFont, out sysSaveBtnLabel);
             PositionMenuRow(saveBtn.GetComponent<RectTransform>(), 0);
             saveBtn.onClick.AddListener(OnSystemMenuSaveClicked);
 
             // 2. LOAD GAME
             sysLoadGameBtn = CreateSysActionButton(sysMainPanel.transform, "BtnLoadGame",
-                "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Restore last recorded checkpoint</color></size>",
+                "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Choose from 4 archive slots to restore</color></size>",
                 new Color(0.07f, 0.17f, 0.26f, 0.98f), new Color(0.35f, 0.78f, 0.98f), sharedFont, out sysLoadBtnLabel);
             PositionMenuRow(sysLoadGameBtn.GetComponent<RectTransform>(), 1);
             sysLoadGameBtn.onClick.AddListener(OnSystemMenuLoadClicked);
@@ -3351,8 +3499,91 @@ namespace SundayLastBreath.UI
             resRect.anchorMax = new Vector2(0.5f, 0f);
             resRect.pivot = new Vector2(0.5f, 0f);
             resRect.anchoredPosition = new Vector2(0f, 14f);
-            resRect.sizeDelta = new Vector2(512f, 38f);
+            resRect.sizeDelta = new Vector2(592f, 40f);
             resumeBtn.onClick.AddListener(CloseSystemMenuModal);
+
+            // =========================================================================
+            // VIEW 1B: 4-SLOT SAVE / LOAD PICKER SUB-WINDOW
+            // =========================================================================
+            sysSlotsPanel = CreateSubPanelRoot(card.transform, "SlotsPickerPanel");
+
+            for (int i = 0; i < SaveManager.TotalSlotCount; i++)
+            {
+                int slotIdx = i;
+                GameObject sCard = new GameObject($"SysSlotCard_{slotIdx}");
+                sCard.transform.SetParent(sysSlotsPanel.transform, false);
+                RectTransform scRect = sCard.AddComponent<RectTransform>();
+                scRect.anchorMin = new Vector2(0.5f, 1f);
+                scRect.anchorMax = new Vector2(0.5f, 1f);
+                scRect.pivot = new Vector2(0.5f, 1f);
+                scRect.anchoredPosition = new Vector2(0f, -10f - (slotIdx * 82f));
+                scRect.sizeDelta = new Vector2(592f, 74f);
+
+                sysSlotCardBgs[slotIdx] = sCard.AddComponent<Image>();
+                sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
+
+                sysSlotCardOutlines[slotIdx] = sCard.AddComponent<Outline>();
+                sysSlotCardOutlines[slotIdx].effectColor = new Color(0.25f, 0.32f, 0.42f, 0.65f);
+
+                sysSlotTitles[slotIdx] = CreateSysTMP(sCard.transform, "SlotTitle", "SLOT", 12.5f, FontStyles.Normal, Color.white, TextAlignmentOptions.MidlineLeft, sharedFont);
+                RectTransform stRect = sysSlotTitles[slotIdx].rectTransform;
+                stRect.anchorMin = new Vector2(0f, 0.5f);
+                stRect.anchorMax = new Vector2(1f, 1f);
+                stRect.offsetMin = new Vector2(14f, 1f);
+                stRect.offsetMax = new Vector2(-186f, -4f);
+
+                sysSlotDetails[slotIdx] = CreateSysTMP(sCard.transform, "SlotDetails", "Details", 11f, FontStyles.Normal, new Color(0.78f, 0.82f, 0.88f), TextAlignmentOptions.MidlineLeft, sharedFont);
+                RectTransform sdRect = sysSlotDetails[slotIdx].rectTransform;
+                sdRect.anchorMin = new Vector2(0f, 0f);
+                sdRect.anchorMax = new Vector2(1f, 0.5f);
+                sdRect.offsetMin = new Vector2(14f, 4f);
+                sdRect.offsetMax = new Vector2(-186f, -1f);
+
+                // Action Button (SAVE HERE / OVERWRITE / LOAD)
+                Button actBtn = CreateSysActionButton(sCard.transform, "BtnSlotAction", "<b>SAVE HERE</b>",
+                    new Color(0.06f, 0.24f, 0.14f, 0.98f), new Color(0.28f, 0.95f, 0.58f), sharedFont, out sysSlotActionLabels[slotIdx]);
+                sysSlotActionLabels[slotIdx].alignment = TextAlignmentOptions.Center;
+                sysSlotActionLabels[slotIdx].fontSize = 12f;
+                sysSlotActionLabels[slotIdx].rectTransform.offsetMin = Vector2.zero;
+                sysSlotActionLabels[slotIdx].rectTransform.offsetMax = Vector2.zero;
+
+                RectTransform abRect = actBtn.GetComponent<RectTransform>();
+                abRect.anchorMin = new Vector2(1f, 0.5f);
+                abRect.anchorMax = new Vector2(1f, 0.5f);
+                abRect.pivot = new Vector2(1f, 0.5f);
+                abRect.anchoredPosition = new Vector2(-50f, 0f);
+                abRect.sizeDelta = new Vector2(120f, 38f);
+                actBtn.onClick.AddListener(() => OnSystemSlotActionClicked(slotIdx));
+                sysSlotActionBtns[slotIdx] = actBtn;
+
+                // Delete Slot Button [X]
+                Button delBtn = CreateSysActionButton(sCard.transform, "BtnSlotDelete", "<b>X</b>",
+                    new Color(0.26f, 0.07f, 0.08f, 0.95f), new Color(0.98f, 0.45f, 0.45f), sharedFont, out TextMeshProUGUI delLbl);
+                delLbl.alignment = TextAlignmentOptions.Center;
+                delLbl.fontSize = 12f;
+                delLbl.rectTransform.offsetMin = Vector2.zero;
+                delLbl.rectTransform.offsetMax = Vector2.zero;
+
+                RectTransform dbRect = delBtn.GetComponent<RectTransform>();
+                dbRect.anchorMin = new Vector2(1f, 0.5f);
+                dbRect.anchorMax = new Vector2(1f, 0.5f);
+                dbRect.pivot = new Vector2(1f, 0.5f);
+                dbRect.anchoredPosition = new Vector2(-10f, 0f);
+                dbRect.sizeDelta = new Vector2(34f, 38f);
+                delBtn.onClick.AddListener(() => OnSystemSlotDeleteClicked(slotIdx));
+                sysSlotDeleteBtns[slotIdx] = delBtn;
+            }
+
+            Button slotsBackBtn = CreateSysActionButton(sysSlotsPanel.transform, "BtnSlotsBack",
+                "<b>[ < BACK TO SYSTEM MENU ]</b>",
+                new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _);
+            RectTransform slbRect = slotsBackBtn.GetComponent<RectTransform>();
+            slbRect.anchorMin = new Vector2(0.5f, 0f);
+            slbRect.anchorMax = new Vector2(0.5f, 0f);
+            slbRect.pivot = new Vector2(0.5f, 0f);
+            slbRect.anchoredPosition = new Vector2(0f, 14f);
+            slbRect.sizeDelta = new Vector2(592f, 38f);
+            slotsBackBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main));
 
             // =========================================================================
             // VIEW 2: SETTINGS SUB-WINDOW (Master, BGM, SFX Sliders)
@@ -3473,8 +3704,8 @@ namespace SundayLastBreath.UI
             rt.anchorMin = new Vector2(0.5f, 1f);
             rt.anchorMax = new Vector2(0.5f, 1f);
             rt.pivot = new Vector2(0.5f, 1f);
-            rt.anchoredPosition = new Vector2(0f, -14f - (index * 64f));
-            rt.sizeDelta = new Vector2(512f, 54f);
+            rt.anchoredPosition = new Vector2(0f, -18f - (index * 72f));
+            rt.sizeDelta = new Vector2(592f, 60f);
         }
 
         private Button CreateSysActionButton(Transform parent, string name, string labelText, Color bgColor, Color borderAndTextColor, TMP_FontAsset font, out TextMeshProUGUI labelOut)
