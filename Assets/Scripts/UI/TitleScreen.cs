@@ -163,8 +163,8 @@ namespace SundayLastBreath.UI
                 if (s.exists)
                 {
                     string savedTimeBadge = !string.IsNullOrEmpty(s.realSaveTime)
-                        ? $"<color=#64748B>[Saved: {s.realSaveTime}]</color>"
-                        : "<color=#64748B>[Recorded Checkpoint]</color>";
+                        ? $"<color=#64748B>[{s.realSaveTime}]</color>"
+                        : "";
 
                     if (slotTitleTexts[slotIdx] != null)
                     {
@@ -176,15 +176,17 @@ namespace SundayLastBreath.UI
                     if (slotDetailTexts[slotIdx] != null)
                     {
                         slotDetailTexts[slotIdx].text =
-                            $"<color=#FBBF24><b>{s.roomDisplayName}</b></color>   |   <color=#E2E8F0>{s.dateString}</color>   |   " +
-                            $"HP: <color=#EF4444><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#10B981><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#A78BFA><b>{s.humanity}/100</b></color>   Items: <b>{s.itemCount}</b>";
+                            $"<color=#FBBF24><b>{s.roomDisplayName}</b></color>   |   <color=#E2E8F0>{s.clockDisplay}</color>   |   " +
+                            $"HP: <color=#EF4444><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#10B981><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#A78BFA><b>{s.humanity}%</b></color>   Items: <b>{s.itemCount}</b>";
                     }
 
                     if (slotLoadButtons[slotIdx] != null)
                     {
                         slotLoadButtons[slotIdx].interactable = true;
                         Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
-                        if (btnBg != null) btnBg.color = new Color(0.08f, 0.38f, 0.22f, 0.98f);
+                        if (btnBg != null) btnBg.color = new Color(0.08f, 0.40f, 0.22f, 0.98f);
+                        Outline btnOl = slotLoadButtons[slotIdx].GetComponent<Outline>();
+                        if (btnOl != null) btnOl.effectColor = new Color(0.28f, 0.90f, 0.55f, 0.75f);
                     }
 
                     if (slotLoadBtnLabels[slotIdx] != null)
@@ -227,13 +229,15 @@ namespace SundayLastBreath.UI
                     {
                         slotLoadButtons[slotIdx].interactable = false;
                         Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
-                        if (btnBg != null) btnBg.color = new Color(0.08f, 0.10f, 0.13f, 0.65f);
+                        if (btnBg != null) btnBg.color = new Color(0.06f, 0.08f, 0.11f, 0.75f);
+                        Outline btnOl = slotLoadButtons[slotIdx].GetComponent<Outline>();
+                        if (btnOl != null) btnOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.35f);
                     }
 
                     if (slotLoadBtnLabels[slotIdx] != null)
                     {
                         slotLoadBtnLabels[slotIdx].text = "EMPTY";
-                        slotLoadBtnLabels[slotIdx].color = new Color(0.40f, 0.45f, 0.52f);
+                        slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.40f, 0.46f);
                     }
 
                     if (slotDeleteButtons[slotIdx] != null)
@@ -317,11 +321,11 @@ namespace SundayLastBreath.UI
             backdrop.color = new Color(0.015f, 0.02f, 0.03f, 0.92f);
             backdrop.raycastTarget = true;
 
-            // 2. Central Dossier Panel (760 x 540)
+            // 2. Central Dossier Panel (860 x 550)
             GameObject panel = new GameObject("DossierPanel");
             panel.transform.SetParent(loadGameModal.transform, false);
             RectTransform pRect = panel.AddComponent<RectTransform>();
-            pRect.sizeDelta = new Vector2(760f, 540f);
+            pRect.sizeDelta = new Vector2(860f, 550f);
             pRect.anchoredPosition = Vector2.zero;
 
             Image pBg = panel.AddComponent<Image>();
@@ -371,7 +375,7 @@ namespace SundayLastBreath.UI
                 cRect.anchorMax = new Vector2(0.5f, 1f);
                 cRect.pivot = new Vector2(0.5f, 1f);
                 cRect.anchoredPosition = new Vector2(0f, -66f - (slotIdx * 98f));
-                cRect.sizeDelta = new Vector2(712f, 88f);
+                cRect.sizeDelta = new Vector2(816f, 88f);
 
                 slotCardBgs[slotIdx] = cardObj.AddComponent<Image>();
                 slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);
@@ -380,36 +384,48 @@ namespace SundayLastBreath.UI
                 slotCardOutlines[slotIdx].effectColor = new Color(0.25f, 0.32f, 0.42f, 0.65f);
                 slotCardOutlines[slotIdx].effectDistance = new Vector2(1.5f, -1.5f);
 
+                // Dedicated Text Container with RectMask2D to strictly prevent text overflowing into buttons
+                GameObject textContainer = new GameObject("TextContainer");
+                textContainer.transform.SetParent(cardObj.transform, false);
+                RectTransform tcRect = textContainer.AddComponent<RectTransform>();
+                tcRect.anchorMin = Vector2.zero;
+                tcRect.anchorMax = Vector2.one;
+                tcRect.offsetMin = new Vector2(18f, 6f);
+                tcRect.offsetMax = new Vector2(-205f, -6f); // Guaranteed safety margin from buttons
+                textContainer.AddComponent<RectMask2D>();
+
                 // Top Line: Slot Title + Survivor Name
                 GameObject topObj = new GameObject("SlotTitle");
-                topObj.transform.SetParent(cardObj.transform, false);
+                topObj.transform.SetParent(textContainer.transform, false);
                 RectTransform topRect = topObj.AddComponent<RectTransform>();
                 topRect.anchorMin = new Vector2(0f, 0.5f);
                 topRect.anchorMax = new Vector2(1f, 1f);
-                topRect.offsetMin = new Vector2(18f, 2f);
-                topRect.offsetMax = new Vector2(-210f, -8f);
+                topRect.offsetMin = new Vector2(0f, 2f);
+                topRect.offsetMax = new Vector2(0f, -2f);
 
                 slotTitleTexts[slotIdx] = topObj.AddComponent<TextMeshProUGUI>();
-                slotTitleTexts[slotIdx].fontSize = 14f;
+                slotTitleTexts[slotIdx].fontSize = 13.5f;
                 slotTitleTexts[slotIdx].color = Color.white;
                 slotTitleTexts[slotIdx].alignment = TextAlignmentOptions.MidlineLeft;
                 slotTitleTexts[slotIdx].textWrappingMode = TextWrappingModes.NoWrap;
+                slotTitleTexts[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
                 SundayTypography.ApplyFont(slotTitleTexts[slotIdx], FontRole.Body);
 
                 // Bottom Line: Location, Clock, Vitals
                 GameObject botObj = new GameObject("SlotDetails");
-                botObj.transform.SetParent(cardObj.transform, false);
+                botObj.transform.SetParent(textContainer.transform, false);
                 RectTransform botRect = botObj.AddComponent<RectTransform>();
                 botRect.anchorMin = new Vector2(0f, 0f);
                 botRect.anchorMax = new Vector2(1f, 0.5f);
-                botRect.offsetMin = new Vector2(18f, 8f);
-                botRect.offsetMax = new Vector2(-210f, -2f);
+                botRect.offsetMin = new Vector2(0f, 2f);
+                botRect.offsetMax = new Vector2(0f, -2f);
 
                 slotDetailTexts[slotIdx] = botObj.AddComponent<TextMeshProUGUI>();
-                slotDetailTexts[slotIdx].fontSize = 12.5f;
+                slotDetailTexts[slotIdx].fontSize = 12f;
                 slotDetailTexts[slotIdx].color = new Color(0.78f, 0.82f, 0.88f);
                 slotDetailTexts[slotIdx].alignment = TextAlignmentOptions.MidlineLeft;
                 slotDetailTexts[slotIdx].textWrappingMode = TextWrappingModes.NoWrap;
+                slotDetailTexts[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
                 SundayTypography.ApplyFont(slotDetailTexts[slotIdx], FontRole.Body);
 
                 // Load Slot Button (Right side)
@@ -419,16 +435,17 @@ namespace SundayLastBreath.UI
                 lbRect.anchorMin = new Vector2(1f, 0.5f);
                 lbRect.anchorMax = new Vector2(1f, 0.5f);
                 lbRect.pivot = new Vector2(1f, 0.5f);
-                lbRect.anchoredPosition = new Vector2(-58f, 0f);
-                lbRect.sizeDelta = new Vector2(132f, 44f);
+                lbRect.anchoredPosition = new Vector2(-56f, 0f);
+                lbRect.sizeDelta = new Vector2(130f, 42f);
 
                 Image lbBg = loadBtnObj.AddComponent<Image>();
-                lbBg.color = new Color(0.08f, 0.38f, 0.22f, 0.98f);
+                lbBg.color = new Color(0.08f, 0.40f, 0.22f, 0.98f);
                 Outline lbOl = loadBtnObj.AddComponent<Outline>();
-                lbOl.effectColor = new Color(0.28f, 0.90f, 0.55f, 0.65f);
+                lbOl.effectColor = new Color(0.28f, 0.90f, 0.55f, 0.75f);
 
                 slotLoadButtons[slotIdx] = loadBtnObj.AddComponent<Button>();
                 slotLoadButtons[slotIdx].targetGraphic = lbBg;
+                slotLoadButtons[slotIdx].transition = Selectable.Transition.None;
                 slotLoadButtons[slotIdx].onClick.AddListener(() => ExecuteResumeSavedSlot(slotIdx));
 
                 GameObject lbTxtObj = new GameObject("Label");
@@ -441,7 +458,7 @@ namespace SundayLastBreath.UI
 
                 slotLoadBtnLabels[slotIdx] = lbTxtObj.AddComponent<TextMeshProUGUI>();
                 slotLoadBtnLabels[slotIdx].text = "<b>► LOAD SLOT</b>";
-                slotLoadBtnLabels[slotIdx].fontSize = 13f;
+                slotLoadBtnLabels[slotIdx].fontSize = 12.5f;
                 slotLoadBtnLabels[slotIdx].alignment = TextAlignmentOptions.Center;
                 slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.98f, 0.65f);
                 SundayTypography.ApplyFont(slotLoadBtnLabels[slotIdx], FontRole.Mono);
@@ -454,7 +471,7 @@ namespace SundayLastBreath.UI
                 dbRect.anchorMax = new Vector2(1f, 0.5f);
                 dbRect.pivot = new Vector2(1f, 0.5f);
                 dbRect.anchoredPosition = new Vector2(-12f, 0f);
-                dbRect.sizeDelta = new Vector2(38f, 44f);
+                dbRect.sizeDelta = new Vector2(36f, 42f);
 
                 Image dbBg = delBtnObj.AddComponent<Image>();
                 dbBg.color = new Color(0.26f, 0.07f, 0.08f, 0.95f);
@@ -463,6 +480,7 @@ namespace SundayLastBreath.UI
 
                 slotDeleteButtons[slotIdx] = delBtnObj.AddComponent<Button>();
                 slotDeleteButtons[slotIdx].targetGraphic = dbBg;
+                slotDeleteButtons[slotIdx].transition = Selectable.Transition.None;
                 slotDeleteButtons[slotIdx].onClick.AddListener(() => OnDeleteSlotClicked(slotIdx));
 
                 GameObject dbTxtObj = new GameObject("Label");
@@ -475,7 +493,7 @@ namespace SundayLastBreath.UI
 
                 TextMeshProUGUI dbTmp = dbTxtObj.AddComponent<TextMeshProUGUI>();
                 dbTmp.text = "<b>X</b>";
-                dbTmp.fontSize = 13f;
+                dbTmp.fontSize = 12.5f;
                 dbTmp.alignment = TextAlignmentOptions.Center;
                 dbTmp.color = new Color(0.98f, 0.45f, 0.45f);
                 SundayTypography.ApplyFont(dbTmp, FontRole.Mono);

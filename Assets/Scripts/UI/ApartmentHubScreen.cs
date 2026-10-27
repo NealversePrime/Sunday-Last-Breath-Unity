@@ -3070,7 +3070,7 @@ namespace SundayLastBreath.UI
                     if (sysSlotDetails[slotIdx] != null)
                     {
                         sysSlotDetails[slotIdx].text =
-                            $"<color=#FBBF24>{s.roomDisplayName}</color>  |  <color=#E2E8F0>{s.dateString}</color>  |  " +
+                            $"<color=#FBBF24>{s.roomDisplayName}</color>  •  <color=#E2E8F0>{s.clockDisplay}</color>  •  " +
                             $"HP <color=#EF4444>{s.hp}/{s.hpMax}</color>  STM <color=#10B981>{s.stamina}/{s.staminaMax}</color>  HUM <color=#A78BFA>{s.humanity}%</color>";
                     }
 
@@ -3132,7 +3132,7 @@ namespace SundayLastBreath.UI
                         {
                             btnBg.color = isSlotPickerSaveMode
                                 ? new Color(0.06f, 0.24f, 0.14f, 0.98f)
-                                : new Color(0.08f, 0.10f, 0.13f, 0.60f);
+                                : new Color(0.06f, 0.08f, 0.11f, 0.75f);
                         }
                     }
 
@@ -3141,7 +3141,7 @@ namespace SundayLastBreath.UI
                         sysSlotActionLabels[slotIdx].text = isSlotPickerSaveMode ? "<b>SAVE HERE</b>" : "EMPTY";
                         sysSlotActionLabels[slotIdx].color = isSlotPickerSaveMode
                             ? new Color(0.28f, 0.95f, 0.58f)
-                            : new Color(0.42f, 0.46f, 0.52f);
+                            : new Color(0.35f, 0.40f, 0.46f);
                     }
 
                     if (sysSlotDeleteBtns[slotIdx] != null)
@@ -3389,14 +3389,14 @@ namespace SundayLastBreath.UI
             overlayImg.color = new Color(0.01f, 0.02f, 0.04f, 0.88f);
             overlayImg.raycastTarget = true;
 
-            // 2. Center Window Card (640 x 490)
+            // 2. Center Window Card (760 x 530)
             GameObject card = new GameObject("SystemWindowCard");
             card.transform.SetParent(systemMenuModal.transform, false);
             RectTransform cardRect = card.AddComponent<RectTransform>();
             cardRect.anchorMin = new Vector2(0.5f, 0.5f);
             cardRect.anchorMax = new Vector2(0.5f, 0.5f);
             cardRect.pivot = new Vector2(0.5f, 0.5f);
-            cardRect.sizeDelta = new Vector2(640f, 490f);
+            cardRect.sizeDelta = new Vector2(760f, 530f);
 
             Image cardBg = card.AddComponent<Image>();
             cardBg.color = new Color(0.05f, 0.07f, 0.10f, 0.99f);
@@ -3499,7 +3499,7 @@ namespace SundayLastBreath.UI
             resRect.anchorMax = new Vector2(0.5f, 0f);
             resRect.pivot = new Vector2(0.5f, 0f);
             resRect.anchoredPosition = new Vector2(0f, 14f);
-            resRect.sizeDelta = new Vector2(592f, 40f);
+            resRect.sizeDelta = new Vector2(710f, 40f);
             resumeBtn.onClick.AddListener(CloseSystemMenuModal);
 
             // =========================================================================
@@ -3516,8 +3516,8 @@ namespace SundayLastBreath.UI
                 scRect.anchorMin = new Vector2(0.5f, 1f);
                 scRect.anchorMax = new Vector2(0.5f, 1f);
                 scRect.pivot = new Vector2(0.5f, 1f);
-                scRect.anchoredPosition = new Vector2(0f, -10f - (slotIdx * 82f));
-                scRect.sizeDelta = new Vector2(592f, 74f);
+                scRect.anchoredPosition = new Vector2(0f, -10f - (slotIdx * 86f));
+                scRect.sizeDelta = new Vector2(710f, 78f);
 
                 sysSlotCardBgs[slotIdx] = sCard.AddComponent<Image>();
                 sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
@@ -3525,23 +3525,36 @@ namespace SundayLastBreath.UI
                 sysSlotCardOutlines[slotIdx] = sCard.AddComponent<Outline>();
                 sysSlotCardOutlines[slotIdx].effectColor = new Color(0.25f, 0.32f, 0.42f, 0.65f);
 
-                sysSlotTitles[slotIdx] = CreateSysTMP(sCard.transform, "SlotTitle", "SLOT", 12.5f, FontStyles.Normal, Color.white, TextAlignmentOptions.MidlineLeft, sharedFont);
+                // Dedicated Text Container with RectMask2D to prevent overlaying into buttons
+                GameObject textContainer = new GameObject("TextContainer");
+                textContainer.transform.SetParent(sCard.transform, false);
+                RectTransform tcRect = textContainer.AddComponent<RectTransform>();
+                tcRect.anchorMin = Vector2.zero;
+                tcRect.anchorMax = Vector2.one;
+                tcRect.offsetMin = new Vector2(16f, 4f);
+                tcRect.offsetMax = new Vector2(-188f, -4f);
+                textContainer.AddComponent<RectMask2D>();
+
+                sysSlotTitles[slotIdx] = CreateSysTMP(textContainer.transform, "SlotTitle", "SLOT", 13f, FontStyles.Normal, Color.white, TextAlignmentOptions.MidlineLeft, sharedFont);
+                sysSlotTitles[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
                 RectTransform stRect = sysSlotTitles[slotIdx].rectTransform;
                 stRect.anchorMin = new Vector2(0f, 0.5f);
                 stRect.anchorMax = new Vector2(1f, 1f);
-                stRect.offsetMin = new Vector2(14f, 1f);
-                stRect.offsetMax = new Vector2(-186f, -4f);
+                stRect.offsetMin = new Vector2(0f, 2f);
+                stRect.offsetMax = new Vector2(0f, -2f);
 
-                sysSlotDetails[slotIdx] = CreateSysTMP(sCard.transform, "SlotDetails", "Details", 11f, FontStyles.Normal, new Color(0.78f, 0.82f, 0.88f), TextAlignmentOptions.MidlineLeft, sharedFont);
+                sysSlotDetails[slotIdx] = CreateSysTMP(textContainer.transform, "SlotDetails", "Details", 11.5f, FontStyles.Normal, new Color(0.78f, 0.82f, 0.88f), TextAlignmentOptions.MidlineLeft, sharedFont);
+                sysSlotDetails[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
                 RectTransform sdRect = sysSlotDetails[slotIdx].rectTransform;
                 sdRect.anchorMin = new Vector2(0f, 0f);
                 sdRect.anchorMax = new Vector2(1f, 0.5f);
-                sdRect.offsetMin = new Vector2(14f, 4f);
-                sdRect.offsetMax = new Vector2(-186f, -1f);
+                sdRect.offsetMin = new Vector2(0f, 2f);
+                sdRect.offsetMax = new Vector2(0f, -2f);
 
                 // Action Button (SAVE HERE / OVERWRITE / LOAD)
                 Button actBtn = CreateSysActionButton(sCard.transform, "BtnSlotAction", "<b>SAVE HERE</b>",
                     new Color(0.06f, 0.24f, 0.14f, 0.98f), new Color(0.28f, 0.95f, 0.58f), sharedFont, out sysSlotActionLabels[slotIdx]);
+                actBtn.transition = Selectable.Transition.None;
                 sysSlotActionLabels[slotIdx].alignment = TextAlignmentOptions.Center;
                 sysSlotActionLabels[slotIdx].fontSize = 12f;
                 sysSlotActionLabels[slotIdx].rectTransform.offsetMin = Vector2.zero;
@@ -3551,7 +3564,7 @@ namespace SundayLastBreath.UI
                 abRect.anchorMin = new Vector2(1f, 0.5f);
                 abRect.anchorMax = new Vector2(1f, 0.5f);
                 abRect.pivot = new Vector2(1f, 0.5f);
-                abRect.anchoredPosition = new Vector2(-50f, 0f);
+                abRect.anchoredPosition = new Vector2(-48f, 0f);
                 abRect.sizeDelta = new Vector2(120f, 38f);
                 actBtn.onClick.AddListener(() => OnSystemSlotActionClicked(slotIdx));
                 sysSlotActionBtns[slotIdx] = actBtn;
@@ -3559,6 +3572,7 @@ namespace SundayLastBreath.UI
                 // Delete Slot Button [X]
                 Button delBtn = CreateSysActionButton(sCard.transform, "BtnSlotDelete", "<b>X</b>",
                     new Color(0.26f, 0.07f, 0.08f, 0.95f), new Color(0.98f, 0.45f, 0.45f), sharedFont, out TextMeshProUGUI delLbl);
+                delBtn.transition = Selectable.Transition.None;
                 delLbl.alignment = TextAlignmentOptions.Center;
                 delLbl.fontSize = 12f;
                 delLbl.rectTransform.offsetMin = Vector2.zero;
@@ -3569,7 +3583,7 @@ namespace SundayLastBreath.UI
                 dbRect.anchorMax = new Vector2(1f, 0.5f);
                 dbRect.pivot = new Vector2(1f, 0.5f);
                 dbRect.anchoredPosition = new Vector2(-10f, 0f);
-                dbRect.sizeDelta = new Vector2(34f, 38f);
+                dbRect.sizeDelta = new Vector2(32f, 38f);
                 delBtn.onClick.AddListener(() => OnSystemSlotDeleteClicked(slotIdx));
                 sysSlotDeleteBtns[slotIdx] = delBtn;
             }
@@ -3578,6 +3592,12 @@ namespace SundayLastBreath.UI
                 "<b>[ < BACK TO SYSTEM MENU ]</b>",
                 new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _);
             RectTransform slbRect = slotsBackBtn.GetComponent<RectTransform>();
+            slbRect.anchorMin = new Vector2(0.5f, 0f);
+            slbRect.anchorMax = new Vector2(0.5f, 0f);
+            slbRect.pivot = new Vector2(0.5f, 0f);
+            slbRect.anchoredPosition = new Vector2(0f, 14f);
+            slbRect.sizeDelta = new Vector2(710f, 38f);
+            slotsBackBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main));
             slbRect.anchorMin = new Vector2(0.5f, 0f);
             slbRect.anchorMax = new Vector2(0.5f, 0f);
             slbRect.pivot = new Vector2(0.5f, 0f);
@@ -3705,7 +3725,7 @@ namespace SundayLastBreath.UI
             rt.anchorMax = new Vector2(0.5f, 1f);
             rt.pivot = new Vector2(0.5f, 1f);
             rt.anchoredPosition = new Vector2(0f, -18f - (index * 72f));
-            rt.sizeDelta = new Vector2(592f, 60f);
+            rt.sizeDelta = new Vector2(710f, 60f);
         }
 
         private Button CreateSysActionButton(Transform parent, string name, string labelText, Color bgColor, Color borderAndTextColor, TMP_FontAsset font, out TextMeshProUGUI labelOut)
