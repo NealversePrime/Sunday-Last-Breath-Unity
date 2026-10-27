@@ -1329,6 +1329,26 @@ namespace SundayLastBreath.UI
             equippedLegs = character.equippedLegs ?? "";
             equippedFeet = character.equippedFeet ?? "";
 
+            // Safety recovery: If loading at Beat 1/Day 0 and both backpack and tableStash are empty (e.g. from an older save),
+            // auto-restore starting items for the player's job so they are never left empty-handed on the coffee table!
+            if (!hasPacked && (tableStash == null || tableStash.Count == 0) && (currentPlayer.inventory == null || currentPlayer.inventory.Count == 0))
+            {
+                var job = System.Array.Find(CharacterCreationDefinitions.Jobs, j => j.title.Equals(currentPlayer.job, StringComparison.OrdinalIgnoreCase) || j.id.Equals(currentPlayer.job, StringComparison.OrdinalIgnoreCase));
+                if (job != null && job.startingItems != null)
+                {
+                    if (tableStash == null) tableStash = new List<InventoryEntry>();
+                    foreach (var item in job.startingItems)
+                    {
+                        tableStash.Add(new InventoryEntry(item.item, item.qty));
+                    }
+                }
+                if (tableStash == null) tableStash = new List<InventoryEntry>();
+                if (!tableStash.Any(entry => string.Equals(entry.itemId, "Apartment Key", StringComparison.OrdinalIgnoreCase) || string.Equals(entry.itemId, "Apartment 407 Key", StringComparison.OrdinalIgnoreCase)))
+                {
+                    tableStash.Insert(0, new InventoryEntry("Apartment Key", 1));
+                }
+            }
+
             UpdateVitalsUI();
             UpdateClockUI();
             UpdateObjectiveUI();
