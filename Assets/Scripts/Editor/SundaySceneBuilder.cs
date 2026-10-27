@@ -3519,61 +3519,180 @@ namespace SundayLastBreath.Editor
             StretchFull(rect);
 
             Image backdrop = modalObj.AddComponent<Image>();
-            backdrop.color = new Color(0f, 0f, 0f, 0.88f);
+            backdrop.color = new Color(0.012f, 0.016f, 0.024f, 0.985f);
             backdrop.raycastTarget = true;
 
+            // Physical Rugged Laptop Chassis
             GameObject hackPanel = new GameObject("HackingPanel");
             hackPanel.transform.SetParent(modalObj.transform, false);
             RectTransform pRect = hackPanel.AddComponent<RectTransform>();
-            pRect.sizeDelta = new Vector2(660f, 520f);
+            pRect.sizeDelta = new Vector2(960f, 690f);
             pRect.anchoredPosition = Vector2.zero;
             Image pBg = hackPanel.AddComponent<Image>();
-            pBg.color = new Color(0.02f, 0.02f, 0.02f, 0.98f);
+            pBg.color = new Color(0.065f, 0.075f, 0.09f, 1f); // Dark matte polycarbonate
+
+            Outline pOl = hackPanel.AddComponent<Outline>();
+            pOl.effectColor = new Color(0.28f, 0.35f, 0.44f, 0.95f);
+            pOl.effectDistance = new Vector2(2f, -2f);
 
             VerticalLayoutGroup vlg = hackPanel.AddComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(18, 18, 14, 14);
-            vlg.spacing = 10f;
+            vlg.padding = new RectOffset(16, 16, 10, 12);
+            vlg.spacing = 6f;
             vlg.childControlWidth = true;
             vlg.childForceExpandWidth = true;
 
-            // Terminal Header
-            GameObject hObj = new GameObject("Header");
-            hObj.transform.SetParent(hackPanel.transform, false);
-            TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
-            hTmp.fontSize = 12f;
-            hTmp.fontStyle = FontStyles.Bold;
-            hTmp.color = new Color(0.3f, 1f, 0.3f);
-            hTmp.text = "SYS_ADMIN - SECURE_NODE_04                         <color=#ff4444>[ENCRYPTED]</color>";
+            // 1. Top Bezel Strip with LEDs, WebCam, and Model Designation
+            GameObject topBezelObj = new GameObject("LaptopTopBezel", typeof(RectTransform));
+            topBezelObj.transform.SetParent(hackPanel.transform, false);
+            LayoutElement tbLe = topBezelObj.AddComponent<LayoutElement>();
+            tbLe.preferredHeight = 22f;
+            tbLe.minHeight = 22f;
 
-            // Terminal Text Body
+            // Left LEDs
+            GameObject ledObj = new GameObject("Leds", typeof(RectTransform));
+            ledObj.transform.SetParent(topBezelObj.transform, false);
+            RectTransform ledRt = ledObj.GetComponent<RectTransform>();
+            ledRt.anchorMin = new Vector2(0f, 0f);
+            ledRt.anchorMax = new Vector2(0.35f, 1f);
+            ledRt.offsetMin = Vector2.zero;
+            ledRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI ledTmp = ledObj.AddComponent<TextMeshProUGUI>();
+            ledTmp.fontSize = 10f;
+            ledTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            ledTmp.text = "<color=#10b981>● PWR</color>   <color=#f59e0b>● HDD</color>   <color=#38bdf8>● NET</color>";
+            SundayTypography.ApplyFont(ledTmp, FontRole.Mono);
+
+            // Center WebCam lens
+            GameObject camObj = new GameObject("WebCam", typeof(RectTransform));
+            camObj.transform.SetParent(topBezelObj.transform, false);
+            RectTransform camRt = camObj.GetComponent<RectTransform>();
+            camRt.anchorMin = new Vector2(0.35f, 0f);
+            camRt.anchorMax = new Vector2(0.65f, 1f);
+            camRt.offsetMin = Vector2.zero;
+            camRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI camTmp = camObj.AddComponent<TextMeshProUGUI>();
+            camTmp.fontSize = 9.5f;
+            camTmp.alignment = TextAlignmentOptions.Center;
+            camTmp.color = new Color(0.40f, 0.48f, 0.58f);
+            camTmp.text = "[ ● ] HD WEBCAM // IR SENSOR";
+            SundayTypography.ApplyFont(camTmp, FontRole.Mono);
+
+            // Right Model Badge
+            GameObject modObj = new GameObject("ModelBadge", typeof(RectTransform));
+            modObj.transform.SetParent(topBezelObj.transform, false);
+            RectTransform modRt = modObj.GetComponent<RectTransform>();
+            modRt.anchorMin = new Vector2(0.65f, 0f);
+            modRt.anchorMax = new Vector2(1f, 1f);
+            modRt.offsetMin = Vector2.zero;
+            modRt.offsetMax = Vector2.zero;
+            TextMeshProUGUI modTmp = modObj.AddComponent<TextMeshProUGUI>();
+            modTmp.fontSize = 9.5f;
+            modTmp.alignment = TextAlignmentOptions.MidlineRight;
+            modTmp.color = new Color(0.40f, 0.48f, 0.58f);
+            modTmp.text = "PANASONIC TOUGHBOOK CF-33";
+            SundayTypography.ApplyFont(modTmp, FontRole.Mono);
+
+            // 2. Inner Laptop Screen / Monitor
+            GameObject screenObj = new GameObject("LaptopScreen", typeof(RectTransform));
+            screenObj.transform.SetParent(hackPanel.transform, false);
+            Image sBg = screenObj.AddComponent<Image>();
+            sBg.color = new Color(0.015f, 0.022f, 0.032f, 1f); // Deep matte LCD display
+
+            Outline sOl = screenObj.AddComponent<Outline>();
+            sOl.effectColor = new Color(0.12f, 0.16f, 0.24f, 1f);
+
+            VerticalLayoutGroup sVlg = screenObj.AddComponent<VerticalLayoutGroup>();
+            sVlg.padding = new RectOffset(14, 14, 8, 10);
+            sVlg.spacing = 6f;
+            sVlg.childControlWidth = true;
+            sVlg.childForceExpandWidth = true;
+
+            LayoutElement sLe = screenObj.AddComponent<LayoutElement>();
+            sLe.preferredHeight = 600f;
+            sLe.flexibleHeight = 1f;
+
+            // 3. OS Window Header Bar
+            GameObject hObj = new GameObject("Header");
+            hObj.transform.SetParent(screenObj.transform, false);
+            Image hBg = hObj.AddComponent<Image>();
+            hBg.color = new Color(0.05f, 0.08f, 0.14f, 0.95f);
+
+            TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
+            hTmp.fontSize = 10.5f;
+            hTmp.fontStyle = FontStyles.Bold;
+            hTmp.text = "<b><color=#38bdf8>[>]</color> terminal@unit407: ~/recon/defense_grid</b>               <color=#64748b>[ETH0: 1 Gbps]</color>   <color=#10b981>[VPN: ACTIVE]</color>   <color=#94a3b8>[ — ]  [ □ ]  [ ✕ ]</color>";
+            SundayTypography.ApplyFont(hTmp, FontRole.Mono);
+
+            LayoutElement hLe = hObj.AddComponent<LayoutElement>();
+            hLe.preferredHeight = 24f;
+            hLe.minHeight = 24f;
+
+            // 4. Terminal Text Body
             GameObject tObj = new GameObject("TerminalText");
-            tObj.transform.SetParent(hackPanel.transform, false);
+            tObj.transform.SetParent(screenObj.transform, false);
             LayoutElement tle = tObj.AddComponent<LayoutElement>();
-            tle.preferredHeight = 260f;
+            tle.preferredHeight = 360f;
+            tle.minHeight = 320f;
             tle.flexibleHeight = 1f;
             terminalText = tObj.AddComponent<TextMeshProUGUI>();
-            terminalText.fontSize = 12f;
-            terminalText.color = new Color(0.35f, 0.95f, 0.35f);
-            terminalText.lineSpacing = 10f;
-            terminalText.text = "> BYPASSING 256-BIT AES ENCRYPTION...\n> ACCESSING SECURE MILITARY NODE...";
+            terminalText.fontSize = 11.5f;
+            terminalText.color = new Color(0.20f, 0.90f, 0.45f);
+            terminalText.lineSpacing = 5f;
+            terminalText.text = "<color=#64748b>root@unit407:~# ./extract_defense_grid.sh --target=DISPATCH_SECURE_NODE_04</color>\n" +
+                                "<color=#38bdf8>[*] ESTABLISHING ENCRYPTED TUNNEL VIA SEATTLE FIBER GRID...</color>\n" +
+                                "<color=#10b981>[+] HANDSHAKE ACCEPTED: 154.790 MHz MILNET GATEWAY (IP: 10.14.88.2)</color>\n" +
+                                "<color=#f59e0b>[*] BYPASSING 256-BIT AES DEFENSE PROTOCOL... [100% OK]</color>\n\n" +
+                                "<color=#ef4444><b>================== [ TOP SECRET // CLASSIFIED DOD DIRECTIVE ] ==================</b></color>\n" +
+                                "<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (EXTREME BIOLOGICAL CONTAINMENT)</color>\n" +
+                                "<color=#f1f5f9><b>THREAT LEVEL   :</b></color> <color=#ef4444><b>CATEGORY 5 (EXTINCTION EVENT)</b></color>\n" +
+                                "<color=#f1f5f9><b>PATHOGEN       :</b></color> <color=#f59e0b>NEURO-AGGRESSIVE MUTAGEN (PRIMARY VECTOR: HARBORVIEW LAB)</color>\n" +
+                                "<color=#f1f5f9><b>STATUS         :</b></color> <color=#ef4444>QUARANTINE FAILED // INFECTION RATE: 87.4%</color>\n" +
+                                "<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>INITIATE SECTOR 4 PURGE (THERMAL FIREBOMBING) AT 0600 HOURS.</b></color>\n" +
+                                "<color=#f1f5f9><b>EXTRACTION LZ  :</b></color> <color=#10b981>POINT 'ECHO' // HARBORVIEW HELIPAD (47.604° N, 122.324° W)</color>\n" +
+                                "<color=#ef4444><b>================================================================================</b></color>\n\n" +
+                                "<color=#10b981>[+] DOWNLOADING ATTACHMENT: EVAC_PROTOCOLS.DAT (128 KB)... DONE.</color>\n" +
+                                "<color=#ffd700><b>[+] GENERATING TIER-1 MILITARY CLEARANCE PASSKEY... SYNCED TO PHONE!</b></color>\n\n" +
+                                "<color=#ef4444><b>[!] INTRUSION DETECTED BY CENTRAL DEFENSE NODE. KILL SWITCH ENGAGED!</b></color>\n" +
+                                "<color=#94a3b8>[X] CONNECTION TERMINATED BY REMOTE HOST. LOCAL IP BURNED.</color>";
+            SundayTypography.ApplyFont(terminalText, FontRole.Mono);
 
-            // Finish Container
+            // 5. Finish Container
             finishContainer = new GameObject("FinishContainer");
-            finishContainer.transform.SetParent(hackPanel.transform, false);
+            finishContainer.transform.SetParent(screenObj.transform, false);
             VerticalLayoutGroup fVlg = finishContainer.AddComponent<VerticalLayoutGroup>();
-            fVlg.spacing = 8f;
+            fVlg.spacing = 6f;
             fVlg.childControlWidth = true;
             fVlg.childForceExpandWidth = true;
 
             GameObject foObj = new GameObject("Outro");
             foObj.transform.SetParent(finishContainer.transform, false);
             TextMeshProUGUI foTmp = foObj.AddComponent<TextMeshProUGUI>();
-            foTmp.fontSize = 11f;
-            foTmp.color = new Color(0.85f, 0.85f, 0.85f);
-            foTmp.text = "<color=#ff4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military is firebombing the city at dawn. You secured a <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your device.";
+            foTmp.fontSize = 11.5f;
+            foTmp.lineSpacing = 5f;
+            foTmp.color = new Color(0.85f, 0.88f, 0.92f);
+            foTmp.text = "<color=#ef4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military is firebombing the city at dawn. You secured a <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your device.";
+            SundayTypography.ApplyFont(foTmp, FontRole.Body);
 
-            CreateApartmentMenuButton(finishContainer.transform, "Btn_CloseHacking", "<b>Shut down the laptop and return to the living room.</b>",
+            LayoutElement oLe = foObj.AddComponent<LayoutElement>();
+            oLe.preferredHeight = 38f;
+            oLe.minHeight = 34f;
+
+            CreateApartmentMenuButton(finishContainer.transform, "Btn_CloseHacking", "<b>SHUT DOWN LAPTOP & RETURN TO LIVING ROOM</b>   <color=#34D399><b>[ESC / SPACE]</b></color>",
                 "", new Color(0.35f, 0.95f, 0.45f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
+
+            // 6. Bottom Bezel / Keyboard Deck Strip
+            GameObject deckObj = new GameObject("LaptopDeckStrip", typeof(RectTransform));
+            deckObj.transform.SetParent(hackPanel.transform, false);
+            LayoutElement dLe = deckObj.AddComponent<LayoutElement>();
+            dLe.preferredHeight = 18f;
+            dLe.minHeight = 18f;
+
+            TextMeshProUGUI dTmp = deckObj.AddComponent<TextMeshProUGUI>();
+            dTmp.fontSize = 9.5f;
+            dTmp.alignment = TextAlignmentOptions.Center;
+            dTmp.color = new Color(0.35f, 0.42f, 0.50f);
+            dTmp.text = "— — —  [ EMBEDDED TPM 2.0 CRYPTOGRAPHIC MODULE ACTIVE // MIL-STD-810G ]  — — —";
+            SundayTypography.ApplyFont(dTmp, FontRole.Mono);
 
             return modalObj;
         }

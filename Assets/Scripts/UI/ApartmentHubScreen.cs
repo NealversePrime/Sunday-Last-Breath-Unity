@@ -305,6 +305,9 @@ namespace SundayLastBreath.UI
         private bool isTyping = false;
         private Coroutine typeRoutine;
         private Coroutine hackingRoutine;
+        private Coroutine hackingLedRoutine;
+        private bool isHackingTerminal = false;
+        private TextMeshProUGUI hackingLedText;
         private Coroutine radioRoutine;
         private Coroutine radioMeterRoutine;
         private bool isRadioTransmitting = false;
@@ -1250,39 +1253,240 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // C. HACKING TERMINAL MODAL ENHANCEMENT (Ensure full width & high-contrast exit button)
+            // C. HACKING TERMINAL MODAL ENHANCEMENT (Panasonic Toughbook Rugged Tactical Laptop & CRT Workstation)
             if (hackingModal != null)
             {
+                Image hBackdrop = hackingModal.GetComponent<Image>();
+                if (hBackdrop != null)
+                {
+                    hBackdrop.color = new Color(0.012f, 0.016f, 0.024f, 0.985f);
+                }
+
                 Transform hackPanel = hackingModal.transform.Find("HackingPanel");
                 if (hackPanel != null)
                 {
+                    RectTransform pRect = hackPanel.GetComponent<RectTransform>();
+                    if (pRect != null)
+                    {
+                        pRect.sizeDelta = new Vector2(960f, 690f);
+                    }
+
+                    Image pBg = hackPanel.GetComponent<Image>();
+                    if (pBg != null)
+                    {
+                        pBg.color = new Color(0.065f, 0.075f, 0.09f, 1f); // Industrial dark matte polycarbonate chassis
+                    }
+
+                    Outline pOl = hackPanel.GetComponent<Outline>() ?? hackPanel.gameObject.AddComponent<Outline>();
+                    pOl.effectColor = new Color(0.28f, 0.35f, 0.44f, 0.95f);
+                    pOl.effectDistance = new Vector2(2f, -2f);
+
                     VerticalLayoutGroup vlg = hackPanel.GetComponent<VerticalLayoutGroup>();
                     if (vlg != null)
                     {
+                        vlg.padding = new RectOffset(16, 16, 10, 12);
+                        vlg.spacing = 6f;
                         vlg.childControlWidth = true;
                         vlg.childControlHeight = true;
                         vlg.childForceExpandWidth = true;
                         vlg.childForceExpandHeight = false;
                     }
-                }
 
-                if (hackingFinishContainer != null)
-                {
-                    VerticalLayoutGroup fvlg = hackingFinishContainer.GetComponent<VerticalLayoutGroup>();
-                    if (fvlg != null)
+                    // 1. Top Bezel Strip with LEDs, WebCam, and Model Designation
+                    Transform topBezelTr = hackPanel.Find("LaptopTopBezel");
+                    if (topBezelTr == null)
                     {
-                        fvlg.childControlWidth = true;
-                        fvlg.childControlHeight = true;
-                        fvlg.childForceExpandWidth = true;
-                        fvlg.childForceExpandHeight = false;
+                        GameObject topBezelObj = new GameObject("LaptopTopBezel", typeof(RectTransform));
+                        topBezelObj.transform.SetParent(hackPanel, false);
+                        topBezelObj.transform.SetSiblingIndex(0);
+
+                        LayoutElement tbLe = topBezelObj.AddComponent<LayoutElement>();
+                        tbLe.preferredHeight = 22f;
+                        tbLe.minHeight = 22f;
+
+                        // Left LEDs
+                        GameObject ledObj = new GameObject("Leds", typeof(RectTransform));
+                        ledObj.transform.SetParent(topBezelObj.transform, false);
+                        RectTransform ledRt = ledObj.GetComponent<RectTransform>();
+                        ledRt.anchorMin = new Vector2(0f, 0f);
+                        ledRt.anchorMax = new Vector2(0.35f, 1f);
+                        ledRt.offsetMin = Vector2.zero;
+                        ledRt.offsetMax = Vector2.zero;
+                        hackingLedText = ledObj.AddComponent<TextMeshProUGUI>();
+                        hackingLedText.fontSize = 10f;
+                        hackingLedText.alignment = TextAlignmentOptions.MidlineLeft;
+                        hackingLedText.text = "<color=#10b981>● PWR</color>   <color=#f59e0b>● HDD</color>   <color=#38bdf8>● NET</color>";
+                        SundayTypography.ApplyFont(hackingLedText, FontRole.Mono);
+
+                        // Center WebCam lens
+                        GameObject camObj = new GameObject("WebCam", typeof(RectTransform));
+                        camObj.transform.SetParent(topBezelObj.transform, false);
+                        RectTransform camRt = camObj.GetComponent<RectTransform>();
+                        camRt.anchorMin = new Vector2(0.35f, 0f);
+                        camRt.anchorMax = new Vector2(0.65f, 1f);
+                        camRt.offsetMin = Vector2.zero;
+                        camRt.offsetMax = Vector2.zero;
+                        TextMeshProUGUI camTmp = camObj.AddComponent<TextMeshProUGUI>();
+                        camTmp.fontSize = 9.5f;
+                        camTmp.alignment = TextAlignmentOptions.Center;
+                        camTmp.color = new Color(0.40f, 0.48f, 0.58f);
+                        camTmp.text = "[ ● ] HD WEBCAM // IR SENSOR";
+                        SundayTypography.ApplyFont(camTmp, FontRole.Mono);
+
+                        // Right Model Badge
+                        GameObject modObj = new GameObject("ModelBadge", typeof(RectTransform));
+                        modObj.transform.SetParent(topBezelObj.transform, false);
+                        RectTransform modRt = modObj.GetComponent<RectTransform>();
+                        modRt.anchorMin = new Vector2(0.65f, 0f);
+                        modRt.anchorMax = new Vector2(1f, 1f);
+                        modRt.offsetMin = Vector2.zero;
+                        modRt.offsetMax = Vector2.zero;
+                        TextMeshProUGUI modTmp = modObj.AddComponent<TextMeshProUGUI>();
+                        modTmp.fontSize = 9.5f;
+                        modTmp.alignment = TextAlignmentOptions.MidlineRight;
+                        modTmp.color = new Color(0.40f, 0.48f, 0.58f);
+                        modTmp.text = "PANASONIC TOUGHBOOK CF-33";
+                        SundayTypography.ApplyFont(modTmp, FontRole.Mono);
+                    }
+                    else
+                    {
+                        hackingLedText = topBezelTr.Find("Leds")?.GetComponent<TextMeshProUGUI>();
+                    }
+
+                    // 2. Laptop Screen Container (Inner Display)
+                    Transform screenTr = hackPanel.Find("LaptopScreen");
+                    if (screenTr == null)
+                    {
+                        GameObject screenObj = new GameObject("LaptopScreen", typeof(RectTransform));
+                        screenObj.transform.SetParent(hackPanel, false);
+                        screenObj.transform.SetSiblingIndex(1);
+
+                        Image sBg = screenObj.AddComponent<Image>();
+                        sBg.color = new Color(0.015f, 0.022f, 0.032f, 1f); // Deep matte CRT display
+
+                        Outline sOl = screenObj.AddComponent<Outline>();
+                        sOl.effectColor = new Color(0.12f, 0.16f, 0.24f, 1f);
+
+                        VerticalLayoutGroup sVlg = screenObj.AddComponent<VerticalLayoutGroup>();
+                        sVlg.padding = new RectOffset(14, 14, 8, 10);
+                        sVlg.spacing = 6f;
+                        sVlg.childControlWidth = true;
+                        sVlg.childControlHeight = true;
+                        sVlg.childForceExpandWidth = true;
+                        sVlg.childForceExpandHeight = false;
+
+                        LayoutElement sLe = screenObj.AddComponent<LayoutElement>();
+                        sLe.preferredHeight = 600f;
+                        sLe.flexibleHeight = 1f;
+
+                        // Reparent existing Header, TerminalText, and FinishContainer into the new screen container
+                        Transform origHeader = hackPanel.Find("Header");
+                        if (origHeader != null) origHeader.SetParent(screenObj.transform, false);
+
+                        Transform origText = hackPanel.Find("TerminalText");
+                        if (origText != null) origText.SetParent(screenObj.transform, false);
+
+                        Transform origFinish = hackPanel.Find("FinishContainer");
+                        if (origFinish != null) origFinish.SetParent(screenObj.transform, false);
+                    }
+
+                    // 3. Header Bar inside LaptopScreen
+                    Transform hTr = hackPanel.Find("LaptopScreen/Header") ?? hackPanel.Find("Header");
+                    if (hTr != null)
+                    {
+                        Image hBg = hTr.GetComponent<Image>() ?? hTr.gameObject.AddComponent<Image>();
+                        hBg.color = new Color(0.05f, 0.08f, 0.14f, 0.95f);
+
+                        TextMeshProUGUI hTmp = hTr.GetComponent<TextMeshProUGUI>();
+                        if (hTmp != null)
+                        {
+                            hTmp.fontSize = 10.5f;
+                            hTmp.fontStyle = FontStyles.Bold;
+                            hTmp.text = "<b><color=#38bdf8>[>]</color> terminal@unit407: ~/recon/defense_grid</b>               <color=#64748b>[ETH0: 1 Gbps]</color>   <color=#10b981>[VPN: ACTIVE]</color>   <color=#94a3b8>[ — ]  [ □ ]  [ ✕ ]</color>";
+                            SundayTypography.ApplyFont(hTmp, FontRole.Mono);
+                        }
+
+                        LayoutElement hLe = hTr.GetComponent<LayoutElement>() ?? hTr.gameObject.AddComponent<LayoutElement>();
+                        hLe.preferredHeight = 24f;
+                        hLe.minHeight = 24f;
+                    }
+
+                    // 4. Terminal Text inside LaptopScreen
+                    Transform tTr = hackPanel.Find("LaptopScreen/TerminalText") ?? hackPanel.Find("TerminalText");
+                    if (tTr != null)
+                    {
+                        hackingTerminalText = tTr.GetComponent<TextMeshProUGUI>();
+                        if (hackingTerminalText != null)
+                        {
+                            hackingTerminalText.fontSize = 11.5f;
+                            hackingTerminalText.lineSpacing = 5f;
+                            hackingTerminalText.color = new Color(0.20f, 0.90f, 0.45f); // Phosphor green
+                            SundayTypography.ApplyFont(hackingTerminalText, FontRole.Mono);
+                        }
+
+                        LayoutElement tLe = tTr.GetComponent<LayoutElement>() ?? tTr.gameObject.AddComponent<LayoutElement>();
+                        tLe.preferredHeight = 360f;
+                        tLe.minHeight = 320f;
+                        tLe.flexibleHeight = 1f;
+                    }
+
+                    // 5. Finish Container inside LaptopScreen
+                    Transform fTr = hackPanel.Find("LaptopScreen/FinishContainer") ?? hackPanel.Find("FinishContainer");
+                    if (fTr != null)
+                    {
+                        hackingFinishContainer = fTr.gameObject;
+                        VerticalLayoutGroup fVlg = fTr.GetComponent<VerticalLayoutGroup>();
+                        if (fVlg != null)
+                        {
+                            fVlg.spacing = 6f;
+                            fVlg.childControlWidth = true;
+                            fVlg.childForceExpandWidth = true;
+                        }
+
+                        Transform oTr = fTr.Find("Outro");
+                        if (oTr != null)
+                        {
+                            TextMeshProUGUI foTmp = oTr.GetComponent<TextMeshProUGUI>();
+                            if (foTmp != null)
+                            {
+                                foTmp.fontSize = 11.5f;
+                                foTmp.lineSpacing = 5f;
+                                foTmp.color = new Color(0.85f, 0.88f, 0.92f);
+                                foTmp.text = "<color=#ef4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military is firebombing the city at dawn. You secured a <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your device.";
+                                SundayTypography.ApplyFont(foTmp, FontRole.Body);
+                            }
+
+                            LayoutElement oLe = oTr.GetComponent<LayoutElement>() ?? oTr.gameObject.AddComponent<LayoutElement>();
+                            oLe.preferredHeight = 38f;
+                            oLe.minHeight = 34f;
+                        }
+                    }
+
+                    // 6. Bottom Bezel / Keyboard Deck Strip
+                    Transform deckTr = hackPanel.Find("LaptopDeckStrip");
+                    if (deckTr == null)
+                    {
+                        GameObject deckObj = new GameObject("LaptopDeckStrip", typeof(RectTransform));
+                        deckObj.transform.SetParent(hackPanel, false);
+
+                        LayoutElement dLe = deckObj.AddComponent<LayoutElement>();
+                        dLe.preferredHeight = 18f;
+                        dLe.minHeight = 18f;
+
+                        TextMeshProUGUI dTmp = deckObj.AddComponent<TextMeshProUGUI>();
+                        dTmp.fontSize = 9.5f;
+                        dTmp.alignment = TextAlignmentOptions.Center;
+                        dTmp.color = new Color(0.35f, 0.42f, 0.50f);
+                        dTmp.text = "— — —  [ EMBEDDED TPM 2.0 CRYPTOGRAPHIC MODULE ACTIVE // MIL-STD-810G ]  — — —";
+                        SundayTypography.ApplyFont(dTmp, FontRole.Mono);
                     }
                 }
 
                 if (closeHackingButton != null)
                 {
                     LayoutElement le = closeHackingButton.GetComponent<LayoutElement>() ?? closeHackingButton.gameObject.AddComponent<LayoutElement>();
-                    le.preferredHeight = 42f;
-                    le.minHeight = 42f;
+                    le.preferredHeight = 44f;
+                    le.minHeight = 44f;
                     le.flexibleWidth = 1f;
 
                     Image bg = closeHackingButton.GetComponent<Image>();
@@ -2179,7 +2383,14 @@ namespace SundayLastBreath.UI
                     }
                     else if (hackingModal != null && hackingModal.activeSelf)
                     {
-                        OnCloseHackingClicked();
+                        if (isHackingTerminal && !isEscape)
+                        {
+                            FastForwardHacking();
+                        }
+                        else
+                        {
+                            OnCloseHackingClicked();
+                        }
                     }
                     return;
                 }
@@ -2297,6 +2508,12 @@ namespace SundayLastBreath.UI
                     feedCtrl.FastForwardFeed();
                     return;
                 }
+            }
+
+            if (hackingModal != null && hackingModal.activeSelf && isHackingTerminal)
+            {
+                FastForwardHacking();
+                return;
             }
 
             if (introSeen) return;
@@ -4926,29 +5143,66 @@ namespace SundayLastBreath.UI
                 hackingFinishContainer.SetActive(false);
             }
 
-            // Start matrix green phosphor scramble sequence
+            // Start laptop terminal decryption & LED activity routines
+            isHackingTerminal = true;
             if (hackingRoutine != null) StopCoroutine(hackingRoutine);
             hackingRoutine = StartCoroutine(HackingTerminalRoutine());
+
+            if (hackingLedRoutine != null) StopCoroutine(hackingLedRoutine);
+            hackingLedRoutine = StartCoroutine(HackingLedRoutine());
+        }
+
+        private IEnumerator HackingLedRoutine()
+        {
+            int tick = 0;
+            while (isHackingTerminal && hackingModal != null && hackingModal.activeSelf)
+            {
+                if (hackingLedText != null)
+                {
+                    string hddColor = (tick % 2 == 0) ? "#f59e0b" : "#78350f";
+                    string netColor = (tick % 3 == 0) ? "#38bdf8" : "#0284c7";
+                    hackingLedText.text = $"<color=#10b981>● PWR</color>   <color={hddColor}>● HDD</color>   <color={netColor}>● NET</color>";
+                }
+                tick++;
+                yield return new WaitForSecondsRealtime(0.12f);
+            }
+
+            if (hackingLedText != null)
+            {
+                hackingLedText.text = "<color=#10b981>● PWR</color>   <color=#78350f>● HDD</color>   <color=#ef4444>● NET [SEVERED]</color>";
+            }
         }
 
         private IEnumerator HackingTerminalRoutine()
         {
+            isHackingTerminal = true;
+
+            if (hackingFinishContainer != null)
+            {
+                hackingFinishContainer.SetActive(false);
+            }
+
             string[] hackingTextLines = new string[]
             {
-                "> BYPASSING 256-BIT AES ENCRYPTION...",
-                "> ACCESSING SECURE MILITARY NODE...",
-                "> DOWNLOADING CLASSIFIED DIRECTIVE: OPR_WILDFIRE",
-                "------------------------------------------------",
-                "<color=#ff5555>THREAT LEVEL : CATEGORY 5 (EXTINCTION)</color>",
-                "PATHOGEN     : NEURO-AGGRESSIVE MUTAGEN (UNKNOWN ORIGIN)",
-                "<color=#ff5555>STATUS       : QUARANTINE FAILED. INFECTION RATE 87%.</color>",
-                "<color=#ff3333><b>DIRECTIVE    : INITIATE SECTOR PURGE (FIREBOMBING) AT 0600 HOURS.</b></color>",
-                "------------------------------------------------",
-                "> DOWNLOADING ATTACHMENT: EVAC_PROTOCOLS.DAT",
-                "> EXTRACTION POINT 'ECHO' COORDINATES SECURED.",
-                "<color=#ffd700>> GENERATING TIER-1 MILITARY CLEARANCE PASSKEY...</color>",
-                "------------------------------------------------",
-                "<color=#ff5555>[!] WARNING: TRACE DETECTED. SEVERING CONNECTION.</color>"
+                "<color=#64748b>root@unit407:~# ./extract_defense_grid.sh --target=DISPATCH_SECURE_NODE_04</color>",
+                "<color=#38bdf8>[*] ESTABLISHING ENCRYPTED TUNNEL VIA SEATTLE FIBER GRID...</color>",
+                "<color=#10b981>[+] HANDSHAKE ACCEPTED: 154.790 MHz MILNET GATEWAY (IP: 10.14.88.2)</color>",
+                "<color=#f59e0b>[*] BYPASSING 256-BIT AES DEFENSE PROTOCOL... [100% OK]</color>",
+                "",
+                "<color=#ef4444><b>================== [ TOP SECRET // CLASSIFIED DOD DIRECTIVE ] ==================</b></color>",
+                "<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (EXTREME BIOLOGICAL CONTAINMENT)</color>",
+                "<color=#f1f5f9><b>THREAT LEVEL   :</b></color> <color=#ef4444><b>CATEGORY 5 (EXTINCTION EVENT)</b></color>",
+                "<color=#f1f5f9><b>PATHOGEN       :</b></color> <color=#f59e0b>NEURO-AGGRESSIVE MUTAGEN (PRIMARY VECTOR: HARBORVIEW LAB)</color>",
+                "<color=#f1f5f9><b>STATUS         :</b></color> <color=#ef4444>QUARANTINE FAILED // INFECTION RATE: 87.4%</color>",
+                "<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>INITIATE SECTOR 4 PURGE (THERMAL FIREBOMBING) AT 0600 HOURS.</b></color>",
+                "<color=#f1f5f9><b>EXTRACTION LZ  :</b></color> <color=#10b981>POINT 'ECHO' // HARBORVIEW HELIPAD (47.604° N, 122.324° W)</color>",
+                "<color=#ef4444><b>================================================================================</b></color>",
+                "",
+                "<color=#10b981>[+] DOWNLOADING ATTACHMENT: EVAC_PROTOCOLS.DAT (128 KB)... DONE.</color>",
+                "<color=#ffd700><b>[+] GENERATING TIER-1 MILITARY CLEARANCE PASSKEY... SYNCED TO PHONE!</b></color>",
+                "",
+                "<color=#ef4444><b>[!] INTRUSION DETECTED BY CENTRAL DEFENSE NODE. KILL SWITCH ENGAGED!</b></color>",
+                "<color=#94a3b8>[X] CONNECTION TERMINATED BY REMOTE HOST. LOCAL IP BURNED.</color>"
             };
 
             if (hackingTerminalText != null) hackingTerminalText.text = "";
@@ -4956,15 +5210,64 @@ namespace SundayLastBreath.UI
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             for (int i = 0; i < hackingTextLines.Length; i++)
             {
+                if (!isHackingTerminal) yield break;
                 sb.AppendLine(hackingTextLines[i]);
                 if (hackingTerminalText != null)
                 {
                     hackingTerminalText.text = sb.ToString();
                 }
-                yield return new WaitForSecondsRealtime(0.25f);
+                PlayBeepSFX();
+                yield return new WaitForSecondsRealtime(0.18f);
             }
 
-            yield return new WaitForSecondsRealtime(0.4f);
+            isHackingTerminal = false;
+            PlayBeepSFX();
+            yield return new WaitForSecondsRealtime(0.35f);
+
+            if (hackingFinishContainer != null)
+            {
+                hackingFinishContainer.SetActive(true);
+            }
+        }
+
+        /// <summary>
+        /// Fast-forwards the hacking terminal to the completed classified directive readout.
+        /// </summary>
+        public void FastForwardHacking()
+        {
+            if (!isHackingTerminal) return;
+
+            isHackingTerminal = false;
+            if (hackingRoutine != null) StopCoroutine(hackingRoutine);
+            if (hackingLedRoutine != null) StopCoroutine(hackingLedRoutine);
+
+            if (hackingLedText != null)
+            {
+                hackingLedText.text = "<color=#10b981>● PWR</color>   <color=#78350f>● HDD</color>   <color=#ef4444>● NET [SEVERED]</color>";
+            }
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("<color=#64748b>root@unit407:~# ./extract_defense_grid.sh --target=DISPATCH_SECURE_NODE_04</color>");
+            sb.AppendLine("<color=#38bdf8>[*] ESTABLISHING ENCRYPTED TUNNEL VIA SEATTLE FIBER GRID...</color>");
+            sb.AppendLine("<color=#10b981>[+] HANDSHAKE ACCEPTED: 154.790 MHz MILNET GATEWAY (IP: 10.14.88.2)</color>");
+            sb.AppendLine("<color=#f59e0b>[*] BYPASSING 256-BIT AES DEFENSE PROTOCOL... [100% OK]</color>");
+            sb.AppendLine("");
+            sb.AppendLine("<color=#ef4444><b>================== [ TOP SECRET // CLASSIFIED DOD DIRECTIVE ] ==================</b></color>");
+            sb.AppendLine("<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (EXTREME BIOLOGICAL CONTAINMENT)</color>");
+            sb.AppendLine("<color=#f1f5f9><b>THREAT LEVEL   :</b></color> <color=#ef4444><b>CATEGORY 5 (EXTINCTION EVENT)</b></color>");
+            sb.AppendLine("<color=#f1f5f9><b>PATHOGEN       :</b></color> <color=#f59e0b>NEURO-AGGRESSIVE MUTAGEN (PRIMARY VECTOR: HARBORVIEW LAB)</color>");
+            sb.AppendLine("<color=#f1f5f9><b>STATUS         :</b></color> <color=#ef4444>QUARANTINE FAILED // INFECTION RATE: 87.4%</color>");
+            sb.AppendLine("<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>INITIATE SECTOR 4 PURGE (THERMAL FIREBOMBING) AT 0600 HOURS.</b></color>");
+            sb.AppendLine("<color=#f1f5f9><b>EXTRACTION LZ  :</b></color> <color=#10b981>POINT 'ECHO' // HARBORVIEW HELIPAD (47.604° N, 122.324° W)</color>");
+            sb.AppendLine("<color=#ef4444><b>================================================================================</b></color>");
+            sb.AppendLine("");
+            sb.AppendLine("<color=#10b981>[+] DOWNLOADING ATTACHMENT: EVAC_PROTOCOLS.DAT (128 KB)... DONE.</color>");
+            sb.AppendLine("<color=#ffd700><b>[+] GENERATING TIER-1 MILITARY CLEARANCE PASSKEY... SYNCED TO PHONE!</b></color>");
+            sb.AppendLine("");
+            sb.AppendLine("<color=#ef4444><b>[!] INTRUSION DETECTED BY CENTRAL DEFENSE NODE. KILL SWITCH ENGAGED!</b></color>");
+            sb.AppendLine("<color=#94a3b8>[X] CONNECTION TERMINATED BY REMOTE HOST. LOCAL IP BURNED.</color>");
+
+            if (hackingTerminalText != null) hackingTerminalText.text = sb.ToString();
 
             if (hackingFinishContainer != null)
             {
@@ -4975,6 +5278,10 @@ namespace SundayLastBreath.UI
         private void OnCloseHackingClicked()
         {
             PlayClickSFX();
+
+            isHackingTerminal = false;
+            if (hackingRoutine != null) StopCoroutine(hackingRoutine);
+            if (hackingLedRoutine != null) StopCoroutine(hackingLedRoutine);
 
             if (hackingModal != null)
             {
