@@ -5678,7 +5678,6 @@ namespace SundayLastBreath.UI
             doorTransitionOverlay.SetActive(true);
             doorTransitionOverlay.transform.SetAsLastSibling();
             doorTransitionCanvasGroup.alpha = 0f;
-            doorTransitionContentBox?.SetActive(true);
 
             // Refresh video source in case of dynamic file addition
             if (doorVideoPlayer != null)
@@ -5789,7 +5788,6 @@ namespace SundayLastBreath.UI
 
             if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
             if (doorVideoRawImage != null) doorVideoRawImage.color = Color.black;
-            doorTransitionContentBox?.SetActive(true);
             doorTransitionOverlay.SetActive(false);
             isDoorTransitioning = false;
         }
