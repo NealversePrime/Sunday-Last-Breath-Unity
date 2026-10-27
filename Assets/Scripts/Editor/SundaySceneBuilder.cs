@@ -2908,55 +2908,143 @@ namespace SundayLastBreath.Editor
             backdrop.color = new Color(0.015f, 0.02f, 0.03f, 1f); // 100% Solid Opaque - zero background bleed
             backdrop.raycastTarget = true;
 
-            // Center Column Container (Contains: Intro prose -> Smartphone device -> Outro prose -> Action button)
+            // Center Group Container (Split Presentation: Left Wing = Narrative Dossier, Right Wing = Oblong 19.5:9 Smartphone)
             GameObject centerCol = new GameObject("PhoneCenterColumn", typeof(RectTransform));
             centerCol.transform.SetParent(modalObj.transform, false);
             RectTransform colRect = centerCol.GetComponent<RectTransform>();
             colRect.anchorMin = new Vector2(0.5f, 0.5f);
             colRect.anchorMax = new Vector2(0.5f, 0.5f);
             colRect.pivot = new Vector2(0.5f, 0.5f);
-            colRect.sizeDelta = new Vector2(460f, 740f);
+            colRect.sizeDelta = new Vector2(920f, 820f);
             colRect.anchoredPosition = Vector2.zero;
 
-            VerticalLayoutGroup colVlg = centerCol.AddComponent<VerticalLayoutGroup>();
-            colVlg.padding = new RectOffset(0, 0, 0, 0);
-            colVlg.spacing = 10f;
-            colVlg.childAlignment = TextAnchor.UpperCenter;
-            colVlg.childControlWidth = true; // Stretches all children to fill the full 460px width
-            colVlg.childControlHeight = true;
-            colVlg.childForceExpandWidth = true;
-            colVlg.childForceExpandHeight = false;
+            // 1. LEFT WING: NARRATIVE DOSSIER PANEL (Holds Scene Context, Consequence Prose & Single Action Button)
+            GameObject dossierObj = new GameObject("NarrativeDossier", typeof(RectTransform));
+            dossierObj.transform.SetParent(centerCol.transform, false);
+            RectTransform dRect = dossierObj.GetComponent<RectTransform>();
+            dRect.anchorMin = new Vector2(0f, 0.5f);
+            dRect.anchorMax = new Vector2(0f, 0.5f);
+            dRect.pivot = new Vector2(0f, 0.5f);
+            dRect.sizeDelta = new Vector2(480f, 800f);
+            dRect.anchoredPosition = new Vector2(0f, 0f);
 
-            // 1. TOP INTRO NARRATIVE PROSE (Twine faithful)
+            Image dBg = dossierObj.AddComponent<Image>();
+            dBg.color = new Color(0.035f, 0.048f, 0.068f, 0.98f);
+
+            Outline dOl = dossierObj.AddComponent<Outline>();
+            dOl.effectColor = new Color(0.22f, 0.28f, 0.38f, 0.85f);
+            dOl.effectDistance = new Vector2(1f, -1f);
+
+            VerticalLayoutGroup dVlg = dossierObj.AddComponent<VerticalLayoutGroup>();
+            dVlg.padding = new RectOffset(26, 26, 24, 24);
+            dVlg.spacing = 14f;
+            dVlg.childAlignment = TextAnchor.UpperLeft;
+            dVlg.childControlWidth = true;
+            dVlg.childForceExpandWidth = true;
+            dVlg.childControlHeight = false;
+            dVlg.childForceExpandHeight = false;
+
+            // Header Label in Dossier
+            GameObject dossierHObj = new GameObject("DossierHeader", typeof(RectTransform));
+            dossierHObj.transform.SetParent(dossierObj.transform, false);
+            TextMeshProUGUI dossierHTmp = dossierHObj.AddComponent<TextMeshProUGUI>();
+            dossierHTmp.text = "// RECON INTEL // PERSONAL SMARTPHONE (UNIT 407)";
+            dossierHTmp.fontSize = 11.5f;
+            dossierHTmp.fontStyle = FontStyles.Bold;
+            dossierHTmp.color = new Color(0.96f, 0.65f, 0.18f, 0.95f); // Amber
+            SundayTypography.ApplyFont(dossierHTmp, FontRole.Mono);
+
+            // Intro Narrative Prose
             GameObject introObj = new GameObject("IntroProse", typeof(RectTransform));
-            introObj.transform.SetParent(centerCol.transform, false);
+            introObj.transform.SetParent(dossierObj.transform, false);
             RectTransform ir = introObj.GetComponent<RectTransform>();
-            ir.sizeDelta = new Vector2(460f, 48f);
+            ir.sizeDelta = new Vector2(428f, 72f);
             LayoutElement introLe = introObj.AddComponent<LayoutElement>();
-            introLe.preferredWidth = 460f;
-            introLe.preferredHeight = 48f;
-            introLe.minHeight = 48f;
+            introLe.preferredHeight = 72f;
+            introLe.minHeight = 72f;
             introLe.flexibleHeight = 0f;
 
             TextMeshProUGUI introTmp = introObj.AddComponent<TextMeshProUGUI>();
-            introTmp.fontSize = 12f;
+            introTmp.fontSize = 13f;
             introTmp.fontStyle = FontStyles.Italic;
-            introTmp.color = new Color(0.80f, 0.84f, 0.90f, 0.95f);
-            introTmp.lineSpacing = 3f;
-            introTmp.alignment = TextAlignmentOptions.Center;
+            introTmp.color = new Color(0.85f, 0.90f, 0.96f, 0.98f);
+            introTmp.lineSpacing = 4f;
+            introTmp.alignment = TextAlignmentOptions.TopLeft;
             introTmp.text = "You pull your phone from your pocket. The screen is cracked, glowing harshly in the dim room. You open the feed. The timeline is refreshing so fast it's making you dizzy.";
             introTmp.textWrappingMode = TextWrappingModes.Normal;
             SundayTypography.ApplyFont(introTmp, FontRole.Narrative);
 
-            // 2. SMARTPHONE DEVICE CHASSIS
+            // Dossier Divider
+            GameObject dossierDivObj = new GameObject("DossierDivider", typeof(RectTransform));
+            dossierDivObj.transform.SetParent(dossierObj.transform, false);
+            LayoutElement divLe = dossierDivObj.AddComponent<LayoutElement>();
+            divLe.preferredHeight = 1f;
+            divLe.minHeight = 1f;
+            divLe.flexibleHeight = 0f;
+            Image dossierDivImg = dossierDivObj.AddComponent<Image>();
+            dossierDivImg.color = new Color(0.20f, 0.26f, 0.36f, 0.75f);
+
+            // Outro Narrative Prose
+            GameObject outroObj = new GameObject("OutroProse", typeof(RectTransform));
+            outroObj.transform.SetParent(dossierObj.transform, false);
+            RectTransform or = outroObj.GetComponent<RectTransform>();
+            or.sizeDelta = new Vector2(428f, 135f);
+            LayoutElement outroLe = outroObj.AddComponent<LayoutElement>();
+            outroLe.preferredHeight = 135f;
+            outroLe.minHeight = 135f;
+            outroLe.flexibleHeight = 0f;
+
+            TextMeshProUGUI outroTmp = outroObj.AddComponent<TextMeshProUGUI>();
+            outroTmp.fontSize = 12.5f;
+            outroTmp.fontStyle = FontStyles.Italic;
+            outroTmp.color = new Color(0.78f, 0.83f, 0.90f, 0.95f);
+            outroTmp.lineSpacing = 4f;
+            outroTmp.alignment = TextAlignmentOptions.TopLeft;
+            outroTmp.text = "The comments are a storm of denial, prayers, and wild conspiracies. One post catches your eye: a traffic map showing military checkpoints. <color=#F59E0B><i>They are barricading the bridges out of the city.</i></color>\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. The internet is gone.";
+            outroTmp.textWrappingMode = TextWrappingModes.Normal;
+            SundayTypography.ApplyFont(outroTmp, FontRole.Narrative);
+
+            // Spacer
+            GameObject spObj = new GameObject("DossierSpacer", typeof(RectTransform));
+            spObj.transform.SetParent(dossierObj.transform, false);
+            LayoutElement spLe = spObj.AddComponent<LayoutElement>();
+            spLe.flexibleHeight = 1f;
+
+            // Action Button in Dossier
+            GameObject btnHolder = new GameObject("ButtonHolder", typeof(RectTransform));
+            btnHolder.transform.SetParent(dossierObj.transform, false);
+            RectTransform bhr = btnHolder.GetComponent<RectTransform>();
+            bhr.sizeDelta = new Vector2(428f, 46f);
+            LayoutElement bhLe = btnHolder.AddComponent<LayoutElement>();
+            bhLe.preferredHeight = 46f;
+            bhLe.minHeight = 46f;
+            bhLe.flexibleHeight = 0f;
+
+            VerticalLayoutGroup bhVlg = btnHolder.AddComponent<VerticalLayoutGroup>();
+            bhVlg.padding = new RectOffset(0, 0, 0, 0);
+            bhVlg.spacing = 0f;
+            bhVlg.childAlignment = TextAnchor.MiddleCenter;
+            bhVlg.childControlWidth = true;
+            bhVlg.childControlHeight = true;
+            bhVlg.childForceExpandWidth = true;
+            bhVlg.childForceExpandHeight = true;
+
+            CreateApartmentMenuButton(btnHolder.transform, "Btn_ClosePhone", "<b>LOWER THE PHONE & RETURN</b>   <size=85%><color=#94A3B8>[ESC / SPACE]</color></size>",
+                "Add Intel to Lore Database.", new Color(0.95f, 0.55f, 0.20f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
+
+            // 2. RIGHT WING: SLEEK OBLONG SMARTPHONE CHASSIS (380 x 800 px, 19.5:9 Modern Flagship Silhouette)
             GameObject phoneChassis = new GameObject("PhoneChassis", typeof(RectTransform));
             phoneChassis.transform.SetParent(centerCol.transform, false);
             RectTransform pcr = phoneChassis.GetComponent<RectTransform>();
-            pcr.sizeDelta = new Vector2(440f, 460f);
+            pcr.anchorMin = new Vector2(1f, 0.5f);
+            pcr.anchorMax = new Vector2(1f, 0.5f);
+            pcr.pivot = new Vector2(1f, 0.5f);
+            pcr.anchoredPosition = new Vector2(0f, 0f);
+            pcr.sizeDelta = new Vector2(380f, 800f);
             LayoutElement chassisLe = phoneChassis.AddComponent<LayoutElement>();
-            chassisLe.preferredWidth = 440f;
-            chassisLe.preferredHeight = 460f;
-            chassisLe.minHeight = 440f;
+            chassisLe.preferredWidth = 380f;
+            chassisLe.preferredHeight = 800f;
+            chassisLe.minHeight = 800f;
             chassisLe.flexibleHeight = 0f;
 
             Image chassisBg = phoneChassis.AddComponent<Image>();
@@ -3157,54 +3245,10 @@ namespace SundayLastBreath.Editor
             RectTransform hpRect = homePillObj.GetComponent<RectTransform>();
             hpRect.anchorMin = new Vector2(0.5f, 0f); hpRect.anchorMax = new Vector2(0.5f, 0f);
             hpRect.pivot = new Vector2(0.5f, 0f);
-            hpRect.sizeDelta = new Vector2(70f, 4f);
+            hpRect.sizeDelta = new Vector2(100f, 4f);
             hpRect.anchoredPosition = new Vector2(0f, 6f);
             Image hpImg = homePillObj.AddComponent<Image>();
-            hpImg.color = new Color(0.32f, 0.38f, 0.48f, 0.7f);
-
-            // 3. BOTTOM OUTRO NARRATIVE PROSE (Twine faithful)
-            GameObject outroObj = new GameObject("OutroProse", typeof(RectTransform));
-            outroObj.transform.SetParent(centerCol.transform, false);
-            RectTransform or = outroObj.GetComponent<RectTransform>();
-            or.sizeDelta = new Vector2(460f, 68f);
-            LayoutElement outroLe = outroObj.AddComponent<LayoutElement>();
-            outroLe.preferredWidth = 460f;
-            outroLe.preferredHeight = 68f;
-            outroLe.minHeight = 68f;
-            outroLe.flexibleHeight = 0f;
-
-            TextMeshProUGUI outroTmp = outroObj.AddComponent<TextMeshProUGUI>();
-            outroTmp.fontSize = 12f;
-            outroTmp.fontStyle = FontStyles.Italic;
-            outroTmp.color = new Color(0.80f, 0.84f, 0.90f, 0.95f);
-            outroTmp.lineSpacing = 3f;
-            outroTmp.alignment = TextAlignmentOptions.Center;
-            outroTmp.text = "The comments are a storm of denial, prayers, and wild conspiracies. One post catches your eye: a traffic map showing military checkpoints. <i>They are barricading the bridges out of the city.</i>\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. The internet is gone.";
-            outroTmp.textWrappingMode = TextWrappingModes.Normal;
-            SundayTypography.ApplyFont(outroTmp, FontRole.Narrative);
-
-            // 4. ACTION BUTTON
-            GameObject btnHolder = new GameObject("ButtonHolder", typeof(RectTransform));
-            btnHolder.transform.SetParent(centerCol.transform, false);
-            RectTransform bhr = btnHolder.GetComponent<RectTransform>();
-            bhr.sizeDelta = new Vector2(480f, 44f);
-            LayoutElement bhLe = btnHolder.AddComponent<LayoutElement>();
-            bhLe.preferredWidth = 480f;
-            bhLe.preferredHeight = 44f;
-            bhLe.minHeight = 44f;
-            bhLe.flexibleHeight = 0f;
-
-            VerticalLayoutGroup bhVlg = btnHolder.AddComponent<VerticalLayoutGroup>();
-            bhVlg.padding = new RectOffset(0, 0, 0, 0);
-            bhVlg.spacing = 0f;
-            bhVlg.childAlignment = TextAnchor.MiddleCenter;
-            bhVlg.childControlWidth = true;
-            bhVlg.childControlHeight = true;
-            bhVlg.childForceExpandWidth = true;
-            bhVlg.childForceExpandHeight = true;
-
-            CreateApartmentMenuButton(btnHolder.transform, "Btn_ClosePhone", "<b>LOWER THE PHONE & GET BACK TO REALITY</b>   <size=90%><color=#94A3B8>[ESC / SPACE]</color></size>",
-                "Add Intel to Lore Database.", new Color(0.95f, 0.55f, 0.20f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
+            hpImg.color = new Color(0.45f, 0.50f, 0.60f, 0.65f);
 
             // Wire SmartphoneFeedController
             SmartphoneFeedController ctrl = modalObj.AddComponent<SmartphoneFeedController>();

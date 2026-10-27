@@ -767,13 +767,14 @@ namespace SundayLastBreath.UI
 
         private void EnsureInspectionModalsEnhanced()
         {
-            // A. PHONE MODAL ENHANCEMENT (Fixes 0px width on Btn_ClosePhone & adds clear exit affordances)
+            // A. PHONE MODAL ENHANCEMENT (Split Presentation: Oblong 19.5:9 Smartphone on Right, Narrative Dossier on Left)
             if (phoneModal != null)
             {
                 Image backdrop = phoneModal.GetComponent<Image>();
                 if (backdrop != null)
                 {
-                    backdrop.color = new Color(0.01f, 0.02f, 0.04f, 0.90f); // Semi-transparent so apartment HUD remains faintly visible behind modal
+                    // Solid dark opaque scrim - zero background text bleed-through
+                    backdrop.color = new Color(0.015f, 0.02f, 0.035f, 0.985f);
                 }
 
                 Transform centerCol = phoneModal.transform.Find("PhoneCenterColumn");
@@ -782,122 +783,157 @@ namespace SundayLastBreath.UI
                     RectTransform colRect = centerCol.GetComponent<RectTransform>();
                     if (colRect != null)
                     {
-                        colRect.sizeDelta = new Vector2(480f, 750f);
+                        colRect.anchorMin = new Vector2(0.5f, 0.5f);
+                        colRect.anchorMax = new Vector2(0.5f, 0.5f);
+                        colRect.pivot = new Vector2(0.5f, 0.5f);
+                        colRect.sizeDelta = new Vector2(920f, 820f);
+                        colRect.anchoredPosition = Vector2.zero;
                     }
 
-                    VerticalLayoutGroup colVlg = centerCol.GetComponent<VerticalLayoutGroup>();
-                    if (colVlg != null)
+                    // Remove legacy single-column vertical layout if present
+                    VerticalLayoutGroup legacyVlg = centerCol.GetComponent<VerticalLayoutGroup>();
+                    if (legacyVlg != null) Destroy(legacyVlg);
+
+                    // 1. LEFT WING: NARRATIVE DOSSIER PANEL (Holds Scene Context, Consequence Prose & Single Action Button)
+                    Transform dossierTr = centerCol.Find("NarrativeDossier");
+                    if (dossierTr == null)
                     {
-                        colVlg.spacing = 8f;
-                        colVlg.childAlignment = TextAnchor.MiddleCenter;
-                        colVlg.childControlWidth = true;
-                        colVlg.childControlHeight = true;
-                        colVlg.childForceExpandWidth = true;
-                        colVlg.childForceExpandHeight = false;
+                        GameObject dObj = new GameObject("NarrativeDossier", typeof(RectTransform));
+                        dObj.transform.SetParent(centerCol, false);
+                        dossierTr = dObj.transform;
                     }
 
+                    RectTransform dRect = dossierTr.GetComponent<RectTransform>();
+                    dRect.anchorMin = new Vector2(0f, 0.5f);
+                    dRect.anchorMax = new Vector2(0f, 0.5f);
+                    dRect.pivot = new Vector2(0f, 0.5f);
+                    dRect.sizeDelta = new Vector2(480f, 800f);
+                    dRect.anchoredPosition = new Vector2(0f, 0f);
+
+                    Image dBg = dossierTr.GetComponent<Image>();
+                    if (dBg == null) dBg = dossierTr.gameObject.AddComponent<Image>();
+                    dBg.color = new Color(0.035f, 0.048f, 0.068f, 0.98f);
+
+                    Outline dOl = dossierTr.GetComponent<Outline>();
+                    if (dOl == null) dOl = dossierTr.gameObject.AddComponent<Outline>();
+                    dOl.effectColor = new Color(0.22f, 0.28f, 0.38f, 0.85f);
+                    dOl.effectDistance = new Vector2(1f, -1f);
+
+                    VerticalLayoutGroup dVlg = dossierTr.GetComponent<VerticalLayoutGroup>();
+                    if (dVlg == null) dVlg = dossierTr.gameObject.AddComponent<VerticalLayoutGroup>();
+                    dVlg.padding = new RectOffset(26, 26, 24, 24);
+                    dVlg.spacing = 14f;
+                    dVlg.childAlignment = TextAnchor.UpperLeft;
+                    dVlg.childControlWidth = true;
+                    dVlg.childForceExpandWidth = true;
+                    dVlg.childControlHeight = false;
+                    dVlg.childForceExpandHeight = false;
+
+                    // Header Label in Dossier
+                    Transform headerTr = dossierTr.Find("DossierHeader");
+                    if (headerTr == null)
+                    {
+                        GameObject hObj = new GameObject("DossierHeader", typeof(RectTransform));
+                        hObj.transform.SetParent(dossierTr, false);
+                        hObj.transform.SetSiblingIndex(0);
+                        TextMeshProUGUI hTmp = hObj.AddComponent<TextMeshProUGUI>();
+                        hTmp.text = "// RECON INTEL // PERSONAL SMARTPHONE (UNIT 407)";
+                        hTmp.fontSize = 11.5f;
+                        hTmp.fontStyle = FontStyles.Bold;
+                        hTmp.color = new Color(0.96f, 0.65f, 0.18f, 0.95f); // Amber
+                        SundayTypography.ApplyFont(hTmp, FontRole.Mono);
+                    }
+
+                    // Reparent IntroProse into NarrativeDossier
                     Transform introObj = centerCol.Find("IntroProse");
+                    if (introObj == null) introObj = dossierTr.Find("IntroProse");
                     if (introObj != null)
                     {
-                        LayoutElement le = introObj.GetComponent<LayoutElement>();
-                        if (le != null)
+                        introObj.SetParent(dossierTr, false);
+                        introObj.SetSiblingIndex(1);
+                        LayoutElement ile = introObj.GetComponent<LayoutElement>();
+                        if (ile != null)
                         {
-                            le.preferredHeight = 42f;
-                            le.minHeight = 42f;
+                            ile.preferredHeight = 72f;
+                            ile.minHeight = 72f;
+                            ile.flexibleHeight = 0f;
+                        }
+                        TextMeshProUGUI iTmp = introObj.GetComponent<TextMeshProUGUI>();
+                        if (iTmp != null)
+                        {
+                            iTmp.alignment = TextAlignmentOptions.TopLeft;
+                            iTmp.fontSize = 13f;
+                            iTmp.color = new Color(0.85f, 0.90f, 0.96f, 0.98f);
+                            iTmp.lineSpacing = 4f;
                         }
                     }
 
-                    Transform chassis = centerCol.Find("PhoneChassis");
-                    if (chassis != null)
+                    // Dossier Divider
+                    Transform divTr = dossierTr.Find("DossierDivider");
+                    if (divTr == null)
                     {
-                        LayoutElement cle = chassis.GetComponent<LayoutElement>();
-                        if (cle != null)
-                        {
-                            cle.preferredHeight = 460f;
-                            cle.minHeight = 460f;
-                        }
-
-                        // Make the bottom HomePill clickable to close the phone as well
-                        Transform homePill = chassis.Find("HomePill");
-                        if (homePill != null)
-                        {
-                            RectTransform hpRect = homePill.GetComponent<RectTransform>();
-                            if (hpRect != null)
-                            {
-                                hpRect.sizeDelta = new Vector2(110f, 6f);
-                            }
-                            Image hpImg = homePill.GetComponent<Image>();
-                            if (hpImg != null)
-                            {
-                                hpImg.color = new Color(0.95f, 0.62f, 0.15f, 0.85f);
-                                hpImg.raycastTarget = true;
-                            }
-                            Button hpBtn = homePill.GetComponent<Button>();
-                            if (hpBtn == null) hpBtn = homePill.gameObject.AddComponent<Button>();
-                            hpBtn.targetGraphic = hpImg;
-                            hpBtn.onClick.RemoveAllListeners();
-                            hpBtn.onClick.AddListener(OnClosePhoneClicked);
-                        }
-
-                        // Add a sleek Top-Right [ X PUT AWAY ] pill above the phone chassis if not already present
-                        if (chassis.Find("Btn_TopRightClosePhone") == null)
-                        {
-                            GameObject topCloseObj = new GameObject("Btn_TopRightClosePhone", typeof(RectTransform));
-                            topCloseObj.transform.SetParent(chassis, false);
-                            RectTransform tcRect = topCloseObj.GetComponent<RectTransform>();
-                            tcRect.anchorMin = new Vector2(1f, 1f);
-                            tcRect.anchorMax = new Vector2(1f, 1f);
-                            tcRect.pivot = new Vector2(1f, 0f);
-                            tcRect.anchoredPosition = new Vector2(0f, 6f);
-                            tcRect.sizeDelta = new Vector2(138f, 24f);
-
-                            Image tcBg = topCloseObj.AddComponent<Image>();
-                            tcBg.color = new Color(0.16f, 0.08f, 0.05f, 0.96f);
-                            Outline tcOl = topCloseObj.AddComponent<Outline>();
-                            tcOl.effectColor = new Color(0.95f, 0.55f, 0.20f, 0.85f);
-
-                            Button tcBtn = topCloseObj.AddComponent<Button>();
-                            tcBtn.targetGraphic = tcBg;
-                            tcBtn.onClick.AddListener(OnClosePhoneClicked);
-
-                            GameObject lblObj = new GameObject("Label", typeof(RectTransform));
-                            lblObj.transform.SetParent(topCloseObj.transform, false);
-                            RectTransform lrt = lblObj.GetComponent<RectTransform>();
-                            lrt.anchorMin = Vector2.zero;
-                            lrt.anchorMax = Vector2.one;
-                            lrt.offsetMin = Vector2.zero;
-                            lrt.offsetMax = Vector2.zero;
-
-                            TextMeshProUGUI tcTmp = lblObj.AddComponent<TextMeshProUGUI>();
-                            tcTmp.text = "<b>[ X ]  PUT AWAY PHONE</b>";
-                            tcTmp.fontSize = 10f;
-                            tcTmp.alignment = TextAlignmentOptions.Center;
-                            tcTmp.color = new Color(0.98f, 0.78f, 0.38f);
-                            tcTmp.raycastTarget = false;
-                            SundayTypography.ApplyFont(tcTmp, FontRole.Mono);
-                        }
+                        GameObject divObj = new GameObject("DossierDivider", typeof(RectTransform));
+                        divObj.transform.SetParent(dossierTr, false);
+                        divObj.transform.SetSiblingIndex(2);
+                        RectTransform divRt = divObj.GetComponent<RectTransform>();
+                        divRt.sizeDelta = new Vector2(0f, 1f);
+                        LayoutElement divLe = divObj.AddComponent<LayoutElement>();
+                        divLe.preferredHeight = 1f;
+                        divLe.minHeight = 1f;
+                        divLe.flexibleHeight = 0f;
+                        Image divImg = divObj.AddComponent<Image>();
+                        divImg.color = new Color(0.20f, 0.26f, 0.36f, 0.75f);
                     }
 
+                    // Reparent OutroProse into NarrativeDossier
                     Transform outroObj = centerCol.Find("OutroProse");
+                    if (outroObj == null) outroObj = dossierTr.Find("OutroProse");
                     if (outroObj != null)
                     {
+                        outroObj.SetParent(dossierTr, false);
+                        outroObj.SetSiblingIndex(3);
                         LayoutElement ole = outroObj.GetComponent<LayoutElement>();
                         if (ole != null)
                         {
-                            ole.preferredHeight = 62f;
-                            ole.minHeight = 62f;
+                            ole.preferredHeight = 135f;
+                            ole.minHeight = 135f;
+                            ole.flexibleHeight = 0f;
+                        }
+                        TextMeshProUGUI oTmp = outroObj.GetComponent<TextMeshProUGUI>();
+                        if (oTmp != null)
+                        {
+                            oTmp.alignment = TextAlignmentOptions.TopLeft;
+                            oTmp.fontSize = 12.5f;
+                            oTmp.color = new Color(0.78f, 0.83f, 0.90f, 0.95f);
+                            oTmp.lineSpacing = 4f;
+                            oTmp.text = "The comments are a storm of denial, prayers, and wild conspiracies. One post catches your eye: a traffic map showing military checkpoints. <color=#F59E0B><i>They are barricading the bridges out of the city.</i></color>\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. The internet is gone.";
                         }
                     }
 
+                    // Flexible Spacer to push button neatly to bottom
+                    Transform spacerTr = dossierTr.Find("DossierSpacer");
+                    if (spacerTr == null)
+                    {
+                        GameObject spObj = new GameObject("DossierSpacer", typeof(RectTransform));
+                        spObj.transform.SetParent(dossierTr, false);
+                        spObj.transform.SetSiblingIndex(4);
+                        LayoutElement spLe = spObj.AddComponent<LayoutElement>();
+                        spLe.flexibleHeight = 1f;
+                    }
+
+                    // Reparent ButtonHolder into NarrativeDossier
                     Transform btnHolder = centerCol.Find("ButtonHolder");
+                    if (btnHolder == null) btnHolder = dossierTr.Find("ButtonHolder");
                     if (btnHolder != null)
                     {
+                        btnHolder.SetParent(dossierTr, false);
+                        btnHolder.SetSiblingIndex(5);
                         LayoutElement bhLe = btnHolder.GetComponent<LayoutElement>();
                         if (bhLe != null)
                         {
-                            bhLe.preferredWidth = 480f;
-                            bhLe.preferredHeight = 44f;
-                            bhLe.minHeight = 44f;
+                            bhLe.preferredHeight = 46f;
+                            bhLe.minHeight = 46f;
+                            bhLe.flexibleHeight = 0f;
                         }
 
                         VerticalLayoutGroup bhVlg = btnHolder.GetComponent<VerticalLayoutGroup>();
@@ -908,8 +944,59 @@ namespace SundayLastBreath.UI
                         bhVlg.childForceExpandWidth = true;
                         bhVlg.childForceExpandHeight = true;
                     }
+
+                    // 2. RIGHT WING: SLEEK OBLONG SMARTPHONE CHASSIS (380 x 800 px, 19.5:9 Flagship Ratio)
+                    Transform chassis = centerCol.Find("PhoneChassis");
+                    if (chassis != null)
+                    {
+                        RectTransform cr = chassis.GetComponent<RectTransform>();
+                        cr.anchorMin = new Vector2(1f, 0.5f);
+                        cr.anchorMax = new Vector2(1f, 0.5f);
+                        cr.pivot = new Vector2(1f, 0.5f);
+                        cr.anchoredPosition = new Vector2(0f, 0f);
+                        cr.sizeDelta = new Vector2(380f, 800f);
+
+                        LayoutElement cle = chassis.GetComponent<LayoutElement>();
+                        if (cle != null)
+                        {
+                            cle.preferredWidth = 380f;
+                            cle.preferredHeight = 800f;
+                            cle.minHeight = 800f;
+                        }
+
+                        // Remove redundant duplicate top-right exit button if present
+                        Transform topClose = chassis.Find("Btn_TopRightClosePhone");
+                        if (topClose != null) Destroy(topClose.gameObject);
+
+                        // Adjust OLED display margins
+                        Transform oled = chassis.Find("OledDisplay");
+                        if (oled != null)
+                        {
+                            RectTransform oRt = oled.GetComponent<RectTransform>();
+                            oRt.offsetMin = new Vector2(8f, 16f);
+                            oRt.offsetMax = new Vector2(-8f, -18f);
+                        }
+
+                        // Bottom Home Indicator Pill
+                        Transform homePill = chassis.Find("HomePill");
+                        if (homePill != null)
+                        {
+                            RectTransform hpRect = homePill.GetComponent<RectTransform>();
+                            if (hpRect != null)
+                            {
+                                hpRect.sizeDelta = new Vector2(100f, 4f);
+                                hpRect.anchoredPosition = new Vector2(0f, 6f);
+                            }
+                            Image hpImg = homePill.GetComponent<Image>();
+                            if (hpImg != null)
+                            {
+                                hpImg.color = new Color(0.45f, 0.50f, 0.60f, 0.65f);
+                            }
+                        }
+                    }
                 }
 
+                // 3. SINGLE UNIFIED ACTION BUTTON (Bottom of Narrative Dossier)
                 if (closePhoneButton != null)
                 {
                     RectTransform cbr = closePhoneButton.GetComponent<RectTransform>();
@@ -919,13 +1006,13 @@ namespace SundayLastBreath.UI
                         cbr.anchorMax = Vector2.one;
                         cbr.offsetMin = Vector2.zero;
                         cbr.offsetMax = Vector2.zero;
-                        cbr.sizeDelta = new Vector2(0f, 44f);
+                        cbr.sizeDelta = new Vector2(0f, 46f);
                     }
 
                     LayoutElement cle = closePhoneButton.GetComponent<LayoutElement>();
                     if (cle == null) cle = closePhoneButton.gameObject.AddComponent<LayoutElement>();
-                    cle.preferredHeight = 44f;
-                    cle.minHeight = 44f;
+                    cle.preferredHeight = 46f;
+                    cle.minHeight = 46f;
                     cle.flexibleWidth = 1f;
 
                     Image bg = closePhoneButton.GetComponent<Image>();
@@ -948,7 +1035,7 @@ namespace SundayLastBreath.UI
                     }
 
                     SetChoiceButtonContent(closePhoneButton,
-                        "<b>LOWER THE PHONE & GET BACK TO REALITY</b>   <color=#F59E0B><b>[ESC / SPACE]</b></color>");
+                        "<b>LOWER THE PHONE & RETURN</b>   <color=#F59E0B><b>[ESC / SPACE]</b></color>");
                 }
             }
 
