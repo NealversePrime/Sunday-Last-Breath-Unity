@@ -3644,7 +3644,7 @@ namespace SundayLastBreath.UI
                 SetChoiceButtonContent(checkPhoneButton, "<b>Check my phone to see if anyone knows what is happening outside.</b>  <color=#64748B><i>(~1 min)</i></color>");
             }
 
-            // 6. Listen to Emergency Band / Radio
+            // 6. Listen to Emergency Band / Radio (Spider-Man Style Emergency Transceiver Scanner)
             if (listenRadioButton != null)
             {
                 if (radioVisited)
@@ -3654,26 +3654,23 @@ namespace SundayLastBreath.UI
                 else
                 {
                     listenRadioButton.gameObject.SetActive(true);
+                    listenRadioButton.interactable = true;
+
                     bool isPolice = currentPlayer != null && string.Equals(currentPlayer.job, "Police Officer", StringComparison.OrdinalIgnoreCase);
-                    bool hasRadioKnowledge = currentPlayer != null && (
-                        currentPlayer.HasTrait("RADIO OPERATOR") ||
-                        (currentPlayer.tech >= 1 && currentPlayer.Tactics >= 4)
-                    );
+                    bool isRadioOp = currentPlayer != null && currentPlayer.HasTrait("RADIO OPERATOR");
 
                     if (isPolice)
                     {
-                        listenRadioButton.interactable = true;
                         SetChoiceButtonContent(listenRadioButton, "<b>Turn on the radio and tune in to the emergency police dispatch band.</b>  <color=#64748B><i>(~3 min)</i></color>");
                     }
-                    else if (hasRadioKnowledge)
+                    else if (isRadioOp)
                     {
-                        listenRadioButton.interactable = true;
-                        SetChoiceButtonContent(listenRadioButton, "<b>Tune the portable radio to scan for emergency frequencies.</b>  <color=#64748B><i>(~5 min)</i></color>");
+                        SetChoiceButtonContent(listenRadioButton, "<b>Tune the transceiver scanner to intercept tactical precinct airwaves.</b>  <color=#38BDF8><i>[Radio Operator: ~3 min]</i></color>");
                     }
                     else
                     {
-                        listenRadioButton.interactable = false;
-                        SetChoiceButtonContent(listenRadioButton, "<s><color=#64748B>Tune the radio to emergency dispatch frequencies.</color></s>  <color=#EF4444><i>[Requires Police or Radio knowledge]</i></color>");
+                        // Spider-Man style: Civilian dialing the emergency scanner dial to listen in on personnel operations
+                        SetChoiceButtonContent(listenRadioButton, "<b>Tune the emergency radio scanner to monitor police & tactical unit traffic.</b>  <color=#64748B><i>(~5 min)</i></color>");
                     }
                 }
             }
@@ -4953,7 +4950,8 @@ namespace SundayLastBreath.UI
             PlayClickSFX();
 
             bool isPolice = currentPlayer != null && string.Equals(currentPlayer.job, "Police Officer", StringComparison.OrdinalIgnoreCase);
-            gameClock.AddTime(isPolice ? 3 : 5);
+            bool isRadioOp = currentPlayer != null && currentPlayer.HasTrait("RADIO OPERATOR");
+            gameClock.AddTime((isPolice || isRadioOp) ? 3 : 5);
             radioVisited = true;
 
             EnsureInspectionModalsEnhanced();
