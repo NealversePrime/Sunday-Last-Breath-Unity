@@ -232,6 +232,10 @@ namespace SundayLastBreath.UI
         [Tooltip("Duration of the smooth fade-in from black revealing the hallway.")]
         [SerializeField] private float doorTransitionFadeInDuration = 1.0f;
 
+        [Header("Modular Passage Entry Point")]
+        [Tooltip("If assigned, exiting the apartment will automatically begin this starting Story Passage! Leave empty to use legacy code.")]
+        [SerializeField] private SundayLastBreath.Data.StoryPassageData hallwayStartingPassage;
+
         [Header("Input Debounce & Typewriter")]
         [SerializeField] private float clickDebounceDelay = 0.35f;
         [SerializeField] private float typewriterSpeed = 35f;
@@ -5881,7 +5885,14 @@ namespace SundayLastBreath.UI
             }
 
             // Step 3: Switch to Hallway Mode behind the black screen
-            EnterHallwayMode(1);
+            if (hallwayStartingPassage != null)
+            {
+                PlayStoryPassage(hallwayStartingPassage);
+            }
+            else
+            {
+                EnterHallwayMode(1);
+            }
 
             // Step 4: Fade in from black to reveal the red 4th floor corridor
             fadeTime = Mathf.Max(0.05f, doorTransitionFadeInDuration);
