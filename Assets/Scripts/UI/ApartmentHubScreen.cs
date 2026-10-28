@@ -7425,9 +7425,31 @@ namespace SundayLastBreath.UI
 
             // 1. Ensure Hub is in narrative corridor mode
             isInHallway = true;
+            currentInspectedRoom = null;
+
+            // Stop living room animated backdrop so it doesn't overwrite stageBackdropImage every frame!
+            if (livingRoomAnimPlayer != null)
+            {
+                livingRoomAnimPlayer.Stop();
+                livingRoomAnimPlayer.enabled = false;
+            }
+
             SetApartmentButtonsVisible(false);
+
+            // Ensure situation box preferred height accommodates rich corridor narration
+            if (situationBox != null)
+            {
+                LayoutElement sle = situationBox.GetComponent<LayoutElement>();
+                if (sle != null) sle.preferredHeight = 110f;
+            }
+
             currentConsoleMode = ConsoleMode.Narrative;
             if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.TransitionFromApartmentToHallway();
+            }
 
             // 2. Visual Backdrop
             if (!passage.keepPreviousBackdrop && passage.backdropSprite != null)
