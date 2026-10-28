@@ -221,8 +221,12 @@ namespace SundayLastBreath.UI
         [Header("Door Exit Transition Timing (Seconds)")]
         [Tooltip("Duration of the smooth fade-to-black when clicking Leave Apartment.")]
         [SerializeField] private float doorTransitionFadeOutDuration = 0.6f;
-        [Tooltip("How long the key-unlocking text is displayed on screen before the door video starts playing.")]
+        [Tooltip("How long the key-unlocking text is displayed on screen before dissolving to the door video.")]
         [SerializeField] private float doorTransitionTextToVideoDelay = 1.5f;
+        [Tooltip("Duration in seconds for the narrative text to smoothly dissolve before the video emerges.")]
+        [SerializeField] private float doorTransitionTextFadeOutDuration = 0.45f;
+        [Tooltip("Duration in seconds for the door video to smoothly fade in from darkness.")]
+        [SerializeField] private float doorTransitionVideoFadeInDuration = 0.4f;
         [Tooltip("Pause duration after the video finishes before fading in to reveal the hallway.")]
         [SerializeField] private float doorTransitionPostVideoPause = 0.4f;
         [Tooltip("Duration of the smooth fade-in from black revealing the hallway.")]
@@ -5579,6 +5583,7 @@ namespace SundayLastBreath.UI
         private TextMeshProUGUI doorTransitionTitleTmp;
         private TextMeshProUGUI doorTransitionDescTmp;
         private GameObject doorTransitionContentBox;
+        private CanvasGroup doorTransitionContentCanvasGroup;
         private UnityEngine.Video.VideoPlayer doorVideoPlayer;
         private RawImage doorVideoRawImage;
         private RenderTexture doorVideoRenderTexture;
@@ -5614,7 +5619,7 @@ namespace SundayLastBreath.UI
             vidRt.offsetMax = Vector2.zero;
 
             doorVideoRawImage = vidObj.GetComponent<RawImage>();
-            doorVideoRawImage.color = Color.black;
+            doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f); // Hidden initially until smooth fade-in
             doorVideoRawImage.raycastTarget = false;
 
             if (doorVideoRenderTexture == null)
@@ -5648,9 +5653,11 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // Centered content box (Narrative Subtitle / Fallback)
-            doorTransitionContentBox = new GameObject("ContentBox", typeof(RectTransform));
+            // Centered content box (Narrative Subtitle / Fallback) with its own CanvasGroup for smooth dissolves
+            doorTransitionContentBox = new GameObject("ContentBox", typeof(RectTransform), typeof(CanvasGroup));
             doorTransitionContentBox.transform.SetParent(doorTransitionOverlay.transform, false);
+            doorTransitionContentCanvasGroup = doorTransitionContentBox.GetComponent<CanvasGroup>();
+            doorTransitionContentCanvasGroup.alpha = 1f;
             RectTransform boxRt = doorTransitionContentBox.GetComponent<RectTransform>();
             boxRt.anchorMin = new Vector2(0.12f, 0.08f);
             boxRt.anchorMax = new Vector2(0.88f, 0.28f);
@@ -5700,6 +5707,10 @@ namespace SundayLastBreath.UI
             doorTransitionOverlay.transform.SetAsLastSibling();
             doorTransitionCanvasGroup.alpha = 0f;
 
+            doorTransitionContentBox?.SetActive(true);
+            if (doorTransitionContentCanvasGroup != null) doorTransitionContentCanvasGroup.alpha = 1f;
+            if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+
             // Refresh video source in case of dynamic file addition
             if (doorVideoPlayer != null)
             {
@@ -5732,10 +5743,27 @@ namespace SundayLastBreath.UI
             }
             doorTransitionCanvasGroup.alpha = 1f;
 
+            // Player reads the narrative text
             if (doorTransitionTextToVideoDelay > 0f)
             {
                 yield return new WaitForSecondsRealtime(doorTransitionTextToVideoDelay);
             }
+
+            // Smoothly dissolve / fade out the narrative text box into deep darkness
+            float textFadeTime = Mathf.Max(0.05f, doorTransitionTextFadeOutDuration);
+            if (doorTransitionContentCanvasGroup != null)
+            {
+                for (float t = 0; t < textFadeTime; t += Time.unscaledDeltaTime)
+                {
+                    doorTransitionContentCanvasGroup.alpha = Mathf.Lerp(1f, 0f, t / textFadeTime);
+                    yield return null;
+                }
+                doorTransitionContentCanvasGroup.alpha = 0f;
+            }
+            doorTransitionContentBox?.SetActive(false);
+
+            // Brief cinematic breath in pitch black darkness
+            yield return new WaitForSecondsRealtime(0.15f);
 
             // Step 2: Play the Resident Evil Door Opening Video!
             bool playedVideo = false;
@@ -5752,8 +5780,6 @@ namespace SundayLastBreath.UI
                 if (doorVideoPlayer.isPrepared)
                 {
                     playedVideo = true;
-                    doorVideoRawImage.color = Color.white;
-                    doorTransitionContentBox?.SetActive(false); // Clean cinematic presentation
 
                     if (doorTransitionPlayKnobSFX)
                     {
@@ -5767,14 +5793,28 @@ namespace SundayLastBreath.UI
 
                     doorVideoPlayer.Play();
 
+                    // Smoothly fade in the video from black (eliminates abrupt cuts!)
+                    float vidFadeIn = Mathf.Max(0.05f, doorTransitionVideoFadeInDuration);
+                    for (float t = 0; t < vidFadeIn; t += Time.unscaledDeltaTime)
+                    {
+                        float a = Mathf.Lerp(0f, 1f, t / vidFadeIn);
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                        yield return null;
+                    }
+                    if (doorVideoRawImage != null) doorVideoRawImage.color = Color.white;
+
                     // Track video playback
-                    yield return new WaitForSecondsRealtime(0.3f);
+                    yield return new WaitForSecondsRealtime(0.2f);
                     float vidLength = (float)doorVideoPlayer.length;
                     if (vidLength <= 0.5f) vidLength = 4.5f;
 
-                    // Play footsteps and door shut as the door swings open into darkness
+                    // Play footsteps as the door swings open into darkness
                     float midTime = vidLength * 0.55f;
-                    yield return new WaitForSecondsRealtime(midTime);
+                    float elapsed = 0.2f + vidFadeIn;
+                    if (midTime > elapsed)
+                    {
+                        yield return new WaitForSecondsRealtime(midTime - elapsed);
+                    }
                     if (doorTransitionPlayFootstepSFX)
                     {
                         if (doorTransitionFootstepSFX != null) PlaySFX(doorTransitionFootstepSFX, 0.8f);
@@ -5789,6 +5829,16 @@ namespace SundayLastBreath.UI
                         else PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
                     }
 
+                    // Smoothly fade video out to darkness as door slams shut
+                    float vidFadeOut = 0.35f;
+                    for (float t = 0; t < vidFadeOut; t += Time.unscaledDeltaTime)
+                    {
+                        float a = Mathf.Lerp(1f, 0f, t / vidFadeOut);
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                        yield return null;
+                    }
+                    if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+
                     if (doorTransitionPostVideoPause > 0f)
                     {
                         yield return new WaitForSecondsRealtime(doorTransitionPostVideoPause);
@@ -5800,6 +5850,7 @@ namespace SundayLastBreath.UI
             if (!playedVideo)
             {
                 doorTransitionContentBox?.SetActive(true);
+                if (doorTransitionContentCanvasGroup != null) doorTransitionContentCanvasGroup.alpha = 1f;
                 doorTransitionTitleTmp.text = "[ UNIT 407 // DISENGAGING DEADBOLT ]";
                 doorTransitionDescTmp.text = "<i>*CLACK-CHUNK*</i>\n\nThe heavy steel deadbolt disengages with a hollow metallic snap.\nYou grip the cold brass handle and ease the door open.";
                 if (doorTransitionPlayKnobSFX)
@@ -5842,7 +5893,9 @@ namespace SundayLastBreath.UI
             doorTransitionCanvasGroup.alpha = 0f;
 
             if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
-            if (doorVideoRawImage != null) doorVideoRawImage.color = Color.black;
+            if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+            if (doorTransitionContentCanvasGroup != null) doorTransitionContentCanvasGroup.alpha = 1f;
+            doorTransitionContentBox?.SetActive(true);
             doorTransitionOverlay.SetActive(false);
             isDoorTransitioning = false;
         }
