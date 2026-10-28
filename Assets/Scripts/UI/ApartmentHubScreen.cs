@@ -249,6 +249,7 @@ namespace SundayLastBreath.UI
         private List<InventoryEntry> tableStash = new List<InventoryEntry>();
         private List<InventoryEntry> floorItems = new List<InventoryEntry>();
         private readonly Dictionary<string, List<InventoryEntry>> roomFloorStashes = new Dictionary<string, List<InventoryEntry>>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> initializedRoomFloorPassages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         private string equippedHead = "";
         private string equippedBody = "";
@@ -7492,21 +7493,25 @@ namespace SundayLastBreath.UI
                 SetLocation(passage.associatedRoomId, passage.passageTitle);
                 tacticalMapController?.DiscoverAdjacentRooms(passage.associatedRoomId);
 
-                // Spawn loose room items if any and room floor stash has not been initialized yet
-                if (passage.initialRoomItems != null && passage.initialRoomItems.Count > 0)
+                // Initialize loose room floor stash if this passage defines initial floor items and haven't populated yet
+                if (passage.initialFloorItems != null && passage.initialFloorItems.Count > 0)
                 {
-                    if (!roomFloorStashes.ContainsKey(passage.associatedRoomId))
+                    string locKey = passage.associatedRoomId;
+                    if (!initializedRoomFloorPassages.Contains(locKey))
                     {
+                        initializedRoomFloorPassages.Add(locKey);
                         var stash = GetCurrentFloorStash();
-                        foreach (var itm in passage.initialRoomItems)
+                        foreach (var item in passage.initialFloorItems)
                         {
-                            if (!string.IsNullOrEmpty(itm))
+                            if (!string.IsNullOrEmpty(item.itemId) && item.quantity > 0)
                             {
-                                stash.Add(new InventoryEntry(itm, 1));
+                                var existing = stash.Find(e => e.itemId.Equals(item.itemId, StringComparison.OrdinalIgnoreCase));
+                                if (existing != null) existing.quantity += item.quantity;
+                                else stash.Add(new InventoryEntry(item.itemId, item.quantity));
                             }
                         }
-                        UpdateFloorItemsNotification();
                         tacticalGearController?.RefreshAll();
+                        UpdateFloorItemsNotification();
                     }
                 }
             }
@@ -7594,19 +7599,7 @@ namespace SundayLastBreath.UI
             // Item loot / award
             if (!string.IsNullOrEmpty(choice.givesItem))
             {
-                if (choice.dropDirectlyToFloor)
-                {
-                    var stash = GetCurrentFloorStash();
-                    var existing = stash.Find(e => e.itemId.Equals(choice.givesItem, StringComparison.OrdinalIgnoreCase));
-                    if (existing != null) existing.quantity += Mathf.Max(1, choice.givesItemQty);
-                    else stash.Add(new InventoryEntry(choice.givesItem, Mathf.Max(1, choice.givesItemQty)));
-                    UpdateFloorItemsNotification();
-                    tacticalGearController?.RefreshAll();
-                }
-                else
-                {
-                    GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
-                }
+                GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
             }
 
             // Room / location transition

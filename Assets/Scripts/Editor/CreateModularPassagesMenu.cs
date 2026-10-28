@@ -29,7 +29,6 @@ namespace SundayLastBreath.Editor
             string pathNorth = $"{folderPath}/Passage_Hallway_North.asset";
             string path408Door = $"{folderPath}/Passage_Unit408_Door.asset";
             string path408Inside = $"{folderPath}/Passage_Unit408_Inside.asset";
-            string path406Door = $"{folderPath}/Passage_Unit406_Door.asset";
 
             var passNorth = AssetDatabase.LoadAssetAtPath<StoryPassageData>(pathNorth);
             if (passNorth == null)
@@ -52,16 +51,7 @@ namespace SundayLastBreath.Editor
                 AssetDatabase.CreateAsset(pass408Inside, path408Inside);
             }
 
-            var pass406Door = AssetDatabase.LoadAssetAtPath<StoryPassageData>(path406Door);
-            if (pass406Door == null)
-            {
-                pass406Door = ScriptableObject.CreateInstance<StoryPassageData>();
-                AssetDatabase.CreateAsset(pass406Door, path406Door);
-            }
-
-            // -----------------------------------------------------------------------------------------
-            // Passage 1: Hallway North
-            // -----------------------------------------------------------------------------------------
+            // Configure Passage 1: Hallway North
             passNorth.passageId = "hallway_1";
             passNorth.passageTitle = "CORRIDOR N // UPPER HALLWAY (SEC 1)";
             passNorth.associatedRoomId = "hallway_1";
@@ -69,29 +59,19 @@ namespace SundayLastBreath.Editor
             passNorth.musicAction = PassageMusicAction.PlayNew;
             passNorth.backgroundMusicOrAmbience = hallwayBgm;
             passNorth.musicVolume = 0.5f;
-            passNorth.storyText = "Pintu apartemenmu terkunci rapat di belakangmu dengan bunyi <i>*klik*</i> berat. Kamu berada di luar sekarang.\n\n<color=#93C5FD><b>LORONG UTARA (LANTAI 4).</b></color> Lampu darurat berkedip redup, memancarkan bayangan panjang di atas karpet kotor. Udara berbau tembaga dan debu dingin.\n\nDi sebelah kirimu terdapat pintu <b>Unit 408</b> dengan keypad elektronik menyala biru. Di seberangnya adalah pintu <b>Unit 406</b> yang tertutup rapat.";
+            passNorth.storyText = "Pintu apartemenmu terkunci rapat di belakangmu dengan bunyi <i>*klik*</i> berat. Kamu berada di luar sekarang.\n\n<color=#93C5FD><b>LORONG UTARA (LANTAI 4).</b></color> Lampu darurat berkedip redup, memancarkan bayangan panjang di atas karpet kotor. Udara berbau tembaga dan debu dingin.\n\nDi sebelah kirimu terdapat pintu <b>Unit 408</b> dengan keypad elektronik menyala biru redup. Di depanmu, lorong membentang panjang ke arah selatan.";
             passNorth.choices.Clear();
             passNorth.choices.Add(new PassageChoiceData
             {
                 choiceLabel = "Periksa Pintu Unit 408 (Keypad Elektronik)",
-                choiceSubtitle = "Kamar Profesor Harmon. Ada keypad angka di samping pintu.",
+                choiceSubtitle = "Kamar Profesor Harmon. Kunci digital terpasang di samping pintu.",
                 targetPassage = pass408Door,
                 targetRoomId = "unit_408",
                 timeMinutesCost = 1
             });
-            passNorth.choices.Add(new PassageChoiceData
-            {
-                choiceLabel = "Periksa Pintu Unit 406",
-                choiceSubtitle = "Pintu tetangga di seberang. Tidak ada suara dari dalam.",
-                targetPassage = pass406Door,
-                targetRoomId = "unit_406",
-                timeMinutesCost = 1
-            });
             EditorUtility.SetDirty(passNorth);
 
-            // -----------------------------------------------------------------------------------------
-            // Passage 2: Unit 408 Door
-            // -----------------------------------------------------------------------------------------
+            // Configure Passage 2: Unit 408 Door
             pass408Door.passageId = "unit_408_door";
             pass408Door.passageTitle = "UNIT 408 // ELECTRONIC KEYPAD";
             pass408Door.associatedRoomId = "unit_408";
@@ -118,9 +98,7 @@ namespace SundayLastBreath.Editor
             });
             EditorUtility.SetDirty(pass408Door);
 
-            // -----------------------------------------------------------------------------------------
-            // Passage 3: Unit 408 Inside (With Loose Items & Scavenge to Floor!)
-            // -----------------------------------------------------------------------------------------
+            // Configure Passage 3: Unit 408 Inside
             pass408Inside.passageId = "unit_408_inside";
             pass408Inside.passageTitle = "UNIT 408 // PROFESSOR HARMON'S APARTMENT";
             pass408Inside.associatedRoomId = "unit_408";
@@ -128,28 +106,25 @@ namespace SundayLastBreath.Editor
             pass408Inside.musicAction = PassageMusicAction.PlayNew;
             pass408Inside.backgroundMusicOrAmbience = tensionBgm;
             pass408Inside.musicVolume = 0.4f;
-            pass408Inside.storyText = "<color=#10B981><b>*BEEP-CLICK-CHUNK!*</b></color>\n\nKunci magnetik terlepas dengan bunyi dentuman berat. Pintu apartemen 408 mengayun terbuka.\n\nDi dalam, rak-rak buku menjulang tinggi memenuhi dinding. Di atas meja kerja berserakan berkas dan perlengkapan medis. Laci meja tampak terkunci rapat.";
+            pass408Inside.storyText = "<color=#10B981><b>*BEEP-CLICK-CHUNK!*</b></color>\n\nKunci magnetik terlepas dengan bunyi dentuman berat. Pintu apartemen 408 mengayun terbuka.\n\nDi dalam, rak-rak buku menjulang tinggi memenuhi dinding. Di atas meja kerjanya terdapat ransel terbuka dan perlengkapan medis yang tertinggal saat ia bergegas pergi.";
             
-            // Loose items on table/floor in this room:
-            pass408Inside.initialRoomItems.Clear();
-            pass408Inside.initialRoomItems.Add("bandage");
-            pass408Inside.initialRoomItems.Add("matches");
+            // Loose items lying in Unit 408 floor / desk container
+            pass408Inside.initialFloorItems.Clear();
+            pass408Inside.initialFloorItems.Add(new PassageInitialItem { itemId = "bandage", quantity = 2 });
+            pass408Inside.initialFloorItems.Add(new PassageInitialItem { itemId = "whiskey", quantity = 1 });
 
             pass408Inside.choices.Clear();
             pass408Inside.choices.Add(new PassageChoiceData
             {
-                choiceLabel = "Bongkar Laci Meja Kerja (Scavenge)",
-                choiceSubtitle = "Bongkar laci kayu dengan paksa [+10 Mins, peluru jatuh ke lantai].",
-                givesItem = "ammo_9mm",
-                givesItemQty = 12,
-                dropDirectlyToFloor = true, // Drops directly to [ ROOM ITEMS ]!
-                timeMinutesCost = 10,
+                choiceLabel = "Periksa meja kerja dan buku catatan",
+                choiceSubtitle = "Catatan sosiologi keruntuhan peradaban milik Harmon.",
+                timeMinutesCost = 3,
                 targetPassage = pass408Inside
             });
             pass408Inside.choices.Add(new PassageChoiceData
             {
                 choiceLabel = "Keluar kembali ke lorong",
-                choiceSubtitle = "Tutup pintu dan kembali ke koridor utama.",
+                choiceSubtitle = "Tutup pintu di belakangmu dan kembali ke koridor.",
                 targetPassage = passNorth,
                 targetRoomId = "hallway_1",
                 timeMinutesCost = 1,
@@ -157,37 +132,10 @@ namespace SundayLastBreath.Editor
             });
             EditorUtility.SetDirty(pass408Inside);
 
-            // -----------------------------------------------------------------------------------------
-            // Passage 4: Unit 406 Door
-            // -----------------------------------------------------------------------------------------
-            pass406Door.passageId = "unit_406_door";
-            pass406Door.passageTitle = "UNIT 406 // UNRESPONSIVE APARTMENT";
-            pass406Door.associatedRoomId = "unit_406";
-            pass406Door.backdropSprite = hallSprite;
-            pass406Door.musicAction = PassageMusicAction.KeepPlaying;
-            pass406Door.storyText = "Pintu kayu nomor 406 tampak terkunci dari dalam. Pegangan pintunya dingin dan kaku.\n\nKamu menempelkan telinga ke permukaan kayu yang tebal. Sunyi senyap—tidak ada suara nafas, langkah kaki, atau desah radio. Penghuninya kemungkinan besar sudah mengungsi saat peringatan darurat pertama berbunyi.";
-            pass406Door.choices.Clear();
-            pass406Door.choices.Add(new PassageChoiceData
-            {
-                choiceLabel = "Ketuk pintu tiga kali",
-                choiceSubtitle = "Mengetuk pelan untuk memastikan ada orang di dalam.",
-                timeMinutesCost = 2,
-                targetPassage = pass406Door
-            });
-            pass406Door.choices.Add(new PassageChoiceData
-            {
-                choiceLabel = "Kembali ke lorong utama",
-                choiceSubtitle = "Mundur kembali ke koridor.",
-                targetPassage = passNorth,
-                targetRoomId = "hallway_1",
-                timeMinutesCost = 1,
-                isBackButton = true
-            });
-            EditorUtility.SetDirty(pass406Door);
-
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("<color=green>[Passage Generator] Successfully generated interconnected passages (North, 408 Door, 408 Inside, 406 Door) with isolated room items!</color>");
+            Debug.Log("<color=green>[Passage Generator] Successfully generated interconnected sample passages in Assets/Resources/StoryPassages/Act1!</color>");
         }
     }
 }
+

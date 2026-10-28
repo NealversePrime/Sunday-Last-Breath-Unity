@@ -24,6 +24,15 @@ namespace SundayLastBreath.Data
     }
 
     [Serializable]
+    public class PassageInitialItem
+    {
+        [Tooltip("Item ID from ItemDatabase, e.g. 'bandage', 'ammo_9mm', 'canned_food', 'lockpick', 'whiskey'.")]
+        public string itemId = "bandage";
+        [Tooltip("Quantity of items lying in this room.")]
+        public int quantity = 1;
+    }
+
+    [Serializable]
     public class PassageChoiceData
     {
         [Header("Choice Button Text")]
@@ -66,9 +75,6 @@ namespace SundayLastBreath.Data
 
         [Tooltip("Quantity of item given.")]
         public int givesItemQty = 1;
-
-        [Tooltip("If true, scavenged items drop directly into the [ ROOM ITEMS ] container on the floor/table of this room instead of backpack!")]
-        public bool dropDirectlyToFloor = false;
 
         [Header("Skill Check (Optional RPG Roll)")]
         [Tooltip("Check type to perform (d20 + player skill bonus).")]
@@ -143,9 +149,9 @@ namespace SundayLastBreath.Data
         [Tooltip("The main narrative text of this passage. Supports Rich Text tags like <b>bold</b>, <i>italic</i>, and <color=#93C5FD>colors</color>.")]
         public string storyText = "Describe what the player sees, hears, and smells here...";
 
-        [Header("5. Loose Room Items (Floor / Table Stash)")]
-        [Tooltip("List of item IDs placed openly on the table/floor of this room (e.g. 'bandage', 'ammo_9mm'). Shows in the [ ROOM ITEMS ] panel and stays in this room!")]
-        public List<string> initialRoomItems = new List<string>();
+        [Header("5. Room Floor Items (Loose Stash in this Room)")]
+        [Tooltip("List of loose items initially lying in this room when discovered. They appear in [ ROOM ITEMS ], stay in this room, and do not follow the player!")]
+        public List<PassageInitialItem> initialFloorItems = new List<PassageInitialItem>();
 
         [Header("6. Choices & Branching (Twine Links)")]
         [Tooltip("The list of interactive buttons displayed in the choice dock below.")]
