@@ -13,57 +13,130 @@ MonoBehaviour:
   m_Name: Passage_Unit408_Door
   m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
   passageId: unit_408_door
-  passageTitle: UNIT 408 // ELECTRONIC KEYPAD
-  associatedRoomId: unit_408
-  backdropSprite: {fileID: 21300000, guid: e8b8b022e2a020240a83be085c02c64f, type: 3}
+  passageTitle: UNIT 408 // ENTRY DOOR
+  associatedRoomId: hallway_1
+  backdropSprite: {fileID: 0}
   keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: f72fb593ecb7eff4a9b682e94357d4d2, type: 3}
+  - {fileID: 21300000, guid: 79b291f133643944da5cce155794dc0d, type: 3}
+  - {fileID: 21300000, guid: 50cd1f62a095f514e955755aa6417ec6, type: 3}
+  - {fileID: 21300000, guid: f3dac416f5e9ffb43bac6cc9fc8e776d, type: 3}
+  - {fileID: 21300000, guid: ebe91e5ffceb05745992bc9355cf5bd2, type: 3}
+  - {fileID: 21300000, guid: 7f63eee47716e3c459588e44088873ed, type: 3}
+  - {fileID: 21300000, guid: fc1055e3025f7484e9efed4c4f5e330d, type: 3}
+  - {fileID: 21300000, guid: 93fadd4fe87faa449b7457d718df3351, type: 3}
+  - {fileID: 21300000, guid: a6a96921030f9344697f026db7eec5ad, type: 3}
+  - {fileID: 21300000, guid: eab75b49def0f5a4ea463429532265e8, type: 3}
+  - {fileID: 21300000, guid: 38c978877af63014290fe6a65d8d88ec, type: 3}
+  - {fileID: 21300000, guid: b9b287d67d350844ebb9f2f3651d21e0, type: 3}
+  - {fileID: 21300000, guid: 2ff213e5b6749724e985cb8a48d83edb, type: 3}
+  - {fileID: 21300000, guid: fdac8b016a26abe4497edd900b15cfab, type: 3}
+  - {fileID: 21300000, guid: 9cae925ea655b394ab13cf028b111dcd, type: 3}
+  - {fileID: 21300000, guid: eb49112817229c94e8f8610cd945e6bd, type: 3}
+  - {fileID: 21300000, guid: a8db6a4136d822242a3c34d634bccc92, type: 3}
+  - {fileID: 21300000, guid: 6cb1ffac71c30214b84079ef4d4d5df6, type: 3}
+  - {fileID: 21300000, guid: e6e046e495d891249a4cc080506876be, type: 3}
+  - {fileID: 21300000, guid: d65e808f0568ea248b49ce38c974864b, type: 3}
+  - {fileID: 21300000, guid: 9cecf4446ca205b4d8150a53901a7302, type: 3}
+  - {fileID: 21300000, guid: 32758de9627df784d85a3c6c44102132, type: 3}
+  - {fileID: 21300000, guid: 83598e4710284734c9754d3b478a2cb2, type: 3}
+  - {fileID: 21300000, guid: 72a8bfb3654737742bf90c951f32fe60, type: 3}
+  - {fileID: 21300000, guid: 6cd2cc24c4cce4c478cae097f10f4fa3, type: 3}
+  - {fileID: 21300000, guid: 5284020ea0ea9fb49aaf48445a410730, type: 3}
+  - {fileID: 21300000, guid: e5d31c00115fb674fad7b01aeca31a2b, type: 3}
+  - {fileID: 21300000, guid: 5246426954031544e94f75f6d95a0af9, type: 3}
+  - {fileID: 21300000, guid: 777815f0fd4f22345bb3ac92006b4507, type: 3}
+  - {fileID: 21300000, guid: 65ecf349cebe4604ea334ca44574e47e, type: 3}
+  - {fileID: 21300000, guid: 3e99d3526edc9434abc7d3d66a4aad3a, type: 3}
+  - {fileID: 21300000, guid: 7715c55c16ff9b8448d8009e7fb259d9, type: 3}
+  - {fileID: 21300000, guid: 1018f05cf6cb20d489f7bf6be350e22e, type: 3}
+  - {fileID: 21300000, guid: 5fb70f4dc6435454b960fcb4ffed7503, type: 3}
+  - {fileID: 21300000, guid: 9c0f258e4b309584983534f06e8a2533, type: 3}
+  - {fileID: 21300000, guid: 4042d4ff205ff6a48a9cffe937ddb4d7, type: 3}
+  - {fileID: 21300000, guid: 8fb5493144999b944bd8b242c4d1f1dd, type: 3}
+  - {fileID: 21300000, guid: 2c01003312dc31648a0ae52fd56197e3, type: 3}
+  - {fileID: 21300000, guid: d08f54ddd48dec84089ae12c345e1728, type: 3}
+  - {fileID: 21300000, guid: d1bec503d0a20814babf17cba3bf02b1, type: 3}
+  - {fileID: 21300000, guid: 203021bfed963ba42b9d5f9a4377c187, type: 3}
+  - {fileID: 21300000, guid: 6a84906b33a20a6408da457cbcaf7394, type: 3}
+  - {fileID: 21300000, guid: e5eb183d5887a524496a2119be349c2c, type: 3}
+  - {fileID: 21300000, guid: fb02b4fb617c7434f8bf8768aa073af5, type: 3}
+  - {fileID: 21300000, guid: 5f5c7eea8905bbb4bbf92ed642c8ec8d, type: 3}
+  - {fileID: 21300000, guid: b267d8287df8206459176e0bfe8e6e49, type: 3}
+  animationFPS: 8
   musicAction: 0
   backgroundMusicOrAmbience: {fileID: 0}
   musicVolume: 0.5
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
-  speakerName: 
-  storyText: 'Profesor Harmon mengajar sosiologi dan sejarah keruntuhan peradaban di universitas.
-
-
-    Pintunya terkunci dengan gembok magnetik berat. Keypad kecil di samping pintu menyala biru dingin menunggu 4 digit angka.
-
-
-    Tertempel memo di atasnya: <i>"Jika aku tidak menjawab, aku sudah tewas atau kabur. Bagaimanapun juga, kamu tidak akan bisa masuk."</i>'
+  speakerName: ''
+  storyText: "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a modern electronic keypad lock. The blue backlight on the keypad pulses weakly.\n\nA handwritten note taped beside the keypad in spidery ink reads: <i>'If you're reading this, don't look outside. Get to the basement.'</i>"
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Harmon texted me the emergency passcode earlier: 8-4-4-5. Let's see if the keypad's backup battery is still alive."
+    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+  initialFloorItems: []
   choices:
-  - choiceLabel: Masukkan kode 8445 dari HP
-    choiceSubtitle: Kamu ingat pesan SMS yang kamu terima di ponsel tadi.
+  - choiceLabel: "Enter the code from your phone (8445)"
+    choiceSubtitle: "Type Harmon's passcode into the pulsing electronic keypad."
     targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
-    targetPassageId: 
-    targetRoomId: unit_408
+    targetPassageId: ''
+    targetRoomId: 'unit_408'
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
-    requiredItem: 
-    consumesItem: 
-    givesItem: 
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
     givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
     skillCheckType: 0
     skillDC: 10
     successPassage: {fileID: 0}
     failurePassage: {fileID: 0}
     choiceSFX: {fileID: 0}
     isBackButton: 0
-  - choiceLabel: Kembali ke lorong utama
-    choiceSubtitle: Mundur beberapa langkah ke koridor.
-    targetPassage: {fileID: 11400000, guid: 2d8facfab5696ff4eada863cecea8452, type: 2}
-    targetPassageId: 
-    targetRoomId: hallway_1
+    transitionVideo: {fileID: 32900000, guid: 2a97efa723e746cdbf04e4ce829d482c, type: 3}
+    transitionVideoPath: "Videos/door_408_enter.mp4"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Return to Upper Hallway"
+    choiceSubtitle: "Step back into the corridor."
+    targetPassage: {fileID: 11400000, guid: 3d8ebf1e8e3258543b88026777e8d1d7, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_1'
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
-    requiredItem: 
-    consumesItem: 
-    givesItem: 
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
     givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
     skillCheckType: 0
     skillDC: 10
     successPassage: {fileID: 0}
     failurePassage: {fileID: 0}
     choiceSFX: {fileID: 0}
     isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

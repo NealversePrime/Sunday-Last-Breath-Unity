@@ -13,57 +13,134 @@ MonoBehaviour:
   m_Name: Passage_Unit408_Inside
   m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
   passageId: unit_408_inside
-  passageTitle: UNIT 408 // PROFESSOR HARMON'S APARTMENT
+  passageTitle: UNIT 408 // HARMON'S STUDY
   associatedRoomId: unit_408
-  backdropSprite: {fileID: 21300000, guid: e8b8b022e2a020240a83be085c02c64f, type: 3}
+  backdropSprite: {fileID: 0}
   keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 680e4460800ba7bcea337827dc78da77, type: 3}
+  - {fileID: 21300000, guid: 41f7fc8654b624a546970a5bcb3ea6b5, type: 3}
+  - {fileID: 21300000, guid: d02ad6c13548175a9ab85c6fa7e004c9, type: 3}
+  - {fileID: 21300000, guid: 3cf3401ecf7ce127eecb9306c1cdc09a, type: 3}
+  - {fileID: 21300000, guid: 6d95097523540d279a1711b5030e37e3, type: 3}
+  - {fileID: 21300000, guid: 742afbf4616d97b278bb1583d440b062, type: 3}
+  - {fileID: 21300000, guid: cae9a348be7508866ed47378534fe479, type: 3}
+  - {fileID: 21300000, guid: 0bb7f8574bfb92c0536d7dd171e33461, type: 3}
+  - {fileID: 21300000, guid: b20baebace330f21f1226afa9ce843a3, type: 3}
+  - {fileID: 21300000, guid: 200469a63ab9de1970f7dbfd55491382, type: 3}
+  - {fileID: 21300000, guid: a619ff958f19533c561d8838dbf2bcd5, type: 3}
+  - {fileID: 21300000, guid: 789dd7d4d54b20835fbcaa4ccb6a9975, type: 3}
+  - {fileID: 21300000, guid: 9c983a475e4bb49900d9bae89086349d, type: 3}
+  - {fileID: 21300000, guid: 47b1d972d1e2ed71757a85b60f1d8a75, type: 3}
+  - {fileID: 21300000, guid: 2194eeeac74607a5da3bea6df6dc8f69, type: 3}
+  - {fileID: 21300000, guid: 026c9941988ba1d723440460bd797091, type: 3}
+  - {fileID: 21300000, guid: 1cfaf55d62ec73561dd3e58556aef944, type: 3}
+  - {fileID: 21300000, guid: a98432c27bb3ac5e7d69048d802b9e5f, type: 3}
+  - {fileID: 21300000, guid: b7093010e78e5b413d0695f7eaaedb6c, type: 3}
+  - {fileID: 21300000, guid: d70f2f9698d84ed2b6a552bec2a00067, type: 3}
+  - {fileID: 21300000, guid: 2f2287ee5ee7bab56e337fc5fcc6061d, type: 3}
+  - {fileID: 21300000, guid: 91c9bb1c6359c0949a8e8147b0acbe5e, type: 3}
+  - {fileID: 21300000, guid: 0cf3d55b3f949fd29e27e78d7675fcc2, type: 3}
+  - {fileID: 21300000, guid: 0a0d00ead067bc51e8097763565f98c8, type: 3}
+  - {fileID: 21300000, guid: 0b619f060ea443519f4b131965a73735, type: 3}
+  - {fileID: 21300000, guid: ab2aedf2fbac2af5e695de3da88e60d0, type: 3}
+  - {fileID: 21300000, guid: 15cdd42ef41512ba6a06a58d722f4b37, type: 3}
+  - {fileID: 21300000, guid: 749fc6a57414dca4a2db52592e04c067, type: 3}
+  - {fileID: 21300000, guid: 132749bd1ba315ef59da8282f04e267e, type: 3}
+  - {fileID: 21300000, guid: 4079164a1a60a9a91f0b35adce5d8ad5, type: 3}
+  - {fileID: 21300000, guid: cde0b9bd0f17eeffcf8f312f17007ef0, type: 3}
+  - {fileID: 21300000, guid: 4171d259e216fb387ccd5efaaff42c27, type: 3}
+  - {fileID: 21300000, guid: 9f35c76245911e9345f713c4419b26a3, type: 3}
+  - {fileID: 21300000, guid: 01573a63f656971581e790843f4b8816, type: 3}
+  - {fileID: 21300000, guid: cbbbc9a13768c814185cf259cd1fb6c4, type: 3}
+  - {fileID: 21300000, guid: 2456811a3b416527967af29c90e40cd4, type: 3}
+  - {fileID: 21300000, guid: 7089e46d3b65b396c1cf43175b964e29, type: 3}
+  - {fileID: 21300000, guid: 759dae05d38074dde9ef34c58bb9d330, type: 3}
+  - {fileID: 21300000, guid: fded1b4aced3bf31437dc756f2548267, type: 3}
+  - {fileID: 21300000, guid: 59c609aded9dd66735d6273848152c5f, type: 3}
+  - {fileID: 21300000, guid: c62c92ae1b595becdfe5871869317a11, type: 3}
+  - {fileID: 21300000, guid: d1bb24252ef94220a97a7128c6d26048, type: 3}
+  - {fileID: 21300000, guid: 8bdc787a13a7fee5a94952ca1c0f9de0, type: 3}
+  - {fileID: 21300000, guid: 8eafc0d3820dae403813a022f8cd7ce7, type: 3}
+  - {fileID: 21300000, guid: ee198cfbc46f425d765c16d068382c7f, type: 3}
+  - {fileID: 21300000, guid: dcb030f373551518a73a3fb78f46c906, type: 3}
+  animationFPS: 8
   musicAction: 1
   backgroundMusicOrAmbience: {fileID: 8300000, guid: 818303d7eaf18a5499deb9372579a6be, type: 3}
-  musicVolume: 0.4
+  musicVolume: 0.45
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
-  speakerName: 
-  storyText: '<color=#10B981><b>*BEEP-CLICK-CHUNK!*</b></color>
-
-
-    Kunci magnetik terlepas dengan bunyi dentuman berat. Pintu apartemen 408 mengayun terbuka.
-
-
-    Di dalam, rak-rak buku menjulang tinggi memenuhi dinding. Di atas meja kerjanya terdapat ransel terbuka dan perlengkapan medis yang tertinggal saat ia bergegas pergi.'
+  speakerName: ''
+  storyText: "The electronic lock chirps, and the heavy door unlatches.\n\n<color=#93C5FD><b>HARMON'S STUDY.</b></color> The apartment has been turned upside down. Bookshelves are emptied onto the carpet, blueprints cover the dining table, and the faint stench of burned copper hangs in the air.\n\nHarmon fled in a panic, but his workbench drawers are still half-open."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "The electronic lock chirps, and the door swings open into darkness.\n\n<color=#93C5FD><b>HARMON'S STUDY.</b></color> Books and papers are scattered everywhere."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "He definitely knew something was coming. The entire desk is covered in emergency frequency notes. I should grab whatever medical supplies and rations he left behind."
+    outroNarration: "Blueprints for the city's power grid are scattered across the drafting table."
+  initialFloorItems: []
   choices:
-  - choiceLabel: Ambil Perban Medis di meja
-    choiceSubtitle: Perban steril militer untuk menghentikan pendarahan.
-    targetPassage: {fileID: 11400000}
-    targetPassageId: 
-    targetRoomId: 
+  - choiceLabel: "Scavenge Harmon's Desk"
+    choiceSubtitle: "Search the drafting table drawers for supplies."
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_408'
     timeMinutesCost: 2
     staminaCost: 0
     healthCost: 0
-    requiredItem: 
-    consumesItem: 
-    givesItem: bandage
-    givesItemQty: 2
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "bandage"
+      quantity: 2
+    - itemId: "whiskey"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
     skillCheckType: 0
     skillDC: 10
     successPassage: {fileID: 0}
     failurePassage: {fileID: 0}
     choiceSFX: {fileID: 0}
     isBackButton: 0
-  - choiceLabel: Keluar kembali ke lorong
-    choiceSubtitle: Tutup pintu di belakangmu dan kembali ke koridor.
-    targetPassage: {fileID: 11400000, guid: 2d8facfab5696ff4eada863cecea8452, type: 2}
-    targetPassageId: 
-    targetRoomId: hallway_1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Leave Apartment (Return to Hallway)"
+    choiceSubtitle: "Step back out into Upper Hallway."
+    targetPassage: {fileID: 11400000, guid: 3d8ebf1e8e3258543b88026777e8d1d7, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_1'
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
-    requiredItem: 
-    consumesItem: 
-    givesItem: 
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
     givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
     skillCheckType: 0
     skillDC: 10
     successPassage: {fileID: 0}
     failurePassage: {fileID: 0}
     choiceSFX: {fileID: 0}
     isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

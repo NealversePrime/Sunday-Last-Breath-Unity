@@ -73981,6 +73981,7 @@ MonoBehaviour:
   doorTransitionVideoFadeInDuration: 0.4
   doorTransitionPostVideoPause: 0.4
   doorTransitionFadeInDuration: 1
+  hallwayStartingPassage: {fileID: 11400000, guid: 2d8facfab5696ff4eada863cecea8452, type: 2}
   clickDebounceDelay: 0.35
   typewriterSpeed: 35
   screenShakeFeedback: {fileID: 0}

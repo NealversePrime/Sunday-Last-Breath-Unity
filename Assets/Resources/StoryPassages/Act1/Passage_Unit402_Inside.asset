@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit402_Inside
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_402_inside
+  passageTitle: UNIT 402 // THE ANDERSON RESIDENCE
+  associatedRoomId: unit_402
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 2eec9ca97d6a917b024d4b6c57ac5624, type: 3}
+  - {fileID: 21300000, guid: eb94656d15ed92b65298686acfe9afc9, type: 3}
+  - {fileID: 21300000, guid: 10fe8239eb825f977c1557e38e06e566, type: 3}
+  - {fileID: 21300000, guid: d2b000f2ccc28719996fb14b9b72d4bf, type: 3}
+  - {fileID: 21300000, guid: 6ba224f12f8a60570ab2d5079621d387, type: 3}
+  - {fileID: 21300000, guid: 03627736d48a6ffc5332873730a988aa, type: 3}
+  - {fileID: 21300000, guid: 6550c8ef9d9301db4447ddda1186808f, type: 3}
+  - {fileID: 21300000, guid: edf013a40b84b86b647478303312be4f, type: 3}
+  - {fileID: 21300000, guid: 28cfb146827cdbedf3493f16b94a3f20, type: 3}
+  - {fileID: 21300000, guid: 582d53a279fefd60f6ee28677dacdcdc, type: 3}
+  - {fileID: 21300000, guid: 4780c0d163e2dd3b56cb85c9c6014d9a, type: 3}
+  - {fileID: 21300000, guid: 0ebd0cfab118d2562b096090380ad650, type: 3}
+  - {fileID: 21300000, guid: 443cf280249954f77f7b02405b6191f1, type: 3}
+  - {fileID: 21300000, guid: 1533e1ea31666af4156e75a15b0708ca, type: 3}
+  - {fileID: 21300000, guid: 074865f275ae694205aaeabdd1f77750, type: 3}
+  - {fileID: 21300000, guid: 3790e006edfa157d897ef003be96f2d2, type: 3}
+  - {fileID: 21300000, guid: 4779363bb1159a64bf4f6fd8fd4cc7a1, type: 3}
+  - {fileID: 21300000, guid: 6079b5e53b360882a99ef81f74fe82de, type: 3}
+  - {fileID: 21300000, guid: f562b7b779fa7b3d731434174da6b4d1, type: 3}
+  - {fileID: 21300000, guid: 5bb6b79e7fca9bf01feda434b905b9b0, type: 3}
+  - {fileID: 21300000, guid: df881f24d2961577825e66434246b106, type: 3}
+  - {fileID: 21300000, guid: 2e2735b789e674653233517f4dc621c3, type: 3}
+  - {fileID: 21300000, guid: 52bc8ac838ebfbaeddbe22393ac6d58a, type: 3}
+  - {fileID: 21300000, guid: 0867a6c38606ea03bd45c4d740c93a47, type: 3}
+  - {fileID: 21300000, guid: 0c9c9697639c710591440813ef713a67, type: 3}
+  - {fileID: 21300000, guid: 24468bfb26442348f8e02342b7ee4c49, type: 3}
+  - {fileID: 21300000, guid: d8a4c3accbd447e2822ecd3e6ba82d95, type: 3}
+  - {fileID: 21300000, guid: 0547fb07d3efcb2d069e0db142faaee3, type: 3}
+  - {fileID: 21300000, guid: 7aa2a8593e8b8ccd48d61afffebef5ba, type: 3}
+  - {fileID: 21300000, guid: d3aa6e4f9731aa5e170828c8fb2a1836, type: 3}
+  - {fileID: 21300000, guid: 39af825c0171ea483d9fd06ffa2d5589, type: 3}
+  - {fileID: 21300000, guid: c6e3496d6f81836c00c3bcd840120976, type: 3}
+  - {fileID: 21300000, guid: 1beb8caacdcc61b51a4e2c744db61d6b, type: 3}
+  - {fileID: 21300000, guid: 29e8b5c21045c3a7b66c81178858589f, type: 3}
+  - {fileID: 21300000, guid: 756d76fecbe2e102aeef2783626c1ea3, type: 3}
+  - {fileID: 21300000, guid: 02e97036b403976c4cdbc5b161b23ec9, type: 3}
+  - {fileID: 21300000, guid: 867cc20061e2d9e1cb938f28b8f9aa1d, type: 3}
+  - {fileID: 21300000, guid: a630ca454a337efa014139e2652fd747, type: 3}
+  - {fileID: 21300000, guid: 919dbad8600935fbfb21d159368a1e15, type: 3}
+  - {fileID: 21300000, guid: 3a0746dbf3068a4bd009c5bdf1e90281, type: 3}
+  - {fileID: 21300000, guid: cf68644d5a35946df76d709695abdad6, type: 3}
+  - {fileID: 21300000, guid: a1ac9e43c399231f75c7c471c653ca30, type: 3}
+  - {fileID: 21300000, guid: 1a1e3acc0239cad5dd71ccb98da44236, type: 3}
+  - {fileID: 21300000, guid: 958015cbb064a2fb7ee112775914a9b0, type: 3}
+  - {fileID: 21300000, guid: 0a0bb33daa9af17296ce9be7b00bf612, type: 3}
+  - {fileID: 21300000, guid: 2d43935cff8e01f8f418d746c4363478, type: 3}
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "You sever the security chain and push the door open.\n\n<color=#93C5FD><b>THE ANDERSON RESIDENCE.</b></color> The apartment smells overpowering of household bleach. Every piece of furniture is draped in white cotton drop sheets, creating ghost-like silhouettes in the dark.\n\nA vintage turntable continues spinning in the corner. On the dining table sits a pristine red first aid kit."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "You push through the door into <b>Unit 402</b>.\n\n<color=#93C5FD><b>THE ANDERSON RESIDENCE.</b></color> White drop sheets cover every piece of furniture."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "They scrubbed this place down with bleach before they vanished. That first aid kit on the table has sterile gauze and hospital-grade painkillers."
+    outroNarration: "The turntable needle scratches at the end of the groove."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Take Medical Kit from Table"
+    choiceSubtitle: "Gather sterile bandages and heavy painkillers."
+    targetPassage: {fileID: 11400000, guid: c1102002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_402'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "bandage"
+      quantity: 2
+    - itemId: "painkillers"
+      quantity: 2
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Return to Lower Hallway"
+    choiceSubtitle: "Step back out into Section 3."
+    targetPassage: {fileID: 11400000, guid: a1103003b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_3'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

@@ -1,0 +1,178 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Hallway_4
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: hallway_4
+  passageTitle: CORRIDOR END // STAIRWELL LANDING (SEC 4)
+  associatedRoomId: hallway_4
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 08d3afd5ba203f23ef1663c3cc691c4f, type: 3}
+  - {fileID: 21300000, guid: cee50ce083d9bf58e8edef1b79e93966, type: 3}
+  - {fileID: 21300000, guid: 49332762a87e949d07b0db9b77c27bc6, type: 3}
+  - {fileID: 21300000, guid: 6f4fa50fd563f1a6b2aef1bd1e36a9a2, type: 3}
+  - {fileID: 21300000, guid: ff82bba9a5c163ef24ad8f3b22223028, type: 3}
+  - {fileID: 21300000, guid: 6282d20a5cae3720f83ccac86f4eaa28, type: 3}
+  - {fileID: 21300000, guid: 9a369e08a9abbdc481bfa16d5ff3e56a, type: 3}
+  - {fileID: 21300000, guid: 98a67c77e61ce5cb2616704637cf5b2a, type: 3}
+  - {fileID: 21300000, guid: fd796e00e0c4ad869bc082ed8d157404, type: 3}
+  - {fileID: 21300000, guid: 375ada789be1490525831f681ec8ad57, type: 3}
+  - {fileID: 21300000, guid: e7dde57a9f77046f9ff7ecd25853320d, type: 3}
+  - {fileID: 21300000, guid: 8a0c680a5d7534e3973ba91ee3d59896, type: 3}
+  - {fileID: 21300000, guid: 2c1ff0a8003af63324e5e79fe9bf5091, type: 3}
+  - {fileID: 21300000, guid: 1142fc8e7a00f7afe198eb5074290aa2, type: 3}
+  - {fileID: 21300000, guid: 51dedf1aba2f2c145c44c9439cf8ca4b, type: 3}
+  - {fileID: 21300000, guid: a2a33f94b23d2ae24b8bd29a1448eca0, type: 3}
+  - {fileID: 21300000, guid: 4db6f77b18eb33a06b6529802a57fc6c, type: 3}
+  - {fileID: 21300000, guid: 005bb7dbbf65c324ed648ed7ab3753a3, type: 3}
+  - {fileID: 21300000, guid: 3e1f6042afde1d7028fefebdd846c376, type: 3}
+  - {fileID: 21300000, guid: 7071202458522a68b28f538a1608690b, type: 3}
+  - {fileID: 21300000, guid: 5a14ffe61edd228055227b0a5b4aea8b, type: 3}
+  - {fileID: 21300000, guid: 0dc8a5a658db83588c041ad4bb2eeb55, type: 3}
+  - {fileID: 21300000, guid: 58ed23949bbdb6bf49e46b2dc7caea49, type: 3}
+  - {fileID: 21300000, guid: 2c8b519755182844ac7a33b6a4ec018f, type: 3}
+  - {fileID: 21300000, guid: f8d22c171b2c8d867b1d1beb050d176b, type: 3}
+  - {fileID: 21300000, guid: f2ee3bea42f4f78b7216177305df0d10, type: 3}
+  animationFPS: 10
+  musicAction: 1
+  backgroundMusicOrAmbience: {fileID: 8300000, guid: 818303d7eaf18a5499deb9372579a6be, type: 3}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "<color=#93C5FD><b>HALLWAY END.</b></color> The corridor terminates at the heavy fire doors leading to the stairwell. Bloody handprints smear the glass viewing pane.\n\nFrom <b>Unit 401</b>, loud, obnoxious pop music thumps through the wood, completely masking the sounds of the nightmare happening outside.\n\nTo the left sits the heavy steel door of the <b>Utility Room</b>."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "<color=#93C5FD><b>HALLWAY END (SECTION 4).</b></color> The corridor terminates at the heavy red fire doors."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Unit 401 was having a party before the blackout hit. That music is deafening. And those bloody streaks on the stairwell door... people were desperate to get down."
+    outroNarration: "Next to the stairwell is the Utility Closet with an authorized personnel swipe lock."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "INVESTIGATE UNIT 401"
+    choiceSubtitle: "The Party door. Slightly ajar. Blaring pop music hides footsteps."
+    targetPassage: {fileID: 11400000, guid: d1101001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_4'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "CHECK UTILITY CLOSET"
+    choiceSubtitle: "Maintenance room. Heavy steel door with magnetic latch."
+    targetPassage: {fileID: 11400000, guid: e1100001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_4'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "ENTER STAIRWELL (EXIT)"
+    choiceSubtitle: "Point of no return. Push through bloody fire doors down to 2nd Floor."
+    targetPassage: {fileID: 11400000, guid: f1100001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'stairwell_4f'
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ RETREAT UP THE HALL"
+    choiceSubtitle: "Back toward Lower Hallway & Unit 402."
+    targetPassage: {fileID: 11400000, guid: a1103003b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_3'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

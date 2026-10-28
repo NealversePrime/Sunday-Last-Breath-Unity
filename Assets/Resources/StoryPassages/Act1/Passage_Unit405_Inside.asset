@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit405_Inside
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_405_inside
+  passageTitle: UNIT 405 // MARCUS'S WORKSHOP
+  associatedRoomId: unit_405
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: d55d7b2c113596aeefbf06c13676b5c5, type: 3}
+  - {fileID: 21300000, guid: 6b5cfea7f91aeba03dd3e17a371bcf3d, type: 3}
+  - {fileID: 21300000, guid: 1c44bc01222f379611046151b186c341, type: 3}
+  - {fileID: 21300000, guid: 50d8814961bbc2d8c2b0bc2134f8db53, type: 3}
+  - {fileID: 21300000, guid: f98a22516fc84a15af25a2f7f1d82417, type: 3}
+  - {fileID: 21300000, guid: 96aeeb3d995c53720dbe2120993b4d98, type: 3}
+  - {fileID: 21300000, guid: 65c75ce2b85f42d74efd93acbeef0274, type: 3}
+  - {fileID: 21300000, guid: e47133fd9a3412b16b58e19e0c5b5467, type: 3}
+  - {fileID: 21300000, guid: c85b27d866c740503665b7bfd7916778, type: 3}
+  - {fileID: 21300000, guid: 9540730b8089d30cea5b2d800885f030, type: 3}
+  - {fileID: 21300000, guid: 6c623676c7a75c70708a67957f70f291, type: 3}
+  - {fileID: 21300000, guid: e30832e9a75bbf64739cc1ef9df86c80, type: 3}
+  - {fileID: 21300000, guid: 1bf46c261ca49ecd706b8c1f4c4bf795, type: 3}
+  - {fileID: 21300000, guid: f609b2e039b0a371e65f1c438639c2c7, type: 3}
+  - {fileID: 21300000, guid: 97a00ab1c590cd0580e3b24755b2e076, type: 3}
+  - {fileID: 21300000, guid: 7a6030c84578e52f4b8a444f26c98ace, type: 3}
+  - {fileID: 21300000, guid: cb92542ec65f70246fd477a3e3ecbd03, type: 3}
+  - {fileID: 21300000, guid: 71c01ba857f5ebb090165d80e1474b17, type: 3}
+  - {fileID: 21300000, guid: 2543c9f16d5f110cf3a06dd35c063aee, type: 3}
+  - {fileID: 21300000, guid: d7d9a59d7b56e38dab6785c8396096ec, type: 3}
+  - {fileID: 21300000, guid: ad2d48447438af9ab98821f22763b934, type: 3}
+  - {fileID: 21300000, guid: 86db86fc40f6919fcdaa5357bd4618f8, type: 3}
+  - {fileID: 21300000, guid: 01fd7de261c2a469a4ea3e1580551396, type: 3}
+  - {fileID: 21300000, guid: 3d65d0044f31c8d0f24ce46650e00f61, type: 3}
+  - {fileID: 21300000, guid: 6e0699ff6d59454b50fad6c09565078e, type: 3}
+  - {fileID: 21300000, guid: 2dc29a2a8c503492984a2db2e68ccd17, type: 3}
+  - {fileID: 21300000, guid: caeadeabfc79fb6d7e2e6017f61e449f, type: 3}
+  - {fileID: 21300000, guid: 5876a4ad8b1cad31e635b59b8816e39d, type: 3}
+  - {fileID: 21300000, guid: 0881f1cf160bd2caec75696c18d15b12, type: 3}
+  - {fileID: 21300000, guid: 9759cda546ad8f5cab5bebe5e420a3f6, type: 3}
+  - {fileID: 21300000, guid: b6532d71e083fe3d737b3034e6bdbdaf, type: 3}
+  - {fileID: 21300000, guid: 4fe404e01a59ee39566c4045969c0df5, type: 3}
+  - {fileID: 21300000, guid: b33daceb562fcf8a866b999ac569f1de, type: 3}
+  - {fileID: 21300000, guid: 3aa85c3a87f87058928f19a4d8feee62, type: 3}
+  - {fileID: 21300000, guid: 63e6fd5607033ffc6ae5f3cee538c778, type: 3}
+  - {fileID: 21300000, guid: acfa86310809e88e401e61ee2d0ba17e, type: 3}
+  - {fileID: 21300000, guid: fb2be21e76efc47256f40a70b83068b4, type: 3}
+  - {fileID: 21300000, guid: c00eb648164bc56625d855fd6e2b4cee, type: 3}
+  - {fileID: 21300000, guid: b42ede85a5920141a3c2a6a77c2f0e7a, type: 3}
+  - {fileID: 21300000, guid: 0e2f5c4d5ff0b2fec91eaf7ddb2003bd, type: 3}
+  - {fileID: 21300000, guid: d09e28ba974b9213fafb9130cb522e0b, type: 3}
+  - {fileID: 21300000, guid: 3aa470bc6206a5848c9acdd682dd7c5a, type: 3}
+  - {fileID: 21300000, guid: a7ffbe7eaa5d517fa8212c2bbff98642, type: 3}
+  - {fileID: 21300000, guid: 0b794d6c207f8bc3a236b45b8b4b1c7d, type: 3}
+  - {fileID: 21300000, guid: 2404604831148af43c37579a906fd9e6, type: 3}
+  - {fileID: 21300000, guid: 4d0a107f320dcecd8f5c7918570e72e3, type: 3}
+  animationFPS: 8
+  musicAction: 1
+  backgroundMusicOrAmbience: {fileID: 8300000, guid: 818303d7eaf18a5499deb9372579a6be, type: 3}
+  musicVolume: 0.45
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "You slip through the cleared doorway into <b>Unit 405</b>.\n\nThe living room looks like a forward operating base. Spent brass shell casings roll across the hardwood floor. Gun cases lie open on the sofa, emptied of rifles.\n\nHowever, a heavy tactical vest and an open box of 9mm ammunition remain on the steel workbench."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "You step past the disarmed tripwire into <b>Unit 405</b>.\n\n<color=#93C5FD><b>TACTICAL WORKSHOP.</b></color> Spent brass shell casings roll across the hardwood floor."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Marcus geared up for a war. He took the heavy ordnance, but there's still plenty of 9mm rounds and a combat knife here. Exactly what I need."
+    outroNarration: "Gun cases lie open on the furniture, cleaned out in a hurry."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Raid the Gunsmith Workbench"
+    choiceSubtitle: "Loot 9mm ammunition and a tactical combat knife."
+    targetPassage: {fileID: 11400000, guid: b1105002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_405'
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "ammo_9mm"
+      quantity: 10
+    - itemId: "knife"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Return to Mid-Hallway"
+    choiceSubtitle: "Slip back through the reinforced door."
+    targetPassage: {fileID: 11400000, guid: a1102002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_2'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

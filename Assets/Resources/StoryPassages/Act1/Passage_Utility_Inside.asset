@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Utility_Inside
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: utility_inside
+  passageTitle: UTILITY CLOSET // WORKSHOP
+  associatedRoomId: utility_room
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 41fd67f1489fbecd996f07b4619a783a, type: 3}
+  - {fileID: 21300000, guid: 4dc0cc3d01fb6709cee3e8a08982b015, type: 3}
+  - {fileID: 21300000, guid: 221fc80a09bb4860904fb89517fa0c4c, type: 3}
+  - {fileID: 21300000, guid: ca238c91ad3b774d11dfbcd4f45136fe, type: 3}
+  - {fileID: 21300000, guid: 352b831da186aba5a28c44fe4173d7e1, type: 3}
+  - {fileID: 21300000, guid: bf4f51d510c8d7fca76c3baef6ddb8e1, type: 3}
+  - {fileID: 21300000, guid: 1353713f7b090078922f8f04003d8d38, type: 3}
+  - {fileID: 21300000, guid: 62e197b6611e8f7fff5fd6321d4ae9fd, type: 3}
+  - {fileID: 21300000, guid: 341ea836afe3ac2cc154730dcfb1e4aa, type: 3}
+  - {fileID: 21300000, guid: a28da8b75c64d1ddab8c064b0f2a3dc2, type: 3}
+  - {fileID: 21300000, guid: 203e0a84d5afaee39779cbae0b21d81a, type: 3}
+  - {fileID: 21300000, guid: e77533754a7beab95cbe0bc5c3a0e32c, type: 3}
+  - {fileID: 21300000, guid: b5d5261054377dbd5d0414da96301857, type: 3}
+  - {fileID: 21300000, guid: ec17a2e59ddea734035a33d4eb73a7b7, type: 3}
+  - {fileID: 21300000, guid: 88c1aa58caae2545413d5af53d594066, type: 3}
+  - {fileID: 21300000, guid: 28228f4838c1e74426cc455a20e0f648, type: 3}
+  - {fileID: 21300000, guid: edac02d1758e2b8523b4bc31522593a4, type: 3}
+  - {fileID: 21300000, guid: cadde217a02524e7f61cb9c7920b56ad, type: 3}
+  - {fileID: 21300000, guid: 3508cbc6ae46100497ed6f743261209e, type: 3}
+  - {fileID: 21300000, guid: 6b0f714425346312a467d5a113eace4f, type: 3}
+  - {fileID: 21300000, guid: 3993543aec4d400da532032b0ab7e633, type: 3}
+  - {fileID: 21300000, guid: ed57930882af6ae93425a9ae3ec948c9, type: 3}
+  - {fileID: 21300000, guid: f80f7699a6e95d19e4563bca6d12ced4, type: 3}
+  - {fileID: 21300000, guid: 09f26a71fae3a5c818be10c2b08fc917, type: 3}
+  - {fileID: 21300000, guid: 2137e8aa51d0433863e4da1d02451efd, type: 3}
+  - {fileID: 21300000, guid: e96cab3f2527f802d19110d6c3430698, type: 3}
+  - {fileID: 21300000, guid: 0c25d41c261018ef5c6fbc182d51c24f, type: 3}
+  - {fileID: 21300000, guid: 201c085edd80ebe7fc2e3694d1adda2c, type: 3}
+  - {fileID: 21300000, guid: d83db8d58bf371ab476a8b2152bb9047, type: 3}
+  - {fileID: 21300000, guid: 0c52129d65ea77d9d4fb3b720d5dc839, type: 3}
+  - {fileID: 21300000, guid: e480610890e7d01049b60650dda51c18, type: 3}
+  - {fileID: 21300000, guid: 4e7c24fd83162d9a76fed91eaacfac7e, type: 3}
+  - {fileID: 21300000, guid: 09127aa2760b124890248ab07e4f0057, type: 3}
+  - {fileID: 21300000, guid: c7a8cf68ccdda4118d3670547ec89f81, type: 3}
+  - {fileID: 21300000, guid: abea11410d0e3450cec7393fafd1b15c, type: 3}
+  - {fileID: 21300000, guid: 6a9839cff28af0d7efae85349df84485, type: 3}
+  - {fileID: 21300000, guid: d6cb5da869e39141caf6f67e4faef5a2, type: 3}
+  - {fileID: 21300000, guid: 8bfbe8d885c9794f16a8995134f067d6, type: 3}
+  - {fileID: 21300000, guid: b27b51c4792c19bf5a00e7c2f4e5a5d2, type: 3}
+  - {fileID: 21300000, guid: 48289523aaa61e966251cd5ad3f88516, type: 3}
+  - {fileID: 21300000, guid: 18da2b2c887476027606624b3b9e1c6c, type: 3}
+  - {fileID: 21300000, guid: e1f94b24d0141408c6af7b0a17b866ab, type: 3}
+  - {fileID: 21300000, guid: 2fc43d2074ddacf89fc7b67a6cc55edf, type: 3}
+  - {fileID: 21300000, guid: d10147965e6650c86ffc52f0da723eb6, type: 3}
+  - {fileID: 21300000, guid: f0e55c79dc7980c324ce139243d27cda, type: 3}
+  - {fileID: 21300000, guid: c8218201f4acea258b8d406b360ccf22, type: 3}
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "<color=#93C5FD><b>SUPERINTENDENT'S WORKSHOP.</b></color>\n\nThe smell of machine oil, WD-40, and rubber fills the room. Tall steel shelving units line both walls, loaded with industrial supplies.\n\nA heavy rubberized waterproof flashlight and rolls of industrial duct tape sit right on the work counter."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "The magnetic lock buzzes and pops free.\n\n<color=#93C5FD><b>SUPERINTENDENT'S WORKSHOP.</b></color> Tall industrial shelves line the bare concrete."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Jackpot. Heavy flashlight with fresh D-cells, plus reinforced duct tape. This flashlight will illuminate the stairwell all the way down."
+    outroNarration: "A yellow mop bucket is overturned in the corner."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Take Flashlight & Duct Tape"
+    choiceSubtitle: "Equip heavy flashlight and grab duct tape."
+    targetPassage: {fileID: 11400000, guid: e1100002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'utility_room'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "flashlight"
+      quantity: 1
+    - itemId: "ducttape"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Return to Hallway End"
+    choiceSubtitle: "Step back out into Section 4."
+    targetPassage: {fileID: 11400000, guid: a1104004b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_4'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

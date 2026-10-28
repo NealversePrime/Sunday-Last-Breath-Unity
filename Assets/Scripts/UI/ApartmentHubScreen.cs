@@ -3693,6 +3693,7 @@ namespace SundayLastBreath.UI
 
             if (dockHeaderLocation != null) dockHeaderLocation.text = "<color=#FFA726>[ UNIT 407 // LIVING ROOM ]</color>";
             if (dockHeaderChannel != null) dockHeaderChannel.text = hasPacked ? "<color=#10B981>DOOR READY TO UNLOCK</color>" : "<color=#EF4444>FRONT DOOR LOCKED (NEED KEYS)</color>";
+            UpdateSituationBoxHeader("LIVING ROOM");
 
             EvaluateHubButtonStates();
         }
@@ -7384,6 +7385,19 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private IEnumerator FadeAtmosphereAudio(float targetVol, float duration)
+        {
+            if (atmosphereSource == null) yield break;
+            float startVol = atmosphereSource.volume;
+            for (float t = 0; t < duration; t += Time.unscaledDeltaTime)
+            {
+                if (atmosphereSource == null) yield break;
+                atmosphereSource.volume = Mathf.Lerp(startVol, targetVol, t / duration);
+                yield return null;
+            }
+            if (atmosphereSource != null) atmosphereSource.volume = targetVol;
+        }
+
         public void PlaySFX(AudioClip clip, float volume = 0.8f)
         {
             if (clip != null)
@@ -7413,6 +7427,16 @@ namespace SundayLastBreath.UI
 
         #region Modular Story Passage Runner (Twine / ScriptableObject Engine)
         public SundayLastBreath.Data.StoryPassageData CurrentPassage { get; private set; }
+        private int currentPassageBeatIndex = 0;
+        private int currentPassageDialogueIndex = 0;
+        private GameObject modularDialogueBox;
+        private Image modularDialogueAvatar;
+        private TextMeshProUGUI modularDialogueSpeakerText;
+        private TextMeshProUGUI modularDialogueSpeechText;
+        private RectTransform modularDialogueGoldBar;
+        private RectTransform modularDialogueAvatarContainer;
+        private RectTransform modularDialogueSpeechContainer;
+        private Coroutine modularAvatarAnimRoutine;
 
         /// <summary>
         /// Plays an interactive story scene / passage directly from a ScriptableObject.
@@ -7453,13 +7477,31 @@ namespace SundayLastBreath.UI
             }
 
             // 2. Visual Backdrop
-            if (!passage.keepPreviousBackdrop && passage.backdropSprite != null)
+            if (!passage.keepPreviousBackdrop)
             {
-                if (stageBackdropImage != null)
+                if (passage.animatedBackdropFrames != null && passage.animatedBackdropFrames.Count > 0)
                 {
-                    stageBackdropImage.enabled = true;
-                    stageBackdropImage.sprite = passage.backdropSprite;
-                    stageBackdropImage.color = Color.white;
+                    if (stageBackdropImage != null)
+                    {
+                        stageBackdropImage.enabled = true;
+                        stageBackdropImage.color = Color.white;
+                        var anim = stageBackdropImage.GetComponent<SundayLastBreath.UI.FrameAnimationPlayer>();
+                        if (anim == null) anim = stageBackdropImage.gameObject.AddComponent<SundayLastBreath.UI.FrameAnimationPlayer>();
+                        anim.enabled = true;
+                        anim.SetFrames(passage.animatedBackdropFrames, passage.animationFPS > 0f ? passage.animationFPS : 8f, true);
+                        anim.Play();
+                    }
+                }
+                else if (passage.backdropSprite != null)
+                {
+                    if (stageBackdropImage != null)
+                    {
+                        var anim = stageBackdropImage.GetComponent<SundayLastBreath.UI.FrameAnimationPlayer>();
+                        if (anim != null) { anim.Stop(); anim.enabled = false; }
+                        stageBackdropImage.enabled = true;
+                        stageBackdropImage.sprite = passage.backdropSprite;
+                        stageBackdropImage.color = Color.white;
+                    }
                 }
             }
 
@@ -7516,48 +7558,341 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 6. Narrative text display
-            if (situationBoxText != null)
+            // 5.5. Dynamic Situation Box Header Synchronization
+            UpdateSituationBoxHeader(passage.passageTitle);
+
+            // 6. Narrative text display, Beats & Dialogue
+            if (passage.dialogueLines != null && passage.dialogueLines.Count > 0)
             {
-                situationBoxText.text = passage.storyText;
+                currentPassageDialogueIndex = 0;
+                DisplayPassageDialogueLine(passage, 0);
+            }
+            else if (passage.narrativeBeats != null && passage.narrativeBeats.Count > 0)
+            {
+                if (modularDialogueBox != null) modularDialogueBox.SetActive(false);
+                if (modularAvatarAnimRoutine != null) { StopCoroutine(modularAvatarAnimRoutine); modularAvatarAnimRoutine = null; }
+                if (situationBox != null) situationBox.SetActive(true);
+                currentPassageBeatIndex = 0;
+                DisplayPassageBeat(passage, 0);
+            }
+            else
+            {
+                if (modularDialogueBox != null) modularDialogueBox.SetActive(false);
+                if (modularAvatarAnimRoutine != null) { StopCoroutine(modularAvatarAnimRoutine); modularAvatarAnimRoutine = null; }
+                if (situationBox != null) situationBox.SetActive(true);
+                if (situationBoxText != null)
+                {
+                    situationBoxText.text = ParseMarkdown(passage.storyText);
+                }
+                RenderPassageChoices(passage);
+            }
+        }
+
+        public static string ParseMarkdown(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return "";
+            string result = System.Text.RegularExpressions.Regex.Replace(input, @"\*\*(.+?)\*\*", "<b>$1</b>");
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"__(.+?)__", "<b>$1</b>");
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"\*(.+?)\*", "<i>$1</i>");
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"_(.+?)_", "<i>$1</i>");
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"~~(.+?)~~", "<s>$1</s>");
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"`(.+?)`", "<color=#93C5FD><b>$1</b></color>");
+            return result;
+        }
+
+        public void UpdateSituationBoxHeader(string subtitle)
+        {
+            if (situationBox == null) return;
+            Transform topRow = situationBox.transform.Find("TopRow");
+            if (topRow != null)
+            {
+                Transform titleTr = topRow.Find("Title");
+                if (titleTr != null)
+                {
+                    var tmp = titleTr.GetComponent<TextMeshProUGUI>();
+                    if (tmp != null)
+                    {
+                        string sector = !string.IsNullOrEmpty(subtitle) ? subtitle.ToUpper() : "TACTICAL SITUATION";
+                        string timeStr = gameClock != null ? $"{gameClock.GetTimeString()} DAY {gameClock.DayCount}" : "23:45 DAY 0";
+                        tmp.text = $"<b><color=#F5A623>● CURRENT SITUATION</color></b>  <color=#78909C>// {sector} ({timeStr})</color>";
+                    }
+                }
+            }
+        }
+
+        private void EnsureModularDialogueBox()
+        {
+            if (modularDialogueBox != null) return;
+            if (monologueBox == null || hubMenuContainer == null) return;
+
+            modularDialogueBox = Instantiate(monologueBox, hubMenuContainer.transform, false);
+            modularDialogueBox.name = "ModularDialogueBox";
+
+            Transform goldBarTr = modularDialogueBox.transform.Find("GoldBar");
+            if (goldBarTr != null) modularDialogueGoldBar = goldBarTr.GetComponent<RectTransform>();
+
+            Transform avatarContTr = modularDialogueBox.transform.Find("AvatarContainer");
+            if (avatarContTr != null)
+            {
+                modularDialogueAvatarContainer = avatarContTr.GetComponent<RectTransform>();
+                modularDialogueAvatar = avatarContTr.GetComponentInChildren<Image>();
             }
 
-            // 7. Choices & Branching (Twine Links)
+            Transform speechContTr = modularDialogueBox.transform.Find("SpeechContainer");
+            if (speechContTr != null)
+            {
+                modularDialogueSpeechContainer = speechContTr.GetComponent<RectTransform>();
+                var tmps = speechContTr.GetComponentsInChildren<TextMeshProUGUI>();
+                if (tmps.Length > 0) modularDialogueSpeakerText = tmps[0];
+                if (tmps.Length > 1) modularDialogueSpeechText = tmps[1];
+            }
+
+            LayoutElement le = modularDialogueBox.GetComponent<LayoutElement>() ?? modularDialogueBox.AddComponent<LayoutElement>();
+            le.preferredHeight = 90f;
+            le.flexibleHeight = 0f;
+            le.flexibleWidth = 1f;
+
+            int sIdx = situationBox != null ? situationBox.transform.GetSiblingIndex() + 1 : 0;
+            modularDialogueBox.transform.SetSiblingIndex(sIdx);
+            modularDialogueBox.SetActive(false);
+        }
+
+        private void DisplayPassageDialogueLine(SundayLastBreath.Data.StoryPassageData passage, int lineIdx)
+        {
+            if (passage == null) return;
+            if (passage.dialogueLines == null || lineIdx >= passage.dialogueLines.Count)
+            {
+                if (modularDialogueBox != null) modularDialogueBox.SetActive(false);
+                if (modularAvatarAnimRoutine != null) { StopCoroutine(modularAvatarAnimRoutine); modularAvatarAnimRoutine = null; }
+                RenderPassageChoices(passage);
+                return;
+            }
+
+            EnsureModularDialogueBox();
+            if (modularDialogueBox == null)
+            {
+                RenderPassageChoices(passage);
+                return;
+            }
+
+            var line = passage.dialogueLines[lineIdx];
+
+            // 1. Narration Above / Situation Box
+            string combinedNarration = "";
+            if (!string.IsNullOrEmpty(line.introNarration))
+            {
+                combinedNarration = ParseMarkdown(line.introNarration);
+            }
+            else if (lineIdx == 0 && !string.IsNullOrEmpty(passage.storyText))
+            {
+                combinedNarration = ParseMarkdown(passage.storyText);
+            }
+
+            if (!string.IsNullOrEmpty(line.outroNarration))
+            {
+                if (!string.IsNullOrEmpty(combinedNarration)) combinedNarration += "\n\n";
+                combinedNarration += $"<color=#94A3B8><i>{ParseMarkdown(line.outroNarration)}</i></color>";
+            }
+
+            if (situationBox != null)
+            {
+                if (!string.IsNullOrEmpty(combinedNarration))
+                {
+                    situationBox.SetActive(true);
+                    if (situationBoxText != null) situationBoxText.text = combinedNarration;
+                }
+                else
+                {
+                    situationBox.SetActive(false);
+                }
+            }
+
+            // 2. Activate Dialogue Box
+            modularDialogueBox.SetActive(true);
+
+            // 3. Layout Left vs Right
+            bool isRight = line.side == SundayLastBreath.Data.DialogueSide.Right;
+            if (modularDialogueGoldBar != null)
+            {
+                modularDialogueGoldBar.anchorMin = new Vector2(isRight ? 1f : 0f, 0f);
+                modularDialogueGoldBar.anchorMax = new Vector2(isRight ? 1f : 0f, 1f);
+                modularDialogueGoldBar.pivot = new Vector2(isRight ? 1f : 0f, 0.5f);
+                modularDialogueGoldBar.anchoredPosition = Vector2.zero;
+            }
+
+            if (modularDialogueAvatarContainer != null)
+            {
+                modularDialogueAvatarContainer.anchorMin = new Vector2(isRight ? 1f : 0f, 0.5f);
+                modularDialogueAvatarContainer.anchorMax = new Vector2(isRight ? 1f : 0f, 0.5f);
+                modularDialogueAvatarContainer.pivot = new Vector2(isRight ? 1f : 0f, 0.5f);
+                modularDialogueAvatarContainer.anchoredPosition = new Vector2(isRight ? -14f : 14f, 0f);
+            }
+
+            if (modularDialogueSpeechContainer != null)
+            {
+                modularDialogueSpeechContainer.anchorMin = new Vector2(0f, 0f);
+                modularDialogueSpeechContainer.anchorMax = new Vector2(1f, 1f);
+                modularDialogueSpeechContainer.pivot = new Vector2(isRight ? 1f : 0f, 0.5f);
+                modularDialogueSpeechContainer.offsetMin = new Vector2(isRight ? 14f : 86f, 6f);
+                modularDialogueSpeechContainer.offsetMax = new Vector2(isRight ? -86f : -14f, -6f);
+            }
+
+            // 4. Speaker Text
+            if (modularDialogueSpeakerText != null)
+            {
+                modularDialogueSpeakerText.alignment = isRight ? TextAlignmentOptions.TopRight : TextAlignmentOptions.TopLeft;
+                if (string.Equals(line.speakerName, "YOU", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(line.speakerName))
+                {
+                    modularDialogueSpeakerText.text = currentPlayer != null ? $"YOU // {currentPlayer.FullName.ToUpper()}" : "YOU";
+                }
+                else
+                {
+                    modularDialogueSpeakerText.text = line.speakerName.ToUpper();
+                }
+            }
+
+            // 5. Speech Text
+            if (modularDialogueSpeechText != null)
+            {
+                modularDialogueSpeechText.alignment = isRight ? TextAlignmentOptions.TopRight : TextAlignmentOptions.TopLeft;
+                string quote = ParseMarkdown(line.dialogueText);
+                if (!quote.StartsWith("\"")) quote = $"\"{quote}\"";
+                modularDialogueSpeechText.text = quote;
+            }
+
+            // 6. Avatar Setup & Animation
+            if (modularAvatarAnimRoutine != null)
+            {
+                StopCoroutine(modularAvatarAnimRoutine);
+                modularAvatarAnimRoutine = null;
+            }
+
+            if (modularDialogueAvatar != null)
+            {
+                if (line.animatedAvatarFrames != null && line.animatedAvatarFrames.Count > 0)
+                {
+                    modularAvatarAnimRoutine = StartCoroutine(AnimateModularDialogueAvatar(line.animatedAvatarFrames, line.avatarFPS));
+                }
+                else if (line.avatarSprite != null)
+                {
+                    modularDialogueAvatar.sprite = line.avatarSprite;
+                }
+                else if (string.Equals(line.speakerName, "YOU", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(line.speakerName))
+                {
+                    if (cachedAvatarFrames == null || cachedAvatarFrames.Count == 0)
+                    {
+                        cachedAvatarFrames = CharacterCreationScreen.LoadPlayerFrames();
+                    }
+                    if (cachedAvatarFrames != null && cachedAvatarFrames.Count > 0)
+                    {
+                        modularAvatarAnimRoutine = StartCoroutine(AnimateModularDialogueAvatar(cachedAvatarFrames, 8f));
+                    }
+                    else if (monologueAvatar != null && monologueAvatar.sprite != null)
+                    {
+                        modularDialogueAvatar.sprite = monologueAvatar.sprite;
+                    }
+                }
+            }
+
+            // 7. Navigation Choices
+            ClearHallwayChoices();
+            if (lineIdx + 1 < passage.dialogueLines.Count)
+            {
+                SetHallwayChoice(0, "▶ Continue... <color=#94A3B8>[Click / 1]</color>", () =>
+                {
+                    currentPassageDialogueIndex++;
+                    DisplayPassageDialogueLine(passage, currentPassageDialogueIndex);
+                });
+            }
+            else
+            {
+                RenderPassageChoices(passage);
+            }
+        }
+
+        private IEnumerator AnimateModularDialogueAvatar(List<Sprite> frames, float fps)
+        {
+            if (frames == null || frames.Count == 0 || modularDialogueAvatar == null) yield break;
+            int idx = 0;
+            float frameDelay = fps > 0f ? (1f / fps) : 0.125f;
+            while (modularDialogueBox != null && modularDialogueBox.activeSelf)
+            {
+                if (modularDialogueAvatar != null)
+                {
+                    modularDialogueAvatar.sprite = frames[idx];
+                    idx = (idx + 1) % frames.Count;
+                }
+                yield return new WaitForSecondsRealtime(frameDelay);
+            }
+        }
+
+        private void DisplayPassageBeat(SundayLastBreath.Data.StoryPassageData passage, int beatIdx)
+        {
+            if (passage == null) return;
+            if (passage.narrativeBeats == null || beatIdx >= passage.narrativeBeats.Count)
+            {
+                RenderPassageChoices(passage);
+                return;
+            }
+
+            if (situationBoxText != null)
+            {
+                situationBoxText.text = ParseMarkdown(passage.narrativeBeats[beatIdx]);
+            }
+
             ClearHallwayChoices();
 
-            if (passage.choices != null)
+            if (beatIdx + 1 < passage.narrativeBeats.Count)
             {
-                for (int i = 0; i < passage.choices.Count; i++)
+                SetHallwayChoice(0, "▶ Continue... <color=#94A3B8>[Click / 1]</color>", () =>
                 {
-                    var choice = passage.choices[i];
-                    int btnIndex = i;
+                    currentPassageBeatIndex++;
+                    DisplayPassageBeat(passage, currentPassageBeatIndex);
+                });
+            }
+            else
+            {
+                // Final beat reached: reveal interactive player choices!
+                RenderPassageChoices(passage);
+            }
+        }
 
-                    string fullLabel = choice.choiceLabel;
-                    if (!string.IsNullOrEmpty(choice.choiceSubtitle))
-                    {
-                        fullLabel += $" <color=#94A3B8>({choice.choiceSubtitle})</color>";
-                    }
+        private void RenderPassageChoices(SundayLastBreath.Data.StoryPassageData passage)
+        {
+            ClearHallwayChoices();
 
-                    // Check requirement
-                    bool meetsReq = true;
-                    if (!string.IsNullOrEmpty(choice.requiredItem))
-                    {
-                        meetsReq = currentPlayer != null && currentPlayer.HasItem(choice.requiredItem);
-                        if (!meetsReq)
-                        {
-                            var def = SundayLastBreath.Data.ItemDatabase.GetDefinition(choice.requiredItem);
-                            string itemTitle = def != null ? def.displayName : choice.requiredItem;
-                            fullLabel += $" <color=#EF4444>[Req: {itemTitle}]</color>";
-                        }
-                    }
+            if (passage == null || passage.choices == null) return;
 
-                    Color? accentColor = choice.isBackButton ? new Color(0.6f, 0.65f, 0.7f) : (Color?)null;
+            for (int i = 0; i < passage.choices.Count; i++)
+            {
+                var choice = passage.choices[i];
+                int btnIndex = i;
 
-                    SetHallwayChoice(btnIndex, fullLabel, () =>
-                    {
-                        ExecutePassageChoice(choice);
-                    }, meetsReq, accentColor);
+                string fullLabel = choice.choiceLabel;
+                if (!string.IsNullOrEmpty(choice.choiceSubtitle))
+                {
+                    fullLabel += $" <color=#94A3B8>- {choice.choiceSubtitle}</color>";
                 }
+
+                // Check requirement
+                bool meetsReq = true;
+                if (!string.IsNullOrEmpty(choice.requiredItem))
+                {
+                    meetsReq = currentPlayer != null && currentPlayer.HasItem(choice.requiredItem);
+                    if (!meetsReq)
+                    {
+                        var def = SundayLastBreath.Data.ItemDatabase.GetDefinition(choice.requiredItem);
+                        string itemTitle = def != null ? def.displayName : choice.requiredItem;
+                        fullLabel += $" <color=#EF4444>[Req: {itemTitle}]</color>";
+                    }
+                }
+
+                Color? accentColor = choice.isBackButton ? new Color(0.6f, 0.65f, 0.7f) : (Color?)null;
+
+                SetHallwayChoice(btnIndex, fullLabel, () =>
+                {
+                    ExecutePassageChoice(choice);
+                }, meetsReq, accentColor);
             }
         }
 
@@ -7596,10 +7931,40 @@ namespace SundayLastBreath.UI
                 tacticalGearController?.RefreshAll();
             }
 
-            // Item loot / award
+            // Item loot / award (single item)
             if (!string.IsNullOrEmpty(choice.givesItem))
             {
-                GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                if (choice.dropLootDirectlyToFloor)
+                {
+                    AddFloorItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                    tacticalGearController?.RefreshAll();
+                    UpdateFloorItemsNotification();
+                }
+                else
+                {
+                    GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                }
+            }
+
+            // Item loot / award (multiple items list)
+            if (choice.givesLootList != null && choice.givesLootList.Count > 0)
+            {
+                foreach (var loot in choice.givesLootList)
+                {
+                    if (!string.IsNullOrEmpty(loot.itemId) && loot.quantity > 0)
+                    {
+                        if (choice.dropLootDirectlyToFloor)
+                        {
+                            AddFloorItem(loot.itemId, loot.quantity);
+                        }
+                        else
+                        {
+                            GiveOrDropItem(loot.itemId, loot.quantity);
+                        }
+                    }
+                }
+                tacticalGearController?.RefreshAll();
+                UpdateFloorItemsNotification();
             }
 
             // Room / location transition
@@ -7630,8 +7995,169 @@ namespace SundayLastBreath.UI
             // Direct target passage
             if (choice.targetPassage != null)
             {
-                PlayStoryPassage(choice.targetPassage);
+                if (choice.transitionVideo != null || !string.IsNullOrEmpty(choice.transitionVideoPath))
+                {
+                    StartCoroutine(PlayPassageVideoTransition(choice, choice.targetPassage));
+                }
+                else
+                {
+                    PlayStoryPassage(choice.targetPassage);
+                }
             }
+        }
+
+        private IEnumerator PlayPassageVideoTransition(SundayLastBreath.Data.PassageChoiceData choice, SundayLastBreath.Data.StoryPassageData targetPassage)
+        {
+            if (targetPassage == null || choice == null) yield break;
+
+            EnsureDoorTransitionOverlay();
+            if (doorTransitionOverlay == null || doorVideoPlayer == null)
+            {
+                PlayStoryPassage(targetPassage);
+                yield break;
+            }
+
+            var clip = choice.transitionVideo;
+            var path = choice.transitionVideoPath;
+
+            // Set video source
+            bool hasVideo = false;
+            if (clip != null)
+            {
+                doorVideoPlayer.source = UnityEngine.Video.VideoSource.VideoClip;
+                doorVideoPlayer.clip = clip;
+                hasVideo = true;
+            }
+            else if (!string.IsNullOrEmpty(path))
+            {
+                var loaded = Resources.Load<UnityEngine.Video.VideoClip>(path);
+                if (loaded != null)
+                {
+                    doorVideoPlayer.source = UnityEngine.Video.VideoSource.VideoClip;
+                    doorVideoPlayer.clip = loaded;
+                    hasVideo = true;
+                }
+                else
+                {
+                    string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", path).Replace("\\", "/");
+                    if (!filePath.EndsWith(".mp4")) filePath += ".mp4";
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        doorVideoPlayer.source = UnityEngine.Video.VideoSource.Url;
+                        doorVideoPlayer.url = filePath;
+                        hasVideo = true;
+                    }
+                }
+            }
+
+            if (!hasVideo)
+            {
+                PlayStoryPassage(targetPassage);
+                yield break;
+            }
+
+            // Optional BGM ducking during cinematic video transition
+            if (choice.fadeOutBgmDuringTransition && atmosphereSource != null && atmosphereSource.isPlaying)
+            {
+                StartCoroutine(FadeAtmosphereAudio(0.05f, 0.4f));
+            }
+
+            isDoorTransitioning = true;
+            doorTransitionOverlay.SetActive(true);
+            doorTransitionContentBox?.SetActive(false);
+            if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+            if (doorTransitionCanvasGroup != null) doorTransitionCanvasGroup.alpha = 0f;
+
+            doorVideoPlayer.Prepare();
+
+            // Fade in black curtain (0.35s)
+            float fadeInTime = 0.35f;
+            for (float t = 0; t < fadeInTime; t += Time.unscaledDeltaTime)
+            {
+                if (doorTransitionCanvasGroup != null) doorTransitionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, t / fadeInTime);
+                yield return null;
+            }
+            if (doorTransitionCanvasGroup != null) doorTransitionCanvasGroup.alpha = 1f;
+
+            // Wait for video prepare
+            float prepTimer = 0f;
+            while (!doorVideoPlayer.isPrepared && prepTimer < 1.5f)
+            {
+                prepTimer += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            if (doorVideoPlayer.isPrepared)
+            {
+                // Play custom start SFX or default knob
+                if (choice.transitionStartSFX != null) PlaySFX(choice.transitionStartSFX, 0.95f);
+                else if (doorTransitionKnobSFX != null) PlaySFX(doorTransitionKnobSFX, 0.95f);
+                else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.95f);
+
+                doorVideoPlayer.Play();
+
+                // Fade video in from black
+                float vidFadeIn = choice.videoFadeInDuration > 0f ? choice.videoFadeInDuration : 0.35f;
+                for (float t = 0; t < vidFadeIn; t += Time.unscaledDeltaTime)
+                {
+                    float a = Mathf.Lerp(0f, 1f, t / vidFadeIn);
+                    if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                    yield return null;
+                }
+                if (doorVideoRawImage != null) doorVideoRawImage.color = Color.white;
+
+                yield return new WaitForSecondsRealtime(0.2f);
+                float vidLen = (float)doorVideoPlayer.length;
+                if (vidLen <= 0.5f) vidLen = 3.5f;
+
+                // Play footsteps / step SFX as door opens into the dark room
+                float midTime = vidLen * 0.55f;
+                float elapsed = 0.2f + vidFadeIn;
+                if (midTime > elapsed)
+                {
+                    yield return new WaitForSecondsRealtime(midTime - elapsed);
+                }
+                if (choice.transitionStepSFX != null) PlaySFX(choice.transitionStepSFX, 0.85f);
+                else if (doorTransitionFootstepSFX != null) PlaySFX(doorTransitionFootstepSFX, 0.8f);
+                else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+
+                float playDuration = Mathf.Max(0.3f, vidLen - midTime - 0.35f);
+                yield return new WaitForSecondsRealtime(playDuration);
+
+                // Play end / slam SFX if provided
+                if (choice.transitionEndSFX != null) PlaySFX(choice.transitionEndSFX, 0.9f);
+
+                // Fade video out to black
+                float vidFadeOut = 0.35f;
+                for (float t = 0; t < vidFadeOut; t += Time.unscaledDeltaTime)
+                {
+                    float a = Mathf.Lerp(1f, 0f, t / vidFadeOut);
+                    if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                    yield return null;
+                }
+                if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+
+                // Brief post-video pause
+                float postPause = choice.postVideoPause > 0f ? choice.postVideoPause : 0.3f;
+                yield return new WaitForSecondsRealtime(postPause);
+            }
+
+            // Transition passage behind dark curtain
+            PlayStoryPassage(targetPassage);
+
+            // Fade in from black to reveal new passage
+            float fadeOutTime = 0.45f;
+            for (float t = 0; t < fadeOutTime; t += Time.unscaledDeltaTime)
+            {
+                if (doorTransitionCanvasGroup != null) doorTransitionCanvasGroup.alpha = Mathf.Lerp(1f, 0f, t / fadeOutTime);
+                yield return null;
+            }
+            if (doorTransitionCanvasGroup != null) doorTransitionCanvasGroup.alpha = 0f;
+
+            if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
+            doorTransitionContentBox?.SetActive(true);
+            doorTransitionOverlay.SetActive(false);
+            isDoorTransitioning = false;
         }
 
         private int GetSkillBonus(SundayLastBreath.Data.PassageSkillCheckType skillType)

@@ -1,0 +1,114 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Stairwell_4F
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: stairwell_4f
+  passageTitle: STAIRWELL // 4TH FLOOR LANDING
+  associatedRoomId: stairwell_4f
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 032f9338ded9b806621267c51341ba8b, type: 3}
+  - {fileID: 21300000, guid: 5874a045bde86ced5ddd5cd8146b400b, type: 3}
+  - {fileID: 21300000, guid: ce3d0121e076386731095c9efc6d97e0, type: 3}
+  - {fileID: 21300000, guid: 739eec70123a96281dbf3d55fe277037, type: 3}
+  - {fileID: 21300000, guid: dd799f1e16130b13d52c1ba939688b16, type: 3}
+  - {fileID: 21300000, guid: 4797233d80206cd123019e10b2966526, type: 3}
+  - {fileID: 21300000, guid: c9395db43ae844dbcabbdcdb904cff0a, type: 3}
+  - {fileID: 21300000, guid: 521b4599914348811de3822fd2d2a5d4, type: 3}
+  - {fileID: 21300000, guid: 8c3ac9ed1005c297db4f64c00872f233, type: 3}
+  - {fileID: 21300000, guid: 9328e4c0b131500acfca9c6e067d1669, type: 3}
+  - {fileID: 21300000, guid: e6e7c30f4b879a4d910006666450f2c8, type: 3}
+  - {fileID: 21300000, guid: 27971925e2cf1ee484c65e202e5d69f4, type: 3}
+  - {fileID: 21300000, guid: 523a9441a5c0a1ea7c951092c6c1a386, type: 3}
+  - {fileID: 21300000, guid: af49e1a3e7f2644565befc8867d540dc, type: 3}
+  - {fileID: 21300000, guid: 94ca642654286c1e3d53fa7b5ad3b960, type: 3}
+  - {fileID: 21300000, guid: e9f871847de22df5c9d769572e9f09ca, type: 3}
+  - {fileID: 21300000, guid: 6a02275fd76d1194020c193cd012b68b, type: 3}
+  - {fileID: 21300000, guid: 99bd63dc93e069e6ec57e486af22f1e0, type: 3}
+  - {fileID: 21300000, guid: 6d73b27c26f094cf130c574235c6d3a6, type: 3}
+  - {fileID: 21300000, guid: 4f696a1f8787bdb9080c0d4ad4a1319a, type: 3}
+  - {fileID: 21300000, guid: 2d9fce3480dcf7dd74e20f67f81d5139, type: 3}
+  - {fileID: 21300000, guid: 4e1343d6706210a2b45d55ad8233ca01, type: 3}
+  - {fileID: 21300000, guid: 21286fe0082174a2db58c2b1e97cb876, type: 3}
+  - {fileID: 21300000, guid: c3faecaaedca62f52fbf682938089072, type: 3}
+  - {fileID: 21300000, guid: edfecdd114b75450586df5c3df5c423b, type: 3}
+  - {fileID: 21300000, guid: d2247fa12567d16ade145e84412c1dd0, type: 3}
+  - {fileID: 21300000, guid: 21a6c6df5b9b407715142b7bb0bce8ce, type: 3}
+  - {fileID: 21300000, guid: 67d7dcc9c2df1e41cf3bbc544cd6854f, type: 3}
+  - {fileID: 21300000, guid: 27df3d15c2b4df4f97e56a84d5a580ce, type: 3}
+  - {fileID: 21300000, guid: 06cee28f604509894becbe84f6ddcd7b, type: 3}
+  - {fileID: 21300000, guid: 9afac7780e342b29f006d1badeaafa78, type: 3}
+  - {fileID: 21300000, guid: a3ab51eba83b3fad3de8f1fd81647cf4, type: 3}
+  - {fileID: 21300000, guid: 569b00d562abd20b21f4609438b8e153, type: 3}
+  - {fileID: 21300000, guid: cb154a7d90f34e14e88871307ee8e57a, type: 3}
+  - {fileID: 21300000, guid: f552ff9a9b0bac01ec03428d99bcdf4c, type: 3}
+  - {fileID: 21300000, guid: ff5f7aa337a9821d599d51df8f1e486f, type: 3}
+  - {fileID: 21300000, guid: d88847ebee5faee0239d6b025ab08004, type: 3}
+  - {fileID: 21300000, guid: 190f1f383ba9542a47d14e1549aec800, type: 3}
+  - {fileID: 21300000, guid: a8d7781709a7a9a4f22ef590721f4466, type: 3}
+  - {fileID: 21300000, guid: 90a7f30ae528e10717ff5d7dfa5e2924, type: 3}
+  - {fileID: 21300000, guid: 9956ec393bd9d04158fccadbaa84ebe3, type: 3}
+  - {fileID: 21300000, guid: 5206a7b467dfd7652ccd5ff28ad056f2, type: 3}
+  - {fileID: 21300000, guid: 7691e6d036eb21c092c47a5311075fb4, type: 3}
+  - {fileID: 21300000, guid: f4ac45df46dbd47b1a0c6cc620c607d2, type: 3}
+  - {fileID: 21300000, guid: d6479676eff9464586ad1c1e5b19d69e, type: 3}
+  - {fileID: 21300000, guid: 3b8f481958b725ead4a2a2f8f81ea4b6, type: 3}
+  animationFPS: 8
+  musicAction: 1
+  backgroundMusicOrAmbience: {fileID: 8300000, guid: 2794956e369c942429eea4d53b73aa65, type: 3}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "You throw your weight against the heavy red fire door. It slams shut behind you with a loud metallic <i>*CLANG*</i>, latching tight.\n\n<color=#EF4444><b>THE STAIRWELL (4TH FLOOR LANDING) - POINT OF NO RETURN.</b></color>\n\nThe stairwell is cast in eerie crimson emergency lighting. Cold air rushes up from below, carrying the distant metallic groan of the building's backup generator.\n\nThe 4th floor is sealed. Your only option now is to descend."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "The heavy fire door slams shut behind you with a deafening metallic boom.\n\n<color=#EF4444><b>STAIRWELL 4F - POINT OF NO RETURN.</b></color>"
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Fire door is latched. No going back to the 4th floor now. The stairs lead all the way down to the 2nd floor and the ground lobby. Keep your eyes open."
+    outroNarration: "Cold drafts and the low hum of a failing generator rise from the depths below."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Descend the Stairs toward 2nd Floor"
+    choiceSubtitle: "Take the concrete steps down into the red emergency glow."
+    targetPassage: {fileID: 11400000, guid: f1100001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'stairwell_4f'
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

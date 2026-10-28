@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Hallway_1
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: hallway_1
+  passageTitle: CORRIDOR N // UPPER HALLWAY (SEC 1)
+  associatedRoomId: hallway_1
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: afa4253274fc4260aec56ecc7b66670d, type: 3}
+  - {fileID: 21300000, guid: 2ddf1f09b4604a4ab34312ab20b4891c, type: 3}
+  - {fileID: 21300000, guid: 6db653e79ab04332a8e2910aa55b606f, type: 3}
+  - {fileID: 21300000, guid: 900aea6527fa4b9880e8585172f0dac7, type: 3}
+  - {fileID: 21300000, guid: 36a6c8eda8b043bb9aa86b4e2bea924a, type: 3}
+  - {fileID: 21300000, guid: d8449efaf2934bf0b28bc03a8530c2d1, type: 3}
+  - {fileID: 21300000, guid: 48140cee54074a6091b9352a8b9a7b38, type: 3}
+  - {fileID: 21300000, guid: 9c825cc3bbf2452e83c6f1b58953587c, type: 3}
+  - {fileID: 21300000, guid: 210af120e3494f8faa480d4486d733e4, type: 3}
+  - {fileID: 21300000, guid: 06f311c68f8a4cf6ac049b50f604f9ea, type: 3}
+  - {fileID: 21300000, guid: fab9928d56154d8ebc9367a98b81f914, type: 3}
+  - {fileID: 21300000, guid: a7d4f688d1304bbd947cded7907f8e0d, type: 3}
+  - {fileID: 21300000, guid: 04032c6c4a9f4248b5cd5d01bc6b28ef, type: 3}
+  - {fileID: 21300000, guid: 8e6b5b07d17c40ee8d223707c2ff8048, type: 3}
+  - {fileID: 21300000, guid: 1b8d72d621684f9089bcd37259980dac, type: 3}
+  - {fileID: 21300000, guid: b8922dd9a5e34939b10b9f25bef410b1, type: 3}
+  - {fileID: 21300000, guid: 6f8fa72972c34e1f9b72e35134d42ffc, type: 3}
+  - {fileID: 21300000, guid: 676522c721c44a70bfab0733f112e07f, type: 3}
+  - {fileID: 21300000, guid: ffc9118708e346d89d4d54a968be067b, type: 3}
+  - {fileID: 21300000, guid: ec8dc7800ea1403385b23a22ca198c8a, type: 3}
+  - {fileID: 21300000, guid: d348840c678a4821a0e25371154a614c, type: 3}
+  - {fileID: 21300000, guid: 062f8712c9b847b8a8ac82b1ed559b49, type: 3}
+  - {fileID: 21300000, guid: 5ad8bae720994510b408c0a616054a6c, type: 3}
+  - {fileID: 21300000, guid: a7b4890b31a942a1b943d09b589c0339, type: 3}
+  - {fileID: 21300000, guid: caedbbe5302d454f80f6e85af9a50c6a, type: 3}
+  - {fileID: 21300000, guid: c634dd2e73e44abba17929385b8a6f67, type: 3}
+  - {fileID: 21300000, guid: 580be33e620046ffbbcabbba8a6685ea, type: 3}
+  animationFPS: 10
+  musicAction: 1
+  backgroundMusicOrAmbience: {fileID: 8300000, guid: 16bb303f22c95804b8505e4ab0ccf0c6, type: 3}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY (4TH FLOOR).</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air. Shadows twitch across the worn carpet.\n\nTo your right is your unit (407). Directly opposite is <b>Unit 408</b>. In front of you, the corridor stretches south into darkness."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Deadbolt clicked shut... no turning back now. Harmon's door is right across the hall at 408. I should check if he's still inside before heading down."
+    outroNarration: "Every distant siren outside echoes through the ventilation grates. In front of you, the hallway stretches south toward the middle wing."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "INVESTIGATE UNIT 408"
+    choiceSubtitle: "The Professor's door. Electronic lock. Total silence inside."
+    targetPassage: {fileID: 11400000, guid: 05759b3026c90954b9a12ac1fa9633a0, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_1'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▼ ADVANCE DOWN THE HALL"
+    choiceSubtitle: "Walk south toward Units 404 & 405."
+    targetPassage: {fileID: 11400000, guid: a1102002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_2'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

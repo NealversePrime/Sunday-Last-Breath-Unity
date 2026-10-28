@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit401_Inside
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_401_inside
+  passageTitle: UNIT 401 // THE ABANDONED PARTY
+  associatedRoomId: unit_401
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 7a3ede842959761d3b2bb301873aa2a6, type: 3}
+  - {fileID: 21300000, guid: 6d24cee74e1195aefa4498dcc109851a, type: 3}
+  - {fileID: 21300000, guid: fb3637f7dd4cbcd60a1ea40916b374fa, type: 3}
+  - {fileID: 21300000, guid: b3e837fbf158198c032cb00fdd38b8e4, type: 3}
+  - {fileID: 21300000, guid: 9c9c0479cebc382afcad844587766478, type: 3}
+  - {fileID: 21300000, guid: 22a7b731c7f6728ae98d476ba58f9af0, type: 3}
+  - {fileID: 21300000, guid: e6d46aa0bf01f8073c5a292eb5d97a00, type: 3}
+  - {fileID: 21300000, guid: 6572b5e0a2ec96007c9d0e007f2dabea, type: 3}
+  - {fileID: 21300000, guid: 02d9d134c07829e8c887f085b99ae315, type: 3}
+  - {fileID: 21300000, guid: e577d61400500ab90b453af96b7b589c, type: 3}
+  - {fileID: 21300000, guid: bd2d081341ca8f325454f0d352c4f965, type: 3}
+  - {fileID: 21300000, guid: e6bc15167a72cc1417457e5936e093d5, type: 3}
+  - {fileID: 21300000, guid: 507f1172795e59bf4cb707662752ce62, type: 3}
+  - {fileID: 21300000, guid: a6d5430f731cb08ec5a4de40f6ffeb48, type: 3}
+  - {fileID: 21300000, guid: e6d5ebc76070cf6f7915c0e15138af5c, type: 3}
+  - {fileID: 21300000, guid: aa44772e9d186a63b866446e978bb6e3, type: 3}
+  - {fileID: 21300000, guid: 4fe809d35316f610f0499693c1e80a6e, type: 3}
+  - {fileID: 21300000, guid: e97a30d1572cfb06cc14dcb59a0dd086, type: 3}
+  - {fileID: 21300000, guid: fe8da148e08a4d2fccfcfd64d4bffc85, type: 3}
+  - {fileID: 21300000, guid: 083a7cc5b32ac6306f221886cb82afb5, type: 3}
+  - {fileID: 21300000, guid: f96627628dcacd70ada8f66f7eed3b9e, type: 3}
+  - {fileID: 21300000, guid: ed60b95a18142deaae3f734a9a3f7c38, type: 3}
+  - {fileID: 21300000, guid: 131f32210b082ccd2d3eccce3c6ba171, type: 3}
+  - {fileID: 21300000, guid: 1923f041ac1b227c2781e48fb0f400f0, type: 3}
+  - {fileID: 21300000, guid: 65dcb7c3af01de7ce9e22e629e0569d5, type: 3}
+  - {fileID: 21300000, guid: a9f6085603a0191860694170511b201f, type: 3}
+  - {fileID: 21300000, guid: c9fec4727294cbeaae4c4eb4b77eca1e, type: 3}
+  - {fileID: 21300000, guid: ade5ce85ad086f130e87edefdd5a4fde, type: 3}
+  - {fileID: 21300000, guid: 878e6ee27d53ded076befb209070ede7, type: 3}
+  - {fileID: 21300000, guid: 241d6fc3dcd7cb36841baddca69bd052, type: 3}
+  - {fileID: 21300000, guid: a9f2d9fe7f974428f19528faaf9205c6, type: 3}
+  - {fileID: 21300000, guid: 915ab1b335987a2f85f5d9840c9bcd9a, type: 3}
+  - {fileID: 21300000, guid: e451acfcdd6dbd77387cbdcbc6df41de, type: 3}
+  - {fileID: 21300000, guid: ffff61a7072a1b34064577f9625dd15a, type: 3}
+  - {fileID: 21300000, guid: 7ceb7e428716df2d4f95f27c5b453e7d, type: 3}
+  - {fileID: 21300000, guid: 87f76943b1a6335bd735427179d6c8e7, type: 3}
+  - {fileID: 21300000, guid: 3efb3373ca9c71dcdfd79982020265ea, type: 3}
+  - {fileID: 21300000, guid: 2676422a59fd109a7b6a268dc9756f65, type: 3}
+  - {fileID: 21300000, guid: ec201253bf99564179ee102a31c79e12, type: 3}
+  - {fileID: 21300000, guid: b54ec1081bd0efa2e86f1beef855e889, type: 3}
+  - {fileID: 21300000, guid: ee84822795f6cfe495c2caed7f2f6bf8, type: 3}
+  - {fileID: 21300000, guid: 24f5124e77bd20bfd1cf25aad3effdb5, type: 3}
+  - {fileID: 21300000, guid: d9b1fd0f4f7b2e928727c100afbf16cb, type: 3}
+  - {fileID: 21300000, guid: d9b6c5194bb08038e0c27bff0b426a2d, type: 3}
+  - {fileID: 21300000, guid: 080d98487d9afa588486d6abc15bc2f4, type: 3}
+  - {fileID: 21300000, guid: aa7566d79533cbfd566575c59fd92920, type: 3}
+  animationFPS: 8
+  musicAction: 1
+  backgroundMusicOrAmbience: {fileID: 8300000, guid: a3219d36b7b366948bd8eaafdb51ffc8, type: 3}
+  musicVolume: 0.6
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "<color=#93C5FD><b>UNIT 401 - THE COLLEGE PARTY.</b></color>\n\nThe apartment is trashed. Red plastic cups, shattered beer bottles, and discarded coats cover every surface. The blaring sound system vibrates the floorboards.\n\nIn the corner, a massive oak bookshelf has toppled over. Underneath its splintered frame, a brass keychain glints in the strobe light."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "You push open the half-ajar door into <b>Unit 401</b>.\n\n<color=#93C5FD><b>THE ABANDONED PARTY.</b></color> Strobe lights flicker against smashed cups."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "They panicked and stampeded for the exits. That toppled shelf is pinning a set of car keys to the floor. Might belong to a vehicle parked outside."
+    outroNarration: "The bass keeps thumping relentlessly through the broken drywall."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Lever the Toppled Shelf and Grab Keys"
+    choiceSubtitle: "Use your body weight to lift the oak shelf and snatch the car keys and alcohol."
+    targetPassage: {fileID: 11400000, guid: d1101001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_401'
+    timeMinutesCost: 2
+    staminaCost: 6
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "carkeys"
+      quantity: 1
+    - itemId: "whiskey"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Return to Hallway End"
+    choiceSubtitle: "Step back out into Section 4."
+    targetPassage: {fileID: 11400000, guid: a1104004b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_4'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

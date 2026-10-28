@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit402_Door
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_402_door
+  passageTitle: UNIT 402 // THE ANDERSONS' DOOR
+  associatedRoomId: hallway_3
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 128413f9705f839c7572bcf7e7b051f9, type: 3}
+  - {fileID: 21300000, guid: d9a65ae3b7d0515b2d481830780ade94, type: 3}
+  - {fileID: 21300000, guid: 7ec5ecdaf73e15e49c9d98c767c149d7, type: 3}
+  - {fileID: 21300000, guid: f78592dc206db475fc7af34440e19b9c, type: 3}
+  - {fileID: 21300000, guid: 79fb67a72ade2991a93cd234b41c8562, type: 3}
+  - {fileID: 21300000, guid: 98cc90cac2a0d5fe02b6eb098b65924a, type: 3}
+  - {fileID: 21300000, guid: 6aa51e3c5427b79ffe097ca3bf7a3483, type: 3}
+  - {fileID: 21300000, guid: 7e2809735ae1c6c21bae987f3278322c, type: 3}
+  - {fileID: 21300000, guid: df5813ece097a1b808b54d37c98c05ec, type: 3}
+  - {fileID: 21300000, guid: e0f78164243c78aa30cf3dca5c7ef024, type: 3}
+  - {fileID: 21300000, guid: 3369f83a627d9cbd29b6a262bb5ec6a9, type: 3}
+  - {fileID: 21300000, guid: 690a4dfe6f86878a1273883b425db4dc, type: 3}
+  - {fileID: 21300000, guid: a9d154af83d786f0b83360deff3f557b, type: 3}
+  - {fileID: 21300000, guid: e33dab80c1dad5f5258e021796a244a7, type: 3}
+  - {fileID: 21300000, guid: 84b204c577b393190cc1eda71835c7ad, type: 3}
+  - {fileID: 21300000, guid: 0d6a6214d320ae5de199bc229a790930, type: 3}
+  - {fileID: 21300000, guid: 80634c94418a617fee83a7dd2aafbd1d, type: 3}
+  - {fileID: 21300000, guid: c14e63c0d0d1287690ef17964fe47cc6, type: 3}
+  - {fileID: 21300000, guid: 417dda7d0c61ee9ad46130047d1ff0dd, type: 3}
+  - {fileID: 21300000, guid: 7948eb76f1162ab1d4e1c10253d64398, type: 3}
+  - {fileID: 21300000, guid: 2acd44fc6e27ce433d43c31da54ceefd, type: 3}
+  - {fileID: 21300000, guid: 1f0655aa90f8a4bfe70b3a21177ad744, type: 3}
+  - {fileID: 21300000, guid: b0b9360dafc5084cb3f4870c87fa4734, type: 3}
+  - {fileID: 21300000, guid: 1633be692d4eb9c4ab77c42a2cd3225e, type: 3}
+  - {fileID: 21300000, guid: 18729b908e75762e538316c52928cbaf, type: 3}
+  - {fileID: 21300000, guid: 9b39804a7dae2f8ffc997aac6352463a, type: 3}
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "<color=#93C5FD><b>UNIT 402 - THE ANDERSONS' APARTMENT.</b></color>\n\nThe door is cracked open two inches, held in place by a heavy brass security chain. Soft Chopin piano notes spill out into the gloomy hallway.\n\nA pale smear of dried blood runs down the doorframe."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "<color=#93C5FD><b>UNIT 402 - THE ANDERSONS' APARTMENT.</b></color> Chopin piano notes spill through the door gap."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Hello? Mr. Anderson? Are you in there? ...No answer. Just the record spinning."
+    outroNarration: "A pale smear of dried blood runs down the doorframe."
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Cut the Security Chain with Tools"
+    choiceSubtitle: "Sever the brass chain link and push the door open."
+    targetPassage: {fileID: 11400000, guid: c1102002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_402'
+    timeMinutesCost: 2
+    staminaCost: 4
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Return to Lower Hallway"
+    choiceSubtitle: "Step back into the dark corridor."
+    targetPassage: {fileID: 11400000, guid: a1103003b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_3'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
