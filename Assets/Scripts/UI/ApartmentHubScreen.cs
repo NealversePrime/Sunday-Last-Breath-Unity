@@ -7491,6 +7491,24 @@ namespace SundayLastBreath.UI
             {
                 SetLocation(passage.associatedRoomId, passage.passageTitle);
                 tacticalMapController?.DiscoverAdjacentRooms(passage.associatedRoomId);
+
+                // Spawn loose room items if any and room floor stash has not been initialized yet
+                if (passage.initialRoomItems != null && passage.initialRoomItems.Count > 0)
+                {
+                    if (!roomFloorStashes.ContainsKey(passage.associatedRoomId))
+                    {
+                        var stash = GetCurrentFloorStash();
+                        foreach (var itm in passage.initialRoomItems)
+                        {
+                            if (!string.IsNullOrEmpty(itm))
+                            {
+                                stash.Add(new InventoryEntry(itm, 1));
+                            }
+                        }
+                        UpdateFloorItemsNotification();
+                        tacticalGearController?.RefreshAll();
+                    }
+                }
             }
 
             // 6. Narrative text display
@@ -7576,7 +7594,19 @@ namespace SundayLastBreath.UI
             // Item loot / award
             if (!string.IsNullOrEmpty(choice.givesItem))
             {
-                GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                if (choice.dropDirectlyToFloor)
+                {
+                    var stash = GetCurrentFloorStash();
+                    var existing = stash.Find(e => e.itemId.Equals(choice.givesItem, StringComparison.OrdinalIgnoreCase));
+                    if (existing != null) existing.quantity += Mathf.Max(1, choice.givesItemQty);
+                    else stash.Add(new InventoryEntry(choice.givesItem, Mathf.Max(1, choice.givesItemQty)));
+                    UpdateFloorItemsNotification();
+                    tacticalGearController?.RefreshAll();
+                }
+                else
+                {
+                    GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                }
             }
 
             // Room / location transition
