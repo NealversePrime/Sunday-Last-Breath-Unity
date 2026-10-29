@@ -1,0 +1,282 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit407_Hub
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_407_hub
+  passageTitle: UNIT 407 // SAFEHOUSE
+  associatedRoomId: unit_407
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 10
+  musicAction: 1
+  backgroundMusicOrAmbience: {fileID: 8300000, guid: 818303d7eaf18a5499deb9372579a6be, type: 3}
+  musicVolume: 0.4
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "The robotic emergency broadcast cuts out. Cold static returns to the television screen.\n\n<color=#93C5FD><b>UNIT 407 - YOUR APARTMENT.</b></color> Through the thin plaster of the walls, you can hear it: the distant, overlapping chorus of emergency sirens echoing across the city.\n\nThe deadbolt on your front door is still thrown, but you can't stay here forever."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "The robotic emergency voice cuts out. Cold static returns to the TV.\n\nThrough the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Lethal force authorized... The Guard doesn't deploy for a standard riot. If they establish a quarantine cordon around this block, I'll be trapped here."
+    outroNarration: "The emergency broadcasts have fallen completely silent. The apartment is cold."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Check Smartphone"
+    choiceSubtitle: "Inspect incoming alerts, cell towers, and message logs."
+    targetPassage: {fileID: 0}
+    targetPassageId: ''
+    targetRoomId: ''
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: 'OPEN_PHONE_MODAL'
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Search Bathroom Medicine Cabinet"
+    choiceSubtitle: "Scavenge the mirror vanity for painkillers and bandages."
+    targetPassage: {fileID: 0}
+    targetPassageId: ''
+    targetRoomId: ''
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'searched_bathroom_407'
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'searched_bathroom_407'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: 'bandage'
+    givesItemQty: 2
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Search Front Closet"
+    choiceSubtitle: "Grab your heavy jacket and emergency supplies."
+    targetPassage: {fileID: 0}
+    targetPassageId: ''
+    targetRoomId: ''
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'searched_closet_407'
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'searched_closet_407'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: 'whiskey'
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Tune Police Radio Scanner"
+    choiceSubtitle: "Listen to emergency SPD dispatch frequencies. (Police, Tech 1, Tactics 5, or Radio Operator)"
+    targetPassage: {fileID: 0}
+    targetPassageId: ''
+    targetRoomId: ''
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'listened_radio_407'
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'listened_radio_407'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: 'OPEN_RADIO_MODAL'
+    requirementMode: 1
+    requiredStat: 'Tactics'
+    requiredStatValue: 5
+    requiredSkill: 'tech'
+    requiredSkillLevel: 1
+    requiredTrait: 'RADIO OPERATOR'
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Inspect Government Network Traffic [HACK]"
+    choiceSubtitle: "Exploit building network vulnerabilities to bypass defense protocols. (Tech 2, Tactics 6, or Gamer)"
+    targetPassage: {fileID: 0}
+    targetPassageId: ''
+    targetRoomId: ''
+    timeMinutesCost: 8
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'hacked_terminal_407'
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'hacked_terminal_407'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: 'OPEN_HACKING_MODAL'
+    requirementMode: 1
+    requiredStat: 'Tactics'
+    requiredStatValue: 6
+    requiredSkill: 'tech'
+    requiredSkillLevel: 2
+    requiredTrait: 'GAMER'
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Step Out into the Corridor"
+    choiceSubtitle: "Unlock the heavy deadbolt and slip into the 4th-floor hallway."
+    targetPassage: {fileID: 11400000, guid: 2d8facfab5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_1'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: "Videos/door_exit.mp4"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

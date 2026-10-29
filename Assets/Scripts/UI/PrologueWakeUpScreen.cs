@@ -62,6 +62,10 @@ namespace SundayLastBreath.UI
         [Tooltip("Optional MMF_Player for screen shake when the TV broadcast dies into static and jolts the player awake.")]
         [SerializeField] private MMF_Player screenShakeFeedback;
 
+        [Header("Modular Story Passage (Data-Driven Narrative)")]
+        [Tooltip("Optional StoryPassageData containing the narrative beats and choices. If unassigned, automatically loads from Resources or falls back to built-in text.")]
+        [SerializeField] private SundayLastBreath.Data.StoryPassageData prologuePassage;
+
         // Sequence State
         private int currentStep = 0;
         private bool isTyping = false;
@@ -70,6 +74,15 @@ namespace SundayLastBreath.UI
         private Coroutine typeRoutine;
         private Coroutine screenShakeRoutine;
         private float lastClickTime = -999f;
+
+        public string[] GetNarrativeSteps()
+        {
+            if (prologuePassage != null && prologuePassage.narrativeBeats != null && prologuePassage.narrativeBeats.Count > 0)
+            {
+                return prologuePassage.narrativeBeats.ToArray();
+            }
+            return NarrativeSteps;
+        }
 
         private static readonly string[] NarrativeSteps = new string[]
         {
@@ -163,6 +176,11 @@ namespace SundayLastBreath.UI
 
         public void StartPrologueSequence()
         {
+            if (prologuePassage == null)
+            {
+                prologuePassage = Resources.Load<SundayLastBreath.Data.StoryPassageData>("StoryPassages/Act1/Passage_Prologue_WakeUp");
+            }
+
             currentStep = 0;
             isTyping = false;
             isTransitioning = false;
@@ -284,10 +302,11 @@ namespace SundayLastBreath.UI
 
         private void AdvanceStep()
         {
-            if (currentStep >= NarrativeSteps.Length) return;
+            string[] steps = GetNarrativeSteps();
+            if (currentStep >= steps.Length) return;
 
             currentStep++;
-            currentFullText = NarrativeSteps[currentStep - 1];
+            currentFullText = steps[currentStep - 1];
 
             // Trigger narrative stage beats & audio cues
             ApplyBeatEffects(currentStep);
@@ -461,8 +480,9 @@ namespace SundayLastBreath.UI
         private void OnTypingComplete()
         {
             isTyping = false;
+            string[] steps = GetNarrativeSteps();
 
-            if (currentStep < NarrativeSteps.Length)
+            if (currentStep < steps.Length)
             {
                 if (continuePrompt != null) continuePrompt.SetActive(true);
             }

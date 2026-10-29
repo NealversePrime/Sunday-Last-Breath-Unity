@@ -123,6 +123,11 @@ namespace SundayLastBreath.UI
             SanitizeAllPhoneGlyphs();
             isNetworkDead = false;
 
+            if (SundayLastBreath.UI.ApartmentHubScreen.Instance != null && SundayLastBreath.UI.ApartmentHubScreen.Instance.CurrentPlayer != null)
+            {
+                SundayLastBreath.UI.ApartmentHubScreen.Instance.CurrentPlayer.SetFlag("checked_phone_harmon", true);
+            }
+
             // 1. Reset Feed Scroll to Top
             if (feedScrollRect != null)
             {

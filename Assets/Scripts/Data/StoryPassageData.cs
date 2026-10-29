@@ -4,6 +4,27 @@ using UnityEngine;
 
 namespace SundayLastBreath.Data
 {
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class StatDropdownAttribute : PropertyAttribute { }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class SkillDropdownAttribute : PropertyAttribute { }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class TraitDropdownAttribute : PropertyAttribute { }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class ItemDropdownAttribute : PropertyAttribute { }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class StoryFlagDropdownAttribute : PropertyAttribute { }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class TriggerActionDropdownAttribute : PropertyAttribute { }
+
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class RoomIdDropdownAttribute : PropertyAttribute { }
+
     public enum PassageMusicAction
     {
         [Tooltip("Don't change the music; keep whatever BGM is currently playing.")]
@@ -21,6 +42,14 @@ namespace SundayLastBreath.Data
         Job,
         Tech,
         Physical
+    }
+
+    public enum ChoiceRequirementMode
+    {
+        [Tooltip("All specified conditions (Stat, Skill, Trait, Item, Flag) must be satisfied.")]
+        AllMustBeMet,
+        [Tooltip("Fulfilling ANY one of the specified conditions (Stat OR Skill OR Trait OR Item) satisfies the requirement.")]
+        AnyCanBeMet
     }
 
     public enum DialogueSide
@@ -65,12 +94,22 @@ namespace SundayLastBreath.Data
         [TextArea(1, 3)]
         [Tooltip("Optional narrative text displayed below the dialogue card.")]
         public string outroNarration = "";
+
+        [Header("6. Conditional Visibility (Story Flags)")]
+        [Tooltip("If set, this dialogue line only displays if the player has this story flag (e.g. 'checked_phone_harmon').")]
+        [StoryFlagDropdown]
+        public string requiresStoryFlag = "";
+
+        [Tooltip("If set, this dialogue line only displays if the player DOES NOT have this story flag (e.g. 'checked_phone_harmon').")]
+        [StoryFlagDropdown]
+        public string requiresNotFlag = "";
     }
 
     [Serializable]
     public class PassageInitialItem
     {
         [Tooltip("Item ID from ItemDatabase, e.g. 'bandage', 'ammo_9mm', 'canned_food', 'lockpick', 'whiskey'.")]
+        [ItemDropdown]
         public string itemId = "bandage";
         [Tooltip("Quantity of items lying in this room.")]
         public int quantity = 1;
@@ -95,6 +134,7 @@ namespace SundayLastBreath.Data
 
         [Header("Location & Map Update")]
         [Tooltip("If set, selecting this choice updates player location, HUD sector title, and tactical map beacon (e.g. 'unit_408', 'hallway_1').")]
+        [RoomIdDropdown]
         public string targetRoomId = "";
 
         [Header("Resources & Time Cost")]
@@ -107,14 +147,61 @@ namespace SundayLastBreath.Data
         [Tooltip("HP damage received if action involves hazard or injury.")]
         public int healthCost = 0;
 
+        [Header("Conditional Availability (Flags & Requirements)")]
+        [Tooltip("If set, player must have this story flag to make this choice active/visible (e.g. 'checked_phone_harmon').")]
+        [StoryFlagDropdown]
+        public string requiresStoryFlag = "";
+
+        [Tooltip("If set, choice is unavailable/hidden if player HAS this story flag (e.g. 'room408_locked_out', 'room408_opened').")]
+        [StoryFlagDropdown]
+        public string requiresNotFlag = "";
+
+        [Tooltip("If true, completely hides the choice button if requirements (flags, stats, items) are not met. If false, shows disabled button with requirement text.")]
+        public bool hideWhenUnavailable = false;
+
+        [Header("Story Flag Consequences")]
+        [Tooltip("Story flag to set when this choice is executed (e.g. 'room408_opened', 'knows_basement_safe').")]
+        [StoryFlagDropdown]
+        public string setsStoryFlagOnExecute = "";
+
+        [Tooltip("Story flag to clear/remove when this choice is executed.")]
+        [StoryFlagDropdown]
+        public string clearsStoryFlagOnExecute = "";
+
+        [Header("Interactive Minigames & Special Triggers")]
+        [Tooltip("Special action ID triggered instead of standard immediate transition (e.g. 'OPEN_KEYPAD_MODAL').")]
+        [TriggerActionDropdown]
+        public string triggerActionId = "";
+
+        [Header("RPG Checks (M.O.R.T.A.L., Skills & Traits)")]
+        [Tooltip("If AnyCanBeMet, fulfilling ANY one requirement (Stat, Skill, Trait, or Item) allows this choice. If AllMustBeMet, ALL specified requirements must be met.")]
+        public ChoiceRequirementMode requirementMode = ChoiceRequirementMode.AllMustBeMet;
+
+        [Tooltip("Required attribute: 'Might'/'STR', 'Observation'/'PER', 'Tactics'/'INT', 'Reflex'/'AGI', 'Auspice'/'LCK', 'Leadership'/'CHA'. Leave empty for none.")]
+        [StatDropdown]
+        public string requiredStat = "";
+        public int requiredStatValue = 0;
+
+        [Tooltip("Required skill name (e.g. 'tech', 'melee', 'shooting', 'stealth', 'scavenging', 'survival', 'resolve'). Leave empty for none.")]
+        [SkillDropdown]
+        public string requiredSkill = "";
+        public int requiredSkillLevel = 0;
+
+        [Tooltip("Required trait name (e.g. 'LOCKSMITH', 'BURGLAR', 'BRAWN', 'HEAVY HITTER'). Leave empty for none.")]
+        [TraitDropdown]
+        public string requiredTrait = "";
+
         [Header("Item Requirements & Loot")]
         [Tooltip("Item ID required in inventory to enable this choice (e.g. 'crowbar', 'room407_keys'). Leave blank if none.")]
+        [ItemDropdown]
         public string requiredItem = "";
 
         [Tooltip("Item ID consumed/removed from inventory upon clicking (e.g. 'lockpick', 'ammo_9mm'). Leave blank if none.")]
+        [ItemDropdown]
         public string consumesItem = "";
 
         [Tooltip("Single item ID awarded to the player upon clicking (e.g. 'bandage', '9mm_ammo'). Drops to room floor if inventory is full.")]
+        [ItemDropdown]
         public string givesItem = "";
 
         [Tooltip("Quantity of item given.")]
@@ -191,6 +278,7 @@ namespace SundayLastBreath.Data
         public string passageTitle = "LOCATION TITLE";
 
         [Tooltip("Map Room ID on the Tactical Blueprint (e.g. 'unit_407', 'unit_408', 'hallway_1'). Auto-syncs player beacon.")]
+        [RoomIdDropdown]
         public string associatedRoomId = "";
 
         [Header("2. Visual Backdrop")]

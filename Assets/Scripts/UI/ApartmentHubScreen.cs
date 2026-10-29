@@ -186,6 +186,7 @@ namespace SundayLastBreath.UI
         [Header("Modal Overlays")]
         [SerializeField] private GameObject phoneModal;
         [SerializeField] private Button closePhoneButton;
+        [SerializeField] private KeypadPuzzleModal keypadModal;
         [SerializeField] private GameObject radioModal;
         [SerializeField] private Button closeRadioButton;
         [SerializeField] private GameObject hackingModal;
@@ -352,7 +353,11 @@ namespace SundayLastBreath.UI
         public bool PhoneVisited
         {
             get => phoneVisited;
-            set => phoneVisited = value;
+            set
+            {
+                phoneVisited = value;
+                if (value && currentPlayer != null) currentPlayer.SetFlag("checked_phone_harmon", true);
+            }
         }
 
         public bool RadioVisited
@@ -2585,12 +2590,33 @@ namespace SundayLastBreath.UI
             // 1. Hotkeys for Choice Selection (1-9) when in Narrative Choice Hub Mode
             if (currentConsoleMode == ConsoleMode.Narrative && hubMenuContainer != null && hubMenuContainer.activeInHierarchy)
             {
-                for (int i = 0; i < Mathf.Min(activeChoiceButtons.Count, 9); i++)
+                // When in stepped dialogue phase (modularDialogueBox is active), Space or Enter also advances the line!
+                bool spaceOrEnter = false;
+#if ENABLE_INPUT_SYSTEM
+                if (Keyboard.current != null)
                 {
-                    if (IsChoiceHotkeyPressed(i + 1))
+                    spaceOrEnter = Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.numpadEnterKey.wasPressedThisFrame;
+                }
+#endif
+#if !ENABLE_INPUT_SYSTEM || ENABLE_LEGACY_INPUT_MANAGER
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                {
+                    spaceOrEnter = true;
+                }
+#endif
+                if (spaceOrEnter && modularDialogueBox != null && modularDialogueBox.activeSelf && activeChoiceButtons.Count > 0)
+                {
+                    activeChoiceButtons[0].TriggerClick();
+                }
+                else
+                {
+                    for (int i = 0; i < Mathf.Min(activeChoiceButtons.Count, 9); i++)
                     {
-                        activeChoiceButtons[i].TriggerClick();
-                        break;
+                        if (IsChoiceHotkeyPressed(i + 1))
+                        {
+                            activeChoiceButtons[i].TriggerClick();
+                            break;
+                        }
                     }
                 }
             }
@@ -4177,6 +4203,7 @@ namespace SundayLastBreath.UI
             // Advance time +1 minute
             gameClock.AddTime(1);
             phoneVisited = true;
+            currentPlayer?.SetFlag("checked_phone_harmon", true);
 
             EnsureInspectionModalsEnhanced();
 
@@ -5359,7 +5386,13 @@ namespace SundayLastBreath.UI
             AppendStoryLog(gameClock.GetTimeString(), "RADIO // EMERGENCY POLICE DISPATCH",
                 "Emergency dispatch authorized unrestricted lethal force. Standard body shots are ineffective; neutralization requires destroying the brain. The Harborview medical perimeter has collapsed.");
 
+            if (currentPlayer != null)
+            {
+                currentPlayer.SetFlag("listened_radio_407", true);
+            }
+
             EvaluateHubButtonStates();
+            if (CurrentPassage != null) RenderPassageChoices(CurrentPassage);
         }
 
         private void OnHackTerminalClicked()
@@ -5541,8 +5574,14 @@ namespace SundayLastBreath.UI
             AppendStoryLog(gameClock.GetTimeString(), "TERMINAL // CLASSIFIED PASSKEY",
                 "Extracted emergency containment directives. Saved Tier-1 Emergency Access Clearance Passkey directly to my phone storage.");
 
+            if (currentPlayer != null)
+            {
+                currentPlayer.SetFlag("hacked_terminal_407", true);
+            }
+
             EvaluateHubButtonStates();
             RefreshAllPDAPanels();
+            if (CurrentPassage != null) RenderPassageChoices(CurrentPassage);
         }
 
         private void OnLeaveApartmentClicked()
@@ -7461,13 +7500,6 @@ namespace SundayLastBreath.UI
 
             SetApartmentButtonsVisible(false);
 
-            // Ensure situation box preferred height accommodates rich corridor narration
-            if (situationBox != null)
-            {
-                LayoutElement sle = situationBox.GetComponent<LayoutElement>();
-                if (sle != null) sle.preferredHeight = 110f;
-            }
-
             currentConsoleMode = ConsoleMode.Narrative;
             if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
 
@@ -7479,7 +7511,11 @@ namespace SundayLastBreath.UI
             // 2. Visual Backdrop
             if (!passage.keepPreviousBackdrop)
             {
-                if (passage.animatedBackdropFrames != null && passage.animatedBackdropFrames.Count > 0)
+                bool hasValidAnimFrames = passage.animatedBackdropFrames != null && 
+                                          passage.animatedBackdropFrames.Count > 0 && 
+                                          passage.animatedBackdropFrames.Exists(f => f != null);
+
+                if (hasValidAnimFrames)
                 {
                     if (stageBackdropImage != null)
                     {
@@ -7501,6 +7537,17 @@ namespace SundayLastBreath.UI
                         stageBackdropImage.enabled = true;
                         stageBackdropImage.sprite = passage.backdropSprite;
                         stageBackdropImage.color = Color.white;
+                    }
+                }
+                else
+                {
+                    if (stageBackdropImage != null)
+                    {
+                        var anim = stageBackdropImage.GetComponent<SundayLastBreath.UI.FrameAnimationPlayer>();
+                        if (anim != null) { anim.Stop(); anim.enabled = false; }
+                        // Never leave a null sprite with Color.white (prevents solid white screen!)
+                        stageBackdropImage.sprite = null;
+                        stageBackdropImage.color = new Color(0.04f, 0.045f, 0.06f, 1f);
                     }
                 }
             }
@@ -7562,7 +7609,8 @@ namespace SundayLastBreath.UI
             UpdateSituationBoxHeader(passage.passageTitle);
 
             // 6. Narrative text display, Beats & Dialogue
-            if (passage.dialogueLines != null && passage.dialogueLines.Count > 0)
+            currentActiveDialogueLines = GetActiveDialogueLines(passage);
+            if (currentActiveDialogueLines != null && currentActiveDialogueLines.Count > 0)
             {
                 currentPassageDialogueIndex = 0;
                 DisplayPassageDialogueLine(passage, 0);
@@ -7571,7 +7619,6 @@ namespace SundayLastBreath.UI
             {
                 if (modularDialogueBox != null) modularDialogueBox.SetActive(false);
                 if (modularAvatarAnimRoutine != null) { StopCoroutine(modularAvatarAnimRoutine); modularAvatarAnimRoutine = null; }
-                if (situationBox != null) situationBox.SetActive(true);
                 currentPassageBeatIndex = 0;
                 DisplayPassageBeat(passage, 0);
             }
@@ -7579,11 +7626,8 @@ namespace SundayLastBreath.UI
             {
                 if (modularDialogueBox != null) modularDialogueBox.SetActive(false);
                 if (modularAvatarAnimRoutine != null) { StopCoroutine(modularAvatarAnimRoutine); modularAvatarAnimRoutine = null; }
-                if (situationBox != null) situationBox.SetActive(true);
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = ParseMarkdown(passage.storyText);
-                }
+                UpdateSituationBoxTextAndHeight(ParseMarkdown(passage.storyText));
+                SetChoiceSubHeaderVisible(true);
                 RenderPassageChoices(passage);
             }
         }
@@ -7620,6 +7664,58 @@ namespace SundayLastBreath.UI
             }
         }
 
+        public void UpdateSituationBoxTextAndHeight(string formattedText)
+        {
+            if (situationBox == null) return;
+
+            if (string.IsNullOrEmpty(formattedText))
+            {
+                situationBox.SetActive(false);
+                return;
+            }
+
+            situationBox.SetActive(true);
+            if (situationBoxText != null)
+            {
+                situationBoxText.text = formattedText;
+                situationBoxText.ForceMeshUpdate();
+
+                // Dynamic height: TopRow is 26px + 4px offset, plus bottom padding of 6px
+                float preferredTextH = situationBoxText.preferredHeight;
+                float targetH = Mathf.Clamp(preferredTextH + 38f, 54f, 135f);
+
+                LayoutElement le = situationBox.GetComponent<LayoutElement>();
+                if (le != null)
+                {
+                    le.preferredHeight = targetH;
+                    le.minHeight = targetH;
+                    le.flexibleHeight = 0f;
+                }
+
+                RectTransform sbtRect = situationBoxText.rectTransform;
+                if (sbtRect != null)
+                {
+                    sbtRect.offsetMin = new Vector2(16f, 4f);
+                    sbtRect.offsetMax = new Vector2(-16f, -30f);
+                }
+            }
+        }
+
+        public void SetChoiceSubHeaderVisible(bool visible, string customText = null)
+        {
+            if (hubMenuContainer == null) return;
+            Transform sh = hubMenuContainer.transform.Find("ChoiceSubHeader");
+            if (sh != null)
+            {
+                sh.gameObject.SetActive(visible);
+                if (visible && !string.IsNullOrEmpty(customText))
+                {
+                    var tmp = sh.GetComponentInChildren<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = customText;
+                }
+            }
+        }
+
         private void EnsureModularDialogueBox()
         {
             if (modularDialogueBox != null) return;
@@ -7627,6 +7723,17 @@ namespace SundayLastBreath.UI
 
             modularDialogueBox = Instantiate(monologueBox, hubMenuContainer.transform, false);
             modularDialogueBox.name = "ModularDialogueBox";
+
+            RectTransform rt = modularDialogueBox.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                rt.anchorMin = new Vector2(0f, 1f);
+                rt.anchorMax = new Vector2(1f, 1f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.anchoredPosition = Vector2.zero;
+                rt.localPosition = Vector3.zero;
+                rt.sizeDelta = new Vector2(0f, 96f);
+            }
 
             Transform goldBarTr = modularDialogueBox.transform.Find("GoldBar");
             if (goldBarTr != null) modularDialogueGoldBar = goldBarTr.GetComponent<RectTransform>();
@@ -7643,12 +7750,22 @@ namespace SundayLastBreath.UI
             {
                 modularDialogueSpeechContainer = speechContTr.GetComponent<RectTransform>();
                 var tmps = speechContTr.GetComponentsInChildren<TextMeshProUGUI>();
-                if (tmps.Length > 0) modularDialogueSpeakerText = tmps[0];
-                if (tmps.Length > 1) modularDialogueSpeechText = tmps[1];
+                if (tmps.Length > 0)
+                {
+                    modularDialogueSpeakerText = tmps[0];
+                    modularDialogueSpeakerText.fontSize = 11.5f;
+                }
+                if (tmps.Length > 1)
+                {
+                    modularDialogueSpeechText = tmps[1];
+                    modularDialogueSpeechText.fontSize = 13.5f;
+                    modularDialogueSpeechText.lineSpacing = 3f;
+                }
             }
 
             LayoutElement le = modularDialogueBox.GetComponent<LayoutElement>() ?? modularDialogueBox.AddComponent<LayoutElement>();
-            le.preferredHeight = 90f;
+            le.preferredHeight = 96f;
+            le.minHeight = 96f;
             le.flexibleHeight = 0f;
             le.flexibleWidth = 1f;
 
@@ -7657,55 +7774,61 @@ namespace SundayLastBreath.UI
             modularDialogueBox.SetActive(false);
         }
 
+        private List<SundayLastBreath.Data.PassageDialogueLine> currentActiveDialogueLines = new List<SundayLastBreath.Data.PassageDialogueLine>();
+
+        private List<SundayLastBreath.Data.PassageDialogueLine> GetActiveDialogueLines(SundayLastBreath.Data.StoryPassageData passage)
+        {
+            var list = new List<SundayLastBreath.Data.PassageDialogueLine>();
+            if (passage == null || passage.dialogueLines == null) return list;
+
+            foreach (var line in passage.dialogueLines)
+            {
+                if (line == null) continue;
+                if (!string.IsNullOrEmpty(line.requiresStoryFlag))
+                {
+                    if (currentPlayer == null || !currentPlayer.HasFlag(line.requiresStoryFlag))
+                        continue;
+                }
+                if (!string.IsNullOrEmpty(line.requiresNotFlag))
+                {
+                    if (currentPlayer != null && currentPlayer.HasFlag(line.requiresNotFlag))
+                        continue;
+                }
+                list.Add(line);
+            }
+            return list;
+        }
+
         private void DisplayPassageDialogueLine(SundayLastBreath.Data.StoryPassageData passage, int lineIdx)
         {
             if (passage == null) return;
-            if (passage.dialogueLines == null || lineIdx >= passage.dialogueLines.Count)
+            if (currentActiveDialogueLines == null || lineIdx >= currentActiveDialogueLines.Count)
             {
-                if (modularDialogueBox != null) modularDialogueBox.SetActive(false);
-                if (modularAvatarAnimRoutine != null) { StopCoroutine(modularAvatarAnimRoutine); modularAvatarAnimRoutine = null; }
-                RenderPassageChoices(passage);
+                EndPassageDialogueAndShowChoices(passage);
                 return;
             }
 
             EnsureModularDialogueBox();
             if (modularDialogueBox == null)
             {
-                RenderPassageChoices(passage);
+                EndPassageDialogueAndShowChoices(passage);
                 return;
             }
 
-            var line = passage.dialogueLines[lineIdx];
+            var line = currentActiveDialogueLines[lineIdx];
 
-            // 1. Narration Above / Situation Box
-            string combinedNarration = "";
+            // 1. Narration Above (Situation Box) - Only display introNarration for this specific line (or storyText on line 0)
+            string currentNarration = "";
             if (!string.IsNullOrEmpty(line.introNarration))
             {
-                combinedNarration = ParseMarkdown(line.introNarration);
+                currentNarration = ParseMarkdown(line.introNarration);
             }
             else if (lineIdx == 0 && !string.IsNullOrEmpty(passage.storyText))
             {
-                combinedNarration = ParseMarkdown(passage.storyText);
+                currentNarration = ParseMarkdown(passage.storyText);
             }
 
-            if (!string.IsNullOrEmpty(line.outroNarration))
-            {
-                if (!string.IsNullOrEmpty(combinedNarration)) combinedNarration += "\n\n";
-                combinedNarration += $"<color=#94A3B8><i>{ParseMarkdown(line.outroNarration)}</i></color>";
-            }
-
-            if (situationBox != null)
-            {
-                if (!string.IsNullOrEmpty(combinedNarration))
-                {
-                    situationBox.SetActive(true);
-                    if (situationBoxText != null) situationBoxText.text = combinedNarration;
-                }
-                else
-                {
-                    situationBox.SetActive(false);
-                }
-            }
+            UpdateSituationBoxTextAndHeight(currentNarration);
 
             // 2. Activate Dialogue Box
             modularDialogueBox.SetActive(true);
@@ -7733,8 +7856,8 @@ namespace SundayLastBreath.UI
                 modularDialogueSpeechContainer.anchorMin = new Vector2(0f, 0f);
                 modularDialogueSpeechContainer.anchorMax = new Vector2(1f, 1f);
                 modularDialogueSpeechContainer.pivot = new Vector2(isRight ? 1f : 0f, 0.5f);
-                modularDialogueSpeechContainer.offsetMin = new Vector2(isRight ? 14f : 86f, 6f);
-                modularDialogueSpeechContainer.offsetMax = new Vector2(isRight ? -86f : -14f, -6f);
+                modularDialogueSpeechContainer.offsetMin = new Vector2(isRight ? 14f : 96f, 6f);
+                modularDialogueSpeechContainer.offsetMax = new Vector2(isRight ? -96f : -14f, -6f);
             }
 
             // 4. Speaker Text
@@ -7751,13 +7874,23 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 5. Speech Text
+            // 5. Speech Text & Dynamic Dialogue Box Height
             if (modularDialogueSpeechText != null)
             {
                 modularDialogueSpeechText.alignment = isRight ? TextAlignmentOptions.TopRight : TextAlignmentOptions.TopLeft;
                 string quote = ParseMarkdown(line.dialogueText);
                 if (!quote.StartsWith("\"")) quote = $"\"{quote}\"";
                 modularDialogueSpeechText.text = quote;
+                modularDialogueSpeechText.ForceMeshUpdate();
+
+                float speechH = modularDialogueSpeechText.preferredHeight;
+                float boxH = Mathf.Clamp(speechH + 34f, 86f, 115f);
+                LayoutElement le = modularDialogueBox.GetComponent<LayoutElement>();
+                if (le != null)
+                {
+                    le.preferredHeight = boxH;
+                    le.minHeight = boxH;
+                }
             }
 
             // 6. Avatar Setup & Animation
@@ -7794,20 +7927,53 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // 7. Navigation Choices
+            // 7. Navigation Flow: Single Stepped Continue Button (Hide Command Subheader)
+            SetChoiceSubHeaderVisible(false);
             ClearHallwayChoices();
-            if (lineIdx + 1 < passage.dialogueLines.Count)
+            SetHallwayChoice(0, "▶ Continue... <color=#94A3B8>[Click / Space / 1]</color>", () =>
             {
-                SetHallwayChoice(0, "▶ Continue... <color=#94A3B8>[Click / 1]</color>", () =>
-                {
-                    currentPassageDialogueIndex++;
-                    DisplayPassageDialogueLine(passage, currentPassageDialogueIndex);
-                });
+                AdvancePassageDialogue(passage, lineIdx);
+            });
+        }
+
+        private void AdvancePassageDialogue(SundayLastBreath.Data.StoryPassageData passage, int currentIdx)
+        {
+            if (passage == null) return;
+            if (currentActiveDialogueLines != null && currentIdx + 1 < currentActiveDialogueLines.Count)
+            {
+                currentPassageDialogueIndex = currentIdx + 1;
+                DisplayPassageDialogueLine(passage, currentPassageDialogueIndex);
             }
             else
             {
-                RenderPassageChoices(passage);
+                EndPassageDialogueAndShowChoices(passage);
             }
+        }
+
+        private void EndPassageDialogueAndShowChoices(SundayLastBreath.Data.StoryPassageData passage)
+        {
+            if (modularDialogueBox != null) modularDialogueBox.SetActive(false);
+            if (modularAvatarAnimRoutine != null) { StopCoroutine(modularAvatarAnimRoutine); modularAvatarAnimRoutine = null; }
+
+            // Display outro narration if available on the last line, otherwise room story text
+            string narrativeSummary = "";
+            if (currentActiveDialogueLines != null && currentActiveDialogueLines.Count > 0)
+            {
+                var lastLine = currentActiveDialogueLines[currentActiveDialogueLines.Count - 1];
+                if (!string.IsNullOrEmpty(lastLine.outroNarration))
+                {
+                    narrativeSummary = ParseMarkdown(lastLine.outroNarration);
+                }
+            }
+
+            if (string.IsNullOrEmpty(narrativeSummary) && !string.IsNullOrEmpty(passage.storyText))
+            {
+                narrativeSummary = ParseMarkdown(passage.storyText);
+            }
+
+            UpdateSituationBoxTextAndHeight(narrativeSummary);
+            SetChoiceSubHeaderVisible(true);
+            RenderPassageChoices(passage);
         }
 
         private IEnumerator AnimateModularDialogueAvatar(List<Sprite> frames, float fps)
@@ -7831,29 +7997,182 @@ namespace SundayLastBreath.UI
             if (passage == null) return;
             if (passage.narrativeBeats == null || beatIdx >= passage.narrativeBeats.Count)
             {
+                UpdateSituationBoxTextAndHeight(ParseMarkdown(passage.storyText));
+                SetChoiceSubHeaderVisible(true);
                 RenderPassageChoices(passage);
                 return;
             }
 
-            if (situationBoxText != null)
-            {
-                situationBoxText.text = ParseMarkdown(passage.narrativeBeats[beatIdx]);
-            }
-
+            UpdateSituationBoxTextAndHeight(ParseMarkdown(passage.narrativeBeats[beatIdx]));
+            SetChoiceSubHeaderVisible(false);
             ClearHallwayChoices();
 
-            if (beatIdx + 1 < passage.narrativeBeats.Count)
+            SetHallwayChoice(0, "▶ Continue... <color=#94A3B8>[Click / Space / 1]</color>", () =>
             {
-                SetHallwayChoice(0, "▶ Continue... <color=#94A3B8>[Click / 1]</color>", () =>
+                if (beatIdx + 1 < passage.narrativeBeats.Count)
                 {
-                    currentPassageBeatIndex++;
+                    currentPassageBeatIndex = beatIdx + 1;
                     DisplayPassageBeat(passage, currentPassageBeatIndex);
-                });
-            }
-            else
+                }
+                else
+                {
+                    UpdateSituationBoxTextAndHeight(ParseMarkdown(passage.storyText));
+                    SetChoiceSubHeaderVisible(true);
+                    RenderPassageChoices(passage);
+                }
+            });
+        }
+
+        private bool EvaluateChoiceRequirements(
+            SundayLastBreath.Data.PassageChoiceData choice,
+            out bool meetsRequirements,
+            out string requirementNote)
+        {
+            meetsRequirements = true;
+            requirementNote = "";
+
+            if (choice == null) return true;
+
+            // 1. Mandatory Story Flag Checks
+            if (!string.IsNullOrEmpty(choice.requiresStoryFlag))
             {
-                // Final beat reached: reveal interactive player choices!
-                RenderPassageChoices(passage);
+                bool hasFlag = currentPlayer != null && currentPlayer.HasFlag(choice.requiresStoryFlag);
+                if (!hasFlag)
+                {
+                    if (choice.hideWhenUnavailable)
+                    {
+                        // Completely hide this choice if player hasn't discovered the prerequisite
+                        return false;
+                    }
+                    meetsRequirements = false;
+                    requirementNote = $"[Req: {choice.requiresStoryFlag}]";
+                }
+            }
+
+            if (!string.IsNullOrEmpty(choice.requiresNotFlag))
+            {
+                bool hasProhibitedFlag = currentPlayer != null && currentPlayer.HasFlag(choice.requiresNotFlag);
+                if (hasProhibitedFlag)
+                {
+                    if (choice.hideWhenUnavailable)
+                    {
+                        return false;
+                    }
+                    meetsRequirements = false;
+                    requirementNote = "[Locked Out]";
+                }
+            }
+
+            // 2. Individual RPG & Item Checks
+            bool hasItemReq = !string.IsNullOrEmpty(choice.requiredItem);
+            bool meetsItem = !hasItemReq || (currentPlayer != null && (currentPlayer.HasItem(choice.requiredItem) || currentPlayer.HasKeyItem(choice.requiredItem)));
+
+            bool hasStatReq = !string.IsNullOrEmpty(choice.requiredStat) && choice.requiredStatValue > 0;
+            bool meetsStat = !hasStatReq || (currentPlayer != null && GetPlayerAttributeValue(choice.requiredStat) >= choice.requiredStatValue);
+
+            bool hasSkillReq = !string.IsNullOrEmpty(choice.requiredSkill) && choice.requiredSkillLevel > 0;
+            bool meetsSkill = !hasSkillReq || (currentPlayer != null && GetPlayerSkillLevel(choice.requiredSkill) >= choice.requiredSkillLevel);
+
+            bool hasTraitReq = !string.IsNullOrEmpty(choice.requiredTrait);
+            bool meetsTrait = !hasTraitReq || (currentPlayer != null && (
+                currentPlayer.HasTrait(choice.requiredTrait) ||
+                string.Equals(currentPlayer.job, choice.requiredTrait, StringComparison.OrdinalIgnoreCase) ||
+                (choice.requiredTrait.IndexOf("RADIO", StringComparison.OrdinalIgnoreCase) >= 0 && string.Equals(currentPlayer.job, "Police Officer", StringComparison.OrdinalIgnoreCase))
+            ));
+
+            List<string> reqLabels = new List<string>();
+            if (hasItemReq)
+            {
+                var def = SundayLastBreath.Data.ItemDatabase.GetDefinition(choice.requiredItem);
+                reqLabels.Add(def != null ? def.displayName : choice.requiredItem);
+            }
+            if (hasStatReq)
+            {
+                reqLabels.Add($"{choice.requiredStat.ToUpperInvariant()} {choice.requiredStatValue}");
+            }
+            if (hasSkillReq)
+            {
+                reqLabels.Add($"{choice.requiredSkill.ToUpperInvariant()} {choice.requiredSkillLevel}");
+            }
+            if (hasTraitReq)
+            {
+                reqLabels.Add(choice.requiredTrait.ToUpperInvariant());
+            }
+
+            bool hasAnyDefinedRequirement = reqLabels.Count > 0;
+
+            if (choice.requirementMode == SundayLastBreath.Data.ChoiceRequirementMode.AnyCanBeMet && hasAnyDefinedRequirement)
+            {
+                // Player needs ANY ONE of Item, Stat, Skill, or Trait
+                bool anyMet = (hasItemReq && meetsItem) ||
+                              (hasStatReq && meetsStat) ||
+                              (hasSkillReq && meetsSkill) ||
+                              (hasTraitReq && meetsTrait);
+
+                if (!anyMet)
+                {
+                    if (choice.hideWhenUnavailable) return false;
+                    meetsRequirements = false;
+                    requirementNote = $"[Req: {string.Join(" or ", reqLabels)}]";
+                }
+            }
+            else if (hasAnyDefinedRequirement)
+            {
+                // AllMustBeMet
+                if (!meetsItem || !meetsStat || !meetsSkill || !meetsTrait)
+                {
+                    if (choice.hideWhenUnavailable) return false;
+                    meetsRequirements = false;
+                    requirementNote = $"[Req: {string.Join(", ", reqLabels)}]";
+                }
+            }
+
+            return true; // Visible in UI
+        }
+
+        private int GetPlayerAttributeValue(string statName)
+        {
+            if (currentPlayer == null || string.IsNullOrEmpty(statName)) return 0;
+            switch (statName.ToUpperInvariant())
+            {
+                case "STR":
+                case "MIGHT":
+                    return currentPlayer.str;
+                case "PER":
+                case "OBSERVATION":
+                    return currentPlayer.per;
+                case "AGI":
+                case "REFLEX":
+                    return currentPlayer.agi;
+                case "INT":
+                case "INTL":
+                case "TACTICS":
+                    return currentPlayer.intl;
+                case "LCK":
+                case "AUSPICE":
+                    return currentPlayer.lck;
+                case "CHA":
+                case "LEADERSHIP":
+                    return currentPlayer.cha;
+                default:
+                    return 0;
+            }
+        }
+
+        private int GetPlayerSkillLevel(string skillName)
+        {
+            if (currentPlayer == null || string.IsNullOrEmpty(skillName)) return 0;
+            switch (skillName.ToLowerInvariant())
+            {
+                case "tech": return currentPlayer.tech;
+                case "shooting": return currentPlayer.shooting;
+                case "melee": return currentPlayer.melee;
+                case "stealth": return currentPlayer.stealth;
+                case "medicine": return currentPlayer.medicine;
+                case "scavenging": return currentPlayer.scavenging;
+                case "survival": return currentPlayer.survival;
+                case "resolve": return currentPlayer.resolve;
+                default: return 0;
             }
         }
 
@@ -7863,10 +8182,17 @@ namespace SundayLastBreath.UI
 
             if (passage == null || passage.choices == null) return;
 
+            int visibleBtnIndex = 0;
             for (int i = 0; i < passage.choices.Count; i++)
             {
                 var choice = passage.choices[i];
-                int btnIndex = i;
+
+                // Evaluate visibility and requirements
+                if (!EvaluateChoiceRequirements(choice, out bool meetsReq, out string reqNote))
+                {
+                    // Choice is hidden (e.g. phone code option before player has checked phone!)
+                    continue;
+                }
 
                 string fullLabel = choice.choiceLabel;
                 if (!string.IsNullOrEmpty(choice.choiceSubtitle))
@@ -7874,21 +8200,14 @@ namespace SundayLastBreath.UI
                     fullLabel += $" <color=#94A3B8>- {choice.choiceSubtitle}</color>";
                 }
 
-                // Check requirement
-                bool meetsReq = true;
-                if (!string.IsNullOrEmpty(choice.requiredItem))
+                if (!meetsReq && !string.IsNullOrEmpty(reqNote))
                 {
-                    meetsReq = currentPlayer != null && currentPlayer.HasItem(choice.requiredItem);
-                    if (!meetsReq)
-                    {
-                        var def = SundayLastBreath.Data.ItemDatabase.GetDefinition(choice.requiredItem);
-                        string itemTitle = def != null ? def.displayName : choice.requiredItem;
-                        fullLabel += $" <color=#EF4444>[Req: {itemTitle}]</color>";
-                    }
+                    fullLabel += $" <color=#EF4444>{reqNote}</color>";
                 }
 
                 Color? accentColor = choice.isBackButton ? new Color(0.6f, 0.65f, 0.7f) : (Color?)null;
 
+                int btnIndex = visibleBtnIndex++;
                 SetHallwayChoice(btnIndex, fullLabel, () =>
                 {
                     ExecutePassageChoice(choice);
@@ -7929,6 +8248,44 @@ namespace SundayLastBreath.UI
             {
                 currentPlayer.RemoveItem(choice.consumesItem, 1);
                 tacticalGearController?.RefreshAll();
+            }
+
+            // Story Flags consequence
+            if (!string.IsNullOrEmpty(choice.setsStoryFlagOnExecute) && currentPlayer != null)
+            {
+                currentPlayer.SetFlag(choice.setsStoryFlagOnExecute, true);
+            }
+            if (!string.IsNullOrEmpty(choice.clearsStoryFlagOnExecute) && currentPlayer != null)
+            {
+                currentPlayer.SetFlag(choice.clearsStoryFlagOnExecute, false);
+            }
+
+            // Special interactive minigames / triggers
+            if (!string.IsNullOrEmpty(choice.triggerActionId))
+            {
+                if (string.Equals(choice.triggerActionId, "OPEN_KEYPAD_MODAL", StringComparison.OrdinalIgnoreCase))
+                {
+                    OpenKeypadPuzzleModal(choice);
+                    return;
+                }
+                else if (string.Equals(choice.triggerActionId, "OPEN_PHONE_MODAL", StringComparison.OrdinalIgnoreCase))
+                {
+                    OnCheckPhoneClicked();
+                    if (CurrentPassage != null) RenderPassageChoices(CurrentPassage);
+                    return;
+                }
+                else if (string.Equals(choice.triggerActionId, "OPEN_RADIO_MODAL", StringComparison.OrdinalIgnoreCase))
+                {
+                    OnListenRadioClicked();
+                    if (CurrentPassage != null) RenderPassageChoices(CurrentPassage);
+                    return;
+                }
+                else if (string.Equals(choice.triggerActionId, "OPEN_HACKING_MODAL", StringComparison.OrdinalIgnoreCase))
+                {
+                    OnHackTerminalClicked();
+                    if (CurrentPassage != null) RenderPassageChoices(CurrentPassage);
+                    return;
+                }
             }
 
             // Item loot / award (single item)
@@ -8004,6 +8361,68 @@ namespace SundayLastBreath.UI
                     PlayStoryPassage(choice.targetPassage);
                 }
             }
+            else if (choice.successPassage == null && choice.failurePassage == null && CurrentPassage != null)
+            {
+                // Remained on same passage (e.g. searched closet/cabinet, acquired items, toggled flags)
+                RenderPassageChoices(CurrentPassage);
+            }
+        }
+
+        private void OpenKeypadPuzzleModal(SundayLastBreath.Data.PassageChoiceData choice)
+        {
+            if (keypadModal == null)
+            {
+                keypadModal = GetComponentInChildren<KeypadPuzzleModal>(true);
+                if (keypadModal == null)
+                {
+                    Canvas canvas = GetComponentInParent<Canvas>();
+                    if (canvas == null) canvas = FindAnyObjectByType<Canvas>();
+                    GameObject kpObj = new GameObject("KeypadPuzzleModal", typeof(RectTransform));
+                    if (canvas != null) kpObj.transform.SetParent(canvas.transform, false);
+                    keypadModal = kpObj.AddComponent<KeypadPuzzleModal>();
+                }
+            }
+
+            keypadModal.OpenKeypad(
+                onUnlocked: () =>
+                {
+                    if (currentPlayer != null)
+                    {
+                        currentPlayer.SetFlag("room408_opened", true);
+                    }
+                    room408_opened = true;
+                    PlayClickSFX();
+
+                    if (choice != null && choice.targetPassage != null)
+                    {
+                        if (choice.transitionVideo != null || !string.IsNullOrEmpty(choice.transitionVideoPath))
+                        {
+                            StartCoroutine(PlayPassageVideoTransition(choice, choice.targetPassage));
+                        }
+                        else
+                        {
+                            PlayStoryPassage(choice.targetPassage);
+                        }
+                    }
+                },
+                onLockedOut: () =>
+                {
+                    if (currentPlayer != null)
+                    {
+                        currentPlayer.SetFlag("room408_locked_out", true);
+                    }
+                    room408_locked_out = true;
+                    PlayBeepSFX();
+                    if (CurrentPassage != null)
+                    {
+                        RenderPassageChoices(CurrentPassage);
+                    }
+                },
+                onCancelled: () =>
+                {
+                    PlayClickSFX();
+                }
+            );
         }
 
         private IEnumerator PlayPassageVideoTransition(SundayLastBreath.Data.PassageChoiceData choice, SundayLastBreath.Data.StoryPassageData targetPassage)
@@ -8460,5 +8879,14 @@ namespace SundayLastBreath.UI
             AudioManager.Instance?.PlayButtonHover();
         }
         #endregion
+    }
+
+    /// <summary>
+    /// Type alias for ApartmentHubScreen representing the Master Main Game Screen for Act 1.
+    /// Manages the visual stage, HUD vitals, PDA console tabs, and all modular story passages.
+    /// </summary>
+    [AddComponentMenu("Sunday's Last Breath/Main Game Screen")]
+    public class MainGameScreen : ApartmentHubScreen
+    {
     }
 }

@@ -82,6 +82,8 @@ MonoBehaviour:
     avatarFPS: 8
     dialogueText: "They scrubbed this place down with bleach before they vanished. That first aid kit on the table has sterile gauze and hospital-grade painkillers."
     outroNarration: "The turntable needle scratches at the end of the groove."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "Take Medical Kit from Table"
@@ -92,6 +94,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''
@@ -124,6 +138,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''

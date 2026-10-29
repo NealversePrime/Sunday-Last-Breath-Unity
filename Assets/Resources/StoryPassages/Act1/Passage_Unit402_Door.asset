@@ -62,6 +62,8 @@ MonoBehaviour:
     avatarFPS: 8
     dialogueText: "Hello? Mr. Anderson? Are you in there? ...No answer. Just the record spinning."
     outroNarration: "A pale smear of dried blood runs down the doorframe."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "Cut the Security Chain with Tools"
@@ -72,6 +74,18 @@ MonoBehaviour:
     timeMinutesCost: 2
     staminaCost: 4
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''
@@ -100,6 +114,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''

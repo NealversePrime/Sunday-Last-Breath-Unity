@@ -82,6 +82,8 @@ MonoBehaviour:
     avatarFPS: 8
     dialogueText: "He definitely knew something was coming. The entire desk is covered in emergency frequency notes. I should grab whatever medical supplies and rations he left behind."
     outroNarration: "Blueprints for the city's power grid are scattered across the drafting table."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "Scavenge Harmon's Desk"
@@ -92,6 +94,18 @@ MonoBehaviour:
     timeMinutesCost: 2
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''
@@ -124,6 +138,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''

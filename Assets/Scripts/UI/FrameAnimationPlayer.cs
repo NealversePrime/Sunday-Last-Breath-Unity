@@ -116,13 +116,16 @@ namespace SundayLastBreath.UI
                 return;
 
             Sprite currentSprite = frames[currentFrameIndex];
-            if (targetImage != null)
+            if (currentSprite != null)
             {
-                targetImage.sprite = currentSprite;
-            }
-            else if (targetRawImage != null && currentSprite != null)
-            {
-                targetRawImage.texture = currentSprite.texture;
+                if (targetImage != null)
+                {
+                    targetImage.sprite = currentSprite;
+                }
+                else if (targetRawImage != null)
+                {
+                    targetRawImage.texture = currentSprite.texture;
+                }
             }
         }
     }

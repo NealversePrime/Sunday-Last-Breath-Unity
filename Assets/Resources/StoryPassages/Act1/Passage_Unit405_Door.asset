@@ -62,6 +62,8 @@ MonoBehaviour:
     avatarFPS: 8
     dialogueText: "Tripwire at ankle height. Classic Marcus. If I kicked this door, that shotgun charge would have taken my leg off. I need to disarm it carefully."
     outroNarration: "A monofilament wire is stretched taut across the threshold."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "Carefully Disarm the Tripwire"
@@ -72,6 +74,18 @@ MonoBehaviour:
     timeMinutesCost: 2
     staminaCost: 5
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''
@@ -100,6 +114,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''

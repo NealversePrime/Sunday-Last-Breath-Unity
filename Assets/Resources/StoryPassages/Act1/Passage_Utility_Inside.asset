@@ -82,6 +82,8 @@ MonoBehaviour:
     avatarFPS: 8
     dialogueText: "Jackpot. Heavy flashlight with fresh D-cells, plus reinforced duct tape. This flashlight will illuminate the stairwell all the way down."
     outroNarration: "A yellow mop bucket is overturned in the corner."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "Take Flashlight & Duct Tape"
@@ -92,6 +94,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''
@@ -124,6 +138,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''

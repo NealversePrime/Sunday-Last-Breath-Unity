@@ -148,6 +148,36 @@ namespace SundayLastBreath.Data
         [Header("Key Items & Important Valuables (RE4 Style — 0 Bag Slots)")]
         public List<KeyItemEntry> keyItems = new List<KeyItemEntry>();
 
+        [Header("Story Flags & Switches")]
+        public List<string> storyFlags = new List<string>();
+
+        public bool HasFlag(string flag)
+        {
+            if (string.IsNullOrEmpty(flag) || storyFlags == null) return false;
+            return storyFlags.Exists(f => string.Equals(f, flag, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void SetFlag(string flag, bool state = true)
+        {
+            if (string.IsNullOrEmpty(flag)) return;
+            if (storyFlags == null) storyFlags = new List<string>();
+
+            int idx = storyFlags.FindIndex(f => string.Equals(f, flag, StringComparison.OrdinalIgnoreCase));
+            if (state)
+            {
+                if (idx < 0) storyFlags.Add(flag);
+            }
+            else
+            {
+                if (idx >= 0) storyFlags.RemoveAt(idx);
+            }
+        }
+
+        public void ToggleFlag(string flag)
+        {
+            SetFlag(flag, !HasFlag(flag));
+        }
+
         /// <summary>
         /// Calculates the total number of tactical backpack slots used (accounting for 1-slot and 2-slot bulky items).
         /// Key items and quest items take 0 slots.
@@ -181,6 +211,8 @@ namespace SundayLastBreath.Data
 
         public bool HasTrait(string name)
         {
+            if (string.IsNullOrEmpty(name)) return false;
+            if (!string.IsNullOrEmpty(job) && string.Equals(job, name, StringComparison.OrdinalIgnoreCase)) return true;
             return traits.Exists(t => t.name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 

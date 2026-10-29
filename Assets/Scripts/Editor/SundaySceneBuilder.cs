@@ -494,7 +494,7 @@ namespace SundayLastBreath.Editor
 
                 private static ApartmentHubScreen BuildApartmentHubScreen(Transform parent)
         {
-            GameObject obj = new GameObject("ApartmentHubScreen", typeof(RectTransform));
+            GameObject obj = new GameObject("MainGameScreen", typeof(RectTransform));
             obj.transform.SetParent(parent, false);
             RectTransform rootRect = obj.GetComponent<RectTransform>();
             StretchFull(rootRect);
@@ -1173,6 +1173,7 @@ namespace SundayLastBreath.Editor
                 11.5f, new Color(0.82f, 0.86f, 0.92f), TextAlignmentOptions.TopLeft, FontStyles.Italic);
             sitBodyTmp.lineSpacing = 2.5f;
             sitBodyTmp.textWrappingMode = TextWrappingModes.Normal;
+            sitBodyTmp.overflowMode = TextOverflowModes.Masking;
             RectTransform sbtRect = sitBodyTmp.rectTransform;
             sbtRect.anchorMin = new Vector2(0f, 0f); sbtRect.anchorMax = new Vector2(1f, 1f);
             sbtRect.offsetMin = new Vector2(16f, 4f);

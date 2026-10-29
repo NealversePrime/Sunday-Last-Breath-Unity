@@ -272,6 +272,26 @@ namespace SundayLastBreath.Data
             };
         }
 
+        /// <summary>
+        /// Returns all registered item definitions.
+        /// </summary>
+        public static Dictionary<string, ItemDefinition> GetAllDefinitions()
+        {
+            InitializeDefinitions();
+            return new Dictionary<string, ItemDefinition>(_itemDefinitions, StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Returns a sorted list of all unique registered item IDs.
+        /// </summary>
+        public static List<string> GetAllItemIds()
+        {
+            InitializeDefinitions();
+            var list = new List<string>(_itemDefinitions.Keys);
+            list.Sort(StringComparer.OrdinalIgnoreCase);
+            return list;
+        }
+
         public static string GetCategoryTag(ItemCategory cat)
         {
             switch (cat)

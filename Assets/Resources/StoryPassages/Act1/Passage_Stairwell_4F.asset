@@ -82,6 +82,8 @@ MonoBehaviour:
     avatarFPS: 8
     dialogueText: "Fire door is latched. No going back to the 4th floor now. The stairs lead all the way down to the 2nd floor and the ground lobby. Keep your eyes open."
     outroNarration: "Cold drafts and the low hum of a failing generator rise from the depths below."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "Descend the Stairs toward 2nd Floor"
@@ -92,6 +94,18 @@ MonoBehaviour:
     timeMinutesCost: 3
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''

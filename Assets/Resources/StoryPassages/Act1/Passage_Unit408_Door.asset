@@ -80,18 +80,42 @@ MonoBehaviour:
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "Harmon texted me the emergency passcode earlier: 8-4-4-5. Let's see if the keypad's backup battery is still alive."
+    dialogueText: "Harmon texted me the emergency passcode earlier: 8-4-6-5. Let's see if the keypad's backup battery is still alive."
     outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+    requiresStoryFlag: 'checked_phone_harmon'
+    requiresNotFlag: ''
+  - introNarration: "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "A heavy electronic deadbolt seals Harmon's door. Total silence inside... I don't know his code, but maybe I can deduce it from the worn keys, bypass the latch, or force it open."
+    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+    requiresStoryFlag: ''
+    requiresNotFlag: 'checked_phone_harmon'
   initialFloorItems: []
   choices:
-  - choiceLabel: "Enter the code from your phone (8445)"
-    choiceSubtitle: "Type Harmon's passcode into the pulsing electronic keypad."
+  - choiceLabel: "Enter passcode from phone (8465)"
+    choiceSubtitle: "Type Harmon's emergency passcode into the pulsing electronic keypad."
     targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
     targetPassageId: ''
     targetRoomId: 'unit_408'
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: 'checked_phone_harmon'
+    requiresNotFlag: ''
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'room408_opened'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''
@@ -112,7 +136,127 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "▲ Return to Upper Hallway"
+  - choiceLabel: "Enter passcode manually (Keypad Minigame)"
+    choiceSubtitle: "Inspect the worn electronic keypad. 3 attempts before security lockout."
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_408'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'room408_locked_out'
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: 'OPEN_KEYPAD_MODAL'
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 32900000, guid: 2a97efa723e746cdbf04e4ce829d482c, type: 3}
+    transitionVideoPath: "Videos/door_408_enter.mp4"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Bypass electronic latch [HACK / LOCKPICK]"
+    choiceSubtitle: "Disassemble the circuit or exploit mechanical failsafe. (INT 6, Tech 2, Locksmith, Burglar, or Multi-Tool)"
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_408'
+    timeMinutesCost: 3
+    staminaCost: 7
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'room408_opened'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 1
+    requiredStat: 'Tactics'
+    requiredStatValue: 6
+    requiredSkill: 'tech'
+    requiredSkillLevel: 2
+    requiredTrait: 'LOCKSMITH'
+    requiredItem: 'Multi-Tool'
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 32900000, guid: 2a97efa723e746cdbf04e4ce829d482c, type: 3}
+    transitionVideoPath: "Videos/door_408_enter.mp4"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Force the door frame [BRUTE FORCE]"
+    choiceSubtitle: "Lever the strike plate or batter the heavy deadbolt. (STR 6, Brawn, or Crowbar)"
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_408'
+    timeMinutesCost: 3
+    staminaCost: 15
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'room408_opened'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 1
+    requiredStat: 'Might'
+    requiredStatValue: 6
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: 'BRAWN'
+    requiredItem: 'crowbar'
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 32900000, guid: 2a97efa723e746cdbf04e4ce829d482c, type: 3}
+    transitionVideoPath: "Videos/door_408_enter.mp4"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Return to Upper Hallway"
     choiceSubtitle: "Step back into the corridor."
     targetPassage: {fileID: 11400000, guid: 3d8ebf1e8e3258543b88026777e8d1d7, type: 2}
     targetPassageId: ''
@@ -120,6 +264,18 @@ MonoBehaviour:
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
     requiredItem: ''
     consumesItem: ''
     givesItem: ''

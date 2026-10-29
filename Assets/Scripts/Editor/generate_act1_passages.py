@@ -41,6 +41,8 @@ GUID_FIREDOOR_SLAM = "421b0a9a95a97d241b55c3ff4ac54d05"
 GUID_DOOR_408_VIDEO = "2a97efa723e746cdbf04e4ce829d482c"
 
 passages_meta = {
+    "Passage_Prologue_WakeUp": "01100001b5696ff4eada863cecea8452",
+    "Passage_Unit407_Hub": "40700001b5696ff4eada863cecea8452",
     "Passage_Hallway_1": "3d8ebf1e8e3258543b88026777e8d1d7",
     "Passage_Hallway_North": "2d8facfab5696ff4eada863cecea8452",
     "Passage_Hallway_2": "a1102002b5696ff4eada863cecea8452",
@@ -96,6 +98,13 @@ def build_passage_yaml(p):
     fps = p.get("fps", 10)
     
     story_text = escape_yaml_string(p.get("storyText", ""))
+
+    # Narrative beats
+    beats = p.get("narrativeBeats", [])
+    if beats:
+        beats_yaml = "  narrativeBeats:\n" + "\n".join([f"  - {escape_yaml_string(b)}" for b in beats])
+    else:
+        beats_yaml = "  narrativeBeats: []"
     
     # Dialogue lines
     lines = p.get("dialogueLines", [])
@@ -104,6 +113,8 @@ def build_passage_yaml(p):
         for l in lines:
             avatar_guid = l.get("avatar_guid", "")
             avatar_yaml = f"{{fileID: 21300000, guid: {avatar_guid}, type: 3}}" if avatar_guid else "{fileID: 0}"
+            req_d_flag = l.get("requiresStoryFlag", "")
+            req_d_not_flag = l.get("requiresNotFlag", "")
             dl_yaml += f"""  - introNarration: {escape_yaml_string(l.get("introNarration", ""))}
     speakerName: {escape_yaml_string(l.get("speakerName", "YOU"))}
     side: {l.get("side", 0)}
@@ -112,6 +123,8 @@ def build_passage_yaml(p):
     avatarFPS: 8
     dialogueText: {escape_yaml_string(l.get("dialogueText", ""))}
     outroNarration: {escape_yaml_string(l.get("outroNarration", ""))}
+    requiresStoryFlag: '{req_d_flag}'
+    requiresNotFlag: '{req_d_not_flag}'
 """
     else:
         dl_yaml = "  dialogueLines: []\n"
@@ -130,6 +143,20 @@ def build_passage_yaml(p):
             time_cost = c.get("timeMinutesCost", 1)
             stamina_cost = c.get("staminaCost", 0)
             
+            # Requirements & Flags
+            req_flag = c.get("requiresStoryFlag", "")
+            req_not_flag = c.get("requiresNotFlag", "")
+            hide_unavail = 1 if c.get("hideWhenUnavailable", False) else 0
+            set_flag = c.get("setsStoryFlagOnExecute", "")
+            clear_flag = c.get("clearsStoryFlagOnExecute", "")
+            trig_action = c.get("triggerActionId", "")
+            req_mode = c.get("requirementMode", 0) # 0: AllMustBeMet, 1: AnyCanBeMet
+            req_stat = c.get("requiredStat", "")
+            req_stat_val = c.get("requiredStatValue", 0)
+            req_skill = c.get("requiredSkill", "")
+            req_skill_lvl = c.get("requiredSkillLevel", 0)
+            req_trait = c.get("requiredTrait", "")
+
             # Loot
             loot_list = c.get("givesLootList", [])
             drop_floor = 1 if c.get("dropLootDirectlyToFloor", False) else 0
@@ -146,6 +173,18 @@ def build_passage_yaml(p):
     timeMinutesCost: {time_cost}
     staminaCost: {stamina_cost}
     healthCost: 0
+    requiresStoryFlag: '{req_flag}'
+    requiresNotFlag: '{req_not_flag}'
+    hideWhenUnavailable: {hide_unavail}
+    setsStoryFlagOnExecute: '{set_flag}'
+    clearsStoryFlagOnExecute: '{clear_flag}'
+    triggerActionId: '{trig_action}'
+    requirementMode: {req_mode}
+    requiredStat: '{req_stat}'
+    requiredStatValue: {req_stat_val}
+    requiredSkill: '{req_skill}'
+    requiredSkillLevel: {req_skill_lvl}
+    requiredTrait: '{req_trait}'
     requiredItem: '{c.get("requiredItem", "")}'
     consumesItem: '{c.get("consumesItem", "")}'
     givesItem: '{c.get("givesItem", "")}'
@@ -198,7 +237,7 @@ MonoBehaviour:
   sfxVolume: 0.8
   speakerName: ''
   storyText: {story_text}
-  narrativeBeats: []
+{beats_yaml}
 {dl_yaml}  initialFloorItems: []
 {ch_yaml}"""
 
@@ -412,14 +451,26 @@ u408_door_def = {
             "introNarration": "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
             "speakerName": "YOU",
             "side": 0,
-            "dialogueText": "Harmon texted me the emergency passcode earlier: 8-4-4-5. Let's see if the keypad's backup battery is still alive.",
-            "outroNarration": "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+            "dialogueText": "Harmon texted me the emergency passcode earlier: 8-4-6-5. Let's see if the keypad's backup battery is still alive.",
+            "outroNarration": "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'",
+            "requiresStoryFlag": "checked_phone_harmon"
+        },
+        {
+            "introNarration": "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
+            "speakerName": "YOU",
+            "side": 0,
+            "dialogueText": "A heavy electronic deadbolt seals Harmon's door. Total silence inside... I don't know his code, but maybe I can deduce it from the worn keys, bypass the latch, or force it open.",
+            "outroNarration": "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'",
+            "requiresNotFlag": "checked_phone_harmon"
         }
     ],
     "choices": [
         {
-            "choiceLabel": "Enter the code from your phone (8445)",
-            "choiceSubtitle": "Type Harmon's passcode into the pulsing electronic keypad.",
+            "choiceLabel": "Enter passcode from phone (8465)",
+            "choiceSubtitle": "Type Harmon's emergency passcode into the pulsing electronic keypad.",
+            "requiresStoryFlag": "checked_phone_harmon",
+            "hideWhenUnavailable": True,
+            "setsStoryFlagOnExecute": "room408_opened",
             "targetPassage": "Passage_Unit408_Inside",
             "targetRoomId": "unit_408",
             "timeMinutesCost": 1,
@@ -427,7 +478,52 @@ u408_door_def = {
             "transitionVideoPath": "Videos/door_408_enter.mp4"
         },
         {
-            "choiceLabel": "▲ Return to Upper Hallway",
+            "choiceLabel": "Enter passcode manually (Keypad Minigame)",
+            "choiceSubtitle": "Inspect the worn electronic keypad. 3 attempts before security lockout.",
+            "requiresNotFlag": "room408_locked_out",
+            "triggerActionId": "OPEN_KEYPAD_MODAL",
+            "targetPassage": "Passage_Unit408_Inside",
+            "targetRoomId": "unit_408",
+            "timeMinutesCost": 1,
+            "transitionVideo": GUID_DOOR_408_VIDEO,
+            "transitionVideoPath": "Videos/door_408_enter.mp4"
+        },
+        {
+            "choiceLabel": "Bypass electronic latch [HACK / LOCKPICK]",
+            "choiceSubtitle": "Disassemble the circuit or exploit mechanical failsafe. (INT 6, Tech 2, Locksmith, Burglar, or Multi-Tool)",
+            "requirementMode": 1,
+            "requiredStat": "Tactics",
+            "requiredStatValue": 6,
+            "requiredSkill": "tech",
+            "requiredSkillLevel": 2,
+            "requiredTrait": "LOCKSMITH",
+            "requiredItem": "Multi-Tool",
+            "staminaCost": 7,
+            "timeMinutesCost": 3,
+            "setsStoryFlagOnExecute": "room408_opened",
+            "targetPassage": "Passage_Unit408_Inside",
+            "targetRoomId": "unit_408",
+            "transitionVideo": GUID_DOOR_408_VIDEO,
+            "transitionVideoPath": "Videos/door_408_enter.mp4"
+        },
+        {
+            "choiceLabel": "Force the door frame [BRUTE FORCE]",
+            "choiceSubtitle": "Lever the strike plate or batter the heavy deadbolt. (STR 6, Brawn, or Crowbar)",
+            "requirementMode": 1,
+            "requiredStat": "Might",
+            "requiredStatValue": 6,
+            "requiredTrait": "BRAWN",
+            "requiredItem": "crowbar",
+            "staminaCost": 15,
+            "timeMinutesCost": 3,
+            "setsStoryFlagOnExecute": "room408_opened",
+            "targetPassage": "Passage_Unit408_Inside",
+            "targetRoomId": "unit_408",
+            "transitionVideo": GUID_DOOR_408_VIDEO,
+            "transitionVideoPath": "Videos/door_408_enter.mp4"
+        },
+        {
+            "choiceLabel": "Return to Upper Hallway",
             "choiceSubtitle": "Step back into the corridor.",
             "targetPassage": "Passage_Hallway_1",
             "targetRoomId": "hallway_1",
@@ -809,7 +905,119 @@ stair_def = {
 h_north_def = dict(h1_def)
 h_north_def["name"] = "Passage_Hallway_North"
 
+# 0. Prologue WakeUp Cold Open
+prologue_def = {
+    "name": "Passage_Prologue_WakeUp",
+    "passageId": "prologue_wakeup",
+    "passageTitle": "UNIT 407 // COLD OPEN",
+    "associatedRoomId": "unit_407",
+    "musicAction": 0,
+    "storyText": "It was supposed to be a quiet Saturday night. You remember the warmth of the couch, the low hum of the apartment heater, and drifting off to the dull murmur of a late-night talk show.",
+    "narrativeBeats": [
+        "It was supposed to be a quiet Saturday night. You remember the warmth of the couch, the low hum of the apartment heater, and drifting off to the dull murmur of a late-night talk show.",
+        "Then, the broadcast dies. A harsh, jagged tearing sound shreds through the tail end of your sleep -- relentless, cold white noise.",
+        "Your eyes snap open as you jolt upright. The living room is drowning in the chaotic strobe of an untuned television. Beside it, the modem flashes its LEDs in a frantic pulse, searching for a dead connection.",
+        "You hold your breath. Beyond the thin glass of the balcony door, a sound bleeds through from the city streets below -- a rising, mournful chorus of distant emergency sirens echoing across the night.",
+        "And buried deep beneath the mechanical wail of the sirens... a raw, terrifying scream that is abruptly cut short in the dark.",
+        "Barefoot and disoriented, you stumble toward the glass balcony door. As you reach out to pull the curtain, your own pale, blurred reflection stares back at you from the darkened window pane."
+    ],
+    "dialogueLines": [],
+    "choices": [
+        {
+            "choiceLabel": "FOCUS ON YOUR REFLECTION...",
+            "choiceSubtitle": "Step up to the window and remember who you are.",
+            "triggerActionId": "TRANSITION_TO_CHARACTER_CREATION"
+        }
+    ]
+}
+
+# 0B. Unit 407 Safehouse Hub
+u407_hub_def = {
+    "name": "Passage_Unit407_Hub",
+    "passageId": "unit_407_hub",
+    "passageTitle": "UNIT 407 // SAFEHOUSE",
+    "associatedRoomId": "unit_407",
+    "musicAction": 1,
+    "bgm_guid": GUID_TENSION_BGM,
+    "musicVolume": 0.4,
+    "storyText": "The robotic emergency broadcast cuts out. Cold static returns to the television screen.\n\n<color=#93C5FD><b>UNIT 407 - YOUR APARTMENT.</b></color> Through the thin plaster of the walls, you can hear it: the distant, overlapping chorus of emergency sirens echoing across the city.\n\nThe deadbolt on your front door is still thrown, but you can't stay here forever.",
+    "narrativeBeats": [],
+    "dialogueLines": [
+        {
+            "introNarration": "The robotic emergency voice cuts out. Cold static returns to the TV.\n\nThrough the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens.",
+            "speakerName": "YOU",
+            "side": 0,
+            "dialogueText": "Lethal force authorized... The Guard doesn't deploy for a standard riot. If they establish a quarantine cordon around this block, I'll be trapped here.",
+            "outroNarration": "The emergency broadcasts have fallen completely silent. The apartment is cold."
+        }
+    ],
+    "choices": [
+        {
+            "choiceLabel": "Check Smartphone",
+            "choiceSubtitle": "Inspect incoming alerts, cell towers, and message logs.",
+            "triggerActionId": "OPEN_PHONE_MODAL",
+            "timeMinutesCost": 1
+        },
+        {
+            "choiceLabel": "Search Bathroom Medicine Cabinet",
+            "choiceSubtitle": "Scavenge the mirror vanity for painkillers and bandages.",
+            "requiresNotFlag": "searched_bathroom_407",
+            "setsStoryFlagOnExecute": "searched_bathroom_407",
+            "givesItem": "bandage",
+            "givesItemQty": 2,
+            "timeMinutesCost": 2
+        },
+        {
+            "choiceLabel": "Search Front Closet",
+            "choiceSubtitle": "Grab your heavy jacket and emergency supplies.",
+            "requiresNotFlag": "searched_closet_407",
+            "setsStoryFlagOnExecute": "searched_closet_407",
+            "givesItem": "whiskey",
+            "givesItemQty": 1,
+            "timeMinutesCost": 2
+        },
+        {
+            "choiceLabel": "Tune Police Radio Scanner",
+            "choiceSubtitle": "Listen to emergency SPD dispatch frequencies. (Police, Tech 1, Tactics 5, or Radio Operator)",
+            "triggerActionId": "OPEN_RADIO_MODAL",
+            "requirementMode": 1,
+            "requiredStat": "Tactics",
+            "requiredStatValue": 5,
+            "requiredSkill": "tech",
+            "requiredSkillLevel": 1,
+            "requiredTrait": "RADIO OPERATOR",
+            "requiresNotFlag": "listened_radio_407",
+            "setsStoryFlagOnExecute": "listened_radio_407",
+            "timeMinutesCost": 3
+        },
+        {
+            "choiceLabel": "Inspect Government Network Traffic [HACK]",
+            "choiceSubtitle": "Exploit building network vulnerabilities to bypass defense protocols. (Tech 2, Tactics 6, or Gamer)",
+            "triggerActionId": "OPEN_HACKING_MODAL",
+            "requirementMode": 1,
+            "requiredStat": "Tactics",
+            "requiredStatValue": 6,
+            "requiredSkill": "tech",
+            "requiredSkillLevel": 2,
+            "requiredTrait": "GAMER",
+            "requiresNotFlag": "hacked_terminal_407",
+            "setsStoryFlagOnExecute": "hacked_terminal_407",
+            "timeMinutesCost": 8
+        },
+        {
+            "choiceLabel": "Step Out into the Corridor",
+            "choiceSubtitle": "Unlock the heavy deadbolt and slip into the 4th-floor hallway.",
+            "targetPassage": "Passage_Hallway_North",
+            "targetRoomId": "hallway_1",
+            "timeMinutesCost": 1,
+            "transitionVideoPath": "Videos/door_exit.mp4"
+        }
+    ]
+}
+
 all_passages = [
+    prologue_def,
+    u407_hub_def,
     h1_def,
     h_north_def,
     h2_def,
