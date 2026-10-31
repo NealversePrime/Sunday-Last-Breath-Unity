@@ -1,0 +1,695 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_School_Infirmary
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_School_Infirmary
+  passageTitle: ACT3 SCHOOL INFIRMARY
+  associatedRoomId: infirmary
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "GROUND FLOOR \u2014 EMERGENCY INFIRMARY"
+  narrativeBeats:
+  - The infirmary is dead quiet. It smells of dried sweat, cold coffee, and old blood.
+  - Every desk has been pushed against the walls to make space for cots. Most are occupied by survivors wrapped in mismatched blankets, their chests rising and falling in exhausted, feverish rhythms.
+  - A portable lamp flickers above a medical tray.
+  - A man in a stained medical coat is sitting on an overturned bucket, staring blankly at a blood-soaked rag in his hands. He looks like he hasn't slept in days. The tray next to him is completely empty of supplies.
+  - He hears your footsteps and slowly looks up.
+  - He tosses the bloody rag into a bin and stands up, wincing as his knees pop.
+  - The smell reaches you before you fully enter the room.
+  - Antiseptic. Sweat. Old blood.
+  - Every desk has been pushed against the walls to make space for cots. Some are occupied by survivors wrapped in mismatched blankets. Others are empty, their sheets folded with an uncomfortable neatness.
+  - A portable lamp flickers above the nearest cot.
+  - A man in a stained medical coat is bent over a wounded survivor. One hand presses firmly against a blood-soaked bandage while the other searches through an almost empty tray of supplies.
+  - His fingers move from one compartment to another. Gauze. Empty. Alcohol wipes. Empty. Antibiotics. Nothing.
+  - The wounded survivor lets out a weak cry. The man immediately leans closer.
+  - You take another step into the room. The floorboard creaks.
+  - He does not turn around.
+  - The survivor on the cot suddenly convulses. The doctor grabs the patient's shoulder and presses harder against the wound. For several seconds, the only sounds are strained breathing and the faint hum of the emergency lamp. Finally, the patient settles.
+  - The man slowly removes his blood-stained gloves and turns toward you.
+  - Find out how serious the situation is.
+  - Learn how the school became an emergency shelter.
+  - Offer assistance before asking for anything.
+  - The infirmary is quieter than before, but not peaceful.
+  - Someone coughs behind a curtain. A patient shifts beneath a thin blanket. The portable lamp continues to flicker over the treatment area.
+  - Dr. Thorne is cleaning dried blood from a pair of forceps. He looks up when you enter, then returns to his work.
+  - He places the forceps on the tray.
+  - He glances toward the occupied cots.
+  - He opens a metal tray. Inside are a few used instruments, two empty medicine packets, and a roll of tape.
+  - He studies you for a moment.
+  - He gestures toward the occupied cots.
+  - "[NEW OBJECTIVE] Search for medical supplies.\r\n            \r\n            \r\n                \r\n                    \r\n                    \r\n                    \r\n                \r\n                Leave the mission for later."
+  - Ask what the infirmary needs.
+  - "i.id === \"Antibiotics\" || i.id === \"Painkillers\" || i.id === \"First Aid Kit\" || i.id === \"Bandage\")>>\r\n        \r\n            \r\n                \r\n                    \r\n                    \r\n                    \r\n                    \r\n                    \r\n                    \r\n                    \r\n                    \r\n                    \r\n                     i.id === \"Antibiotics\")>>\r\n                        \r\n                     i.id === \"Painkillers\")>>\r\n                        \r\n                     i.id === \"First Aid Kit\")>>\r\n                        \r\n                    \r\n                        \r\n                    \r\n                    \r\n                \r\n                [+20 HUMANITY] [+20 TRUST] [+30 XP] Hand over the medical supplies."
+  - The infirmary has changed.
+  - The smell of blood is still there, but it no longer overwhelms everything else. Fresh bandages have replaced several of the stained ones. The supply tray is no longer empty.
+  - A patient near the wall is sitting upright, drinking water. Another sleeps beneath a clean blanket.
+  - Dr. Thorne stands beside the treatment table, organizing medicine into small labeled containers.
+  - When he notices you, his expression softens slightly.
+  - He closes one of the containers.
+  - Thorne looks across the room at the survivors resting on the cots.
+  - He reaches beneath the treatment table and places a compact medical kit beside you.
+  - "[MAX HP RESTORED] Thorne cleans and dresses your wounds.\r\n            \r\n        \r\n    \r\n        Your wounds are treated, and your health is fully restored."
+  - Check on the survivors you helped.
+  - He pauses before returning to his work.
+  - Leave Dr. Thorne's triage ward.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Exhausted Doctor
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: If you're injured, sit against the wall and wait. If you're armed, keep the weapon pointed at the floor.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Dr. Adrian Thorne. I used to work at St. Gabriel's. Now I work wherever people are still breathing. The long night is over, but infection doesn't sleep.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Unknown Doctor
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Stay with me. You hear me? Keep your eyes open.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Unknown Doctor
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Stop there.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Unknown Doctor
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: If you're injured, sit against the wall and wait. If you're armed, keep the weapon pointed at the floor. And if you're here to ask whether anyone has seen your friends, ask quietly.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Dr. Adrian Thorne. I used to work at St. Gabriel's Medical Center. Now I work wherever people are still breathing.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The patient on that cot has a deep wound and a fever. I can keep him stable for now, but 'for now' is doing a lot of work.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: People think the worst part is the wound. It usually isn't. Infection is quieter. It waits until everyone believes the danger has passed.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The school had generators, running water, and enough classrooms to separate the sick from everyone else. That made it useful.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Then the roads closed. Supplies stopped arriving. Useful became desperate.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Help? Yes. I need help. But I don't need another person standing in the doorway telling me they're willing.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I need supplies. Clean bandages. Antibiotics. Painkillers. Anything that can keep an injury from becoming a death sentence.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Bring me something useful, and I'll remember that you came back.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You're still looking for supplies. Good. Don't take unnecessary risks, but don't come back empty-handed either.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Every hour matters to someone in this room.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You came back. And you brought what we needed.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The patient from Cot Four is stable. He may even keep the leg. That's more than I was prepared to promise earlier.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You didn't just bring medicine. You bought these people time. Around here, time is worth more than almost anything.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: From now on, if you're hurt, come here. I won't promise miracles. I can promise I'll try.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Try not to make a habit of needing me. But if you do, the infirmary is open.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Better than yesterday. Not all of them are out of danger, but they're alive. That's enough for today.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dr. Thorne
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: c4a413d62cae652976b23d105bdc4f1b, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The school remembers who helps. People talk. You've earned more trust here than you may realize.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Ask about the wounded survivor \u25BC"
+    choiceSubtitle: Find out how serious the situation is.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Ask what happened to this place \u25BC"
+    choiceSubtitle: Learn how the school became an emergency shelter.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Ask if Thorne needs help \u25BC"
+    choiceSubtitle: Offer assistance before asking for anything.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Accept Thorne's medical supply mission \u25BC"
+    choiceSubtitle: '[NEW OBJECTIVE] Search for medical supplies.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Tell Thorne you need time to prepare \u25BC"
+    choiceSubtitle: Leave the mission for later.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Ask if Thorne needs help \u25BC"
+    choiceSubtitle: Ask what the infirmary needs.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Give medical supplies to Dr. Thorne [INVENTORY] \u25BC"
+    choiceSubtitle: '[+20 HUMANITY] [+20 TRUST] [+30 XP] Hand over the medical supplies.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 10
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Let Dr. Thorne treat your injuries \u25BC"
+    choiceSubtitle: '[MAX HP RESTORED] Thorne cleans and dresses your wounds.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 15
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Ask Thorne how the patients are doing \u25BC"
+    choiceSubtitle: Check on the survivors you helped.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Infirmary
+    targetRoomId: infirmary
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Exit Infirmary to Hallway [WEST]"
+    choiceSubtitle: Leave Dr. Thorne's triage ward.
+    targetPassage: {fileID: 11400000, guid: 53c56bda0d2fecc46b3938a6bd856d17, type: 2}
+    targetPassageId: Act3_SchoolGFloor
+    targetRoomId: hall_g_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

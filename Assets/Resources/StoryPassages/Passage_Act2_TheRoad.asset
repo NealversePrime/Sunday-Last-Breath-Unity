@@ -1,0 +1,730 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act2_TheRoad
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act2_TheRoad
+  passageTitle: ACT2 THEROAD
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* =======================================================================\r\n   SYSTEM INITIALIZATION\r\n======================================================================= */\r\n/* Clear the map when leaving the building */"
+  narrativeBeats:
+  - "/* 1. CLEAR PREVIOUS AUDIO & START THE RIOT */\r\n    if (typeof window.HallwayAmbience !== 'undefined') window.HallwayAmbience.stop();\r\n    setup.sound.stopAll(); \r\n    \r\n    /* Play inside car ambiance */\r\n    setup.sound.play(\"inside_car\", \"audio/bgm/insidecar.mp3\", true, 0.4);"
+  - THE ESCAPE
+  - "Your chest heaves against the seatbelt. Your knuckles are white on the steering wheel, and there is dark, drying blood on your jacket that you are trying very hard not to look at. \r\n                \r\n                    You let out a long, shuddering breath as the doors lock with a mechanical *thunk*. Your hands are shaking\u2014not from pain, but from the sheer, overwhelming realization that you actually made it out."
+  - The locked doors and the running engine are the only things separating you from the nightmare outside. The horrors of the Ascott Residency are shrinking in the rearview mirror.
+  - The city is a nightmare in the glass. Plumes of thick black smoke rise from the downtown grid. Sirens echo endlessly in the distance, overlapping into a chaotic, directionless wail.
+  - "Inside the car, it is jarringly quiet. The dashboard clock glows a faint, digital blue. \r\n                \r\n                \r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                            \r\n                                \r\n                                \r\n                                    THE ESCAPE"
+  - "/* =================================================================\r\n                                   COMPANION: VANE IS PRESENT\r\n                                ================================================================= */\r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    \r\n                                    \r\n                                        \r\n                                            Vane is in the passenger seat. The adrenaline that carried him through the lobby and the parking lot is finally crashing. He rests his forehead against the cool glass of the window, his eyes closed."
+  - He opens his eyes, staring blankly at the passing, burning ruins of the city. He lets out a dry, humorless laugh.
+  - He takes a slow, shuddering breath, then turns to look at you. The fear is still there, but now there's a desperate need for direction.
+  - He traces the frayed edge of his ruined designer jacket.
+  - To keep your hands from shaking, you force your mind to focus on a single point. You need a destination. You need a reason to keep the car on the road.
+  - "/* =================================================================\r\n                                   COMPANION: PLAYER IS ALONE\r\n                                ================================================================= */\r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    \r\n                                    \r\n                                        \r\n                                            The silence in the car is heavy. The empty passenger seat feels like a glaring reminder of everyone who didn't make it out of the lobby."
+  - "Survivor's guilt is a cold thing. It starts in your stomach and creeps up your throat. The sheer scale of the collapse is setting in. The military has barricaded the bridges. The hospitals are gone. The world you knew yesterday is dead. \r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                            To keep your hands from shaking, you force your mind to focus on a single point. You need a destination. You need a reason to keep the car on the road."
+  - "WHO IS WAITING FOR YOU OUTSIDE THE CITY?\r\n            \r\n            \r\n            \r\n                \r\n                    \r\n                    /* WIFE / GIRLFRIEND */\r\n                    \r\n                        \r\n                            \r\n                            \r\n                                What is her name?\r\n                                \r\n                                \r\n                                    Presets: \r\n                                     | \r\n                                     |"
+  - "/* HUSBAND / BOYFRIEND */\r\n                    \r\n                        \r\n                            \r\n                            \r\n                                What is his name?\r\n                                \r\n                                \r\n                                    Presets: \r\n                                     | \r\n                                     |"
+  - "/* NON-BINARY PARTNER */\r\n                    \r\n                        \r\n                            \r\n                            \r\n                                What is their name?\r\n                                \r\n                                \r\n                                    Presets: \r\n                                     | \r\n                                     |"
+  - /* PARENTS (Bypasses Name Entry) */
+  - /* LONE WOLF (Bypasses Name Entry) */
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I didn't think we were getting out of that lobby. I really didn't.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: My entire life was sponsorships, unboxing videos, aesthetic lighting... None of that prepared me for bludgeoning someone's skull in with a Pelican camera case.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I don't have anywhere to go. My family and I... we haven't spoken since I moved to the city to do my own thing.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: My entire world was on a screen, and the internet is dead. I was just running to run. Where are we going?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: My Wife / Girlfriend
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Chloe
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Elena
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Confirm Name
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: My Husband / Boyfriend
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Marcus
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Elias
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Confirm Name
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: My Partner (Non-Binary)
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Jordan
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Taylor
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Confirm Name
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: My Parents
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: No one. I'm surviving for me.
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 1236b6a2f31db204c94d73eea11cf113, type: 2}
+    targetPassageId: Act2_TheRoad_Resolution
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

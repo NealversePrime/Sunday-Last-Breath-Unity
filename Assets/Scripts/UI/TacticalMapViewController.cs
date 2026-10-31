@@ -100,11 +100,36 @@ namespace SundayLastBreath.UI
         [Header("Modular Floor Data (Optional ScriptableObject)")]
         [SerializeField] private TacticalFloorMapData currentFloorData;
 
+        [Header("Vector Graphics Floorplan (SVG)")]
+        [SerializeField] private Image vectorMapBackdropImage;
+
+        [Header("Tactical Blueprint Zoom & Pan")]
+        [SerializeField] private RectTransform floorplanCanvasRect;
+        [SerializeField] private RectTransform blueprintViewportRect;
+        [SerializeField] private Button zoomInButton;
+        [SerializeField] private Button zoomOutButton;
+        [SerializeField] private Button zoomResetButton;
+        [SerializeField] private TextMeshProUGUI zoomLevelTmp;
+
+        private float currentZoom = 1.0f;
+        private const float MinZoom = 0.8f;
+        private const float MaxZoom = 3.0f;
+        private const float ZoomStep = 0.25f;
+
+        private Vector2 canvasBasePosition = new Vector2(0f, 2f);
+        private Vector2 panOffset = Vector2.zero;
+        private bool isDraggingPan = false;
+        private Vector2 lastMouseScreenPos;
+        private Vector2 leftMouseDownPos;
+        private bool leftDragThresholdPassed = false;
+
         [Header("Serialized Blueprint Nodes & Grid")]
         [SerializeField] private Image blueprintGridOverlayImage;
         [SerializeField] private List<NodeUIHolder> serializedHolders = new List<NodeUIHolder>();
 
         [Header("Blueprint Header & Telemetry Banners")]
+        [SerializeField] private TextMeshProUGUI blueprintHeaderTitleTmp;
+        [SerializeField] private TextMeshProUGUI blueprintHeaderSubtitleTmp;
         [SerializeField] private TextMeshProUGUI blueprintCoordTmp;
         [SerializeField] private TextMeshProUGUI blueprintFooterLocationTmp;
 
@@ -123,6 +148,7 @@ namespace SundayLastBreath.UI
 
         private readonly Dictionary<string, NodeModel> nodeRegistry = new Dictionary<string, NodeModel>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NodeUIHolder> uiHolders = new Dictionary<string, NodeUIHolder>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<GameObject> dynamicRoomHitboxes = new List<GameObject>();
 
         private static Sprite cachedBlueprintGridSprite;
         private static Sprite cachedHatchedSprite;
@@ -496,6 +522,123 @@ namespace SundayLastBreath.UI
                 transitActionButton.onClick.RemoveAllListeners();
                 transitActionButton.onClick.AddListener(OnTransitButtonClicked);
             }
+
+            if (zoomInButton != null)
+            {
+                zoomInButton.onClick.RemoveAllListeners();
+                zoomInButton.onClick.AddListener(() =>
+                {
+                    AudioManager.Instance?.PlayButtonClick();
+                    ZoomIn();
+                });
+            }
+            if (zoomOutButton != null)
+            {
+                zoomOutButton.onClick.RemoveAllListeners();
+                zoomOutButton.onClick.AddListener(() =>
+                {
+                    AudioManager.Instance?.PlayButtonClick();
+                    ZoomOut();
+                });
+            }
+            if (zoomResetButton != null)
+            {
+                zoomResetButton.onClick.RemoveAllListeners();
+                zoomResetButton.onClick.AddListener(() =>
+                {
+                    AudioManager.Instance?.PlayButtonClick();
+                    ResetZoom();
+                });
+            }
+
+            if (floorplanCanvasRect != null && canvasBasePosition == Vector2.zero)
+            {
+                canvasBasePosition = floorplanCanvasRect.anchoredPosition;
+            }
+
+            if (currentFloorData == null)
+            {
+                currentFloorData = Resources.Load<TacticalFloorMapData>("Maps/FloorMap_Ascott_4F");
+            }
+
+            if (currentFloorData != null)
+            {
+                if (blueprintHeaderTitleTmp != null && !string.IsNullOrEmpty(currentFloorData.floorTitle))
+                    blueprintHeaderTitleTmp.text = currentFloorData.floorTitle;
+                if (blueprintHeaderSubtitleTmp != null && !string.IsNullOrEmpty(currentFloorData.floorSubtitle))
+                    blueprintHeaderSubtitleTmp.text = currentFloorData.floorSubtitle;
+                if (blueprintCoordTmp != null && !string.IsNullOrEmpty(currentFloorData.gridCoordinate))
+                    blueprintCoordTmp.text = currentFloorData.gridCoordinate;
+            }
+
+            SyncRoomHitboxes();
+            UpdateVectorMapDisplay();
+        }
+
+        public void BindVectorMapBackdrop(Image backdropImg)
+        {
+            vectorMapBackdropImage = backdropImg;
+            UpdateVectorMapDisplay();
+        }
+
+        public void UpdateVectorMapDisplay()
+        {
+            if (vectorMapBackdropImage == null) return;
+
+            Sprite mapSprite = currentFloorData != null ? currentFloorData.vectorMapSprite : null;
+            if (mapSprite != null)
+            {
+                vectorMapBackdropImage.sprite = mapSprite;
+                vectorMapBackdropImage.preserveAspect = true;
+                vectorMapBackdropImage.gameObject.SetActive(true);
+
+                Transform parent = vectorMapBackdropImage.transform.parent;
+                if (parent != null)
+                {
+                    Transform sp = parent.Find("StructuralPerimeter");
+                    if (sp != null) sp.gameObject.SetActive(false);
+
+                    Transform cs = parent.Find("CentralCorridorShaft");
+                    if (cs != null) cs.gameObject.SetActive(false);
+                }
+
+                bool isAscott4F = currentFloorData == null || currentFloorData.floorId == "ascott_4f";
+
+                foreach (var holder in serializedHolders)
+                {
+                    if (holder == null || holder.rootObj == null) continue;
+
+                    if (!isAscott4F)
+                    {
+                        holder.rootObj.SetActive(false);
+                    }
+                    else
+                    {
+                        holder.rootObj.SetActive(true);
+
+                        if (holder.bgImage != null)
+                        {
+                            holder.bgImage.color = new Color(0f, 0f, 0f, 0f);
+                        }
+                        if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(false);
+                        if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
+                        if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
+                        if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
+                        if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
+                        if (holder.beaconObj != null) holder.beaconObj.SetActive(false);
+                        if (holder.doorTickImage != null)
+                        {
+                            Transform dtParent = holder.doorTickImage.transform.parent;
+                            if (dtParent != null) dtParent.gameObject.SetActive(false);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // If no vector sprite assigned on floor data, keep backdrop image hidden
+                vectorMapBackdropImage.gameObject.SetActive(false);
+            }
         }
 
         private void Update()
@@ -524,6 +667,217 @@ namespace SundayLastBreath.UI
             else if (left) TrySelectDirection("A");
             else if (down) TrySelectDirection("S");
             else if (right) TrySelectDirection("D");
+
+            HandlePanZoomInput();
+        }
+
+        public void BindPanZoomControls(RectTransform canvasRect, RectTransform viewportRect,
+                                        Button inBtn, Button outBtn, Button resetBtn, TextMeshProUGUI zoomTmp)
+        {
+            floorplanCanvasRect = canvasRect;
+            blueprintViewportRect = viewportRect;
+            zoomInButton = inBtn;
+            zoomOutButton = outBtn;
+            zoomResetButton = resetBtn;
+            zoomLevelTmp = zoomTmp;
+
+            if (floorplanCanvasRect != null)
+            {
+                canvasBasePosition = floorplanCanvasRect.anchoredPosition;
+            }
+
+            if (zoomInButton != null)
+            {
+                zoomInButton.onClick.RemoveAllListeners();
+                zoomInButton.onClick.AddListener(ZoomIn);
+            }
+            if (zoomOutButton != null)
+            {
+                zoomOutButton.onClick.RemoveAllListeners();
+                zoomOutButton.onClick.AddListener(ZoomOut);
+            }
+            if (zoomResetButton != null)
+            {
+                zoomResetButton.onClick.RemoveAllListeners();
+                zoomResetButton.onClick.AddListener(ResetZoom);
+            }
+
+            ApplyZoomAndPan();
+            UpdateZoomReadout();
+        }
+
+        public void ZoomIn()
+        {
+            SetZoom(currentZoom + ZoomStep);
+        }
+
+        public void ZoomOut()
+        {
+            SetZoom(currentZoom - ZoomStep);
+        }
+
+        public void ResetZoom()
+        {
+            panOffset = Vector2.zero;
+            SetZoom(1.0f);
+        }
+
+        public void OnDragPan(Vector2 screenDelta)
+        {
+            if (floorplanCanvasRect == null || currentZoom <= 1.001f) return;
+
+            Canvas canvas = GetComponentInParent<Canvas>();
+            float scaleFactor = canvas != null ? canvas.scaleFactor : 1.0f;
+            if (scaleFactor <= 0.001f) scaleFactor = 1.0f;
+
+            panOffset += screenDelta / scaleFactor;
+            ApplyZoomAndPan();
+        }
+
+        public void SetZoom(float targetZoom)
+        {
+            currentZoom = Mathf.Clamp(targetZoom, MinZoom, MaxZoom);
+            if (currentZoom <= 1.001f)
+            {
+                panOffset = Vector2.zero;
+            }
+            ApplyZoomAndPan();
+            UpdateZoomReadout();
+        }
+
+        private void ApplyZoomAndPan()
+        {
+            if (floorplanCanvasRect == null) return;
+
+            floorplanCanvasRect.localScale = Vector3.one * currentZoom;
+
+            if (currentZoom > 1.001f)
+            {
+                float halfWidth = floorplanCanvasRect.rect.width * 0.5f;
+                float halfHeight = floorplanCanvasRect.rect.height * 0.5f;
+                float maxPanX = halfWidth * (currentZoom - 1f) + 40f;
+                float maxPanY = halfHeight * (currentZoom - 1f) + 40f;
+
+                panOffset.x = Mathf.Clamp(panOffset.x, -maxPanX, maxPanX);
+                panOffset.y = Mathf.Clamp(panOffset.y, -maxPanY, maxPanY);
+            }
+            else
+            {
+                panOffset = Vector2.zero;
+            }
+
+            floorplanCanvasRect.anchoredPosition = canvasBasePosition + panOffset;
+        }
+
+        private void UpdateZoomReadout()
+        {
+            if (zoomLevelTmp != null)
+            {
+                zoomLevelTmp.text = $"{Mathf.RoundToInt(currentZoom * 100f)}%";
+            }
+        }
+
+        private void HandlePanZoomInput()
+        {
+            if (floorplanCanvasRect == null) return;
+
+            Vector2 mousePos = Vector2.zero;
+            float scrollDelta = 0f;
+            bool rightHeld = false;
+            bool middleHeld = false;
+            bool leftHeld = false;
+            bool rightDown = false;
+            bool middleDown = false;
+            bool leftDown = false;
+
+#if ENABLE_INPUT_SYSTEM
+            if (Mouse.current != null)
+            {
+                mousePos = Mouse.current.position.ReadValue();
+                scrollDelta = Mouse.current.scroll.ReadValue().y;
+                rightHeld = Mouse.current.rightButton.isPressed;
+                middleHeld = Mouse.current.middleButton.isPressed;
+                leftHeld = Mouse.current.leftButton.isPressed;
+                rightDown = Mouse.current.rightButton.wasPressedThisFrame;
+                middleDown = Mouse.current.middleButton.wasPressedThisFrame;
+                leftDown = Mouse.current.leftButton.wasPressedThisFrame;
+            }
+            if (Keyboard.current != null)
+            {
+                if (Keyboard.current.equalsKey.wasPressedThisFrame || Keyboard.current.numpadPlusKey.wasPressedThisFrame)
+                    ZoomIn();
+                if (Keyboard.current.minusKey.wasPressedThisFrame || Keyboard.current.numpadMinusKey.wasPressedThisFrame)
+                    ZoomOut();
+                if (Keyboard.current.digit0Key.wasPressedThisFrame || Keyboard.current.numpad0Key.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame)
+                    ResetZoom();
+            }
+#else
+            mousePos = Input.mousePosition;
+            scrollDelta = Input.mouseScrollDelta.y;
+            rightHeld = Input.GetMouseButton(1);
+            middleHeld = Input.GetMouseButton(2);
+            leftHeld = Input.GetMouseButton(0);
+            rightDown = Input.GetMouseButtonDown(1);
+            middleDown = Input.GetMouseButtonDown(2);
+            leftDown = Input.GetMouseButtonDown(0);
+
+            if (Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus)) ZoomIn();
+            if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus)) ZoomOut();
+            if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0) || Input.GetKeyDown(KeyCode.R)) ResetZoom();
+#endif
+
+            // Check if mouse is hovering over blueprint area
+            bool isOverViewport = false;
+            if (blueprintViewportRect != null)
+            {
+                isOverViewport = RectTransformUtility.RectangleContainsScreenPoint(blueprintViewportRect, mousePos);
+            }
+
+            // Scroll zoom
+            if (isOverViewport && Mathf.Abs(scrollDelta) > 0.05f)
+            {
+                if (scrollDelta > 0f) ZoomIn();
+                else ZoomOut();
+            }
+
+            // Drag to pan: Right-click, Middle-click, or Left-drag (when zoomed)
+            bool startDrag = isOverViewport && (rightDown || middleDown);
+            bool isDraggingActive = rightHeld || middleHeld;
+
+            // Handle left click drag when zoomed in
+            if (isOverViewport && leftDown && currentZoom > 1.0f)
+            {
+                leftMouseDownPos = mousePos;
+                leftDragThresholdPassed = false;
+            }
+            if (leftHeld && currentZoom > 1.0f && !leftDragThresholdPassed)
+            {
+                if (Vector2.Distance(mousePos, leftMouseDownPos) > 6f)
+                {
+                    leftDragThresholdPassed = true;
+                    isDraggingPan = true;
+                    lastMouseScreenPos = mousePos;
+                }
+            }
+
+            if (startDrag)
+            {
+                isDraggingPan = true;
+                lastMouseScreenPos = mousePos;
+            }
+            else if (!isDraggingActive && (!leftHeld || !leftDragThresholdPassed))
+            {
+                isDraggingPan = false;
+                leftDragThresholdPassed = false;
+            }
+
+            if (isDraggingPan && currentZoom > 1.0f)
+            {
+                Vector2 delta = mousePos - lastMouseScreenPos;
+                panOffset += delta;
+                ApplyZoomAndPan();
+                lastMouseScreenPos = mousePos;
+            }
         }
 
         // =========================================================================
@@ -532,11 +886,127 @@ namespace SundayLastBreath.UI
 
         public void LoadFloor(TacticalFloorMapData floorData)
         {
+            if (floorData == null) return;
             currentFloorData = floorData;
+
+            if (blueprintHeaderTitleTmp != null && !string.IsNullOrEmpty(floorData.floorTitle))
+            {
+                blueprintHeaderTitleTmp.text = floorData.floorTitle;
+            }
+            if (blueprintHeaderSubtitleTmp != null && !string.IsNullOrEmpty(floorData.floorSubtitle))
+            {
+                blueprintHeaderSubtitleTmp.text = floorData.floorSubtitle;
+            }
+            if (blueprintCoordTmp != null && !string.IsNullOrEmpty(floorData.gridCoordinate))
+            {
+                blueprintCoordTmp.text = floorData.gridCoordinate;
+            }
+
             nodeRegistry.Clear();
             InitializeDataModel();
+            SyncRoomHitboxes();
+            UpdateVectorMapDisplay();
             RefreshAllNodes();
             SelectNode(currentLocationId);
+        }
+
+        public void SyncRoomHitboxes()
+        {
+            // Clean up previously spawned dynamic hitboxes
+            if (dynamicRoomHitboxes != null && dynamicRoomHitboxes.Count > 0)
+            {
+                foreach (var go in dynamicRoomHitboxes)
+                {
+                    if (go != null)
+                    {
+                        if (Application.isPlaying) Destroy(go);
+                        else DestroyImmediate(go);
+                    }
+                }
+                dynamicRoomHitboxes.Clear();
+            }
+
+            // Remove any stale/destroyed entries from uiHolders
+            var staleKeys = new List<string>();
+            foreach (var kvp in uiHolders)
+            {
+                if (kvp.Value == null || kvp.Value.rootObj == null)
+                {
+                    staleKeys.Add(kvp.Key);
+                }
+            }
+            foreach (var k in staleKeys)
+            {
+                uiHolders.Remove(k);
+            }
+
+            if (currentFloorData == null || currentFloorData.rooms == null || currentFloorData.rooms.Count == 0)
+            {
+                return;
+            }
+
+            bool isAscott4F = string.Equals(currentFloorData.floorId, "ascott_4f", StringComparison.OrdinalIgnoreCase);
+
+            if (floorplanCanvasRect == null) return;
+
+            foreach (var r in currentFloorData.rooms)
+            {
+                if (r == null || string.IsNullOrEmpty(r.roomId)) continue;
+
+                // On Ascott 4F, if serializedHolders already binds this room, wire it and continue
+                if (isAscott4F && uiHolders.TryGetValue(r.roomId, out var existingHolder) && existingHolder != null && existingHolder.rootObj != null)
+                {
+                    if (nodeRegistry.TryGetValue(r.roomId, out NodeModel m))
+                    {
+                        existingHolder.model = m;
+                    }
+                    continue;
+                }
+
+                // Dynamically instantiate clickable node hitbox
+                GameObject nodeObj = new GameObject("DynamicHitbox_" + r.roomId, typeof(RectTransform));
+                nodeObj.transform.SetParent(floorplanCanvasRect, false);
+
+                RectTransform rt = nodeObj.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0.5f, 0.5f);
+                rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.anchoredPosition = r.position;
+                rt.sizeDelta = (r.size.x > 5f && r.size.y > 5f) ? r.size : new Vector2(60f, 40f);
+
+                Image bg = nodeObj.AddComponent<Image>();
+                bg.color = new Color(0f, 0f, 0f, 0f);
+                bg.raycastTarget = true;
+
+                Outline ol = nodeObj.AddComponent<Outline>();
+                ol.effectColor = new Color(0.20f, 0.34f, 0.48f, 0.85f);
+                ol.effectDistance = new Vector2(1.5f, -1.5f);
+                ol.enabled = false;
+
+                Button btn = nodeObj.AddComponent<Button>();
+                btn.targetGraphic = bg;
+                string capturedId = r.roomId;
+                btn.onClick.AddListener(() =>
+                {
+                    AudioManager.Instance?.PlayButtonClick();
+                    OnNodeClicked(capturedId);
+                });
+
+                nodeRegistry.TryGetValue(r.roomId, out NodeModel model);
+
+                var dynamicHolder = new NodeUIHolder
+                {
+                    nodeId = r.roomId,
+                    model = model,
+                    rootObj = nodeObj,
+                    bgImage = bg,
+                    outline = ol,
+                    button = btn
+                };
+
+                uiHolders[r.roomId] = dynamicHolder;
+                dynamicRoomHitboxes.Add(nodeObj);
+            }
         }
 
         private void InitializeDataModel()
@@ -759,8 +1229,10 @@ namespace SundayLastBreath.UI
             ApplyVisualState(holder);
         }
 
-        public void BindBlueprintBanners(TextMeshProUGUI coordTmp, TextMeshProUGUI footerLocationTmp, Image gridOverlayImg = null)
+        public void BindBlueprintBanners(TextMeshProUGUI headerTitleTmp, TextMeshProUGUI subtitleTmp, TextMeshProUGUI coordTmp, TextMeshProUGUI footerLocationTmp, Image gridOverlayImg = null)
         {
+            blueprintHeaderTitleTmp = headerTitleTmp;
+            blueprintHeaderSubtitleTmp = subtitleTmp;
             blueprintCoordTmp = coordTmp;
             blueprintFooterLocationTmp = footerLocationTmp;
             if (gridOverlayImg != null)
@@ -1005,7 +1477,7 @@ namespace SundayLastBreath.UI
             {
                 if (isCurrent)
                 {
-                    intelThreatText.text = "<color=#64748b>THREAT:</color> <color=#2ecc71><b>NONE</b></color>";
+                    intelThreatText.text = "<color=#94a3b8>THREAT:</color> <color=#2ecc71><b>NONE</b></color>";
                 }
                 else if (isDiscovered)
                 {
@@ -1015,13 +1487,13 @@ namespace SundayLastBreath.UI
                         "LOW" or "MINIMAL" => "#38bdf8",
                         "MEDIUM" => "#f39c12",
                         "HIGH" or "DANGER" or "IMPASSABLE" => "#e74c3c",
-                        _ => "#94a3b8"
+                        _ => "#cbd5e1"
                     };
-                    intelThreatText.text = $"<color=#64748b>THREAT:</color> <color={threatCol}><b>{model.threatLevel}</b></color>";
+                    intelThreatText.text = $"<color=#94a3b8>THREAT:</color> <color={threatCol}><b>{model.threatLevel}</b></color>";
                 }
                 else
                 {
-                    intelThreatText.text = "<color=#64748b>THREAT:</color> <color=#94a3b8><b>UNKNOWN (NO SENSOR DATA)</b></color>";
+                    intelThreatText.text = "<color=#94a3b8>THREAT:</color> <color=#cbd5e1><b>UNKNOWN (NO SENSOR DATA)</b></color>";
                 }
             }
 
@@ -1029,15 +1501,15 @@ namespace SundayLastBreath.UI
             {
                 if (isCurrent)
                 {
-                    intelScavengeText.text = $"<color=#64748b>SUPPLIES:</color> <color=#2ecc71><b>{model.scavengeStatus}</b></color>";
+                    intelScavengeText.text = $"<color=#94a3b8>SUPPLIES:</color> <color=#2ecc71><b>{model.scavengeStatus}</b></color>";
                 }
                 else if (isDiscovered)
                 {
-                    intelScavengeText.text = $"<color=#64748b>SUPPLIES:</color> <color=#f39c12><b>{model.scavengeStatus}</b></color>";
+                    intelScavengeText.text = $"<color=#94a3b8>SUPPLIES:</color> <color=#f39c12><b>{model.scavengeStatus}</b></color>";
                 }
                 else
                 {
-                    intelScavengeText.text = "<color=#64748b>SUPPLIES:</color> <color=#94a3b8><b>UNKNOWN (UNSEARCHED)</b></color>";
+                    intelScavengeText.text = "<color=#94a3b8>SUPPLIES:</color> <color=#cbd5e1><b>UNKNOWN (UNSEARCHED)</b></color>";
                 }
             }
 
@@ -1045,11 +1517,11 @@ namespace SundayLastBreath.UI
             {
                 if (isCurrent || isDiscovered)
                 {
-                    intelAcousticText.text = $"<color=#64748b>AUDIO:</color> <color=#38bdf8><b>{model.acousticScan}</b></color>";
+                    intelAcousticText.text = $"<color=#94a3b8>AUDIO:</color> <color=#38bdf8><b>{model.acousticScan}</b></color>";
                 }
                 else
                 {
-                    intelAcousticText.text = "<color=#64748b>AUDIO:</color> <color=#94a3b8><b>OUT OF SENSOR RANGE</b></color>";
+                    intelAcousticText.text = "<color=#94a3b8>AUDIO:</color> <color=#cbd5e1><b>OUT OF SENSOR RANGE</b></color>";
                 }
             }
 
@@ -1154,6 +1626,43 @@ namespace SundayLastBreath.UI
             bool isCurrent = string.Equals(holder.model.id, currentLocationId, StringComparison.OrdinalIgnoreCase);
             bool isSelected = string.Equals(holder.model.id, selectedNodeId, StringComparison.OrdinalIgnoreCase);
             bool isDiscovered = holder.model.isDiscovered || isCurrent;
+
+            bool hasVectorMap = currentFloorData != null && currentFloorData.vectorMapSprite != null;
+
+            if (hasVectorMap)
+            {
+                if (holder.bgImage != null)
+                {
+                    holder.bgImage.color = new Color(0f, 0f, 0f, 0f);
+                }
+                if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(false);
+                if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
+                if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
+                if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
+                if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
+                if (holder.beaconObj != null) holder.beaconObj.SetActive(false);
+
+                if (holder.outline != null)
+                {
+                    if (isCurrent)
+                    {
+                        holder.outline.enabled = true;
+                        holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 0.95f);
+                        holder.outline.effectDistance = new Vector2(2f, -2f);
+                    }
+                    else if (isSelected)
+                    {
+                        holder.outline.enabled = true;
+                        holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 0.90f);
+                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
+                    }
+                    else
+                    {
+                        holder.outline.enabled = false;
+                    }
+                }
+                return;
+            }
 
             // Player Radar Halo (Illuminates soft pulsing aura around current sector)
             if (holder.beaconObj != null)

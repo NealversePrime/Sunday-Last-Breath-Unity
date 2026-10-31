@@ -75,6 +75,10 @@ namespace SundayLastBreath.Data
         public string floorSubtitle = "SCHEMATIC SCALE 1:100 // CONTIGUOUS FLOORPLAN";
         public string gridCoordinate = "GRID [W-01:R-01] // BIO-RADAR: ACTIVE";
 
+        [Header("Vector Graphics Blueprint Backdrop")]
+        [Tooltip("Optional Vector Sprite (imported from SVG via VectorGraphics package) representing the architectural floorplan")]
+        public Sprite vectorMapSprite;
+
         [Header("Room Nodes")]
         public List<TacticalRoomNodeData> rooms = new List<TacticalRoomNodeData>();
 

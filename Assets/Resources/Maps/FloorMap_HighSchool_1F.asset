@@ -1,0 +1,628 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a88fae75884c3cd47b7055258e0d7570, type: 3}
+  m_Name: FloorMap_HighSchool_1F
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.TacticalFloorMapData
+  floorId: highschool_1f
+  floorTitle: "ARCHITECTURAL BLUEPRINT // TIMBERLINE HIGH SCHOOL \u2014 1ST FLOOR ACADEMIC WING"
+  floorSubtitle: CLASSROOMS & LABORATORIES // ELEVATED FLOOR
+  gridCoordinate: 'GRID [HS-02:1F] // BIO-RADAR: SCANNING'
+  vectorMapSprite: {fileID: 3286163911610860551, guid: fce55dbb1b72bc4438f3ad9a2dfbad21, type: 3}
+  rooms:
+  - roomId: headmaster_office
+    roomCode: HEADMASTER OFFICE
+    shortSub: OFFICE
+    fullTitle: HEADMASTER OFFICE // OFFICE
+    position: {x: 0, y: -107}
+    size: {x: 73, y: 46}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: HEADMASTER OFFICE // OFFICE
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector HEADMASTER OFFICE. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - hall_1_center
+  - roomId: hall_1_center
+    roomCode: CORR-1 CENTER
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 CENTER // CORRIDOR
+    position: {x: 0, y: -49}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 CENTER // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds:
+    - headmaster_office
+    - hall_1_west_1
+  - roomId: blocked_staff_office
+    roomCode: BLOCKED STAFF OFFICE
+    shortSub: BIOHAZARD
+    fullTitle: BLOCKED STAFF OFFICE // BIOHAZARD
+    position: {x: -80, y: -107}
+    size: {x: 53, y: 46}
+    iconType: 3
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 1
+    isAccessible: 0
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: BLOCKED STAFF OFFICE // BIOHAZARD
+    statusTag: BLOCKED
+    threatLevel: HIGH
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Critical biohazard quarantine or structural cave-in. Passage blocked by severe debris or viral contamination.
+    connectedRoomIds:
+    - hall_1_west_1
+  - roomId: stairs_1_east
+    roomCode: STAIRS 1 EAST
+    shortSub: FIRE EXIT
+    fullTitle: STAIRS 1 EAST // FIRE EXIT
+    position: {x: -73, y: 3}
+    size: {x: 39, y: 30}
+    iconType: 6
+    isHallway: 0
+    isStairs: 1
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: STAIRS 1 EAST // FIRE EXIT
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Emergency fire exit stairwell. Heavy reinforced fire doors provide vertical access between facility floors.
+    connectedRoomIds:
+    - hall_1_west_1
+  - roomId: room_201
+    roomCode: ROOM 201
+    shortSub: RESIDENTIAL
+    fullTitle: ROOM 201 // RESIDENTIAL
+    position: {x: -213, y: 7}
+    size: {x: 83, y: 41}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: ROOM 201 // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector ROOM 201. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - hall_1_west_3
+  - roomId: toilet_e
+    roomCode: TOILET E
+    shortSub: RESIDENTIAL
+    fullTitle: TOILET E // RESIDENTIAL
+    position: {x: -112, y: 18}
+    size: {x: 24, y: 44}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: TOILET E // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector TOILET E. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - hall_1_west_3
+  - roomId: hall_1_west_1
+    roomCode: CORR-1 WEST 1
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 WEST 1 // CORRIDOR
+    position: {x: -74, y: -49}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 WEST 1 // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds:
+    - blocked_staff_office
+    - hall_1_center
+    - stairs_1_east
+    - hall_1_west_2
+  - roomId: hall_1_west_2
+    roomCode: CORR-1 WEST 2
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 WEST 2 // CORRIDOR
+    position: {x: -143, y: -49}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 WEST 2 // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds:
+    - hall_1_west_1
+    - radio_room
+    - hall_1_west_3
+  - roomId: hall_1_west_3
+    roomCode: CORR-1 WEST 3
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 WEST 3 // CORRIDOR
+    position: {x: -143, y: 7}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 WEST 3 // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds:
+    - hall_1_west_2
+    - toilet_e
+    - hall_1_west_4
+    - room_201
+  - roomId: hall_1_west_4
+    roomCode: CORR-1 WEST 4
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 WEST 4 // CORRIDOR
+    position: {x: -143, y: 63}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 WEST 4 // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds:
+    - hall_1_west_3
+    - room_202
+    - roof_access
+  - roomId: room_202
+    roomCode: ROOM 202
+    shortSub: RESIDENTIAL
+    fullTitle: ROOM 202 // RESIDENTIAL
+    position: {x: -213, y: 63}
+    size: {x: 83, y: 41}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: ROOM 202 // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector ROOM 202. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - hall_1_west_4
+  - roomId: roof_access
+    roomCode: ROOF ACCESS
+    shortSub: RESIDENTIAL
+    fullTitle: ROOF ACCESS // RESIDENTIAL
+    position: {x: -154, y: 110}
+    size: {x: 200, y: 39}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: ROOF ACCESS // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector ROOF ACCESS. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - hall_1_west_4
+  - roomId: department_office
+    roomCode: DEPARTMENT OFFICE
+    shortSub: OFFICE
+    fullTitle: DEPARTMENT OFFICE // OFFICE
+    position: {x: 127, y: -104}
+    size: {x: 146, y: 53}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: DEPARTMENT OFFICE // OFFICE
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector DEPARTMENT OFFICE. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds: []
+  - roomId: hall_1_east_1
+    roomCode: CORR-1 EAST 1
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 EAST 1 // CORRIDOR
+    position: {x: -243, y: 119}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 EAST 1 // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds: []
+  - roomId: stairs_1_west
+    roomCode: STAIRS 1 WEST
+    shortSub: FIRE EXIT
+    fullTitle: STAIRS 1 WEST // FIRE EXIT
+    position: {x: -235, y: 115}
+    size: {x: 39, y: 30}
+    iconType: 6
+    isHallway: 0
+    isStairs: 1
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: STAIRS 1 WEST // FIRE EXIT
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Emergency fire exit stairwell. Heavy reinforced fire doors provide vertical access between facility floors.
+    connectedRoomIds: []
+  - roomId: hall_1_east_2
+    roomCode: CORR-1 EAST 2
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 EAST 2 // CORRIDOR
+    position: {x: 165, y: -71}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 EAST 2 // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds: []
+  - roomId: hall_1_east_3
+    roomCode: CORR-1 EAST 3
+    shortSub: CORRIDOR
+    fullTitle: CORR-1 EAST 3 // CORRIDOR
+    position: {x: 143, y: 7}
+    size: {x: 24, y: 24}
+    iconType: 7
+    isHallway: 1
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: CORRIDOR
+    undiscoveredTitle: CORR-1 EAST 3 // CORRIDOR
+    statusTag: CLEAR
+    threatLevel: MEDIUM
+    scavengeStatus: UNSEARCHED
+    acousticScan: AIR DRAFT & SCRATCHING
+    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    connectedRoomIds: []
+  - roomId: toilet_w
+    roomCode: TOILET W
+    shortSub: RESIDENTIAL
+    fullTitle: TOILET W // RESIDENTIAL
+    position: {x: -243, y: 108}
+    size: {x: 24, y: 44}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: TOILET W // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector TOILET W. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds: []
+  - roomId: computer_lab
+    roomCode: COMPUTER LAB
+    shortSub: LABORATORY
+    fullTitle: COMPUTER LAB // LABORATORY
+    position: {x: 213, y: 38}
+    size: {x: 83, y: 83}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: COMPUTER LAB // LABORATORY
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector COMPUTER LAB. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - server_room
+  - roomId: server_room
+    roomCode: SERVER ROOM
+    shortSub: SERVICE ROOM
+    fullTitle: SERVER ROOM // SERVICE ROOM
+    position: {x: 213, y: 112}
+    size: {x: 83, y: 37}
+    iconType: 5
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: SERVER ROOM // SERVICE ROOM
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Facility service closet and breaker substation. Houses fuse boxes, spare cables, and building maintenance gear.
+    connectedRoomIds:
+    - computer_lab
+  - roomId: radio_room
+    roomCode: RADIO ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: RADIO ROOM // RESIDENTIAL
+    position: {x: -184, y: -67}
+    size: {x: 53, y: 44}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: RADIO ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector RADIO ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - hall_1_west_2
+  - roomId: roof_access_2
+    roomCode: ROOF ACCESS 2
+    shortSub: RESIDENTIAL
+    fullTitle: ROOF ACCESS 2 // RESIDENTIAL
+    position: {x: -184, y: -67}
+    size: {x: 53, y: 44}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: ROOF ACCESS 2 // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector ROOF ACCESS 2. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds: []
+  - roomId: department_offices
+    roomCode: DEPARTMENT OFFICES
+    shortSub: OFFICE
+    fullTitle: DEPARTMENT OFFICES // OFFICE
+    position: {x: -184, y: -67}
+    size: {x: 53, y: 44}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: DEPARTMENT OFFICES // OFFICE
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector DEPARTMENT OFFICES. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds: []
+  - roomId: library
+    roomCode: LIBRARY
+    shortSub: LIBRARY
+    fullTitle: LIBRARY // LIBRARY
+    position: {x: -184, y: -67}
+    size: {x: 53, y: 44}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: LIBRARY // LIBRARY
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector LIBRARY. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds: []
+  - roomId: library_2
+    roomCode: LIBRARY 2
+    shortSub: LIBRARY
+    fullTitle: LIBRARY 2 // LIBRARY
+    position: {x: -184, y: -67}
+    size: {x: 53, y: 44}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: LIBRARY 2 // LIBRARY
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector LIBRARY 2. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds: []
+  doorways:
+  - doorId: door_headmaster_office_hall_1_center
+    connectedRoomId: hall_1_center
+    position: {x: 0, y: -78}
+    size: {x: 24, y: 4}
+  - doorId: door_blocked_staff_office_hall_1_west_1
+    connectedRoomId: hall_1_west_1
+    position: {x: -77, y: -78}
+    size: {x: 24, y: 4}
+  - doorId: door_hall_1_west_1_hall_1_center
+    connectedRoomId: hall_1_center
+    position: {x: -37, y: -49}
+    size: {x: 24, y: 4}
+  - doorId: door_hall_1_west_1_stairs_1_east
+    connectedRoomId: stairs_1_east
+    position: {x: -73.5, y: -23}
+    size: {x: 24, y: 4}
+  - doorId: door_hall_1_west_2_hall_1_west_1
+    connectedRoomId: hall_1_west_1
+    position: {x: -108.5, y: -49}
+    size: {x: 24, y: 4}
+  - doorId: door_radio_room_hall_1_west_2
+    connectedRoomId: hall_1_west_2
+    position: {x: -163.5, y: -58}
+    size: {x: 24, y: 4}
+  - doorId: door_radio_room_hall_1_west_2
+    connectedRoomId: hall_1_west_2
+    position: {x: -163.5, y: -58}
+    size: {x: 24, y: 4}
+  - doorId: door_hall_1_west_2_hall_1_west_3
+    connectedRoomId: hall_1_west_3
+    position: {x: -143, y: -21}
+    size: {x: 24, y: 4}
+  - doorId: door_hall_1_west_3_toilet_e
+    connectedRoomId: toilet_e
+    position: {x: -127.5, y: 12.5}
+    size: {x: 24, y: 4}
+  - doorId: door_hall_1_west_3_hall_1_west_4
+    connectedRoomId: hall_1_west_4
+    position: {x: -143, y: 35}
+    size: {x: 24, y: 4}
+  - doorId: door_room_201_hall_1_west_3
+    connectedRoomId: hall_1_west_3
+    position: {x: -178, y: 7}
+    size: {x: 24, y: 4}
+  - doorId: door_room_202_hall_1_west_4
+    connectedRoomId: hall_1_west_4
+    position: {x: -178, y: 63}
+    size: {x: 24, y: 4}
+  - doorId: door_hall_1_west_4_roof_access
+    connectedRoomId: roof_access
+    position: {x: -148.5, y: 86.5}
+    size: {x: 24, y: 4}
+  - doorId: door_computer_lab_server_room
+    connectedRoomId: server_room
+    position: {x: 213, y: 75}
+    size: {x: 24, y: 4}

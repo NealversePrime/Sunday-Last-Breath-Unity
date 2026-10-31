@@ -1,0 +1,31 @@
+                    <svg width="260" height="50" viewBox="0 0 260 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="F2-Hallway-Group">
+                            <rect id="f2_hall_1" width="50" height="50" fill="black"/>
+                            <line id="Line-15" x1="50" y1="24.5" x2="70" y2="24.5" stroke="white"/>
+
+                            <rect id="f2_hall_2" x="70" width="50" height="50" fill="black"/>
+                            <line id="Line-16" x1="120" y1="24.5" x2="140" y2="24.5" stroke="white"/>
+
+                            <rect id="f2_hall_3" x="140" width="50" height="50" fill="black"/>
+                            <line id="Line-17" x1="190" y1="24.5" x2="210" y2="24.5" stroke="white"/>
+
+                            <rect id="f2_hall_4" x="210" width="50" height="50" fill="black"/>
+                            <rect id="image 1" width="50" height="50" transform="matrix(-1 0 0 1 260 0)" fill="url(#pattern0_117_66)"/>
+                        </g>
+    <defs>
+        <style>
+            rect[fill="black"] { fill: #080a0f; stroke: #263545; stroke-width: 1.5; rx: 3px; }
+            line[stroke="white"], path[stroke="white"] { stroke: #3b5068; stroke-width: 2; stroke-linecap: round; }
+            rect[id*="blocked"] { fill: url(#hazard-stripes) !important; stroke: #eab308 !important; stroke-width: 1.5; }
+            path[fill="white"] { fill: #e2e8f0; }
+        </style>
+        <pattern id="hazard-stripes" width="10" height="10" patternTransform="rotate(35)" patternUnits="userSpaceOnUse">
+            <rect width="10" height="10" fill="#18181b"/>
+            <line x1="0" y1="0" x2="0" y2="10" stroke="#f59e0b" stroke-width="4" />
+        </pattern>
+        <pattern id="pattern0_117_66" width="10" height="10" patternUnits="userSpaceOnUse">
+            <rect width="10" height="10" fill="#080a0f"/>
+            <circle cx="5" cy="5" r="3" fill="#f59e0b"/>
+        </pattern>
+    </defs>
+</svg>

@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Prologue
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Prologue
+  passageTitle: PROLOGUE
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "State.variables.gameClockActive = true;\r\n    \r\n    /* PENGAMAN: Pastikan class UI kembali normal jika passage direfresh */\r\n    $(\"body\").removeClass(\"eas-broadcast-active\");\r\n    \r\n    if(State.variables.creation_music) {\r\n        setup.sound.fade(\"creation_theme\", 2000);\r\n        setTimeout(function() {\r\n            setup.sound.stop(\"creation_theme\");\r\n            setup.sound.play(\"atmosphere\", \"audio/bgm/atmosphere.mp3\", true, 0.6);\r\n        }, 2000);\r\n        State.variables.creation_music = false;\r\n        \r\n        ['clock', 'static', 'siren', 'scream'].forEach(function(id) {\r\n            if (setup.sound.tracks[id]) setup.sound.stop(id);\r\n        });\r\n    }"
+  narrativeBeats:
+  - "if (!State.variables.hasPacked && State.variables.inventory && State.variables.inventory.length > 0) {\r\n        State.variables.tableStash = clone(State.variables.inventory);\r\n        State.variables.inventory = [];\r\n    }"
+  - "You turn away from the glass. The silence in your apartment breaks\u2014not with a scream, but with a tone.\r\n                \r\n                    \r\n                        EMERGENCY ALERT SYSTEM\r\n                    \r\n                    \r\n                        CIVIL DANGER WARNING\r\n                    \r\n                    \r\n                        \"The following message is transmitted at the request of the King County Sheriff's Office. This is not a test."
+  - A Civil Danger Warning is in effect for the Seattle metropolitan area. At 21:46, authorities reported a rapidly spreading biological hazard. Affected individuals exhibit extreme, unprovoked violence. The pathogen is highly contagious through fluid contact.
+  - Shelter in place immediately. Major interstates are closed. Lock all doors, turn off lights, and remain completely silent. Do not approach infected individuals.
+  - "The National Guard has been deployed. Lethal force is authorized.\"\r\n                    \r\n                \r\n                \r\n                    /* PICU KELAS CSS KHUSUS EAS DI SINI */\r\n                    $(\"body\").addClass(\"eas-broadcast-active\");\r\n                    \r\n                    /* PLAY TTS EMERGENCY BROADCAST HERE */\r\n                    setup.sound.play(\"ebs_warning\", \"audio/sfx/ebs_warning.mp3\", true, 0.8);\r\n                \r\n            \r\n        \r\n        \r\n        \r\n            \r\n            \r\n                \r\n            \r\n        \r\n        \r\n        \r\n            \r\n                CLICK TO CONTINUE \u25B6"
+  - "/* KEMBALIKAN UI KE UKURAN NORMAL SAAT KLIK NEXT */\r\n                            $(\"body\").removeClass(\"eas-broadcast-active\");"
+  - "/* KILLS THE ROBOTIC VOICE AND RESTARTS THE CREEPY STATIC */\r\n                            setup.sound.stop(\"ebs_warning\");\r\n                            setup.sound.play(\"static\", \"audio/sfx/static.mp3\", true, 0.3);\r\n                        \r\n                        The robotic voice cuts out. Static returns to the TV."
+  - "Through the thin walls of your apartment, you can hear it. The distant, overlapping wail of sirens. And closer... the muffled sound of heavy, frantic footsteps pounding down the hallway outside your door.\r\n                    \r\n                    \r\n                \r\n                \r\n                    \r\n                        LIVING ROOM\n\r\n                        You are standing in the middle of your living room in your pajamas. You feel naked. Vulnerable."
+  - "You glance around the dim room, illuminated only by the harsh red glow of the TV. Your everyday carry\u2014keys, phone, small tools\u2014sits on the cramped desk. But your heavier equipment rests by the front door, exactly where you dropped it after yesterday's shift."
+  - It's not a tactical survival kit. But right now, the tools of your trade are the only thing standing between you and whatever violent outbreak is tearing the city apart.
+  - "0>>\r\n                            \r\n                                \r\n                                    \r\n                                        \n\r\n                                        _i.id\r\n                                    \r\n                                \r\n                            \r\n                        \r\n                            (Table is empty)"
+  dialogueLines:
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: '''Shelter in place.'' Right. Wait in a fourth-floor box with a single exit while the military shoots anything that moves. That''s not a shelter. That''s a coffin.'
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: '''Lethal force authorized...'' The Guard doesn''t deploy for a standard riot. If they establish a quarantine cordon around this block, I''ll be trapped here.'
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: '''Biological hazard. Extreme violence.'' In an apartment complex with shared ventilation and paper-thin walls... staying here is suicide.'
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: '''Lethal force authorized...'' They don''t lock down the whole city for mass hysteria. And this front door isn''t heavy enough to keep a panicked mob out.'
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: Next
+    choiceSubtitle: 
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

@@ -1,0 +1,342 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act2_Highway
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act2_Highway
+  passageTitle: ACT2 HIGHWAY
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* =======================================================================\r\n   INITIALIZATION & VARIABLES\r\n   Runs only on the first visit to set up the scene.\r\n   ======================================================================= */"
+  narrativeBeats:
+  - "/* ADD 1 HOUR OF DRIVING TIME TO THE GAME CLOCK */\r\n    \r\n    \r\n    /* AUDIO: Initial Highway Ambience (Heavy Rain & Wind) EXACTLY ONCE */"
+  - /* WEAPON TYPE DETECTION (For the UI) */
+  - "INTERSTATE 5 \u2014 SOUTHBOUND"
+  - You've been driving for an hour. The adrenaline has faded into a dull, throbbing exhaustion. The highway was supposed to be the main artery out of the county.
+  - Instead, it's a parking lot.
+  - "A sea of red taillights stretches for miles into the dense, fog-choked night. Nobody is moving. Engines are idling, pumping gray exhaust into the cold air. You brake to a halt at the very back of the gridlock.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                        Vane leans forward, peering through the windshield."
+  - You put the car in park and rub your eyes. The silence in the cabin is heavy.
+  - ". You?\">>\r\n                                        \n\r\n                                        \r\n                                    \r\n                                        You put the car in park and rub your eyes. The silence in the cabin is oppressive. It leaves too much room for your thoughts to wander back to the blood in the Ascott Residency."
+  - See if there's any news on the traffic.
+  - "INTERSTATE 5 \u2014 SOUTHBOUND"
+  - "He reaches out and twists the radio dial, looking for a distraction. \r\n                    \r\n                        You reach out and twist the radio dial. You just want music. Anything to drown out the quiet."
+  - "Static hisses through the speakers, sharp and loud. You cycle through dead stations until a voice breaks through the noise. It isn't a DJ.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                        [EMERGENCY BROADCAST SYSTEM]"
+  - '"...repeat, all military checkpoints on I-5 and Highway 99 have been overrun. Do not proceed to the quarantine zones. I repeat, the quarantine zones have fallen."'
+  - "\"The pathogen is highly virulent. Infection is transmitted via saliva and blood transfer. Reanimation occurs within three to five minutes of death. They are not human anymore. Aim for the brain stem. May God have mercy on...\"\r\n                                    \r\n                                    \n\r\n                                    The signal cuts out, replaced by a whining dial tone."
+  - You stare at the radio. The military is gone. There is no rescue coming.
+  - "You unbuckle your seatbelt. \"Stay here,\" you mutter, popping your door open. \"I'm going to see what's holding up the line.\"\r\n                                                    \r\n                                                        You unbuckle your seatbelt, popping the door open. You need to see what's holding up the line."
+  - Check the road ahead.
+  - "INTERSTATE 5 \u2014 SOUTHBOUND"
+  - You step out onto the asphalt. The air is freezing. You walk past the first few cars ahead of you. Families. Solo drivers. Some are sleeping, some are crying. Nobody knows what's happening.
+  - You look about a quarter-mile down the highway.
+  - BOOM.
+  - "A brilliant flash of orange fire erupts near the front of the gridlock. A car just exploded. \r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    Then, the screaming starts."
+  - It's a wave. You watch in horror as the brake lights of the cars ahead of you violently shift. Drivers are panicking, slamming their cars into the vehicles next to them, trying to escape the road. Through the fog, you see shapes sprinting between the cars. They are dragging people through shattered windows.
+  - "The infection didn't start at the front of the line\u2014someone in the traffic jam was bitten."
+  - "The wave of panic and blood is moving backward. Straight toward you.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                        /* AUDIO: Vane driving */"
+  - As you sprint back to your car, you hear the engine roar. Vane has slid into the driver's seat! He slams the car into reverse, tires squealing, perfectly angling the sedan to hop the median and face the opposite direction.
+  - He kicks the passenger door open for you.
+  - You lunge for the door, but two figures vault over the hood of the car parked next to yours. Their clothes are torn, their mouths dripping with fresh gore. They cut you off from the passenger door.
+  - "Vane can't drive away without leaving you behind. You have to kill them to get in the car.\r\n                                                    \r\n                                                        You turn and sprint back to your sedan. You have to U-turn and get off this highway right now. You reach the door handle, fumbling for your keys. You need to get in, throw it in reverse, and jump the median."
+  - But before you can pull the door open, glass shatters from the car parked directly adjacent to yours. Two figures crawl out of the broken window, thrashing wildly. Their skin is pale, their mouths dripping with fresh gore. They lock their milky eyes on you.
+  - They are blocking your door. You can't turn the car around until they're dead.
+  - "/* Fade out environment before jumping to combat */\r\n                                                                \r\n                                                                \r\n                                                                \r\n                                                            \r\n                                                            Engage the infected."
+  - "INTERSTATE 5 \u2014 COMBAT"
+  - "0>>\r\n                \r\n                    \r\n                    \r\n                    \r\n                        \r\n                    \r\n                    \r\n                    ENEMIES REMAINING: \r\n                    \r\n                    \r\n                    \r\n                        \r\n                            \r\n                                TARGET: _z.name (Evasion: _z.ev%)"
+  - "EQUIPPED: \r\n                    \r\n                        UNARMED (Fists)\r\n                    \r\n                        $equip.weapon"
+  - "/* AUDIO: Post-Combat Body Drop */\r\n                \r\n                    \r\n                    \r\n                \r\n                \r\n                \r\n                \r\n                    \U0001F480\r\n                    TARGETS ELIMINATED\r\n                    \n\r\n                    [+50 XP]\r\n                    \r\n                        \r\n                        \r\n                    \r\n                \r\n                \r\n                \r\n                    \r\n                        The final infected collapses against the side of the car, smearing thick, dark blood down the glass before slumping to the wet asphalt. You are panting hard. Your hands are slick with rain and gore.\r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                            Vane leans over from the driver's seat and kicks the passenger door open for you. He looks completely pale, staring wide-eyed at the bodies on the ground."
+  - You don't need to be told twice. You shove the bodies away with your boot, slide into the passenger seat, and slam the door shut.
+  - "Vane takes his foot off the brake. The sedan surges backward, completing its 180-degree spin over the muddy median, before he throws it into Drive and punches the gas.\r\n                                        \r\n                                            You shove the bodies away with your boot, yank the door open, and slide into the driver's seat. You slam the door shut and lock it just as another infected throws its hands against the rear window."
+  - You throw the car into reverse, spinning 180 degrees over the muddy median, ripping up grass and mud. You shift into Drive and punch the gas, leaving the horde to swarm the empty gridlock behind you.
+  - "The highway is a graveyard. You need a new route. And you are going to need fuel.\r\n                                        \r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    /* Clean up phase variables before advancing to the next Act */\r\n                                                    \r\n                                                     \r\n                                                \r\n                                                Get off the interstate."
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Dammit. Dead stop. We aren't going anywhere fast.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: So... before today. Before the world literally ended. What did you actually do?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I was a <<print $job>>. You?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Content creator. Aesthetic lifestyle, brand sponsorships... Honestly? Maintaining the 'perfect life' illusion was exhausting. Funny how a zombie apocalypse is the only thing that could cure my burnout.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Overrun? But... the army was out there. If they can't stop this, what the hell are we supposed to do?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: GET IN! WE HAVE COMPANY!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Get in. Get in right now.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: See if there's any news on the traffic.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_Highway
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Check the road ahead.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_Highway
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Engage the infected.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_Highway
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: ATTACK TARGET
+    choiceSubtitle: 
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Get off the interstate.
+    targetPassage: {fileID: 11400000, guid: deaceb2739f091247998c57bf909a8a1, type: 2}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

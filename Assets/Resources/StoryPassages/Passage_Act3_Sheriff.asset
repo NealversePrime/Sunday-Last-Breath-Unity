@@ -1,0 +1,1600 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_Sheriff
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_Sheriff
+  passageTitle: ACT3 SHERIFF
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* \u2500\u2500\u2500 TIME OF DAY CHECK (DAY 0 / EARLY OUTBREAK) \u2500\u2500\u2500 */"
+  narrativeBeats:
+  - "/* \u2500\u2500\u2500 COMPANIONS CHECKS \u2500\u2500\u2500 */"
+  - "/* \u2500\u2500\u2500 WEAPON & EQUIPMENT DETECTION \u2500\u2500\u2500 */"
+  - i.id === "Multi-Tool") or $equip.weapon === "Multi-Tool")>>
+  - "/* Check if any bladed weapon exists in the inventory */\r\n [\"Combat Knife\", \"Hunting Knife\", \"Kitchen Knife\", \"Scalpel\", \"Machete\"].includes(i.id)) !== undefined)>>"
+  - "/* \u2500\u2500\u2500 VEHICLE CAPACITY CHECKS \u2500\u2500\u2500 */"
+  - "/* Maya + Lily */\r\n  /* Diane + 2 Boys */\r\n= 4)>>"
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 1 \u2014 THE APPROACH\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "KING COUNTY SHERIFF \u2014 SUBSTATION 4"
+  - "The tires crunch softly against wet gravel as the car rolls to a halt behind the dark building. Up close, a cracked plastic sign on the wall reads KING COUNTY SHERIFF \u2014 SUBSTATION 4."
+  - Only a few hours ago, this was an ordinary, quiet town. Now the gravel lot looks like a war zone. Two patrol cruisers sit smashed together against the perimeter fence, their windshields spiderwebbed with bullet holes. Spent brass casings glint in the wet mud alongside burnt-out road flares and scattered paperwork.
+  - "The morning fog hangs heavy and gray over the scene. A faint, dying red emergency strobe flickers behind the barred windows\u2014weak, like a failing heartbeat in the damp chill. The bodies piled near the shattered front entrance are stiffening under a thin layer of morning frost."
+  - "Somewhere around the side of the building, a mechanical engine gives a dry, sputtering rattle\u2014an emergency generator running on its very last drops of gas.\r\n                \r\n                    The freezing rain pours down in sheets against the dark concrete. The emergency strobe behind the front windows pulses violently\u2014a blinding red flash that paints the wet pavement in bloody reflections every two seconds."
+  - Somewhere in the utility alley, a heavy generator roars with a steady, deafening drone, keeping the building's circuits buzzing in the pitch-black night.
+  - Vane cuts the ignition, his hands trembling slightly on the steering wheel as he stares through the rain at the bloodstained cruiser doors. In the backseat, Maya gathers seven-year-old Lily against her chest, turning the little girl's head into her jacket so she won't see the bodies outside.
+  - Vane kills the engine. In the back, Diane's hands rest tightly on the shoulders of her two boys. She stares out at the bullet-pocked brick with a cold, protective glare.
+  - Vane leans over the dashboard, his eyes wide as he clutches his Pelican camera case against his knees like a shield.
+  - "Maya's voice comes from the rear seat\u2014a hushed, terrified whisper so as not to panic Lily."
+  - Diane looks at the blood smeared across the cruiser windshields, her face pale but resolute.
+  - You sit in the driver's seat as the engine ticks cool.
+  - Only yesterday evening, life was normal. Now, in the dark pre-dawn hours, you're staring at the bloodied remains of a county sheriff substation. You have no idea how widespread this outbreak is, but if the local police couldn't hold their own precinct, the entire valley might be falling.
+  - You check your weapon. The front entrance is blocked with bodies and overturned furniture. Your only way inside is through the rear maintenance fence.
+  - Slip into the dark alley running along the side of the building.
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 2 \u2014 THE PERIMETER FENCE & ENTRY (DRAMATIC ACTION CHOICES)\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "SUBSTATION \u2014 REAR MAINTENANCE PERIMETER"
+  - You slip through the dripping pine branches into the maintenance alley. A ten-foot chain-link fence topped with barbed wire seals off the rear loading dock and the heavy steel exit door.
+  - "Through the wire mesh, you can see a large metal trash dumpster shoved beneath the wall. About eight feet above the concrete, a narrow transom window sits unlatched and slightly ajar\u2014probably left cracked for ventilation before the chaos erupted last night."
+  - "You help Vane over the fence and drop quietly onto the loading dock. The rear steel door is solid and has no exterior handle\u2014locked from the inside."
+  - '"Look up there," Vane whispers nervously, pointing at the narrow open window. "I think I can squeeze through the transom gap if you give me a boost. I''ll drop down on the other side and hit the emergency crash bar to let you in."'
+  - You lace your fingers together and brace your back against the brick. Vane steps onto your hands, grabs the windowsill, and wriggles his slender frame through the narrow opening.
+  - "*CRASH\u2014CLATTER!*"
+  - In the pitch darkness inside, his shoe catches a metal shelving unit. Steel filing trays and clipboards crash onto the floor with a deafening rattle that rings through the air vents.
+  - '"Oh god... sorry, I''m sorry," Vane''s voice whispers in a panic through the window. "I couldn''t see... but I think something outside heard that!"'
+  - From the dark corner beside the dumpster, a figure in a torn police uniform stumbles into view. Its face is covered in dark, half-dried blood, its eyes milky and unfocused. It stops, head twitching wildly toward you, drawing in a sharp, guttural breath to shriek!
+  - "\u26A0\uFE0F DANGER: Silence the turned deputy before its scream draws the horde from the front!"
+  - "i.id === \"Compound Bow\") or $equip.weapon === \"Compound Bow\">>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                        You draw the heavy carbon string to your cheek, exhaling into the freezing mist. The fiber-optic sight settles between the turned deputy's milky eyes."
+  - "*THWIP\u2014CRACK!*"
+  - The broadhead arrow punches through the skull with violent precision. The turned deputy collapses like a cut marionette, hitting the wet mud with a soft, dull thud.
+  - 'From the open transom window above, Vane lets out a shaky, trembling breath: "Holy shit... you got it. Hold on, I''m hitting the manual release bar now!"'
+  - "A heavy metallic clunk echoes as the back security door pops unlocked.\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Step inside the records room corridor.\r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                                [COMPOUND BOW] Carbon arrow kill. Zero noise."
+  - "= 2 or hasTrait(\"GHOST\")) and _hasBlade>>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                        You ghost across the wet asphalt, slipping into the creature's peripheral blind spot with zero sound. Just as its chest expands to scream, your arm hooks around its jaw, yanking its head back while your blade drives upward into the base of its skull!"
+  - A wet crunch. The creature instantly goes dead weight. You guide the heavy corpse down onto the asphalt without a sound.
+  - 'Vane peers down from the window, his eyes wide in awe: "You took it down like a ghost... hold on, pushing the crash bar now!"'
+  - "The heavy door latch unseals with a dull click.\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Step inside the records room corridor.\r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                                [STEALTH 2 / GHOST + BLADE] Silent execution. Zero noise.\r\n                            \r\n                        \r\n                            \r\n                                Stealth blade takedown\n\r\n                                \r\n                                    = 2 or hasTrait(\"GHOST\"))>>\r\n                                        [REQUIRES STEALTH 2 / GHOST] You lack the speed to close the distance quietly in time.\r\n                                    \r\n                                        [REQUIRES BLADED WEAPON] You need a knife or blade equipped to execute silently."
+  - "= 6 or $skills.melee >= 2>>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                        You cross the distance in two powerful strides. Before the turned deputy can draw breath into its lungs, both your hands clamp onto its collar and throat, using your full body momentum to slam it skull-first into the concrete!"
+  - '*CRACK!*'
+  - The bone fractures against the curb. The creature twitches once and goes limp.
+  - 'From the window above, Vane exhales a shaky gasp: "Damn... that was close. Pushing the bar now!"'
+  - "The rear security door clicks open.\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Step inside the records room corridor.\r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                                [STR 6 / MELEE 2] Violent slam. Low noise.\r\n                            \r\n                        \r\n                            \r\n                                Tackle and slam [REQUIRES STR 6 / MELEE 2]\n\r\n                                You lack the brute physical power to pin it down before it shrieks."
+  - You throw your entire body weight into the lunging creature. The two of you crash hard into the steel dumpster with a deafening *BOOM!*
+  - Rotting teeth snap inches from your throat as frantic fingernails gouge across your arm. Spitting blood and freezing rain, you wrench its head sideways and smash its skull repeatedly into the asphalt curb until the thrashing stops.
+  - '[INJURY] -15 HP, -20 STAMINA. You lean against the brick wall, bruised and bleeding, chest heaving in the dark.'
+  - "From the window above, Vane is trembling in panic: \"Jesus Christ! The whole alley heard that\u2014get inside, quick!\""
+  - "The steel crash bar rattles open.\r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                            \r\n                                            Escape into the records room corridor.\r\n                                        \r\n                                    \r\n                                \r\n                            \r\n                            [INJURY + NOISE] Costs 20 STAMINA and 15 HP. Brutal brawl. High noise."
+  - The front of the building is impassable. Your only way inside is to scale or breach the rear maintenance fence alone.
+  - "= 6>>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                        You take two quick strides, spring off the steel dumpster lid, and catch the wet window sill with your fingertips. In one fluid, acrobatic motion, you pull your chest up and slip through the narrow transom gap, landing lightly in a crouch on the records room linoleum."
+  - "Zero noise generated. You reach over and unbolt the rear door from inside.\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                                [AGI 6] Acrobatic vault. Zero noise.\r\n                            \r\n                        \r\n                            \r\n                                Dumpster vault [REQUIRES AGI 6]\n\r\n                                You lack the acrobatic agility to reach the window cleanly."
+  - "= 6>>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                        You grip the cold steel mesh and haul your weight upward with steady, controlled muscle. Swinging one leg carefully over the top rail to avoid the razor wire, you drop onto the loading dock, absorbing the impact with bent knees."
+  - "Low noise. You pop the window latch and pull yourself into the building.\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                                [STR 6] Controlled climb. Costs 10 STAMINA. Low noise.\r\n                            \r\n                        \r\n                            \r\n                                Climb by strength [REQUIRES STR 6]\n\r\n                                You lack the upper body strength to haul yourself over quietly."
+  - "i.id === \"Crowbar\")>>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                        You seat the hardened iron pry tip beneath the padlock's shackle and lean your full weight into the bar. The steel housing groans under the pressure\u2014and with a sharp, clean *POP*, the lock snaps."
+  - "You catch the chain before it clatters against the pavement and ease the gate open.\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                                [PRYING TOOL] Snap lock shackle. Zero noise.\r\n                            \r\n                        \r\n                            \r\n                                Pry gate lock [REQUIRES CROWBAR OR TIRE IRON]\n\r\n                                No heavy prying tool available."
+  - "i.id === \"Lockpicks\")>>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                        Your hands are steady despite the freezing drizzle. You insert the tension wrench and rake the four brass pins. In less than six seconds, the cylinder rotates with a soft mechanical click."
+  - "The padlock opens in your palm. The service gate swings inward without a whisper.\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                                [LOCKSMITH / LOCKPICKS] Pick lock. Zero noise."
+  - You scramble up the chain-link fence in a desperate rush. The wire mesh rattles violently against the steel posts, echoing down the alley. Your jacket snags on the top barbed wire, tearing with a sharp rip as you tumble over and land hard on the concrete loading dock with a loud metallic crash!
+  - "[HIGH NOISE] Costs 15 STAMINA. You scramble through the transom window into the building, heart hammering against your ribs.\r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                            \r\n                            [NOISE HAZARD] Costs 15 STAMINA. Rushed scramble. High noise generated."
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 3 \u2014 INTERIOR SEARCH\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "SUBSTATION \u2014 RECORDS & ARMORY CORRIDOR"
+  - You push through the back door and drop the interior security bolt into place. Vane leans against the concrete wall, clutching his chest and panting in the dim red emergency light.
+  - You slip inside the rear corridor and pause, listening to the echoing silence.
+  - The air smells heavily of spent rounds, old coffee, and cold rain. The red emergency strobe pulses down the hallway. Three distinct areas are within reach.
+  - "/* \u2550\u2550 ZONE 1: BOOKING DESK \u2550\u2550 */\r\n                \r\n                    \r\n                        \r\n                        \r\n                            The Booking Desk"
+  - "Shattered computer screens and scattered patrol logs. An emergency dispatch terminal is still flickering with an active text prompt.\r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                \r\n                                Check what was typed before the staff fled or fell.\r\n                            \r\n                        \r\n                    \r\n                \r\n                    \r\n                        \u2713 [DISPATCH TERMINAL SEARCHED]"
+  - You punch in a standard county override code. The screen reveals a series of frantic 911 calls that flooded the substation starting around 22:00 Saturday night. The final dispatched radio broadcast ordered all surviving staff and civilian refugees to fall back to a fortified perimeter at Timberline Regional High School.
+  - "A chilling unfinished memo is left on the screen:\r\n                            \r\n                                \"...perimeter at the high school established by Vice Principal and volunteer staff. Jumpy as hell. Do not approach the school gate on foot without announcing yourself over the horn or having local ID...\"\r\n                            \r\n                        = 5 or hasTrait(\"THEORY\")>>\r\n                            You scroll through the panicked operator notes. The calls start with violent domestic reports at 10 PM last night, spiraling into total blackout within two hours. A handwritten sticky note on the monitor reads: \"FALLBACK: REGIONAL HIGH SCHOOL GYM. BE CAREFUL AT GATES.\"\r\n                        \r\n                            You find an evacuation bulletin printed on the desk:\r\n                            \r\n                                ALL UNITS & CIVILIANS FALL BACK TO TIMBERLINE REGIONAL HIGH SCHOOL REFUGEE SANCTUARY."
+  - "/* \u2550\u2550 ZONE 2: EVIDENCE LOCKER \u2550\u2550 */\r\n                \r\n                    \r\n                        \r\n                        \r\n                            The Evidence Cage"
+  - Heavy steel mesh cage with a padlock on the latch. Inside are stacked tactical vest pouches and emergency field trauma kits.
+  - "[MEDIC] You spot sealed boxes of broad-spectrum antibiotics and trauma bandages on the second shelf.\r\n                                \r\n                            \r\n                        \r\n                        \r\n                             i.id === \"Lockpicks\")>>\r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                            \r\n                                            \r\n                                        \r\n                                        \r\n                                    \r\n                                    [LOCKSMITH] Acquire: Tactical Vest, 2\xD7 Antibiotics, 2\xD7 Painkillers. Zero noise.\r\n                                \r\n                             i.id === \"Crowbar\")>>\r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                            \r\n                                        \r\n                                        \r\n                                    \r\n                                    [CROWBAR] Acquire: Tactical Vest, 1\xD7 Antibiotics. Low noise.\r\n                                \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [NOISE] Costs 15 STAMINA. Acquire: Tactical Vest. High noise.\r\n                                \r\n                            \r\n                        \r\n                    \r\n                \r\n                    \r\n                        \u2713 [EVIDENCE LOCKER SEARCHED]\n\r\n                        Tactical vest and medical supplies secured."
+  - "/* \u2550\u2550 ZONE 3: ARMORY SAFE \u2550\u2550 */\r\n                \r\n                    \r\n                        \r\n                        \r\n                            The Armory Safe"
+  - "Reinforced metal cabinet. Beside it stands a personal locker labeled with a nametag: DEP. REYES. Taped inside the louver is a small school photo of a smiling young girl.\r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                        Keypad override [OFFLINE]\r\n                                    \r\n                                \r\n                                    \r\n                                        \r\n                                            \r\n                                            \r\n                                            \r\n                                            \r\n                                        \r\n                                        [POLICE] Acquire: Remington 870, 12\xD7 Shells. Zero noise.\r\n                                    \r\n                                \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [LOCKSMITH] Acquire: FN Five-Seven, 20\xD7 Ammo. Zero noise.\r\n                                \r\n                            = 2 or _hasMultiTool>>\r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [TECH 2] Acquire: Remington 870, 8\xD7 Shells. Zero noise.\r\n                                \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [BRUTE FORCE] Costs 20 STAMINA. Acquire: Remington 870, 8\xD7 Shells. High noise.\r\n                                \r\n                            \r\n                        \r\n                    \r\n                \r\n                    \r\n                        \u2713 [ARMORY SEARCHED]\n\r\n                        Firearms and ammunition secured."
+  - Head back toward the rear loading dock with your gear.
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 4 \u2014 THE EXIT\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "SUBSTATION \u2014 LOADING DOCK (SILENT EXIT)"
+  - You ease back through the records corridor. The red strobe still pulses through the lobby, but the front glass holds. You push the rear exit door open and step out into the freezing pre-dawn air.
+  - As you drop off the dock, you freeze.
+  - Standing by the maintenance shed fence in the shadows is a woman in a police windbreaker over dark civilian clothes. A tactical respirator hangs loose around her neck, and tinted goggles are pushed up on her forehead. Her face is pale and streaked with soot, her eyes red-rimmed and sunken from hollow grief and hours without sleep.
+  - Her hand rests near her holstered sidearm, but she doesn't draw. She stares at you with pure exhaustion.
+  - Her voice is raspy, tight with held-back tears.
+  - She takes a ragged breath, blinking hard against the cold mist.
+  - Her grief is real. Hear her out and accept her help.
+  - '[TRUST NO ONE] Read her voice and posture for any sign of deception.'
+  - "= 7>>\r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        [DIPLOMAT / CHA 7] Acknowledge her sacrifice and form a mutual partnership."
+  - "SUBSTATION \u2014 EMERGENCY ALARM BREACH"
+  - Before you reach the rear exit door, an automated building alarm detonates with a deafening siren that shrieks through the ceiling horns!
+  - Heavy motorized fire shutters begin groaning downward, threatening to trap you inside. Through the front glass, infected turn in a frenzy and surge toward the records hallway!
+  - Suddenly, a figure in a police windbreaker and respirator appears at the exterior maintenance console. Her hands slam against the manual release valve. The descending steel shutter screeches and halts fifty centimeters off the concrete!
+  - She tosses a burning road flare into the front hallway to distract the infected, then reaches under the shutter toward you.
+  - Roll out onto the loading dock into the alley.
+  - '[LIE DETECTOR] Rapid read as you scramble under the steel bar.'
+  - "= 7>>\r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        [DIPLOMAT] Establish camaraderie in the heat of the moment."
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 5 \u2014 REYES REACTION & VEHICLE CAPACITY\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "SUBSTATION \u2014 ALLEYWAY EXTRACTION"
+  - Reyes pulls her respirator down to her chest. Her eyes are heavy with unspeakable fatigue.
+  - "[LIE DETECTOR] Her hands tremble with grief, but her gaze is completely steady. The sorrow over her daughter is raw and genuine. She is telling the absolute truth.\r\n                    \r\n                \r\n            \r\n                Reyes gives a faint, appreciative nod, wiping a bead of rain from her eyebrow."
+  - You follow Reyes down the wet gravel path toward the parked sedan.
+  - As you reach the car, Reyes peers through the window.
+  - Her gaze immediately locks onto Maya in the back seat, holding young Lily tucked protectively against her jacket, and Diane with her two boys.
+  - Reyes's breath catches in her throat. A look of overwhelming, piercing grief washes over her features as she stares at the children. Her hand drops from the car door handle.
+  - She steps back, swallowing hard, her jaw tightening with fierce resolve.
+  - She counts the passengers through the windshield.
+  - She sees the children in the rear seat. Her eyes soften with deep emotion.
+  - "She knows the local side streets and can move silently.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        Keep everyone inside the vehicle for maximum protection."
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 6 \u2014 THE ESCORT OUT\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "TIMBERLINE \u2014 EN ROUTE TO HIGH SCHOOL SANCTUARY"
+  - Reyes runs to the maintenance shed and wheels out a matte-black mountain bike. She fastens a small, dim red LED light to the seat post.
+  - "In the backseat, Maya holds Lily close, her eyes shining with quiet gratitude as she watches Reyes prepare the route.\r\n                \r\n                    Diane watches through the window with a solemn, respectful nod. \"A mother who lost everything... she'll fight like hell to protect what's left.\""
+  - "She pushes off the gravel and pedals smoothly into the dark, foggy morning road ahead.\r\n            \r\n                Reyes climbs into the car and rests her hands on her knees, staring out at the foggy windshield."
+  - She leans back against the headrest, closing her eyes for a brief moment to gather her strength.
+  - The engine hums quietly. You pull out of the substation gravel lot, rolling north through the mist toward Timberline Regional High School.
+  - She knows the checkpoint guards. Follow her lead to get past the gates safely.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: God... not even the police? They had body armor, rifles, radios... what could have done this to them in just one night? If an entire squad of deputies couldn't hold their own station, what are we supposed to do?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Listen to that humming sound around the side. That's a generator. If there's power, maybe the desk computer or an emergency radio is still on... maybe someone left an evac notice or a frequency we can tune into. But look at those front doors. Whatever attacked them tore right through the glass.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Maya, keep Lily down in the footwell and keep the doors locked. Vane, watch my back. If anything goes wrong\u2014if you hear screams or gunshots\u2014don't wait for me. Hit the gas and get the hell out of here."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Look at those dead officers by the steps. If a dozen armed cops couldn't survive the night in a reinforced concrete bunker, whatever did this isn't human. We shouldn't be here. We should keep driving.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Diane, we're almost out of options. We don't even know where the military checkpoint is. That generator is still running\u2014there might be an emergency log or a map on the desk inside before the fuel runs dry."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Diane, stay with the boys. Keep the car in drive. If you hear anything go bad inside, step on the gas. We'll be as fast as we can.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "The front entrance is completely blocked by corpses and broken furniture. But look at the utility box on the side\u2014the generator is humming. If the power's on, maybe their emergency dispatch terminal has information about where survivors are being sent."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: We can't use the front doors. We'll have to find a way in through the rear maintenance fence. Stay quiet, keep low.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Look at the bullet holes in the walls... they were shooting wildly in the dark. It looks like a slaughterhouse. Please be careful in there... Lily and I can't do this alone if something happens to you.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I'll just grab what we need and come right back. Keep the doors locked. If you see anything move outside, stay down.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The emergency alert went out only hours ago, and this town is already tearing itself apart. Don't be a hero in there. Get the supplies and get back out. My boys need living allies.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Understood. I won't take any dumb risks.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The air in here smells like burnt gunpowder and copper... Look down the hall. That's the booking desk and the evidence lockers. Let's see if anyone left a radio log or supplies before whatever happened here happened.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: ...Is she a survivor? How long has she been standing there?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Easy... I'm not infected. Deputy Reyes. This is my substation. Or it was, until midnight.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I live just down the road. When the 911 calls exploded at ten last night, my radio broadcast told everyone to head for the high school sanctuary. I tried to get my daughter, Emma, there... but the streets were blocked with crashed cars and infected. We were attacked. She didn't make it.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I couldn't save my own little girl. So I volunteered to scout the roads outside the school on my bike... looking for people who still have a chance. You came out of that station alive, which means you're trying to reach the sanctuary too. But you won't get past the school gates without someone who knows the guards.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The emergency shutters are dropping! We're gonna be trapped!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Deputy Reyes! Slide under the shutter NOW! It's not going to hold!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "I have no reason to lie to you. My house is just down the road\u2014I lived there with my daughter, Emma. When the town collapsed around midnight, I tried to get her to the high school sanctuary. She died in my arms on that road. I don't care about anything now except helping other people reach those gates alive."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Thanks, $firstName. Having people who can still talk calmly after a night like this gives me hope. Let's get to your vehicle.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You have children in there.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "I'm not crowding that car or draining your fuel. I have my mountain bike stashed in the maintenance shed around the corner. I've been riding on two wheels since midnight\u2014silent, fast, and able to squeeze through blocked alleys. I'll ride point and scout the turns ahead. We're going to get those kids to safety. Follow my rear light."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "That car is at full capacity. Extra weight will only risk blowing a tire on these broken rural roads. I have my mountain bike stashed in the shed\u2014I'll ride point and scout ahead on two wheels."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Keep the kids comfortable. I'll take my mountain bike from the shed and ride ahead to scout the intersections. It's safer if I check the road first.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: There's room in the passenger seat, or I can pull my mountain bike from the shed and ride point to scout ahead. What do you prefer?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Smart... silent, fast on rough dirt trails. She's doing everything she can to survive.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Follow my red light. Keep about twenty meters behind me so you have room to brake. When we reach the high school perimeter, stay in the car. The Vice Principal and the volunteer guards are scared and jumpy after last night. Let me talk to them first\u2014they know my badge."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Head north on County Road 4. When we pull up to the high school gate, let me step out first. The Vice Principal has the place locked down tight, and the guards will be on edge. They know my face.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Look around and listen \u25BC"
+    choiceSubtitle: Slip into the dark alley running along the side of the building.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Draw, aim, and release. [COMPOUND BOW]'
+    choiceSubtitle: Step inside the records room corridor.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Step from the shadows and strike the base of the skull. [STEALTH 2 / GHOST + BLADE]'
+    choiceSubtitle: Step inside the records room corridor.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: stealth
+    requiredSkillLevel: 2
+    requiredTrait: GHOST
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Lunge forward and slam it into the pavement. [STR 6 / MELEE 2]'
+    choiceSubtitle: Step inside the records room corridor.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Might
+    requiredStatValue: 6
+    requiredSkill: melee
+    requiredSkillLevel: 2
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Tackle it and wrestle it down! (Desperate Struggle)
+    choiceSubtitle: Escape into the records room corridor.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 20
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Vault off the dumpster lid and grab the open window sill. [AGI 6]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Reflex
+    requiredStatValue: 6
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Climb the chain-link fence hand-over-hand. [STR 6]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 10
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Might
+    requiredStatValue: 6
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Pry the service gate padlock with leverage. [CROWBAR / TIRE IRON]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Pick the gate padlock. [LOCKSMITH / LOCKPICKS]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: LOCKSMITH
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Scramble frantically over the chain-link! (Brute Force)
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 15
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Examine the Dispatch Terminal
+    choiceSubtitle: Check what was typed before the staff fled or fell.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Pick Evidence Cage
+    choiceSubtitle: "[LOCKSMITH] Acquire: Tactical Vest>, 2\xD7 Antibiotics, 2\xD7 Painkillers>. Zero noise."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: LOCKSMITH
+    requiredItem: 
+    consumesItem: 
+    givesItem: Tactical Vest
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Pry Evidence Cage
+    choiceSubtitle: "[CROWBAR] Acquire: Tactical Vest>, 1\xD7 Antibiotics>. Low noise."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Tactical Vest
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Smash Cage Lock (Brute Force)
+    choiceSubtitle: '[NOISE] Costs 15 STAMINA. Acquire: Tactical Vest. High noise.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 15
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Tactical Vest
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Key Municipal Override
+    choiceSubtitle: "[POLICE] Acquire: Remington 870, 12\xD7 Shells. Zero noise."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Remington 870
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Pick Reyes's Personal Locker
+    choiceSubtitle: "[LOCKSMITH] Acquire: FN Five-Seven, 20\xD7 Ammo. Zero noise."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: LOCKSMITH
+    requiredItem: 
+    consumesItem: 
+    givesItem: FN Five-Seven
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Bypass Solenoid Circuit
+    choiceSubtitle: "[TECH 2] Acquire: Remington 870, 8\xD7 Shells. Zero noise."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: tech
+    requiredSkillLevel: 2
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Remington 870
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Sledge Safe Latch (Brute Force)
+    choiceSubtitle: "[BRUTE FORCE] Costs 20 STAMINA. Acquire: Remington 870, 8\xD7 Shells. High noise."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 20
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Remington 870
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Make for the rear exit (Loading Dock)
+    choiceSubtitle: Head back toward the rear loading dock with your gear.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: Her grief is real. Hear her out and accept her help.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: '[TRUST NO ONE] Read her voice and posture for any sign of deception.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: TRUST NO ONE
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: '[DIPLOMAT / CHA 7] Acknowledge her sacrifice and form a mutual partnership.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Leadership
+    requiredStatValue: 7
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: DIPLOMAT
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Drop and slide under the steel shutter!
+    choiceSubtitle: Roll out onto the loading dock into the alley.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: '[LIE DETECTOR] Rapid read as you scramble under the steel bar.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: TRUST NO ONE
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: '[DIPLOMAT] Establish camaraderie in the heat of the moment.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Leadership
+    requiredStatValue: 7
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: DIPLOMAT
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Ride point on the bike. Scout the road ahead.
+    choiceSubtitle: She knows the local side streets and can move silently.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Get in the car. We stay together.
+    choiceSubtitle: Keep everyone inside the vehicle for maximum protection.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Prepare to follow Reyes \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Follow Reyes to Timberline High School Sanctuary
+    choiceSubtitle: She knows the checkpoint guards. Follow her lead to get past the gates safely.
+    targetPassage: {fileID: 11400000, guid: f0c238b817368cf41b07250574d2d1c5, type: 2}
+    targetPassageId: Act3_ArrivalSchool
+    targetRoomId: security_foyer
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

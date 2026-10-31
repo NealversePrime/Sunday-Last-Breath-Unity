@@ -1,0 +1,1652 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_Home
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_Home
+  passageTitle: ACT3 HOME
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* \u2500\u2500 COMPANION CHECKS (BULLETPROOF) \u2500\u2500 */"
+  narrativeBeats:
+  - "/* \u2500\u2500 TIME OF ARRIVAL \u2500\u2500 */"
+  - "/* \u2500\u2500 CAR CAPACITY CALCULATION \u2500\u2500 */"
+  - "/* Maya + Lily */\r\n  /* Diane + 2 Boys */\r\n= 4)>>"
+  - "/* \u2500\u2500 DYNAMIC WEAPON CHECK FOR DIALOGUE \u2500\u2500 */"
+  - i.id === "Multi-Tool") or $equip.weapon === "Multi-Tool")>>
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 1 \u2014 THE APPROACH\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "THE COLONIAL HOUSE \u2014 EXTERIOR"
+  - 'You pull the sedan to the curb and cut the engine. The colonial house sits quiet at the head of the cul-de-sac, set back from the road behind a low split-rail fence. Up close, the details resolve out of the fog:'
+  - Every window intact, every shutter still on its hinges. In the pale gray of early morning, against a street of broken glass and kicked-in doors, the house looks almost normal. Like the world stopped just before it got here.
+  - "The ground-floor window to the left of the porch has been covered from the inside with a dark blanket. In daylight, the covering looks deliberate\u2014measured, tucked at the corners. Not panicked. Someone took their time doing this. Along the bottom edge: a faint amber warmth. A candle burning in the middle of the morning. Either no one told them it was daylight, or they never went to sleep.\r\n                \r\n                    Every window intact, every shutter still on its hinges. In a neighborhood where every other house has at least one broken pane or kicked-in door, this is conspicuous. Someone maintained this place after the world stopped maintaining anything."
+  - "The ground-floor window to the left of the porch has been covered from the inside with a dark blanket\u2014thick enough to block most light. But a faint, unsteady amber glow pulses behind it. A candle. Someone is in there, holding the dark at bay."
+  - "Vane leans forward between the seats. He\u2019s chewing his lower lip nervously, studying the house with the focused expression he gets when he's running numbers."
+  - In the backseat, Maya has seven-year-old Lily tucked securely under her arm. Her voice is careful, but edged with a mother's desperation.
+  - "/* \u2500\u2500 DYNAMIC WEAPON DIALOGUE FOR MAYA \u2500\u2500 */"
+  - Vane squints nervously at the covered window.
+  - Diane looks at the house without expression. Her hands are folded tightly in her lap.
+  - "/* \u2500\u2500 DYNAMIC WEAPON DIALOGUE FOR DIANE \u2500\u2500 */"
+  - Vane shivers, clutching Marcus's journal.
+  - Maya is already looking at the house the way she looks at things she's trying to decide whether to be afraid of. She rubs Lily's shoulders to generate heat.
+  - Diane studies the house from the passenger seat. The boys are asleep in the back, finally.
+  - A pause.
+  - You sit alone with the engine ticking cool and look at the covered window for a long moment.
+  - "The candle glow behind the blanket is struggling against the cold morning light. It\u2019s been burning all night.\r\n                                    \r\n                                        The candle glow behind the blanket is sharp and warm against the pitch-black exterior. Someone is awake."
+  - "You get out of the car. The cold hits you immediately. You need food. You need medicine. You decide to approach carefully\u2014if someone is holding this house, a loud confrontation is the last thing you want right now."
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 2 \u2014 ENTRY (DRAMATIC RESOLUTION CHOICES)\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "THE COLONIAL HOUSE \u2014 ENTRY"
+  - "The split-rail fence gate opens without resistance. You move up the stone path to the porch, boards solid underfoot\u2014no rot, no creak. The front door is a heavy wooden slab with a brass handle. You try it. Locked, but the deadbolt is old, the kind installed twenty years ago by someone who thought a neighborhood like this didn't need anything serious."
+  - The windows flanking the door are intact and latched from inside. Around the side of the house, a narrow gravel path leads toward a wooden gate to the backyard.
+  - "= 5 or hasTrait(\"TRACKER\") or hasTrait(\"NIGHT OWL\")>>\r\n                    \r\n                        [ PER 5 / TRACKER ]"
+  - "You crouch at the front step. Tire tracks in the soft mud of the garden border\u2014single set, bicycle width, leading around toward the back. The tracks are covered in a light layer of morning dew. Recent, but cold."
+  - "And there's something else: the faint, stale smell of cold coffee grounds drifting from the back utility pipe.\r\n                        \r\n                            You crouch at the front step. Tire tracks in the soft mud of the garden border\u2014single set, bicycle width, leading around toward the back. The mud is still wet and hasn't settled. Recent. Very recent."
+  - 'And there''s something else: a faint, warm smell of freshly brewed coffee drifting under the door.'
+  - "i.id === \"Lockpicks\")>>\r\n                        \r\n                            \r\n                                \r\n                                \r\n                                    You kneel on the porch and insert the tension wrench into the aged brass keyway. With two light strokes of the pick, the upper pins set into place. The cylinder turns smoothly with a satisfying mechanical click."
+  - "Zero noise generated. The heavy wooden door swings open on well-oiled hinges, revealing the dark, silent hallway within.\r\n                                    The heavy wooden door swings open on well-oiled hinges, revealing the dark, silent hallway within."
+  - The heavy wooden door swings open on well-oiled hinges, revealing the dark, silent hallway within.
+  - "You step inside, sliding the door shut behind you. \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                    \r\n                                \r\n                            \r\n                                \r\n                            \r\n                            [LOCKSMITH / LOCKPICKS] Old brass tumbler. Zero noise.\r\n                            [LOCKSMITH / LOCKPICKS] Old brass tumbler. Pick the lock silently."
+  - "= 5 or hasTrait(\"TRACKER\") or $agi >= 5>>\r\n                        \r\n                            \r\n                                \r\n                                \r\n                                    You follow the narrow stone path around the side of the house, stepping over wet rose bushes into the backyard. The rear kitchen door is closed, but you notice the strike plate isn't fully seated\u2014someone left in a frantic rush and failed to lock it."
+  - "Zero noise generated. You give the handle a gentle push. The door glides open silently, leading right into the shadowy kitchen.\r\n                                    You give the handle a gentle push. The door glides open silently, leading right into the shadowy kitchen."
+  - "You step inside, sliding the door shut behind you.\r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                            \r\n                            [PER 5 / TRACKER / AGI 5] Unlatched back door. Zero noise.\r\n                            [PER 5 / TRACKER / AGI 5] Notice the unlatched back door and slip inside quietly.\r\n                        \r\n                    \r\n                        \r\n                            Check the back door\n\r\n                            [REQUIRES PER 5 / TRACKER / AGI 5] You don't notice anything useful around the sides of the house."
+  - "= 5>>\r\n                        \r\n                            \r\n                                \r\n                                \r\n                                \r\n                                    You brace your boot against the base of the porch wall and lean your full weight into the door beside the deadbolt. You give one powerful, controlled shove\u2014"
+  - '*CRACK!*'
+  - "The aged pine frame splinters and the deadbolt pops free. The sharp crack echoes across the porch, but the thick trees baffle the noise.\r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                            \r\n                            [STR 5] Pop the door frame. Costs 10 STAMINA. Low noise.\r\n                            [STR 5] Pop the door frame. Costs 10 STAMINA.\r\n                        \r\n                    \r\n                        \r\n                            Force the door frame\n\r\n                            [REQUIRES STR 5] The deadbolt is too solid for you to pop cleanly."
+  - You work your tool under the wooden sash of the dining room window. Applying steady leverage, the small brass catch inside gives way with a muted pop.
+  - "You lift the sash, catch the frame, and climb over the sill into the dining room.\r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                            \r\n                            [TOOLS] Pop window latch. Low noise.\r\n                            [TOOLS] Pop window latch with a tool."
+  - You bundle your thick jacket sleeve around your forearm and drive your elbow straight through the lower window pane!
+  - "*CRASH\u2014SHATTER!*"
+  - "Shards of glass cascade across the hardwood floor inside with a loud, ringing clatter. The sound carries sharply into the dead, quiet street.\r\n                                Shards of glass cascade across the hardwood floor inside with a loud, ringing clatter. The sound carries sharply into the dead, quiet street. You freeze, waiting for a horde, but miraculously... the street stays dead."
+  - "[HIGH NOISE GENERATED] You reach through the broken frame, unlock the front deadbolt from inside, and step into the foyer over broken glass.\r\n                                You reach through the broken frame, unlock the front deadbolt from inside, and step into the foyer over broken glass.\r\n                                \r\n                                    \r\n                                        \r\n                                            \r\n                                            \r\n                                        \r\n                                    \r\n                                \r\n                            \r\n                        \r\n                        [RISK: NOISE] Smash window pane. High noise generated.\r\n                            Smash window pane. Will draw attention if anything is nearby.\r\n                        Smash window pane. Will draw attention if anything is nearby."
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 3 \u2014 SEARCH THE HOUSE\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "THE COLONIAL HOUSE \u2014 INTERIOR"
+  - You step inside. Vane follows, pulling the door almost closed behind him.
+  - The house smells of dying candle wax, old wood, and cold coffee grounds. The hallway is dimly lit by grey morning light cutting through the window cracks.
+  - The house smells of fresh candle wax, warm wood, and freshly brewed coffee. The hallway is completely dark save for the bright amber glow bleeding under the living room door.
+  - "He keeps his voice at a breath. His hand stays nervously on his weapon.\r\n                \r\n                    You step inside and hold still, listening. The house smells of \r\n                    \r\n                        cold morning air and stale coffee. The candle in the living room has burned down to a stub.\r\n                    \r\n                        warm wax and freshly brewed coffee. The bright amber glow under the door tells you the candle is still burning strongly."
+  - Someone was here. Maybe still is. You move anyway.
+  - Four areas within reach. You can search them in any order.
+  - "/* \u2550\u2550 ZONE 1: THE KITCHEN \u2550\u2550 */\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                        \r\n                            The Kitchen"
+  - "The pantry door is open. Shelves partially cleared.\r\n                            \r\n                                The coffee pot on the stove is stone cold. The lower shelves are mostly bare.\r\n                            \r\n                                A half-empty pot of coffee sits lukewarm on the stovetop. Canned goods are pushed to the wall."
+  - "[MEDIC] Your eye catches a small wooden medicine box mounted near the back door. Still latched.\r\n                                \r\n                            \r\n                        \r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                        \r\n                                        \r\n                                    \r\n                                        \r\n                                        \r\n                                    \r\n                                    \r\n                                        \r\n                                    \r\n                                    \r\n                                \r\n                                \r\n                                    \r\n                                        Acquire: 1\xD7 Canned Food, 1\xD7 Water, 2\xD7 Bandage.\r\n                                    \r\n                                        Acquire: 2\xD7 Canned Food, 2\xD7 Water, 2\xD7 Bandage.\r\n                                    \r\n                                \r\n                                    \r\n                                        Acquire: 1\xD7 Canned Food, 1\xD7 Water.\r\n                                    \r\n                                        Acquire: 2\xD7 Canned Food, 2\xD7 Water.\r\n                                    \r\n                                \r\n                            \r\n                        \r\n                    \r\n                \r\n                    \r\n                        \u2713 [KITCHEN SEARCHED]\n\r\n                        You cleared what was left on the back shelves."
+  - "/* \u2550\u2550 ZONE 2: THE BATHROOM CABINET \u2550\u2550 */\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                        \r\n                            The Bathroom Cabinet"
+  - "Upstairs, end of the hall. The mirrored cabinet above the sink was left open. \r\n                            \r\n                                The front shelves are completely cleared out. Only a single container remains.\r\n                            \r\n                                Gaps show where bottles were grabbed in a hurry, but several packages remain standing."
+  - '[MEDIC] You spot broad-spectrum antibiotics with a recent refill date.'
+  - "Acquire: 1\xD7 Painkillers, 1\xD7 Bandage, 2\xD7 Pills.\r\n                                    \r\n                                        Acquire: 2\xD7 Painkillers, 1\xD7 Bandage, 2\xD7 Pills.\r\n                                    \r\n                                \r\n                                    \r\n                                        Acquire: 1\xD7 Painkillers, 1\xD7 Bandage.\r\n                                    \r\n                                        Acquire: 2\xD7 Painkillers, 1\xD7 Bandage.\r\n                                    \r\n                                \r\n                            \r\n                        \r\n                    \r\n                \r\n                    \r\n                        \u2713 [CABINET SEARCHED]\n\r\n                        Cleared the back row of the medicine cabinet."
+  - "/* \u2550\u2550 ZONE 3: THE LIVING ROOM (NEW LORE) \u2550\u2550 */\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                        \r\n                            The Living Room"
+  - The coffee table holds a folded road map of King County, an open leather-bound journal, and a small framed photograph face-up next to it.
+  - "The fat pillar candle on the table has burned completely down into an unusable puddle of cold wax.\r\n                            \r\n                                A fat pillar candle sits here, burning brightly and casting a warm glow over the pages."
+  - "Read what was left behind. +15 Humanity.\r\n                                \r\n                                    Read what was left behind. Take the lighter. +15 Humanity.\r\n                                \r\n                            \r\n                        \r\n                    \r\n                \r\n                    \r\n                        \u2713 [LIVING ROOM SEARCHED]"
+  - "= 5 or hasTrait(\"THEORY\") or $job == \"Police Officer\">>\r\n                            The journal sits next to a framed photograph of a smiling little girl. The handwriting inside is rigid, pressed hard into the paper. The ink is fresh."
+  - "\"Day 0. 22:00. The infection hit us two hours before the city sirens even started. I tried to get Emma to the high school sanctuary. We didn't make it to the gates. I wear the badge, but I couldn't protect my own daughter. Now I just sit in her empty house, scouting the perimeter, finding stragglers to save because I couldn't save her. The Vice Principal has the high school locked down tight. They're a good leader, maybe the best we could ask for, but they are strict. They aren't letting anyone through the gates without a thorough vetting. I've been vouching for the ones who deserve to live.\"\r\n                            \r\n                            \n\r\n                            You set the photograph down gently. A sanctuary at the local high school, locked down by someone called 'the Vice Principal'. You memorize the location from the road map. It's a solid lead for shelter. And you know who lives in this house now\u2014and what she lost.\r\n                        \r\n                            The journal sits next to a framed photograph of a little girl. The handwriting inside is frantic but fresh."
+  - "\"Emma didn't make it to the sanctuary. I couldn't save my own daughter. Now I just scout the roads, trying to guide stragglers to the gates to make up for it. The Vice Principal has the high school on total lockdown. They're strict, but it's keeping the place safe. I'll vouch for whoever makes it this far.\"\r\n                            \r\n                            \n\r\n                            You set the photograph down gently. A fortified high school sanctuary. You memorize the coordinates from the road map. It's the best chance for survival. You know what happened in this house."
+  - "/* \u2550\u2550 ZONE 4: THE UPSTAIRS BEDROOMS \u2550\u2550 */\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                        \r\n                            The Upstairs Bedroom"
+  - A child's bedroom directly across from the master suite. A small pink backpack is gone from its hook, but a heavy police uniform jacket is draped hastily over a rocking chair. A gun lockbox under the bed is open and empty.
+  - "Check the uniform pockets and lockbox. Acquire: 2\xD7 Scrap Metal.\r\n                            \r\n                        \r\n                    \r\n                \r\n                    \r\n                        \u2713 [BEDROOM SEARCHED]\n\r\n                        You checked the pockets and the lockbox. Nothing else of use remains."
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 4 \u2014 REYES ENCOUNTER\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "THE COLONIAL HOUSE \u2014 UPSTAIRS"
+  - You hear it between one room and the next.
+  - "A floorboard. Upstairs. One deliberate creak\u2014the sound of weight shifting from one foot to the other. Then silence. Then footsteps, slow and careful, moving toward the top of the stairs."
+  - Vane's trembling hand finds your arm. He doesn't say anything, but his breathing quickens. His eyes go wide, tracking the sound across the ceiling.
+  - You have maybe four seconds to decide your posture before whoever is up there reaches the landing.
+  - Whoever is up there is scared. Scared people react to perceived threats. You remove the threat.
+  - '[TRUST NO ONE / LIE DETECTOR] Control the chokepoint. Let them descend into your field of view on your terms. You''ll read them instantly.'
+  - "= 7>>\r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        [DIPLOMAT / CHA 7] Announce yourself before they reach the landing. Give them your voice and your meaning to defuse their fear."
+  - "= 2>>\r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        [GHOST / STEALTH 2] Disappear before they see you. Watch them come down. Read them completely before they know you're there."
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 5 \u2014 REYES REVEAL (VICE PRINCIPAL LORE)\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "THE COLONIAL HOUSE \u2014 THE HALLWAY"
+  - You step into the hall and raise both hands.
+  - "The figure at the top of the stairs stops. One hand is already on the sidearm at her hip\u2014not drawn, but ready. She takes you in: the raised hands, the stance, the faces behind you."
+  - A long pause. Then she lowers her hand from the weapon.
+  - "She comes down the stairs slowly. Mid-twenties, tactical respirator around her neck, tinted goggles pushed up onto her forehead, police surplus jacket over civilian clothes.\r\n                    \r\n                        Her eyes are deep with fatigue. She rubs her face, exhaling a shuddering breath."
+  - Her eyes are sharp, pupils contracted by adrenaline. Her hand hovers near her weapon.
+  - She looks at the supplies on the counter. Then back at you.
+  - She shakes her head slowly, looking past you toward the living room.
+  - You step into the hallway, gripping your weapon, ready for anything.
+  - "The figure at the top stops. Sees you holding your ground. Her hand moves toward her hip\u2014then stops when she registers your posture. You aren't panicking. You're waiting. That's a different thing."
+  - '"I''m going to reach up very slowly," she says, "and pull this respirator down so you can see my face. Stand down."'
+  - "She does. Mid-twenties. Controlled. \r\n                    \r\n                        Her skin is pale, exhaustion tracing dark lines under her eyes. She looks like she\u2019s running on empty.\r\n                    \r\n                        Her expression is iron-tight. Adrenaline has her snapping alert by the second."
+  - "[LIE DETECTOR] First read: elevated heart rate visible at the throat, natural given the circumstance. Pupil response: alarm, not aggression. No deception signals in the baseline. She's grieving and scared, not malicious.\r\n                        \r\n                    \r\n                    \r\n                    \n\r\n                    She waits. Hands visible. You lower your guard. Slightly."
+  - Silence. Three seconds of it.
+  - "Then the footsteps resume\u2014slower now, deliberate. She comes down the stairs with her hand away from her weapon, reading the hallway as she descends. Mid-twenties. Respirator around her neck, goggles up."
+  - "Her eyes carry the heavy weight of interrupted sleep, her shoulders slumped slightly with fatigue.\r\n                    \r\n                        Her movement is taut, prepared to draw her weapon at the slightest sudden motion in the dark.\r\n                    \r\n                    \n\r\n                    She takes in the group without comment, then looks at you specifically."
+  - Something in her expression softens, just a fraction. She looks toward the living room where her journal sits.
+  - You step into the kitchen doorway and go still.
+  - The figure descends the stairs. She moves carefully, one hand on the banister, scanning the hallway as she comes down. She hasn't seen you yet.
+  - "[GHOST] You read her in ten seconds: the weapon at her hip is a standard-issue police sidearm, holstered and snapped. The jacket is surplus, civilian underneath. Her eyes are scanning for sounds, not shapes. She's frightened but trained. She isn't going to shoot first.\r\n                        \r\n                    \r\n                    Mid-twenties. Tactical respirator around her neck, goggles pushed up.\r\n                    \r\n                        Her eyes are heavy, blinking away sleep as she steps off the bottom stair.\r\n                    \r\n                        Her gaze is sharp, sweeping the dark corners of the foyer.\r\n                    \r\n                    \n\r\n                    She sees you. Neither of you moves."
+  - Then you step fully into the hallway, hands open at your sides.
+  - '"...You were already there," she says quietly. "You were watching me come down."'
+  - A long pause. She looks toward the living room, a flash of deep pain crossing her features. Then she exhales.
+  - Vane steps timidly into the hallway behind you. He adjusts his glasses, looking at Reyes with a mix of awe and pity.
+  - Through the front window, Maya watches the house. Reyes catches her eye through the glass, her gaze immediately locking onto the seven-year-old girl tucked under Maya's arm.
+  - A profound, silent grief flashes across the Deputy's face as she stares at Lily. She gives Maya a slow, affirming nod. I will get your girl there safely. Maya relaxes by a fraction.
+  - Through the window you can see the car. Diane is watching the porch. Reyes sees the twin boys sleeping in the back seat and her posture instantly shifts from defensive to fiercely protective.
+  - "/*\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n     PHASE 6 & 7 \u2014 CAR CAPACITY CHECK & DEPARTURE\r\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\r\n*/"
+  - "THE COLONIAL HOUSE \u2014 THE ESCORT"
+  - You move back toward the front door. Reyes follows, pulling her respirator up and checking her sidearm with practiced habit. Outside, the fog has thickened. Your car sits at the curb, its windows fogged from the people inside. Reyes stops at the porch rail and looks at it.
+  - She counts the silhouettes through the glass. A child's face is visible in the back seat, watching the porch with exhausted, dark-circled eyes. Reyes goes still, her voice heavy with memory.
+  - She counts the silhouettes and exhales slowly through her nose.
+  - She sees the children through the window before she sees anything else. She stares at them for a long moment.
+  - She glances at the car, then back at you.
+  - "She knows the roads and she knows the checkpoint. Let her do what she does.\r\n                            \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                \r\n                                \r\n                                    \r\n                                        [TRUST NO ONE] You don't let someone you just met ride ahead of your group unsupervised.\r\n                                    \r\n                                        Keep the group together. Slower, but unified."
+  - "Reyes disappears around the side of the house. A minute later, she rolls a matte-black mountain bike out of the garage\u2014no reflectors, deliberately invisible. She checks the tires once and clips a small red light to the seat post."
+  - "In the car, Maya watches Reyes through the windshield. Her posture relaxes slightly under the morning light. Another survivor holding it together.\r\n                            \r\n                                In the car, Maya watches Reyes through the windshield. Her eyes track the blinking red light into the dark, suspicious but acknowledging the help."
+  - "Diane's hand comes off the gear shift as Reyes rolls the bike out. She watches the red morning light catch the frame, silent and calculating.\r\n                            \r\n                                Diane's hand comes off the gear shift as Reyes rolls the bike out. One of her boys presses his face to the glass, watching the red light pulse in the dark."
+  - Reyes pulls up alongside your window, the red tail light already blinking.
+  - A beat.
+  - "She pushes off into the cold morning fog. The small red light bobs once, then steadies\u2014a dim ruby point floating north through the gray mist.\r\n                        \r\n                            She pushes off into the pitch-black fog. The small red light bobs once, then steadies\u2014a dim ruby point floating north through the dark."
+  - Reyes locks the house behind her. She gets in the back seat without ceremony, sets her respirator on her knee, and faces forward.
+  - A pause.
+  - "The engine turns over. The colonial house disappears into the fog behind you as you pull away from the curb\u2014its intact windows, \r\n                    \r\n                        the cold, spent candle stub,\r\n                    \r\n                        the burning candle,\r\n                    \r\n                    the journal left open on the coffee table. Someone tried to hold on to their humanity here despite losing everything. You hope it's enough to get you through the gates."
+  - "Whatever Reyes is preparing to tell the guards\u2014you'll hear it when you get there."
+  - She knows the checkpoint. She knows the people inside. Following her is your best chance to get past those jumpy guards alive.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: A candle burning in broad daylight? I-it looks like a signal... or they've been awake all night and finally passed out. We should watch the side door.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Candle in the window. Covered from the inside. They're trying to keep a low profile in the dark. Keep your eyes on the tree line, please.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The mist is lifting. We're completely exposed out here on the curb. If we're going inside, we need to do it now before whoever is in there wakes up.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: It's freezing out here. Lily is shivering violently. If there's a heat source in there, I don't care who owns it. Just... go slow. _mayaAdvice
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Stay in the car with Lily. Doors locked. Vane, you're on the porch with me. We assess the situation before we confront anyone.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: M-morning light makes that dark blanket stand out. Anyone walking down the road will spot it. I don't think they're alert upstairs.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Candle. Someone's awake in there, or the draft hasn't knocked it out. Could be infected drawn to the flame, or a survivor holding the angle.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: My boys are exhausted. They need a warm floor, not a wet car seat. Let's go see what's left.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Marcus warned me about these suburban cul-de-sacs. Too many blind corners in the dark. Keep your guard up, even if you just want to talk.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Marcus warned me about these suburban cul-de-sacs. Too many blind corners in the dark. Keep a hand on your weapon, but let them speak first.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Diane, keep the boys down and the doors locked. Vane, we go in together. Quiet and slow.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Faint light behind the blanket. It's too late for a candle, which means they've been burning it all night. They might be asleep from exhaustion.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: K-keying on a live candle at four in the morning... they are awake for a reason. Please go slow. Let's not start a fight.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Either way we go in. Stay behind my shoulder until we know what we're dealing with. I'll try to talk if someone's there.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Morning is coming. If someone is inside, they are going to notice a car idling outside their front gate. We need to move.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: It's pitch black out here. A single candle inside means they're trying to save battery power. They are living by simple rules. Find us a way in, but don't force a fight if you don't have to.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I'll be careful. Keep Lily asleep if you can. If things go wrong and negotiations fail, you drive.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The morning mist is thick. The soil in those garden boxes is recently turned. They were tending this place yesterday.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: It's too dark to see if the perimeter is clear. Marcus used to say you never walk up the front path of a house with a covered window in the dark without being ready.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Diane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 1abcf24bcd990bc501457bcc3bb2fffb, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: We need shelter. Talk to them if you can. Take what you need if you can't.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Lock the doors behind me. I'll read the room before I do anything drastic.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "C-coffee's cold. The pot's empty. They've been gone\u2014or asleep\u2014for hours."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Smells like coffee. Recent. Keep your hand near your weapon, they might still be holding the corner.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Deputy Reyes. This is my house. I haven't slept since... since the outbreak hit at 22:00. I just run scouting routes for the sanctuary now.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Deputy Reyes. This is my house. You're lucky I didn't pull the trigger. Walking into a dark home at four in the morning is a good way to get a hole in your chest.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You found my supplies.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: We'll leave you half. We didn't know anyone was here.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Keep it. I don't need much anymore. I saw you looking at the journal. That was my daughter, Emma. We didn't make it to the sanctuary. Now I just try to guide people who still have a chance. I know where the high school is, I know the checkpoint layout, and I know who's running it.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The Vice Principal. I read the journal. I actually know them. They're a good leader.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The best we have right now. But that means they're strict. The guards at the gate won't hesitate to shoot if you spook them. You're going to want my vouch before you drive up to that gate.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Deputy Reyes. This is my house. I run scouting routes for the high school sanctuary. I've been doing this alone since I lost my daughter. I am not a threat to you.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The high school sanctuary. You know where it is.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I know the checkpoint, and I know the Vice Principal has it locked down tight. You need my vouch to get in without getting shot.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I know the Vice Principal. They'll let me in.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Maybe. But their guards are terrified. Let me make the introduction.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: We're not infected. We're survivors. We'll replace what we take. You have my word.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You announced yourself. Most people don't.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Most people haven't thought about what they'd want to hear if they were on the other side of that door.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Deputy Reyes. This is my home. Or it was. Before I lost my daughter to this... thing. The food is yours. In exchange, let me help you. Because the Vice Principal has the high school on a hair-trigger lockdown, and you shouldn't walk up to that gate without an escort.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I read your journal. I needed to know who I was dealing with before I introduced myself. Now I know.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Deputy Reyes. This is my house. You're the first people who've figured out I was upstairs before I reached the bottom of the stairs. I couldn't save my daughter, Emma. But I can guide you. So. Do you want to reach the sanctuary safely?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Yes.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I can do that. And I can vouch for you at the gate. The Vice Principal is running a tight ship, and their guards are jumpy.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You've been staying here... alone? Just scouting to save strangers?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: It's the only way I can sleep at night, kid. Finding people who still have a chance.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You've got kids out there. We need to move them before the streets wake up.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You've got kids in there. I'm going to make sure they get inside those walls.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: That car is already full. I'm not adding my weight to it. It's broad daylight; a blue sedan stands out like a beacon on these logging roads. My bike is in the garage out back. Quiet, no gas, and I know every back route. I'll ride ahead. Follow my tail light.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: That car is already full. I'm not adding my weight to it. The roads are pitch black and the fog is setting in. My bike is in the garage around the back. Quiet, no gas, and I know the bypasses. I'll ride ahead. Follow my tail light.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "You're already over weight for that chassis. My bike is in the garage out back\u2014I've been riding since the grid went down. Quiet, no fuel drain. I'll take point. You follow."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "You're moving with kids. My bike is in the garage\u2014I've been on two wheels since the first hour. Safer for them if I ride ahead and clear the path rather than add another body to a car with children in it."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "My bike is in the garage out back. I've been riding since the first hour\u2014quiet, no fuel drain, and I know a back route that keeps you off the main road entirely. I can lead from the front, or ride in your back seat if you'd rather keep the group together. Your call."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: She had that bike prepped and ready. She's been surviving like a ghost since the start.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Follow the red light. Twenty-meter gap. Kill your headlights when I kill mine. When we hit the checkpoint fence, stay in the car and let me do the talking.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The Vice Principal has the perimeter guards on high alert. Just let me handle the introduction so no one gets jumpy.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: North on the main road. I'll tell you when to turn. When we reach the checkpoint fence, let me get out first and speak to them before you roll up. They know my face.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The Vice Principal has the perimeter guards on high alert. Just let me handle the introduction so no one gets jumpy.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Discuss the approach \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Pick the front door lock. [LOCKSMITH / LOCKPICKS]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: LOCKSMITH
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Step inside the house \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Check the back door. [PER 5 / TRACKER / AGI 5]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Observation
+    requiredStatValue: 5
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: TRACKER
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Force the door frame. [STR 5]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 10
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Might
+    requiredStatValue: 5
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Lever a side window open. [TOOLS]'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Break the front window. (Brute Force)
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Search Kitchen
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Canned Food
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Search Cabinet
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Painkillers
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Read Journal & Search
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Lighter
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Search the Bedroom
+    choiceSubtitle: "Check the uniform pockets and lockbox. Acquire: 2\xD7 Scrap Metal."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Scrap Metal
+    givesItemQty: 2
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Move deeper into the house
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Step into the hall. Raise your hands. Show you're not a threat.
+    choiceSubtitle: Whoever is up there is scared. Scared people react to perceived threats. You remove the threat.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Ready your weapon. Let them come to you. [TRUST NO ONE / LIE DETECTOR]'
+    choiceSubtitle: '[TRUST NO ONE / LIE DETECTOR] Control the chokepoint. Let them descend into your field of view on your terms. You''ll read them instantly.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: TRUST NO ONE
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: '[DIPLOMAT / CHA 7] Announce yourself before they reach the landing. Give them your voice and your meaning to defuse their fear.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Leadership
+    requiredStatValue: 7
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: DIPLOMAT
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Step back into cover. Watch the stairs. [GHOST / STEALTH 2]'
+    choiceSubtitle: '[GHOST / STEALTH 2] Disappear before they see you. Watch them come down. Read them completely before they know you''re there.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: stealth
+    requiredSkillLevel: 2
+    requiredTrait: GHOST
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Discuss transportation \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Accept her plan \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Accept her plan \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Accept her plan \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: She knows the roads and she knows the checkpoint. Let her do what she does.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: \
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Follow Reyes north toward the sanctuary
+    choiceSubtitle: She knows the checkpoint. She knows the people inside. Following her is your best chance to get past those jumpy guards alive.
+    targetPassage: {fileID: 11400000, guid: f0c238b817368cf41b07250574d2d1c5, type: 2}
+    targetPassageId: Act3_ArrivalSchool
+    targetRoomId: security_foyer
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

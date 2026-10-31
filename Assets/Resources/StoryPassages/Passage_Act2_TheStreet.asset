@@ -1,0 +1,689 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act2_TheStreet
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act2_TheStreet
+  passageTitle: ACT2 THESTREET
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* =======================================================================\r\n   SYSTEM INITIALIZATION\r\n======================================================================= */\r\n/* Clear the map when leaving the building */"
+  narrativeBeats:
+  - "/* INIT PHASE & AUDIO ONLY ONCE */\r\n    \r\n        \r\n        \r\n            /* Stop the lobby drone/ambience to ensure a clean slate */\r\n            if (typeof window.HallwayAmbience !== 'undefined') window.HallwayAmbience.stop();\r\n            setup.sound.stopAll(); \r\n            \r\n            /* Play the heavy city riot track immediately on load */\r\n            setup.sound.play(\"city_riot\", \"audio/bgm/city_riot_heavy.mp3\", true, 0.8);"
+  - THE STREETS
+  - The cold air hits you the moment you push through the lobby doors, but it offers no relief. The street is a warzone.
+  - "A tide of human panic surges down the avenue. You don't even get a chance to pick a direction before the crowd hits you. It is a wave of pure, blind terror\u2014elbows, shoulders, the overwhelming stench of sweat, exhaust, and blood. You are shoved violently, your boots sliding on asphalt slick with things you don't want to look at.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                \r\n                                    You fight against the brutal current, throwing your weight sideways until you tear yourself out of the crush, stumbling into a narrow, shadowed alleyway between two high-rises. You lean against a brick wall, your lungs burning."
+  - "/* --- COMPANION CHECK: VANE --- */\r\n                                    \r\n                                        Vane tumbles into the alley right behind you, slamming his heavy camera case against the brick wall. His designer jacket is torn, and his perfectly styled hair is plastered to his forehead with sweat and rain."
+  - He bends over, hands on his knees, panting hard. He's bleeding from a scrape on his cheek, but his dark eyes are wide and sharply focused. He gasps, looking back at the stampede.
+  - He tries to joke, but his voice shakes. He looks at you, his facade dropping completely.
+  - '/* --- COMPANION CHECK: MAYA --- */'
+  - Maya staggers into the alleyway right after you, her arms wrapped fiercely around Lily. She presses the little girl's face into her coat, shielding her from the horrors on the street.
+  - She looks up at you, her chest heaving. The weight of her dead sister's promise is written all over her exhausted face.
+  - The apartment building was a tomb, but the city is a slaughterhouse. You need to leave. Tonight.
+  - "/* --- AUDIO TRANSITION --- */\r\n                                                \r\n                                                \r\n                                                /* --- PLAY THE JUMPSCARE SOUNDS --- */"
+  - Step deeper into the alleyway.
+  - THE ALLEYWAY
+  - You take one deep breath. You don't get a second.
+  - A screech echoes from above. Before you can even look up, a heavy mass plummets from a fire escape three stories overhead.
+  - It hits the pavement with a wet, sickening CRUNCH of asphalt and bone, completely flattening a civilian who had been running blindly down the alley.
+  - The thing that fell doesn't stay down.
+  - Its legs are shattered, bent at impossible angles, but it drags itself up by its arms with terrifying speed and immediately sinks its jagged teeth into the screaming civilian's neck. Blood sprays across the brick wall.
+  - Maya shoves Lily behind her, turning the little girl's face into her coat so she can't see the carnage. Maya's eyes meet yours in absolute horror.
+  - "[COMBAT] Silence it before it finishes feeding.\r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            [FLEE] Bypass the carnage and run deeper into the alley."
+  - THE ALLEYWAY - RESOLUTION
+  - You don't hesitate. Your weapon comes down hard, crushing the infected's skull before it can fully tear the man's throat out. It goes limp.
+  - The civilian underneath is gurgling, eyes rolling back. He is already gone.
+  - "Vane looks away, swallowing hard, gripping his camera case like a lifeline. \r\n                \r\n                You step over them and push deeper into the alley, emerging out the other side."
+  - Leave the alley behind.
+  - THE ALLEYWAY - RESOLUTION
+  - You stumble backward in horror. You turn and sprint in the opposite direction, cutting through a narrow chain-link gate to put a barrier between you and the feeding frenzy.
+  - You burst through the gate, chest heaving, and find yourself in a wide, open space.
+  - '[-5 HUMANITY]'
+  - Assess your surroundings.
+  - THE PARKING LOT
+  - You are standing in a gated parking lot behind a mid-rise office building. It's mostly empty, but parked near the exit ramp is a blue four-door sedan. The windows are intact. The tires are fully inflated.
+  - It is your ticket out of this hellhole. You just need to get it running.
+  - "i.id === \"Car Keys\")>>\r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        [ITEM: CAR KEYS] Use the keys you took from Unit 401."
+  - '[COMPANION] See if Vane has any hidden talents.'
+  - "= 2>>\r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        [TECH 2 / MECHANIC] Strip the wires and bypass the ignition."
+  - '[RISK: NOISE] You don''t have keys or tools. Break in and hope for the best.'
+  - "IGNITION\r\n            \r\n            \r\n            \r\n                \r\n                    You reach into your pocket and pull out the keys you pried from the dead man's fingers in Unit 401."
+  - You hit the unlock button. The sedan chirps happily, its headlights flashing brightly in the dark. The doors unlock with a heavy *clack*. In the middle of the apocalypse, it feels like absolute magic.
+  - Vane stares at you, a slow, genuinely impressed smile spreading across his exhausted face.
+  - But the magic doesn't last. The sudden bright flash of the headlights and the sharp chirp of the horn echo like a dinner bell through the empty lot.
+  - From the deep shadows, three infected step into the amber glow of the streetlights, drawn by the sudden noise and light.
+  - You're going to have to defend the car while the engine warms up.
+  - "IGNITION\r\n            \r\n            \r\n            \r\n                \r\n                    You look at the steering column, then look at Vane."
+  - Vane smirks, a sudden, sharp flash of confidence cutting through his terror. He wraps his jacket around his elbow and smashes the driver's window inward, clearing the glass quickly before sliding into the seat.
+  - He pulls a multi-tool from his pocket, wedges it under the steering column, and pops the plastic casing with practiced ease.
+  - He strips two wires, twists them together, and the engine roars to life. But the roaring engine and the shattered glass shatter the silence of the parking lot.
+  - From the darkness, three infected sprint toward the sound. Vane ducks lower inside the car.
+  - "IGNITION\r\n            \r\n            \r\n            \r\n                \r\n                    You smash the driver's side window with your elbow, clear the glass, and unlock the door."
+  - "Diving under the steering column, you rip away the plastic paneling. You strip the ignition wires and strike them together. A spark flashes in the dark, and the engine roars to life on the second try. \r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    The engine is running, but it's acting like a beacon. The roaring mechanical sound cuts through the night air."
+  - From the shadows of the parking lot, three infected step into the amber glow of the streetlights, drawn directly to you. You have to clear them out before you can safely get in and drive away.
+  - "IGNITION\r\n            \r\n            \r\n            \r\n                You have no idea how to hotwire a car, and you don't have the keys. You wrap your jacket around your fist and smash the driver's side window."
+  - BEEP! BEEP! BEEP!
+  - "The car alarm immediately triggers, a deafening wail echoing off the concrete buildings. You frantically tear through the glovebox and center console\u2014nothing."
+  - "/* STOP PARKING LOT AMBIENCE BECAUSE THE ALARM IS TOO LOUD */\r\n                \r\n                \r\n                From the shadows of the parking lot, three infected step into the amber glow of the streetlights, drawn by the noise. You're going to have to fight for this car."
+  - '[CAR ALARM TRIGGERED - PREPARE FOR COMBAT]'
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Okay... okay. Not exactly the VIP exit I'm used to.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: This whole city is a death trap. My followers always said I was dramatic about crowds, but this is insane. We can't stay here.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I've got you, baby. Auntie Maya's got you. Just don't look back there.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: We need to get off the streets. Now. If that crowd shifts into this alley, we'll be trampled.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Okay. Remind me never to underestimate you. And here I thought my unboxing videos were slick.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Watch the paint.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Misspent youth. Before the brand deals and the sponsorships, I hung out with a very different crowd.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I'll get it in gear! Just keep them off me for thirty seconds!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Step deeper into the alleyway.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[COMBAT] Silence it before it finishes feeding.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Run the other way [FLEE]'
+    choiceSubtitle: '[FLEE] Bypass the carnage and run deeper into the alley.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Step out into the parking lot
+    choiceSubtitle: Leave the alley behind.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Catch your breath and look around
+    choiceSubtitle: Assess your surroundings.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Use the Car Keys you found
+    choiceSubtitle: '[ITEM: CAR KEYS] Use the keys you took from Unit 401.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Ask Vane if he knows how to start it
+    choiceSubtitle: '[COMPANION] See if Vane has any hidden talents.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Hotwire the sedan [TECH]'
+    choiceSubtitle: '[TECH 2 / MECHANIC] Strip the wires and bypass the ignition.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: tech
+    requiredSkillLevel: 2
+    requiredTrait: HOTWIRE
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Smash the window and search for keys
+    choiceSubtitle: '[RISK: NOISE] You don''t have keys or tools. Break in and hope for the best.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: fd9bbeb88597f0a4a8f536d1ff1a5d0d, type: 2}
+    targetPassageId: Act2_ParkingLot_Combat
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: fd9bbeb88597f0a4a8f536d1ff1a5d0d, type: 2}
+    targetPassageId: Act2_ParkingLot_Combat
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: fd9bbeb88597f0a4a8f536d1ff1a5d0d, type: 2}
+    targetPassageId: Act2_ParkingLot_Combat
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Draw your weapon
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: fd9bbeb88597f0a4a8f536d1ff1a5d0d, type: 2}
+    targetPassageId: Act2_ParkingLot_Combat
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

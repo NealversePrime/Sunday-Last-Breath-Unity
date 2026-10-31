@@ -1,0 +1,186 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_7Eleven_RescueSuccess
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_7Eleven_RescueSuccess
+  passageTitle: ACT3 7ELEVEN RESCUESUCCESS
+  associatedRoomId: headmaster_office
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: /* DYNAMIC LEADER CONFIGURATION */
+  narrativeBeats:
+  - /* CLEARANCE FLAGS */
+  - "1ST FLOOR \u2014 COMMAND OFFICE VICTORIOUS RETURN"
+  - You, Reyes, and  climb the wide interior staircase and step through the double oak doors of the Command Office.
+  - Outside the windows, guards cheer as the diesel fuel truck rolls through the reinforced bus barricades. Inside, the overwhelming tension in the air breaks in an instant.
+  - Matriarch Evelyn gasps, clutching her chest before running straight around the heavy mahogany desk. Tears stream down her face as she throws her arms around your father, burying her face into his shoulder.
+  - Your father gently holds her, then reaches an arm out and pulls you firmly into the embrace.
+  - Matriarch Evelyn looks up from the radio receiver with profound relief in her eyes as you enter together.
+  - drops the heavy shotgun onto the briefing table, turning to you with eyes full of emotion before pulling you into a fierce, breathless embrace.
+  - Evelyn watches you two with a gentle, approving nod.
+  - "smile like that since the world ended. You two have something rare and unbreakable\u2014and Timberline High is honored to have you here.\">>\r\n                \r\n                    Matriarch Evelyn gasps in relief, rushing around the mahogany desk to inspect Commander Hayes's bandaged arm."
+  - turns squarely toward you, extending a firm hand in salute.
+  - "\U0001F3C6 SENIOR COUNCIL CLEARANCE UNLOCKED\r\n                    \n\r\n                    You now hold unconditional access to all military reserves, armories, and secure wings of Timberline Sanctuary."
+  - Visit the upper laboratories, server room, and department offices.
+  - Visit the Canteen, Infirmary, Locker Rooms, and Main Foyer.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Thank God... almighty God... you're both back! You're both alive!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dad
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 55a158dea642682c29a4feceded6d2cc, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: It's all thanks to our kid, Evelyn. $firstName stood shoulder to shoulder with Reyes, cut through that ambush, and pulled me out of a death trap.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I always believed you would find us, $firstName. Against everything that took the world... our family survived together.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "I haven't seen <<print _leaderName>> smile like that since the world ended. You two have something rare and unbreakable\u2014and Timberline High is honored to have you here."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Thank God you made it back! The generator crew already has the diesel connected to the boiler room.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Commander Hayes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 303440381b4c9b01134bffd26dd5e479, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: It's all thanks to $firstName right here. Stood shoulder to shoulder with Reyes and pulled us out of an absolute slaughterhouse.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "\U0001F3E2 Step out to 1st Floor Upper Hallway - NORTH"
+    choiceSubtitle: Visit the upper laboratories, server room, and department offices.
+    targetPassage: {fileID: 11400000, guid: e47cd5da9b30be448aeca1f1111e10a7, type: 2}
+    targetPassageId: Act3_School1Floor
+    targetRoomId: hall_1_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F3EB Descend to Ground Floor Main Corridor - SOUTH"
+    choiceSubtitle: Visit the Canteen, Infirmary, Locker Rooms, and Main Foyer.
+    targetPassage: {fileID: 11400000, guid: 53c56bda0d2fecc46b3938a6bd856d17, type: 2}
+    targetPassageId: Act3_SchoolGFloor
+    targetRoomId: hall_g_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

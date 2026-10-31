@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_StoryCaption
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: StoryCaption
+  passageTitle: STORYCAPTION
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* ==========================================================\n   SECTION 1: TAB NAVIGATION\n   Controls which panel is visible in the sidebar.\n   ========================================================== */"
+  narrativeBeats:
+  - '/* Row 1: Primary Tabs */'
+  - "MAIN\n    \n    \n        BAG\n    \n    \n        SKILLS\n    \n    \n        TRAITS"
+  - '/* Row 2: Secondary/Utility Tabs */'
+  - "MAP\n    \n    \n        LORE"
+  - "/* ==========================================================\n   SECTION 2: MAIN TAB (DASHBOARD)\n   Displays Character Info, Level, XP, and Vitals.\n   ========================================================== */"
+  - "/* Character Identity */\n    \n        $firstName $lastName\n        $gender | $job"
+  - "/* Progression (Level and XP) */\n    \n        \n            \n                LVL $level\n            \n            \n                $xp/$xp_req"
+  - "/* Dynamic Safe House Trust Display (Shown only when in the safe house) */\n    \n        \n            \n                \n                \n                    SAFE HOUSE TRUST\n                    $safehouseTrust/100\n                \n            \n        \n    \n    \n    /* Vitals (Survival Meters) */\n    \n        \n        /* Health Points */\n        \n            \n                \n                \n                    HEALTH\n                    $hp/$hp_max\n                \n            \n        \n        \n        /* Stamina (Energy) */\n        \n            \n                \n                \n                    STAMINA\n                    $stamina/$stamina_max\n                \n            \n        \n        \n        /* Hunger Level */\n        \n            \n                \n                \n                    HUNGER\n                    $hunger/100\n                \n            \n        \n        \n        /* Thirst Level */\n        \n            \n                \n                \n                    THIRST\n                    $thirst/100\n                \n            \n        \n        \n        /* Humanity (Alignment) */\n        \n            \n                \n                \n                    HUMANITY\n                    $hum/100"
+  - "/* ==========================================================\n   SECTION 3: BAG TAB (INVENTORY)\n   Displays Equipped items and Backpack contents.\n   ========================================================== */"
+  - "EQUIPMENT\n    \n    \n    INVENTORY"
+  - "/* ==========================================================\n   SECTION 4: SKILLS & ATTRIBUTES TAB\n   Displays Radar Charts for Core Stats and Skills.\n   ========================================================== */"
+  - "/* Attributes (STR, INT, AGI, etc.) */\n    ATTRIBUTES"
+  - "/* Skills (Shooting, Melee, etc.) */\n    SKILLS"
+  - "/* ==========================================================\n   SECTION 5: TRAITS TAB\n   Lists all acquired perks and passive abilities.\n   ========================================================== */"
+  - "TRAITS & PERKS\n    \n    \n    /* Empty State Logic */"
+  - "/* ==========================================================\n   SECTION 6: MAP TAB\n   Displays the dynamic floor plan/location map.\n   ========================================================== */"
+  - LOCATION MAP
+  - "/* ==========================================================\n   SECTION 7: SIDEBAR FOOTER (SYSTEM CONTROLS)\n   Persistent buttons at the bottom of the UI.\n   ========================================================== */"
+  - "/* Retro Slim Volume Slider */\n    \n        VOLUME"
+  - /* System Menu Button */
+  dialogueLines: []
+  initialFloorItems: []
+  choices: []

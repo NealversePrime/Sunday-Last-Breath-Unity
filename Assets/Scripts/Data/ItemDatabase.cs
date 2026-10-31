@@ -450,11 +450,27 @@ namespace SundayLastBreath.Data
 
         private static readonly Dictionary<string, string> _traitAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
+            // Drawbacks & Weaknesses
+            { "POOR VISION", "trait_blind" },
+            { "BLIND", "trait_blind" },
+            { "FOUR EYES", "trait_blind" },
+            { "PYROMANIAC", "trait_pyro" },
+            { "PYRO", "trait_pyro" },
+            { "GERMOPHOBE", "trait_germophobe" },
             { "CLEAN", "trait_germophobe" },
+            { "STERILE", "trait_germophobe" },
+            { "SHOPAHOLIC", "trait_shopaholic" },
             { "SHOPPER", "trait_shopaholic" },
+            { "BARTERER", "trait_shopaholic" },
             { "BAD KNEE", "trait_badknee" },
             { "LONE WOLF", "trait_lonewolf" },
+            { "SOLOIST", "trait_lonewolf" },
             { "RADIO OPERATOR", "trait_radio" },
+            { "CAUTIOUS SCOUT", "tracker" },
+            { "HERBALIST", "trait_gardener" },
+            { "HUNGRY", "trait_glutton" },
+
+            // Perks & Job Traits
             { "GUNSLINGER", "gunslinger" },
             { "SHOTGUNNER", "shotgunner" },
             { "BLUNT BRUISER", "blunt_bruiser" },
@@ -468,7 +484,17 @@ namespace SundayLastBreath.Data
             { "FIELD MEDIC", "field_medic" },
             { "FAST LEARNER", "fast_learner" },
             { "ADRENALINE", "adrenaline" },
-            { "STEADY HANDS", "steady_hands" }
+            { "STEADY HANDS", "steady_hands" },
+
+            // Twine Story / Specialty Perks
+            { "AUTHORITY", "authority" },
+            { "BREACHER", "breacher" },
+            { "IRON GRIP", "iron_grip" },
+            { "LOCKSMITH", "locksmith" },
+            { "GHOST", "ghost" },
+            { "ANATOMIST", "anatomist" },
+            { "SILVER TONGUE", "silver_tongue" },
+            { "INSPIRATION", "inspiration" }
         };
 
         private static void EnsureLoaded()
@@ -585,6 +611,27 @@ namespace SundayLastBreath.Data
                 if (keyNorm.Contains(norm) || norm.Contains(keyNorm.Replace("trait_", "").Replace("perk_", "")))
                 {
                     return kvp.Value;
+                }
+            }
+
+            // Direct fallback against MortalStats drawbacks database
+            if (MortalStats.AllDrawbacks != null)
+            {
+                var db = System.Array.Find(MortalStats.AllDrawbacks, d =>
+                    string.Equals(d.title, traitName, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(d.id, traitName, StringComparison.OrdinalIgnoreCase));
+                if (db != null)
+                {
+                    if (!string.IsNullOrEmpty(db.iconName))
+                    {
+                        if (_traitIconCache.TryGetValue(db.iconName, out var dbIcon)) return dbIcon;
+                        if (_traitIconCache.TryGetValue("trait_" + db.iconName, out var dbIcon2)) return dbIcon2;
+                    }
+                    if (!string.IsNullOrEmpty(db.id))
+                    {
+                        if (_traitIconCache.TryGetValue(db.id, out var idIcon)) return idIcon;
+                        if (_traitIconCache.TryGetValue("trait_" + db.id, out var idIcon2)) return idIcon2;
+                    }
                 }
             }
 

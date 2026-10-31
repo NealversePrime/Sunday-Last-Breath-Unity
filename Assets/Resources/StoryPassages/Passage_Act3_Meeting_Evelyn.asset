@@ -1,0 +1,883 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_Meeting_Evelyn
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_Meeting_Evelyn
+  passageTitle: ACT3 MEETING EVELYN
+  associatedRoomId: headmaster_office
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: /* COMPANIONS ARRIVAL TRACKING */
+  narrativeBeats:
+  - 0))>>
+  - /* DYNAMIC LEADER & AVATAR CONFIGURATION */
+  - "1ST FLOOR \u2014 OUTSIDE COMMAND SUITE"
+  - Officer Reyes is slouched against the cold painted brick wall outside the heavy double doors of the Command suite, both thumbs hooked into her tactical vest to keep her fingers from trembling. Under the flickering fluorescent tube, her knuckles are split and crusted with dried road grime.
+  - Reyes flinches slightly, blinking against the glare before blowing out a long, ragged breath through her teeth.
+  - "CLICK TO CONTINUE \u25B6"
+  - "1ST FLOOR \u2014 COMMAND &amp; HEADMASTER'S OFFICE\r\n                    \r\n                    \r\n                        Reyes pushes open the heavy oak double doors. The office smells of stale grounds, copper, and wet wool. Topographic road maps are tacked over the bookshelves, transceivers murmuring low, hollow static."
+  - "Behind a massive oak desk strewn with ammunition manifests stands a woman with dark, sunken hollows under her eyes\u2014Matriarch Evelyn."
+  - You take two steps past the threshold, bracing for the cold, intimidating commander Reyes warned you about. But as your eyes land on the woman behind the desk, your breath violently snags in your chest. The room tilts.
+  - "At the sound of your voice, she snaps her head up from the grease-pencil map, jaw tight and ready to bark an order\u2014and completely freezes. Her eyes widen in stunned, disbelieving horror, then flood with tears. The grease pencil slips from her limp fingers, hitting the blotter and rolling onto the linoleum with a soft click."
+  - She scrambles around the mahogany desk, catching her hip on the sharp corner, and throws her arms around you in a desperate, bruising embrace. Her hands tremble uncontrollably against your soaked jacket, clutching at your shoulder blades, her face buried into your neck as if checking that you are warm, breathing flesh.
+  - "She looks up with cold tactical scrutiny\u2014until her gaze fixes on your face. A sharp, stunned gasp catches in her throat."
+  - jacket...  wouldn't stop showing it to every guard at the gate!">>
+  - '''s here! Is  safe?!">>'
+  - made it in last night with the first convoy, $firstName!  brought twenty refugees through the front gates... spent all night by the radio console scanning for your voice until  vocal cords gave out.  swore you were still alive!">>
+  - forever.">>
+  - She looks up from the maps, her gaze assessing you with cold, hard scrutiny.
+  - You pull back from her arms, your eyes scanning the room. A second command chair sits empty by the radio console; a cold tin mug sits beside an unread clipboard.
+  - Her fingers tighten abruptly on your wrists. Her expression shatters into raw, sick terror.
+  - You look across the room, your stomach dropping when you see only Evelyn and Reyes.
+  - Evelyn's relief instantly hardens into a mask of grim dread.
+  - '''s here, where is  right now? Why isn''t  in the office?">>'
+  - Evelyn's relief instantly hardens into a mask of grim dread.
+  - "isn't here right now, $firstName.  stayed up all night watching the road, running down to the gate every time an engine revved. But when our generator died at sunrise and the infirmary lost power,  took a crew down Route 9 to get fuel rather than lose  mind waiting.\">>\r\n                                \r\n                                     isn't here, $firstName. You missed  by less than half an hour. When the pre-dawn fog rolled in,  took a crew down Route 9 to siphon fuel before the infected on the highway started moving. If you'd pulled in twenty minutes sooner, you would've caught  at the loading dock.\">>"
+  - go out there?!">>
+  - "took an armored flatbed and three volunteers from the gate...\">>\r\n                            \r\n                        \r\n                            Reyes steps up to the desk, her expression tightening."
+  - "\U0001F4FB FREQUENCY 146.520 \u2014 EMERGENCY DISTRESS BROADCAST\r\n                    \r\n                        Before another word can be spoken, the Motorola base station screams with redlined static!"
+  - "\U0001F4FB EMERGENCY BROADCAST \u2014 FREQ 146.520 [MAYDAY]\r\n                                \u25CF LIVE SIGNAL"
+  - '[HEAVY SQUELCH... VIOLENT AUTOMATIC SHOTGUN BLASTS CRACKING OFF CERAMIC TILE]'
+  - '[STATIC BURST... RAPID, BREATHLESS SOBBING AND HAMMERING BLOWS AGAINST GLASS]'
+  - '[HIGH-PITCHED SQUELCH... HEAVY AUTOMATIC WEAPONS FIRE ECHOING IN ENCLOSED SPACE]'
+  - "1ST FLOOR \u2014 COMMAND &amp; HEADMASTER'S OFFICE\r\n                    \r\n                        Evelyn stands frozen, the dead microphone resting against her trembling fingers. Tears cut clean tracks through the dust on her cheeks as the flatline carrier tone hums through the silent room."
+  - She turns toward you, her voice a cracked, horrifying whisper.
+  - She grabs your wrists with bruising force, her eyes wild with grief.
+  - You pull away, your chest burning with shallow, violent breaths. Your knuckles are clenched white. You look directly at Reyes.
+  - Your hand slams into the desk so hard the maps rattle. The dead hiss from the speaker feels like poison in your ears.
+  - '''s bracing that cooler with one shoulder and six bullets. Reyes, tell me your scout truck has fuel.">>'
+  - She slams both fists onto the desk, her expression dark as iron.
+  - Officer Reyes pulls her slide back with a sharp, heavy metallic snap, checking the brass in the chamber.
+  - /* OBJECTIVE LIFECYCLE */
+  - "[ACTIVE RESCUE] Get your confiscated weapons back, grab emergency firepower, and roll out to Route 9.\r\n                            \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                \r\n                                Return to the Ground Floor corridor to check equipment and supplies."
+  dialogueLines:
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Reyes...
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Still upright? Good. For a minute down in that stairwell, I thought I was gonna have to carry you up here.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: My legs are shaking so hard I can barely feel the linoleum. Is... is Evelyn inside?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Yeah. She's in there. Listen to me for two seconds\u2014don't let her ice-queen routine rattle you. She hasn't slept thirty consecutive minutes since the city went dark. She's running this whole sanctuary on bitter coffee and raw nerve."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Ever since the sun broke, the tension's been suffocating. The boiler in the basement is choking black smoke, and the guys on the fence are jumping at shadows on the tree line.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I just spent the morning watching people get dragged through car windows on that highway. A tired woman with a clipboard isn't what scares me. Let's just get in there.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: That storm washed out the south bridge an hour ago. The guards outside are soaked to the bone and jumping at every twig snap. We're on edge.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: My boots are full of muddy water and my chest aches every time I breathe, but I'm standing. Open the door.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The folks who came in with us through the gate... someone's looking after them?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Checked on them myself. They're down in the gym getting dry blankets and hot broth. You dragged them out of hell, partner. Now take a breath\u2014let's face the Matriarch."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "That's the spirit. Take a breath\u2014let's go see the Matriarch."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Mom...? Mom, is that... is that really you?!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: ...$firstName...?! God in heaven... $firstName! You're alive?!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "God, Mom, it's really you... I thought\u2014when the sirens blared and the phones died, I thought you and Dad never made it out of the city..."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "You're breathing... you're really here! When dawn broke and the sky over the city was red with fire, we thought\u2014we thought you were trapped in the high-rise district when the power died! Tell me you're not hurt! Where were you all night?!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "You made it through the storm... oh God, you made it. When the bridges blew and the sirens cut out, we thought we'd left you behind in that nightmare to die! Look at me\u2014tell me you're not bitten!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "I'm clean, Mom. Look at me\u2014I'm not bitten. The highway was a nightmare, but I found a way through the valley. I'm right here."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The guys at the gate told me you brought survivors in behind you... you kept other people alive on that road... oh God, my baby... I am so proud of you...
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Wait... Reyes, who is this? Merciful God... you're $firstName. _leaderName had a photo of you tucked in <<print _poss>> jacket... <<print _subj>> wouldn't stop showing it to every guard at the gate!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Evelyn! Where's _leaderName? Please\u2014tell me they're here! Are they safe?!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: They made it in last night with the first convoy, $firstName! They brought twenty refugees through the front gates... spent all night by the radio console scanning for your voice until their vocal cords gave out. They swore you were still alive!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Thank God... when the cell towers cut on the interstate, I thought I'd lost them forever.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Evelyn! Where's _leaderName? Please\u2014tell me <<print _subj>>'s here! Is <<print _subj>> safe?!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: <<print _capSubj>> made it in last night with the first convoy, $firstName! <<print _capSubj>> brought twenty refugees through the front gates... spent all night by the radio console scanning for your voice until <<print _poss>> vocal cords gave out. <<print _capSubj>> swore you were still alive!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Thank God... when the cell towers cut on the interstate, I thought I'd lost <<print _obj>> forever.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: And the checkpoint told me you brought survivors in behind you. _leaderName knew you'd be out there keeping people alive.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Reyes. You're back on two feet. And who's this with you?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Survivor off the valley highway, ma'am. Cleared road blocks, watched my six, pulled me out of two ambushes. We need Commander Hayes right now.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Reyes told me this school was a fortified safe haven. But the guards outside look like they're barely holding the gates together.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "We are holding by the skin of our teeth. If you survived Route 9, you're welcome to dry blankets and hot rations\u2014provided you can pull your weight."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: They also escorted a civilian vehicle through the checkpoint, ma'am. Good people under fire.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Mom... where's Dad? Why isn't he here?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Your father... God, $firstName, when dawn broke and you still hadn't shown up, he was losing his mind. He was up on the roof in the freezing rain all night with a spotlight, praying every engine rumble on the road was you. But when sunrise hit, the main generator died... the infirmary down in the gym lost heat. Sick people and kids were freezing. He couldn't just sit here doing nothing. He took the flatbed out to Route 9 at first light to get diesel!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Your father... oh God, $firstName, you missed him by twenty minutes! Twenty minutes! When the morning fog rolled in, he took a flatbed down Route 9 to siphon diesel from an abandoned tanker before the infected started moving. If you'd pulled into the gate just a little sooner, he'd be standing right here!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "He went back out onto Route 9?! Mom, that road is a slaughterhouse\u2014there are swarms packed at every overpass! Why the hell did you let him leave?!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Because he's Arthur! You know your father\u2014he couldn't just sit by while people froze to death! He swore he'd be back before breakfast with enough fuel to keep the clinic heaters going. He took Miller and two guys from the gate with him..."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Wait... if they're here, where are they right now? Why aren't they in the office?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: They aren't here right now, $firstName. They stayed up all night watching the road, running down to the gate every time an engine revved. But when our generator died at sunrise and the infirmary lost power, they took a crew down Route 9 to get fuel rather than lose their mind waiting.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: They aren't here, $firstName. You missed them by less than half an hour. When the pre-dawn fog rolled in, they took a crew down Route 9 to siphon fuel before the infected on the highway started moving. If you'd pulled in twenty minutes sooner, you would've caught them at the loading dock.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Route 9 is a graveyard! Why the hell would you let them go out there?!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Because our clinic was freezing, the heaters were failing, and _leaderName refused to let anyone else shoulder that risk. They took an armored flatbed and three volunteers from the gate...
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Wait... if <<print _subj>>'s here, where is <<print _subj>> right now? Why isn't <<print _subj>> in the office?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: <<print _capSubj>> isn't here right now, $firstName. <<print _capSubj>> stayed up all night watching the road, running down to the gate every time an engine revved. But when our generator died at sunrise and the infirmary lost power, <<print _subj>> took a crew down Route 9 to get fuel rather than lose <<print _poss>> mind waiting.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: <<print _capSubj>> isn't here, $firstName. You missed <<print _obj>> by less than half an hour. When the pre-dawn fog rolled in, <<print _subj>> took a crew down Route 9 to siphon fuel before the infected on the highway started moving. If you'd pulled in twenty minutes sooner, you would've caught <<print _obj>> at the loading dock.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Route 9 is a graveyard! Why the hell would you let <<print _obj>> go out there?!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Because our clinic was freezing, the heaters were failing, and _leaderName refused to let anyone else shoulder that risk. <<print _capSubj>> took an armored flatbed and three volunteers from the gate...
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Where is Commander Hayes, Evelyn? He was supposed to be coordinating the defenses.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Hayes waited as long as he could for your report, Reyes. But when our fuel reserves hit zero at dawn, he took a team down Route 9 to get diesel.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Hayes isn't here, Reyes. You missed him by twenty minutes. He used the morning fog to slip down Route 9 before the infected on the highway started roaming.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: We just drove through the valley pass. Route 9 is crawling with infected and armed scavengers. If your commander took people down there, they walked into a meat grinder.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Hayes knew the risk. The clinic was freezing and people were dying. But their check-in was due ten minutes ago...
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Chloe (Radio Room)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Command, Radio Room! It's the Route 9 team\u2014they just broke silence, screaming for help! Patching the channel through now!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dad
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 55a158dea642682c29a4feceded6d2cc, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Evelyn?! Evie, can you hear me through the\u2014[CONCUSSIVE SHOTGUN ROAR]... damn it! They boxed the truck at the 7-Eleven pumps! Snipers on the car wash roof! Miller took buckshot through the chest\u2014he's bleeding out!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dad
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 55a158dea642682c29a4feceded6d2cc, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The gunfire pulled the whole highway down on us! We're wedged inside the walk-in dairy cooler... hundreds of infected slamming against the display glass! The metal frame is bowing inward, Evelyn! It's starring... it's about to burst!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Arthur! Arthur, hold on! Neal is here! Listen to me\u2014Neal is alive, he's standing right in front of me! Hold that door!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dad
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 55a158dea642682c29a4feceded6d2cc, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "[SQUELCH... RAGGED, SHAKEN GASP] ...Neal?! Neal's... oh God... my boy's alive... [TERRIFYING METALLIC GROAN, GLASS SPRAYING, ROARS] Evie, NO! Do NOT open the gates! Don't send the guards out here! Keep the school sealed! Neal... Neal, don't let her come out here... take care of your mother... tell her I\u2014[BLINDING STATIC SCREECH, TRANSMISSION SNAPPED]"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "_leaderName, hold on! $firstName is right here\u2014standing right beside me! We are coming for you!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Commander Hayes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 303440381b4c9b01134bffd26dd5e479, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Command, Hayes! MAYDAY, MAYDAY! Route 9 commercial strip\u2014the 7-Eleven! Armed hostiles pinned our flatbed at the pumps! The exchange pulled a horde off the expressway!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Commander Hayes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 303440381b4c9b01134bffd26dd5e479, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Miller took a slug to the lung, we're pushed into the walk-in cooler! Scavs suppressing the front while infected are hammering the display windows! The frame is warping\u2014we have under twenty rounds left! We need someone to hit their flank NOW, or we're slaughtered! [EXPLOSIVE IMPACT, RADIO GOES DEAD]"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: He told us not to open the gates... he's giving up. He's sitting in the dark waiting for that glass to cave in. But if I pull the guards off the fence, five hundred people in this gymnasium will be torn to shreds.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: $firstName... your truck is the only vehicle warm and running. Please. Don't let him die in that cold room. Bring your father back to me!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Keys. Reyes, where are the truck keys?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Partner, that 7-Eleven is a kill box\u2014"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I didn't crawl forty miles across an ash-covered city just to stand in this office and listen to my dad die through a speaker. Tell Vance to open that armory cage. We're moving. Right now.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: How far is that 7-Eleven?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Four miles down Route 9. By the car wash junction. But that highway is a graveyard\u2014our guards can't leave the barricade or the school will fall."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I don't give a damn about the road. They're bracing that cooler with one shoulder and six bullets. Reyes, tell me your scout truck has fuel.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I don't give a damn about the road. <<print _capSubj>>'s bracing that cooler with one shoulder and six bullets. Reyes, tell me your scout truck has fuel.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Half a tank and an armored bull-bar. If we're hitting that alley, we roll this second before that display glass shatters.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Tell Vance to give me my gear and whatever heavy fire he's got downstairs. We're rolling out.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: God damn it! If we pull the guards off the fence, the infected will breach the front doors. Reyes, take $firstName and the truck. Hit those scavengers from the rear car wash alley, blow the horde off the cooler glass, and drag Hayes out!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: If we're heading back into that meat grinder, I need my weapons back and whatever heavy fire you have. Tell Vance to open the steel cage before I kick it in myself.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Reyes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: fafca2e534bf20aa39a4a695c872da2d, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "You heard the Matriarch. Grab your gear, partner\u2014we hit Vance's armory and roll before that glass gives way."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: Next
+    choiceSubtitle: '[ACTIVE RESCUE] Get your confiscated weapons back, grab emergency firepower, and roll out to Route 9.'
+    targetPassage: {fileID: 11400000, guid: b99d5ec22f4b7c94cac5a10eee8f1487, type: 2}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F392 Prepare your gear in the Hub before departing"
+    choiceSubtitle: Return to the Ground Floor corridor to check equipment and supplies.
+    targetPassage: {fileID: 11400000, guid: 53c56bda0d2fecc46b3938a6bd856d17, type: 2}
+    targetPassageId: Act3_SchoolGFloor
+    targetRoomId: hall_g_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

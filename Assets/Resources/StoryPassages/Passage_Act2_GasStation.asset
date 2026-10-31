@@ -1,0 +1,710 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act2_GasStation
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act2_GasStation
+  passageTitle: ACT2 GASSTATION
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* ====================================================================\r\n   INITIALIZATION & STATE SETUP\r\n   Runs once when the passage is first loaded.\r\n   ==================================================================== */"
+  narrativeBeats:
+  - '/* AUDIO: Heavy rain, wind blowing through pine trees, a squeaking metal sign */'
+  - "ROUTE 9 \u2014 TIMBERLINE PIT STOP"
+  - /* --- 1. VISUALS --- */
+  - "/* --- 2. NARRATIVE --- */\r\n                    You pull off the highway, putting miles between you and the gridlock. The road narrows, winding into the dense, towering pine forests of the Pacific Northwest."
+  - The fuel gauge is brushing the red line.
+  - A pair of flickering halogen lights cut through the fog ahead. A lonely, isolated gas station. It looks abandoned. The power is surging, casting long, erratic shadows across the wet pavement. You pull up to the pump.
+  - /* --- 3. DYNAMIC COMPANION REACTION --- */
+  - Vane steps out into the rain, pulling his ruined designer jacket tight against the cold. He looks around at the pitch-black tree line, visibly on edge.
+  - You nod, stepping out of the car. Vane grabs the fuel nozzle. He's exposed out here, but you need gas.
+  - 'You step out into the freezing rain. The silence of the woods is vast and oppressive. You grab the fuel nozzle and shove it into the car, but the pump screen reads: PLEASE SEE CASHIER.'
+  - You wedge your wallet into the handle to lock the trigger open. You have to go inside and authorize the console.
+  - "/* --- 4. PLAYER CHOICES --- */\r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            It's dark inside."
+  - "TIMBERLINE PIT STOP \u2014 INTERIOR"
+  - /* --- 1. VISUALS & AUDIO --- */
+  - "/* --- 2. NARRATIVE --- */\r\n                    The glass doors slide open on a broken track. The smell is a mix of stale coffee, damp cardboard, and spilled antifreeze. The aisles have been hastily looted\u2014shelves knocked over, chip bags trampled into the linoleum. The back of the store fades into pitch-black shadow."
+  - You make your way behind the counter. The manager's terminal is blinking in the dark, casting a sickly green light across the desk. It is asking for a four-digit PIN.
+  - "/* --- DYNAMIC EXPLORATION TEXT --- */\r\n                    \r\n                        You spent five tense minutes picking through the wreckage of the aisles. Every wrapper that crunched under your boot sounded like a gunshot. You managed to salvage an intact Energy Bar. Near the back hallway, you also spotted a torn blue employee vest discarded on the floor. In the pocket was a crumpled receipt with 'PUMP AUTH: 6821' scrawled in pen."
+  - "/* --- 3. PRE-CHOICE VARIABLE SETUP --- */\r\n                     i.id === \"Flashlight\")>>\r\n                     i.id === \"Lighter\")>>"
+  - "/* --- 4. PLAYER CHOICES (EXPLORE OR BYPASS) --- */\r\n                    \r\n                        \r\n                        \r\n                        \r\n                            \U0001F526 LOOK AROUND\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                \r\n                                Dig through the trampled shelves. You might find supplies or a clue to the PIN."
+  - "\u2699\uFE0F AUTHORIZE THE PUMP\r\n                            \r\n                            \r\n                            \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [KNOWLEDGE] You punch in the code. The system accepts it immediately."
+  - "= 1>>\r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [TECH 1] You pop the housing and bridge the auth wire directly. Fast and clean.\r\n                                \r\n                            \r\n                                \r\n                                    Override the terminal\n\r\n                                    [REQUIRES TECH 1] You don't know the password and can't hack the system."
+  - '[FLASHLIGHT] The beam illuminates a sticky note taped under the register: ''6821''.'
+  - "= 4>>\r\n                                    \r\n                                        \r\n                                            \r\n                                            \r\n                                            \r\n                                            \r\n                                            \r\n                                            \r\n                                            \r\n                                        \r\n                                        [LIGHTER + PER 4] In the dim, flickering light, you spot a sticky note under the register.\r\n                                    \r\n                                \r\n                                    \r\n                                        Search the counter with your Lighter\n\r\n                                        [REQUIRES PER 4] The flame is too dim. You can't spot anything useful."
+  - "= 6>>\r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [PER 6] Your eyes adjust. You find a sticky note with a PIN by pure tactile search."
+  - "Search the counter\n\r\n                                    [REQUIRES LIGHT SOURCE OR PER 6] It's pitch black back here. You can't see anything."
+  - '[RISK: NOISE] Costs 5 STAMINA. Break the glass manager''s box on the wall to pull the lever.'
+  - "TIMBERLINE PIT STOP \u2014 INTERIOR"
+  - /* --- 1. VISUALS & AUDIO (MAP FOUND) --- */
+  - "/* --- 2. NARRATIVE (THE MAP LORE) --- */\r\n                    \r\n                        The shattering of the glass override box echoed violently through the empty store. You don't have time to enjoy the silence."
+  - The terminal beeps in authorization. Outside, the pump whirs to life, a rhythmic, mechanical *ding... ding... ding...* cutting through the rain.
+  - "As you turn to leave the counter, you notice a display rack of local transit maps. You grab one and unroll it across the glass counter.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                \r\n                                    The main highways\u2014I-5, 99, the major bridges\u2014they are all death traps now. Choked with abandoned cars and the infected."
+  - "[LORE: MARCUS'S JOURNAL]\n\r\n                                        You stare at the topography lines. You remember the dead hunter's words in Unit 405: \"The military will lock down the interstates. Take the old logging road up the northern ridge.\""
+  - "You trace your finger along the dark green sections of the map. There it is. A thin, winding dirt service road cutting straight through the mountains, bypassing the military blockades completely. You have a route.\r\n                                    \r\n                                        You stare at the topography lines. The main roads are out. If you're going to survive, you have to go off-grid. You trace your finger along a thin, winding dirt service road cutting straight through the mountains. It's a risk, but it's your only option.\r\n                                    \r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                    /* --- 3. THE CRASH EVENT --- */"
+  - CRASH.
+  - "You freeze. The noise you made drew it out. A metal shelf collapses in the back storage room.\r\n                                                    \r\n                                                        You freeze. The sound came from the back storage room. A metal shelf collapsing."
+  - A low, wet snarl echoes down the dark aisle. Something is in here with you. It's between you and the front doors. Outside, the fuel pump keeps dinging.
+  - Vane is outside. If that thing gets out the front door before you do, he won't see it coming.
+  - /* --- 4. PRE-CHOICE VARIABLE SETUP --- */
+  - "/* --- 5. PLAYER CHOICES (COMBAT/FLEE) --- */\r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                                [EQUIPPED FIREARM] You have a gun. You aren't sneaking. Put it down."
+  - "= 6>>\r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                                [AGI 6] Bypass the aisles entirely. Vault over the glass case directly to the exit.\r\n                                                            \r\n                                                        \r\n                                                            \r\n                                                                Vault the counter\n\r\n                                                                [REQUIRES AGI 6] You aren't fast or agile enough to clear the high counter silently."
+  - "= 2 or hasTrait(\"GHOST\")>>\r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                                [STEALTH 2] Use the shadows. Creep past it completely unnoticed.\r\n                                                            \r\n                                                        \r\n                                                            \r\n                                                                Slip through the dark aisles\n\r\n                                                                [REQUIRES STEALTH 2] You aren't quiet enough to sneak past it in these tight aisles.\r\n                                                            \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                                [MELEE COMBAT] Costs 10 STAMINA. Hit it hard and fast with your  before it sees you."
+  - '[RISK: INJURY] Make a break for it. It will clip you on the way out. Take -10 HP.'
+  - "ROUTE 9 \u2014 TIMBERLINE PIT STOP"
+  - /* --- 1. AUDIO FADEOUT --- */
+  - "/* --- 2. DYNAMIC NARRATIVE RESOLUTION --- */\r\n                    \r\n                    \r\n                        /* COMBAT SUCCESS - NOISE CONSEQUENCES */\r\n                        \r\n                            You step forward, meeting the infected head-on. Your weapon connects brutally in the dark aisle. The creature collapses to the linoleum, twitching once before going perfectly still. You stand over it, chest heaving."
+  - "[+25 XP]\r\n                            \r\n                            /* THE FIX: Stop Infinite XP Farming */"
+  - Then, another sound. A high, gurgling screech answers from the back storage room. Then another. Then a third. It wasn't just one infected hiding back there. It was a pack. And the noise you just made woke them all up.
+  - You hear the frantic scrambling of bodies hitting the aisles behind you. At that exact moment, the fuel pump outside chimes with a loud, mechanical *DING*. It's full.
+  - You sprint for the glass doors, bursting out into the freezing rain just as the pack rounds the corner behind you.
+  - "/* STEALTH/AGILITY SUCCESS - TIMING CONSEQUENCES */\r\n                        \r\n                            You move like a ghost, skirting the edges of the aisles or vaulting cleanly over the debris. The infected snarls in the darkness behind you, completely unaware that you are slipping out the front doors."
+  - You hit the wet pavement outside, the cold air burning your lungs. But the fuel pump isn't done. You stand there for five agonizing seconds in the freezing rain, watching the digital numbers slowly tick up while the shadow paces inside the store.
+  - '*DING.*'
+  - The mechanical chime of the pump finishing is deafening. Inside, the infected's head snaps toward the window, spotting you instantly. It lets out a terrifying shriek and charges the glass doors.
+  - "/* DESPERATION - CHAOS CONSEQUENCES */\r\n                        \r\n                            You don't think. You just run. Pure, blind panic. You slip on a puddle of spilled soda, crashing hard into a wire rack. You feel its jagged teeth scrape against your shoulder, tearing your jacket, but you kick it off wildly and scramble to your feet."
+  - You slam your full body weight into the glass double doors, bursting out into the freezing rain. The creature is literally inches behind you, its jaws snapping at the back of your neck.
+  - "/* --- 3. GETTING IN THE CAR --- */\r\n                                    \r\n                                        Vane jumps, seeing the creature lunging for the door. He drops the fuel nozzle, spilling gasoline across the pavement."
+  - "You both throw yourselves into the car, slamming the doors shut just as a pale, blood-soaked hand violently slaps the convenience store window.\r\n                                    \r\n                                        You yank the fuel nozzle out, tossing it to the ground, and throw yourself into the driver's seat. You slam the door and hit the locks just as a pale, blood-soaked hand violently slaps the convenience store window, right where your head is resting against the glass."
+  - "You shove the car into gear. The tires spin in the wet mud before finding traction, and the sedan rockets away from the flickering lights of the gas station.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                    /* --- 4. ACT 2.5 BRANCHING LOGIC --- */\r\n                                                    \r\n                                                        You have a full tank of gas. You have a map. You follow the hand-drawn lines from Marcus's hunting journal, pulling off the main roads and navigating toward a winding dirt trail that heads up the northern ridge. To his cabin.\r\n                                                        \r\n                                                        \r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                            \r\n                                                        \r\n                                                    \r\n                                                        You have a full tank of gas, but no destination. Just \"away.\" You take the first rural off-ramp you see, navigating by the dashboard compass to avoid the major highways. The road is pitch black, winding deep into the woods."
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I'll handle the pump. You go inside and authorize it. Just... please be fast. I feel like the first guy to die in a low-budget slasher film out here.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Get in! Let's go!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: It's dark inside.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Search the dark aisles first (5 Minutes)
+    choiceSubtitle: Dig through the trampled shelves. You might find supplies or a clue to the PIN.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Energy Bar
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Enter the PIN from the receipt [6821]'
+    choiceSubtitle: '[KNOWLEDGE] You punch in the code. The system accepts it immediately.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Override the terminal [TECH 1]'
+    choiceSubtitle: '[TECH 1] You pop the housing and bridge the auth wire directly. Fast and clean.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: tech
+    requiredSkillLevel: 1
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Search the counter with your Flashlight
+    choiceSubtitle: '[FLASHLIGHT] The beam illuminates a sticky note taped under the register: ''6821''.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Search the counter with your Lighter [PER 4]'
+    choiceSubtitle: '[LIGHTER + PER 4] In the dim, flickering light, you spot a sticky note under the register.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Observation
+    requiredStatValue: 4
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Search in the dark [PER 6]'
+    choiceSubtitle: '[PER 6] Your eyes adjust. You find a sticky note with a PIN by pure tactile search.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Observation
+    requiredStatValue: 6
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Smash the manual override box
+    choiceSubtitle: '[RISK: NOISE] Costs 5 STAMINA. Break the glass manager''s box on the wall to pull the lever.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 2
+    staminaCost: 5
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[EQUIPPED FIREARM] You have a gun. You aren''t sneaking. Put it down.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Vault the counter [AGI 6]'
+    choiceSubtitle: '[AGI 6] Bypass the aisles entirely. Vault over the glass case directly to the exit.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Reflex
+    requiredStatValue: 6
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Slip through the dark aisles [STEALTH 2]'
+    choiceSubtitle: '[STEALTH 2] Use the shadows. Creep past it completely unnoticed.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: stealth
+    requiredSkillLevel: 2
+    requiredTrait: GHOST
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Ambush it with your melee weapon
+    choiceSubtitle: '[MELEE COMBAT] Costs 10 STAMINA. Hit it hard and fast with your > before it sees you.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 10
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Sprint for the glass doors!
+    choiceSubtitle: '[RISK: INJURY] Make a break for it. It will clip you on the way out. Take -10 HP.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_GasStation
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 0992c183457e1e2469b400452c720d34, type: 2}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Drive into the dark
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: f86569b2816b71647a98bc7e72a00c0a, type: 2}
+    targetPassageId: Act2_5_MayaCrash
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

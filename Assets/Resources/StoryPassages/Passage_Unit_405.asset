@@ -1,0 +1,547 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit_405
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Unit_405
+  passageTitle: UNIT 405
+  associatedRoomId: unit_405
+  backdropSprite: {fileID: 21300000, guid: cfef5a178731a284398c4de878cbf5d7, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: '/* AUDIO: Low ambient tension */'
+  narrativeBeats:
+  - /* Variable Defaults */
+  - /* Setup Action Costs */
+  - UNIT 405 - THE BOOBY TRAP
+  - This is Marcus's place. The guy was a fanatic. An ex-military survivalist who spent his weekends hunting in the mountains and his weeknights reinforcing his walls.
+  - The door is heavy solid core steel, but strangely, it's unlocked. It sits ajar by a fraction of an inch. The sharp, acidic smell of cordite and gun oil leaks into the hallway.
+  - You push the door gently. It stops with a faint metallic *clink*.
+  - You shine your light down. A near-invisible monofilament fishing line is tied from the doorknob to the pin of a flashbang grenade and a makeshift 12-gauge blank shell rigged to the doorframe. If you open this door normally, it will blow your eardrums out and alert every infected within a three-mile radius.
+  - "\u2699\uFE0F DISARM THE TRAP"
+  - "\u274C TRAP TRIGGERED. Your ears are ringing. The blank shell detonated, and the noise echoed down the entire floor. The wire is gone now."
+  - "[BURGLAR/LOCKSMITH] Cost:  STAMINA. You know tension rigs. You slide a card to jam the striker mechanism safely.\r\n                            \r\n                        \r\n                            \r\n                                Block the firing pin\n\r\n                                [REQUIRES BURGLAR/LOCKSMITH] You lack the steady hands to jam the mechanism."
+  - "= 2>>\r\n                            \r\n                                \r\n                                    \r\n                                \r\n                                [TECH 2] Cost:  STAMINA. You dismantle the anchor point without pulling the wire.\r\n                            \r\n                        \r\n                            \r\n                                Release the tension spring\n\r\n                                [REQUIRES TECH 2] You don't understand how the spring mechanism is anchored."
+  - "i.id === \"Multi-Tool\")>>\r\n                            \r\n                                \r\n                                    \r\n                                \r\n                                [ITEM] Cost:  STAMINA. You grip the wire with pliers, snip it, and slowly release the tension.\r\n                            \r\n                        \r\n                            \r\n                                Cut the wire\n\r\n                                [REQUIRES MULTI-TOOL] You don't have wire cutters to snip it cleanly."
+  - "= 6>>\r\n                            \r\n                                \r\n                                    \r\n                                \r\n                                [PER /6] Cost:  STAMINA. Your sharp eyes map the tripwire perfectly. You contort your body and slide through safely.\r\n                            \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                \r\n                                [PER /6] You can barely see the wire in the dark. It's going to require immense focus and steady nerves to avoid touching it."
+  - "/* Panggil widget */\r\n                        \r\n                        \r\n                        /* HIDDEN TRIGGERS: Trik untuk menghubungkan JS ke Makro Twine */"
+  - UNIT 405 - THE HUNTER'S SANCTUARY
+  - You step into Marcus's apartment.
+  - "It looks like a staging ground. A heavy wooden table in the center acts as a reloading bench, dusted with gunpowder and brass shavings. In the corner, a massive steel gun safe sits with its door wide open\u2014completely stripped of the rifles you know he owned."
+  - He didn't die here. He geared up.
+  - On the wall above the bench is a topographical map of the state. A thick red marker traces a route avoiding the highways, ending at a circled location labeled 'Oakhaven Cabin'. Underneath the map is a HAM radio, turned off, with a notepad resting on the microphone.
+  - Near the empty safe, a small wooden toy car lies forgotten on the rug. The silence in this room feels entirely different from the Professor's study. This is the silence of someone who chose to fight.
+  - "\U0001F392 SECURE THE AREA"
+  - "[LORE] \"Diane... I emptied the safe. I rigged the door for looters. But on the stairs... one of them bit my arm. It burns. I'm not coming to Oakhaven. I won't bring this to you and the boys. I'm going to end it outside. I love you.\"\r\n                        \r\n                    \r\n                        \r\n                            \U0001F4DD Diane and the boys are at Oakhaven Cabin. Marcus was bitten and chose to die alone to protect them."
+  - "Marcus took the big guns, but left the loose items. You can scavenge handfuls of Pistol Ammo (12x) and some Scrap Metal.\r\n                        \r\n                    \r\n                        \r\n                            \U0001F50D The workbench is cleared. Only brass shavings remain."
+  - "The rifles are gone, but tucked in the corner is a high-carbon Hunting Knife. A reliable weapon.\r\n                        \r\n                    \r\n                        \r\n                            \U0001F52A The safe is completely empty."
+  - You've armed yourself with what Marcus left behind. Seeing that toy car on the floor feels different now. His family is waiting for someone who is never coming home.
+  dialogueLines:
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Paranoid bastard. He left a welcome present.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: Block the firing pin
+    choiceSubtitle: '[BURGLAR/LOCKSMITH] Cost: > STAMINA. You know tension rigs. You slide a card to jam the striker mechanism safely.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: LOCKSMITH
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Release the tension spring
+    choiceSubtitle: '[TECH 2] Cost: > STAMINA. You dismantle the anchor point without pulling the wire.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: tech
+    requiredSkillLevel: 2
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Cut and hold the wire [MULTI-TOOL]'
+    choiceSubtitle: '[ITEM] Cost: > STAMINA. You grip the wire with pliers, snip it, and slowly release the tension.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Squeeze through the gap [PER 6/6]'
+    choiceSubtitle: '[PER >/6] Cost: > STAMINA. Your sharp eyes map the tripwire perfectly. You contort your body and slide through safely.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Observation
+    requiredStatValue: 6
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Squeeze through the gap [MINIGAME]'
+    choiceSubtitle: '[PER >/6] You can barely see the wire in the dark. It''s going to require immense focus and steady nerves to avoid touching it.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 15
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: room405_opened
+    clearsStoryFlagOnExecute: 
+    triggerActionId: TRIGGER_QTE
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: WIN
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: LOSE
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Step back and return to the hallway"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F4DD Read the notepad by the radio (5 minutes)"
+    choiceSubtitle: '[LORE] "Diane... I emptied the safe. I rigged the door for looters. But on the stairs... one of them bit my arm. It burns. I''m not coming to Oakhaven. I won''t bring this to you and the boys. I''m going to end it outside. I love you."'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F50D Sweep the reloading bench (5 minutes)"
+    choiceSubtitle: Marcus took the big guns, but left the loose items. You can scavenge handfuls of Pistol Ammo (12x) and some Scrap Metal.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Pistol Ammo
+    givesItemQty: 12
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F52A Check the bottom of the gun safe (3 minutes)"
+    choiceSubtitle: The rifles are gone, but tucked in the corner is a high-carbon Hunting Knife. A reliable weapon.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_405
+    targetRoomId: unit_405
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Hunting Knife
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Leave the apartment and return to the hallway"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

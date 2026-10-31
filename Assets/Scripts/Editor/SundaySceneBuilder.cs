@@ -8,6 +8,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using SundayLastBreath.Core;
 using SundayLastBreath.UI;
 using SundayLastBreath.Data;
@@ -63,6 +65,20 @@ namespace SundayLastBreath.Editor
             cam.orthographicSize = 5f;
             camObj.tag = "MainCamera";
             camObj.AddComponent<AudioListener>();
+
+            var camData = camObj.AddComponent<UniversalAdditionalCameraData>();
+            camData.renderPostProcessing = true;
+
+            // Global URP Post-Processing Volume
+            ConfigurePostProcessingProfile();
+            GameObject volumeObj = new GameObject("Global PostProcess Volume");
+            Volume volume = volumeObj.AddComponent<Volume>();
+            volume.isGlobal = true;
+            VolumeProfile profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>("Assets/DefaultVolumeProfile.asset");
+            if (profile != null)
+            {
+                volume.sharedProfile = profile;
+            }
 
             // 3. EventSystem
             GameObject eventSystemObj = new GameObject("EventSystem");
@@ -1688,7 +1704,7 @@ namespace SundayLastBreath.Editor
             pTraitsObj.SetActive(false);
 
             CreateSectionBadge(pTraitsObj.transform, "TRAITS & SPECIAL PERKS");
-            GameObject traitsScroll = new GameObject("TraitsScroll", typeof(RectTransform));
+            GameObject traitsScroll = new GameObject("TraitsScroll", typeof(RectTransform), typeof(ScrollRect), typeof(RectMask2D), typeof(Image));
             traitsScroll.transform.SetParent(pTraitsObj.transform, false);
             LayoutElement tsLe = traitsScroll.AddComponent<LayoutElement>();
             tsLe.flexibleWidth = 1f;
@@ -1696,17 +1712,32 @@ namespace SundayLastBreath.Editor
             RectTransform tsScrollRect = traitsScroll.GetComponent<RectTransform>();
             StretchFull(tsScrollRect);
 
+            Image tsBg = traitsScroll.GetComponent<Image>();
+            tsBg.color = new Color(0f, 0f, 0f, 0.01f); // Transparent raycast target for scroll events
+            tsBg.raycastTarget = true;
+
+            ScrollRect tsSr = traitsScroll.GetComponent<ScrollRect>();
+            tsSr.horizontal = false;
+            tsSr.vertical = true;
+            tsSr.scrollSensitivity = 30f;
+            tsSr.movementType = ScrollRect.MovementType.Clamped;
+
             GameObject traitsContent = new GameObject("Content", typeof(RectTransform));
             traitsContent.transform.SetParent(traitsScroll.transform, false);
             RectTransform tcRect = traitsContent.GetComponent<RectTransform>();
             tcRect.anchorMin = new Vector2(0f, 1f); tcRect.anchorMax = new Vector2(1f, 1f);
             tcRect.pivot = new Vector2(0.5f, 1f);
+            tcRect.anchoredPosition = Vector2.zero;
             tcRect.sizeDelta = new Vector2(0f, 0f);
             VerticalLayoutGroup tcVlg = traitsContent.AddComponent<VerticalLayoutGroup>();
             tcVlg.spacing = 8f;
             tcVlg.childControlWidth = true; tcVlg.childControlHeight = false;
+            tcVlg.childForceExpandWidth = true; tcVlg.childForceExpandHeight = false;
             ContentSizeFitter tcCsf = traitsContent.AddComponent<ContentSizeFitter>();
             tcCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            tsSr.content = tcRect;
+            tsSr.viewport = tsScrollRect;
 
             // TAB 4: MAP PANEL (Architectural Blueprint & Bio-Radar Scanner)
             GameObject pMapObj = new GameObject("Panel_Map", typeof(RectTransform));
@@ -3747,6 +3778,186 @@ namespace SundayLastBreath.Editor
                     }
                 }
             }
+        }
+
+        [MenuItem("Tools/Sunday's Last Breath/Configure URP Post-Processing Profile", false, 100)]
+        public static void ConfigurePostProcessingProfile()
+        {
+            string profilePath = "Assets/DefaultVolumeProfile.asset";
+            VolumeProfile profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(profilePath);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                AssetDatabase.CreateAsset(profile, profilePath);
+            }
+
+            // 1. Bloom (Emergency Broadcast & CRT Glow)
+            if (!profile.TryGet<Bloom>(out var bloom))
+            {
+                bloom = profile.Add<Bloom>(true);
+            }
+            if (bloom != null && !AssetDatabase.Contains(bloom))
+            {
+                AssetDatabase.AddObjectToAsset(bloom, profile);
+            }
+            bloom.threshold.overrideState = true;
+            bloom.threshold.value = 0.85f;
+            bloom.intensity.overrideState = true;
+            bloom.intensity.value = 0.95f;
+            bloom.scatter.overrideState = true;
+            bloom.scatter.value = 0.70f;
+            bloom.tint.overrideState = true;
+            bloom.tint.value = new Color(1.0f, 0.92f, 0.85f);
+            EditorUtility.SetDirty(bloom);
+
+            // 2. Vignette (Dark Claustrophobic Surveillance Frame)
+            if (!profile.TryGet<Vignette>(out var vignette))
+            {
+                vignette = profile.Add<Vignette>(true);
+            }
+            if (vignette != null && !AssetDatabase.Contains(vignette))
+            {
+                AssetDatabase.AddObjectToAsset(vignette, profile);
+            }
+            vignette.intensity.overrideState = true;
+            vignette.intensity.value = 0.32f;
+            vignette.smoothness.overrideState = true;
+            vignette.smoothness.value = 0.40f;
+            vignette.color.overrideState = true;
+            vignette.color.value = new Color(0.04f, 0.01f, 0.01f, 1f);
+            EditorUtility.SetDirty(vignette);
+
+            // 3. Film Grain (Analog Retro CRT Noise Texture)
+            if (!profile.TryGet<FilmGrain>(out var grain))
+            {
+                grain = profile.Add<FilmGrain>(true);
+            }
+            if (grain != null && !AssetDatabase.Contains(grain))
+            {
+                AssetDatabase.AddObjectToAsset(grain, profile);
+            }
+            grain.type.overrideState = true;
+            grain.type.value = FilmGrainLookup.Medium1;
+            grain.intensity.overrideState = true;
+            grain.intensity.value = 0.22f;
+            grain.response.overrideState = true;
+            grain.response.value = 0.80f;
+            EditorUtility.SetDirty(grain);
+
+            // 4. Chromatic Aberration (CRT Glass Fringe)
+            if (!profile.TryGet<ChromaticAberration>(out var chroma))
+            {
+                chroma = profile.Add<ChromaticAberration>(true);
+            }
+            if (chroma != null && !AssetDatabase.Contains(chroma))
+            {
+                AssetDatabase.AddObjectToAsset(chroma, profile);
+            }
+            chroma.intensity.overrideState = true;
+            chroma.intensity.value = 0.12f;
+            EditorUtility.SetDirty(chroma);
+
+            // 5. Color Adjustments (Deep Obsidian Contrast)
+            if (!profile.TryGet<ColorAdjustments>(out var colorAdj))
+            {
+                colorAdj = profile.Add<ColorAdjustments>(true);
+            }
+            if (colorAdj != null && !AssetDatabase.Contains(colorAdj))
+            {
+                AssetDatabase.AddObjectToAsset(colorAdj, profile);
+            }
+            colorAdj.contrast.overrideState = true;
+            colorAdj.contrast.value = 10f;
+            colorAdj.saturation.overrideState = true;
+            colorAdj.saturation.value = -5f;
+            colorAdj.postExposure.overrideState = true;
+            colorAdj.postExposure.value = 0.05f;
+            EditorUtility.SetDirty(colorAdj);
+
+            EditorUtility.SetDirty(profile);
+            AssetDatabase.SaveAssets();
+        }
+
+        [MenuItem("Tools/Sunday's Last Breath/Create All Sector Map Data Assets", false, 101)]
+        public static void CreateAllSectorMapDataAssets()
+        {
+            string mapsDir = "Assets/Resources/Maps";
+            if (!Directory.Exists(mapsDir))
+            {
+                Directory.CreateDirectory(mapsDir);
+            }
+
+            CreateOrUpdateMapAsset(
+                path: "Assets/Resources/Maps/FloorMap_Ascott_4F.asset",
+                floorId: "ascott_4f",
+                title: "ARCHITECTURAL BLUEPRINT // ASCOTT RESIDENCY — 4TH FLOOR WEST WING",
+                subtitle: "SCHEMATIC SCALE 1:100 // CONTIGUOUS FLOORPLAN",
+                gridCoord: "GRID [W-01:R-01] // BIO-RADAR: ACTIVE",
+                svgPath: "Assets/Sprites/Maps/Map_Ascott_4thFloor.svg"
+            );
+
+            CreateOrUpdateMapAsset(
+                path: "Assets/Resources/Maps/FloorMap_Ascott_Lobby.asset",
+                floorId: "ascott_lobby",
+                title: "ARCHITECTURAL BLUEPRINT // ASCOTT GRAND RESIDENCY — MAIN LOBBY & FOYER",
+                subtitle: "SCHEMATIC SCALE 1:100 // GROUND FLOOR ENTRY",
+                gridCoord: "GRID [G-01:L-01] // BIO-RADAR: ELEVATED THREAT",
+                svgPath: "Assets/Sprites/Maps/Map_Ascott_Lobby.svg"
+            );
+
+            CreateOrUpdateMapAsset(
+                path: "Assets/Resources/Maps/FloorMap_Ascott_2F.asset",
+                floorId: "ascott_2f",
+                title: "ARCHITECTURAL BLUEPRINT // ASCOTT RESIDENCY — 2ND FLOOR CORRIDOR",
+                subtitle: "SCHEMATIC SCALE 1:100 // RESIDENTIAL ACCESS",
+                gridCoord: "GRID [W-02:R-01] // BIO-RADAR: STANDBY",
+                svgPath: "Assets/Sprites/Maps/Map_Ascott_2F_Hallway.svg"
+            );
+
+            CreateOrUpdateMapAsset(
+                path: "Assets/Resources/Maps/FloorMap_HighSchool_Ground.asset",
+                floorId: "hs_ground",
+                title: "ARCHITECTURAL BLUEPRINT // TIMBERLINE HIGH SCHOOL — GROUND FLOOR",
+                subtitle: "COMMUNITY EVACUATION FACILITY // CIVIC BLUEPRINT",
+                gridCoord: "GRID [HS-01:GF] // BIO-RADAR: SCANNING",
+                svgPath: "Assets/Sprites/Maps/Map_HighSchool_GroundFloor.svg"
+            );
+
+            CreateOrUpdateMapAsset(
+                path: "Assets/Resources/Maps/FloorMap_HighSchool_1F.asset",
+                floorId: "hs_1f",
+                title: "ARCHITECTURAL BLUEPRINT // TIMBERLINE HIGH SCHOOL — 1ST FLOOR ACADEMIC WING",
+                subtitle: "CLASSROOMS & LABORATORIES // ELEVATED FLOOR",
+                gridCoord: "GRID [HS-02:1F] // BIO-RADAR: SCANNING",
+                svgPath: "Assets/Sprites/Maps/Map_HighSchool_1stFloor.svg"
+            );
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("[SundaySceneBuilder] All Sector Map Data Assets successfully generated with SVG Vector Sprites!");
+        }
+
+        private static void CreateOrUpdateMapAsset(string path, string floorId, string title, string subtitle, string gridCoord, string svgPath)
+        {
+            TacticalFloorMapData asset = AssetDatabase.LoadAssetAtPath<TacticalFloorMapData>(path);
+            if (asset == null)
+            {
+                asset = ScriptableObject.CreateInstance<TacticalFloorMapData>();
+                AssetDatabase.CreateAsset(asset, path);
+            }
+
+            asset.floorId = floorId;
+            asset.floorTitle = title;
+            asset.floorSubtitle = subtitle;
+            asset.gridCoordinate = gridCoord;
+
+            Sprite svgSprite = AssetDatabase.LoadAssetAtPath<Sprite>(svgPath);
+            if (svgSprite != null)
+            {
+                asset.vectorMapSprite = svgSprite;
+            }
+
+            EditorUtility.SetDirty(asset);
         }
 
         // --- SPLASH ---
@@ -6665,29 +6876,54 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI scaleTmp = CreateTMPText(bpSubBar.transform, "ScaleLabel",
                 "SCHEMATIC SCALE 1:100 // CONTIGUOUS FLOORPLAN",
-                8f, new Color(0.38f, 0.56f, 0.72f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+                10f, new Color(0.55f, 0.72f, 0.88f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             StretchFull(scaleTmp.rectTransform);
             scaleTmp.rectTransform.offsetMax = new Vector2(-340f, 0f);
 
             TextMeshProUGUI footerLocTmp = CreateTMPText(bpSubBar.transform, "ActivePosBanner",
                 "<color=#00e5ff><b>PLAYER POS:</b> UNIT 407</color>",
-                8.5f, new Color(0.75f, 0.88f, 0.96f), TextAlignmentOptions.MidlineRight);
+                10.5f, new Color(0.85f, 0.94f, 1.0f), TextAlignmentOptions.MidlineRight);
             StretchFull(footerLocTmp.rectTransform);
             footerLocTmp.rectTransform.offsetMin = new Vector2(240f, 0f);
 
-            mapCtrl.BindBlueprintBanners(coordBannerTmp, footerLocTmp, gridOverlayImg);
+            mapCtrl.BindBlueprintBanners(tbTitle, scaleTmp, coordBannerTmp, footerLocTmp, gridOverlayImg);
 
             // =========================================================================
-            // 3. CONTIGUOUS FLOORPLAN CANVAS (616x274 centered inside BlueprintViewport)
+            // 3. CONTIGUOUS FLOORPLAN CANVAS & MASK CONTAINER
             // =========================================================================
+            GameObject fpContainer = new GameObject("FloorplanContainer", typeof(RectTransform), typeof(RectMask2D), typeof(Image), typeof(BlueprintPanZoomHandler));
+            fpContainer.transform.SetParent(bpViewport.transform, false);
+            RectTransform fpcRect = fpContainer.GetComponent<RectTransform>();
+            fpcRect.anchorMin = new Vector2(0f, 0f);
+            fpcRect.anchorMax = new Vector2(1f, 1f);
+            fpcRect.offsetMin = new Vector2(2f, 25f);   // Above LegendBar
+            fpcRect.offsetMax = new Vector2(-2f, -25f); // Below BlueprintSubHeader
+
+            Image fpcImg = fpContainer.GetComponent<Image>();
+            fpcImg.color = new Color(0f, 0f, 0f, 0f); // Fully transparent background
+            fpcImg.raycastTarget = true;              // Catches mouse scroll & drag over entire blueprint
+
+            BlueprintPanZoomHandler pzHandler = fpContainer.GetComponent<BlueprintPanZoomHandler>();
+            pzHandler.Initialize(mapCtrl);
+
             GameObject fpCanvas = new GameObject("FloorplanCanvas", typeof(RectTransform));
-            fpCanvas.transform.SetParent(bpViewport.transform, false);
+            fpCanvas.transform.SetParent(fpContainer.transform, false);
             RectTransform fpRect = fpCanvas.GetComponent<RectTransform>();
             fpRect.anchorMin = new Vector2(0.5f, 0.5f);
             fpRect.anchorMax = new Vector2(0.5f, 0.5f);
             fpRect.pivot = new Vector2(0.5f, 0.5f);
             fpRect.anchoredPosition = new Vector2(0f, 2f);
             fpRect.sizeDelta = new Vector2(616f, 274f);
+
+            // Vector Graphics Architectural Blueprint Backdrop (Imported via VectorGraphics SVG)
+            GameObject vMapObj = new GameObject("VectorMapBackdrop", typeof(RectTransform));
+            vMapObj.transform.SetParent(fpCanvas.transform, false);
+            RectTransform vmRect = vMapObj.GetComponent<RectTransform>();
+            StretchFull(vmRect);
+            Image vmImg = vMapObj.AddComponent<Image>();
+            vmImg.preserveAspect = true;
+            vmImg.raycastTarget = false;
+            mapCtrl.BindVectorMapBackdrop(vmImg);
 
             // Outer Structural Wing Perimeter Wall
             GameObject perimeterObj = new GameObject("StructuralPerimeter", typeof(RectTransform));
@@ -6699,11 +6935,10 @@ namespace SundayLastBreath.Editor
             perimRect.anchoredPosition = Vector2.zero;
             perimRect.sizeDelta = new Vector2(560f, 260f);
             Image perimBg = perimeterObj.AddComponent<Image>();
-            perimBg.color = new Color(0.02f, 0.035f, 0.06f, 0.94f);
+            perimBg.color = new Color(0f, 0f, 0f, 0f);
             perimBg.raycastTarget = false;
             Outline perimOl = perimeterObj.AddComponent<Outline>();
-            perimOl.effectColor = new Color(0.22f, 0.40f, 0.58f, 0.90f);
-            perimOl.effectDistance = new Vector2(1.5f, -1.5f);
+            perimOl.enabled = false;
 
             // Central Spine Corridor Continuous Structural Shaft
             GameObject spineShaft = new GameObject("CentralCorridorShaft", typeof(RectTransform));
@@ -6715,11 +6950,10 @@ namespace SundayLastBreath.Editor
             ssRect.anchoredPosition = Vector2.zero;
             ssRect.sizeDelta = new Vector2(64f, 248f);
             Image ssBg = spineShaft.AddComponent<Image>();
-            ssBg.color = new Color(0.035f, 0.055f, 0.09f, 0.96f);
+            ssBg.color = new Color(0f, 0f, 0f, 0f);
             ssBg.raycastTarget = false;
             Outline ssOl = spineShaft.AddComponent<Outline>();
-            ssOl.effectColor = new Color(0.18f, 0.32f, 0.46f, 0.75f);
-            ssOl.effectDistance = new Vector2(1f, -1f);
+            ssOl.enabled = false;
 
             // 5 Contiguous Floorplan Rows (y = +104, +52, 0, -52, -104)
             CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, 100f,
@@ -6763,9 +6997,86 @@ namespace SundayLastBreath.Editor
             lbRect.offsetMax = new Vector2(-10f, 23f);
 
             TextMeshProUGUI legendTmp = CreateTMPText(legendBar.transform, "LegendText",
-                "<color=#00e5ff>■</color> CURRENT SECTOR     <color=#14b87a>■</color> CLEARED / OPEN     <color=#f59e0b>■</color> LOCKED     <color=#f43f5e>■</color> BIOHAZARD / BLOCKED     <color=#64748b>■</color> COLLAPSED",
-                8f, new Color(0.65f, 0.76f, 0.86f), TextAlignmentOptions.Center, FontStyles.Bold);
+                "<color=#00e5ff>■</color> CURRENT SECTOR     <color=#14b87a>■</color> CLEARED / OPEN     <color=#f59e0b>■</color> LOCKED     <color=#f43f5e>■</color> BIOHAZARD / BLOCKED     <color=#94a3b8>■</color> COLLAPSED",
+                9.5f, new Color(0.78f, 0.88f, 0.96f), TextAlignmentOptions.Center, FontStyles.Bold);
             StretchFull(legendTmp.rectTransform);
+
+            // Tactical Blueprint Zoom & Pan Toolbar (Top-right of blueprint area)
+            GameObject zoomWidget = new GameObject("BlueprintZoomWidget", typeof(RectTransform));
+            zoomWidget.transform.SetParent(bpViewport.transform, false);
+            RectTransform zwRect = zoomWidget.GetComponent<RectTransform>();
+            zwRect.anchorMin = new Vector2(1f, 1f);
+            zwRect.anchorMax = new Vector2(1f, 1f);
+            zwRect.pivot = new Vector2(1f, 1f);
+            zwRect.anchoredPosition = new Vector2(-10f, -28f);
+            zwRect.sizeDelta = new Vector2(138f, 22f);
+
+            Image zwBg = zoomWidget.AddComponent<Image>();
+            zwBg.color = new Color(0.02f, 0.05f, 0.09f, 0.92f);
+            zwBg.raycastTarget = false;
+            Outline zwOl = zoomWidget.AddComponent<Outline>();
+            zwOl.effectColor = new Color(0.14f, 0.28f, 0.42f, 0.85f);
+            zwOl.effectDistance = new Vector2(1f, -1f);
+
+            // [ - ] Zoom Out Button
+            GameObject btnOutObj = new GameObject("BtnZoomOut", typeof(RectTransform), typeof(Image), typeof(Button));
+            btnOutObj.transform.SetParent(zoomWidget.transform, false);
+            RectTransform outRect = btnOutObj.GetComponent<RectTransform>();
+            outRect.anchorMin = new Vector2(0f, 0.5f);
+            outRect.anchorMax = new Vector2(0f, 0.5f);
+            outRect.pivot = new Vector2(0f, 0.5f);
+            outRect.anchoredPosition = new Vector2(3f, 0f);
+            outRect.sizeDelta = new Vector2(22f, 18f);
+            btnOutObj.GetComponent<Image>().color = new Color(0.08f, 0.16f, 0.26f, 1f);
+            Button btnOut = btnOutObj.GetComponent<Button>();
+            TextMeshProUGUI outTxt = CreateTMPText(btnOutObj.transform, "Label", "-", 11f, new Color(0.22f, 0.74f, 0.97f), TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(outTxt.rectTransform);
+
+            // Zoom Readout ("100%")
+            TextMeshProUGUI zoomReadoutTmp = CreateTMPText(zoomWidget.transform, "ZoomReadout", "100%", 8.5f, new Color(0.85f, 0.92f, 0.98f), TextAlignmentOptions.Center, FontStyles.Bold);
+            RectTransform zrRect = zoomReadoutTmp.rectTransform;
+            zrRect.anchorMin = new Vector2(0f, 0.5f);
+            zrRect.anchorMax = new Vector2(0f, 0.5f);
+            zrRect.pivot = new Vector2(0.5f, 0.5f);
+            zrRect.anchoredPosition = new Vector2(47f, 0f);
+            zrRect.sizeDelta = new Vector2(38f, 18f);
+
+            // [ + ] Zoom In Button
+            GameObject btnInObj = new GameObject("BtnZoomIn", typeof(RectTransform), typeof(Image), typeof(Button));
+            btnInObj.transform.SetParent(zoomWidget.transform, false);
+            RectTransform inRect = btnInObj.GetComponent<RectTransform>();
+            inRect.anchorMin = new Vector2(0f, 0.5f);
+            inRect.anchorMax = new Vector2(0f, 0.5f);
+            inRect.pivot = new Vector2(0f, 0.5f);
+            inRect.anchoredPosition = new Vector2(72f, 0f);
+            inRect.sizeDelta = new Vector2(22f, 18f);
+            btnInObj.GetComponent<Image>().color = new Color(0.08f, 0.16f, 0.26f, 1f);
+            Button btnIn = btnInObj.GetComponent<Button>();
+            TextMeshProUGUI inTxt = CreateTMPText(btnInObj.transform, "Label", "+", 11f, new Color(0.22f, 0.74f, 0.97f), TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(inTxt.rectTransform);
+
+            // [ 1x ] Reset Button
+            GameObject btnResetObj = new GameObject("BtnZoomReset", typeof(RectTransform), typeof(Image), typeof(Button));
+            btnResetObj.transform.SetParent(zoomWidget.transform, false);
+            RectTransform resetRect = btnResetObj.GetComponent<RectTransform>();
+            resetRect.anchorMin = new Vector2(0f, 0.5f);
+            resetRect.anchorMax = new Vector2(0f, 0.5f);
+            resetRect.pivot = new Vector2(0f, 0.5f);
+            resetRect.anchoredPosition = new Vector2(98f, 0f);
+            resetRect.sizeDelta = new Vector2(36f, 18f);
+            btnResetObj.GetComponent<Image>().color = new Color(0.08f, 0.16f, 0.26f, 1f);
+            Button btnReset = btnResetObj.GetComponent<Button>();
+            TextMeshProUGUI resetTxt = CreateTMPText(btnResetObj.transform, "Label", "1x", 9f, new Color(0.56f, 0.68f, 0.82f), TextAlignmentOptions.Center, FontStyles.Bold);
+            StretchFull(resetTxt.rectTransform);
+
+            mapCtrl.BindPanZoomControls(fpRect, bpRect, btnIn, btnOut, btnReset, zoomReadoutTmp);
+
+            #if UNITY_EDITOR
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(btnIn.onClick, mapCtrl.ZoomIn);
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(btnOut.onClick, mapCtrl.ZoomOut);
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(btnReset.onClick, mapCtrl.ResetZoom);
+            UnityEditor.EditorUtility.SetDirty(mapCtrl);
+            #endif
 
             // =========================================================================
             // 4. RIGHT COLUMN: BIO-RADAR & RECON DOSSIER (533px wide x 342px tall)
@@ -6798,7 +7109,7 @@ namespace SundayLastBreath.Editor
             dbBg.color = new Color(0.06f, 0.10f, 0.16f, 0.96f);
             TextMeshProUGUI dbTxt = CreateTMPText(dosBadge.transform, "Text",
                 "BIO-RADAR & RECON DOSSIER // SECTOR TELEMETRY",
-                9.5f, new Color(0.95f, 0.55f, 0.15f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+                10.5f, new Color(0.98f, 0.62f, 0.20f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             StretchFull(dbTxt.rectTransform);
             dbTxt.rectTransform.offsetMin = new Vector2(10f, 0f);
             dbTxt.rectTransform.offsetMax = new Vector2(-10f, 0f);
@@ -6828,14 +7139,14 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI intelTitleTmp = CreateTMPText(titleRow.transform, "IntelSectorTitle",
                 "<b>UNIT 407 // YOUR RESIDENCE</b>",
-                13f, new Color(0.0f, 0.90f, 1.0f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+                13.5f, new Color(0.0f, 0.92f, 1.0f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             StretchFull(intelTitleTmp.rectTransform);
             intelTitleTmp.rectTransform.offsetMin = new Vector2(28f, 0f);
 
             // Clearance Status Pill (y: -60 to -78)
             TextMeshProUGUI intelStatusTmp = CreateTMPText(intelCard.transform, "StatusTag",
                 "<color=#00e5ff><b>[ CURRENT SECTOR ]</b></color>",
-                9.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+                10.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform stRect = intelStatusTmp.rectTransform;
             stRect.anchorMin = new Vector2(0f, 1f);
             stRect.anchorMax = new Vector2(1f, 1f);
@@ -6859,8 +7170,8 @@ namespace SundayLastBreath.Editor
             mcOl.effectDistance = new Vector2(1f, -1f);
 
             TextMeshProUGUI intelThreatTmp = CreateTMPText(metricsCard.transform, "ThreatMetric",
-                "<color=#64748b>THREAT:</color> <color=#2ecc71><b>NONE</b></color>",
-                9.5f, new Color(0.82f, 0.88f, 0.95f), TextAlignmentOptions.MidlineLeft);
+                "<color=#94a3b8>THREAT:</color> <color=#2ecc71><b>NONE</b></color>",
+                10.5f, new Color(0.85f, 0.92f, 0.98f), TextAlignmentOptions.MidlineLeft);
             intelThreatTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
             intelThreatTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
             intelThreatTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -6868,8 +7179,8 @@ namespace SundayLastBreath.Editor
             intelThreatTmp.rectTransform.offsetMax = new Vector2(-10f, -4f);
 
             TextMeshProUGUI intelScavengeTmp = CreateTMPText(metricsCard.transform, "ScavengeMetric",
-                "<color=#64748b>SALVAGE:</color> <color=#f39c12><b>DEPLETED / SECURED</b></color>",
-                9.5f, new Color(0.82f, 0.88f, 0.95f), TextAlignmentOptions.MidlineLeft);
+                "<color=#94a3b8>SALVAGE:</color> <color=#f39c12><b>DEPLETED / SECURED</b></color>",
+                10.5f, new Color(0.85f, 0.92f, 0.98f), TextAlignmentOptions.MidlineLeft);
             intelScavengeTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
             intelScavengeTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
             intelScavengeTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -6877,8 +7188,8 @@ namespace SundayLastBreath.Editor
             intelScavengeTmp.rectTransform.offsetMax = new Vector2(-10f, -25f);
 
             TextMeshProUGUI intelAcousticTmp = CreateTMPText(metricsCard.transform, "AcousticMetric",
-                "<color=#64748b>AUDIO:</color> <color=#38bdf8><b>60Hz TV STATIC HUM</b></color>",
-                9.5f, new Color(0.82f, 0.88f, 0.95f), TextAlignmentOptions.MidlineLeft);
+                "<color=#94a3b8>AUDIO:</color> <color=#38bdf8><b>60Hz TV STATIC HUM</b></color>",
+                10.5f, new Color(0.85f, 0.92f, 0.98f), TextAlignmentOptions.MidlineLeft);
             intelAcousticTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
             intelAcousticTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
             intelAcousticTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -6888,7 +7199,7 @@ namespace SundayLastBreath.Editor
             // Architectural & Recon Notes Header (y: -156 to -172)
             TextMeshProUGUI notesHdrTmp = CreateTMPText(intelCard.transform, "NotesHeader",
                 "ARCHITECTURAL & RECON NOTES:",
-                8.5f, new Color(0.45f, 0.58f, 0.72f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
+                9.5f, new Color(0.55f, 0.72f, 0.88f), TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             notesHdrTmp.rectTransform.anchorMin = new Vector2(0f, 1f);
             notesHdrTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
             notesHdrTmp.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -6912,7 +7223,7 @@ namespace SundayLastBreath.Editor
 
             TextMeshProUGUI intelDescTmp = CreateTMPText(descBox.transform, "IntelDescription",
                 "Your residential apartment. The television flickers with civil defense emergency alert white noise. Heavy reinforced deadbolt held firm during the initial outbreak chaos. Direct exit to North Spine Corridor.",
-                10f, new Color(0.78f, 0.86f, 0.95f), TextAlignmentOptions.TopLeft);
+                11f, new Color(0.85f, 0.92f, 0.98f), TextAlignmentOptions.TopLeft);
             intelDescTmp.lineSpacing = 3f;
             StretchFull(intelDescTmp.rectTransform);
             intelDescTmp.rectTransform.offsetMin = new Vector2(10f, 6f);
@@ -6965,6 +7276,18 @@ namespace SundayLastBreath.Editor
             mapCtrl.BindIntelReferences(hdrIconImg, intelTitleTmp, intelStatusTmp,
                 intelThreatTmp, intelScavengeTmp, intelAcousticTmp, intelDescTmp,
                 quickNavTmp, transitBtn, transitBg, transitTxt);
+
+            TacticalFloorMapData defaultFloor = AssetDatabase.LoadAssetAtPath<TacticalFloorMapData>("Assets/Resources/Maps/FloorMap_Ascott_4F.asset");
+            if (defaultFloor != null)
+            {
+                var so = new SerializedObject(mapCtrl);
+                var spFloor = so.FindProperty("currentFloorData");
+                if (spFloor != null)
+                {
+                    spFloor.objectReferenceValue = defaultFloor;
+                    so.ApplyModifiedProperties();
+                }
+            }
 
             return mapCtrl;
         }

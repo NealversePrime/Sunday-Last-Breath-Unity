@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_School_Headmaster
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_School_Headmaster
+  passageTitle: ACT3 SCHOOL HEADMASTER
+  associatedRoomId: headmaster_office
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: /* DYNAMIC LEADER & AVATAR CONFIGURATION */
+  narrativeBeats:
+  - /* If player enters office before triggering the briefing, route them directly into the story briefing */
+  - "1ST FLOOR \u2014 COMMAND & HEADMASTER'S OFFICE"
+  - Topographic maps and radio logs clutter the desk. The red emergency receiver light continues to pulse on the desk console.
+  - Matriarch Evelyn looks up sharply as the doors swing open, her face etched with deep tension.
+  - "team won't last long against that horde. Get down to the 7-Eleven with Reyes before it's too late!\">>\r\n                        \r\n                    \r\n                        \r\n                    \r\n                \r\n                    \r\n                    The command office is humming with coordinated purpose. Maps of the surrounding county are pinned with green clearance markers."
+  - "Your mother and father stand together behind the mahogany desk. Your dad places a firm, proud hand on your shoulder while your mom reviews regional perimeter updates.\r\n                    \r\n                        \r\n                            _leaderName looks up from the supply manifests with a warm, intimate smile. Evelyn stands beside them, nodding in deep respect.\r\n                        \r\n                            _leaderName looks up from the supply manifests with a warm, intimate smile. Evelyn stands beside , nodding in deep respect.\r\n                        \r\n                    \r\n                        Commander Hayes and Matriarch Evelyn coordinate logistics across the compound with radios and defense manifests."
+  - '[ACTIVE RESCUE] Unseal your confiscated weapons, requisition heavy ordnance, and roll out to Route 9.'
+  - Return to the Upper Hallway Center corridor.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Mom (Evelyn)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: $firstName! Why are you still in the building? Every minute that passes is another minute your father is trapped in that cooler! Please, get to Route 9!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: $firstName, the clock is ticking. _leaderName and their team won't last long against that horde. Get down to the 7-Eleven with Reyes before it's too late!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: $firstName, the clock is ticking. _leaderName and <<print _poss>> team won't last long against that horde. Get down to the 7-Eleven with Reyes before it's too late!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Matriarch Evelyn
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: d44660ccf987768fc8f51e4ae4a327b2, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Reyes and you need to roll out immediately. Commander Hayes is our chief tactical officer\u2014we cannot afford to lose him on Route 9."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "\U0001F52B Proceed to Armory with Reyes to Gear Up - RESCUE PREP"
+    choiceSubtitle: '[ACTIVE RESCUE] Unseal your confiscated weapons, requisition heavy ordnance, and roll out to Route 9.'
+    targetPassage: {fileID: 11400000, guid: b99d5ec22f4b7c94cac5a10eee8f1487, type: 2}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Exit Headmaster's Office to Hallway - NORTH"
+    choiceSubtitle: Return to the Upper Hallway Center corridor.
+    targetPassage: {fileID: 11400000, guid: e47cd5da9b30be448aeca1f1111e10a7, type: 2}
+    targetPassageId: Act3_School1Floor
+    targetRoomId: hall_1_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

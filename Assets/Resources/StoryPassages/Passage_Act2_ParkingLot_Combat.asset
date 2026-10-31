@@ -1,0 +1,186 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act2_ParkingLot_Combat
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act2_ParkingLot_Combat
+  passageTitle: ACT2 PARKINGLOT COMBAT
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* =================================================================\r\n   PHASE 1: INITIALIZE COMBAT (RUNS EXACTLY ONCE)\r\n   Sets up the enemy horde array and opening flavor text.\r\n================================================================= */"
+  narrativeBeats:
+  - "0>>\r\n            \r\n            \r\n                THE PARKING LOT \u2014 COMBAT"
+  - "The car alarm wails. You spin around, weapon raised, as the shadows detach themselves from the walls.\r\n                    \r\n                \r\n            \r\n            \r\n            \r\n            \r\n                \r\n                    \r\n                \r\n                \r\n                ENEMIES REMAINING: \r\n                \r\n                \r\n                    \r\n                        \r\n                            TARGET: _z.name (Evasion: _z.ev%)"
+  - "EQUIPPED: \r\n                \r\n                    UNARMED (Fists)\r\n                \r\n                    $equip.weapon"
+  - "TARGETS ELIMINATED\r\n                \n\r\n                [+50 XP]"
+  - The second infected hits the pavement and doesn't get back up. You lower your weapon, chest heaving. Your lungs burn from the adrenaline.
+  - "You don't hear the third one until it's already on you.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                \r\n                                \r\n                                \r\n                                \r\n                                    \r\n                                    \r\n                                        \r\n                                    \r\n                                    \r\n                                    It drops from the roof of an adjacent toll booth\u2014a massive, ruined man wearing a blood-soaked mechanic's shirt. He hits you squarely in the chest, the sheer momentum knocking you flat on your back against the asphalt."
+  - -15 HP (Ambush)
+  - "You grapple his shoulders, your boots scrambling for purchase. His jaws snap wildly at your face, so close you can smell the putrid, rotting meat in his teeth. His strength is impossible. Your arms are buckling. \r\n                                    \r\n                                    \r\n                                        \r\n                                        /* -------------------------------------------------------------\r\n                                           BRANCH A: VANE IS WITH THE PLAYER\r\n                                        ------------------------------------------------------------- */\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                        Suddenly, blinding halogen headlights wash over you."
+  - The roar of a revving engine drowns out the creature's gurgling snarl.
+  - The blue sedan lurches forward. Tires squeal on the pavement as Vane dumps the clutch. The car broadsides the infected mechanic at forty miles an hour. The impact sounds like a butcher dropping a slab of meat on a block. The creature is launched ten feet into the air, crumpling against a concrete pillar in a spray of dark gore.
+  - You lie there on the asphalt, completely untouched, staring at the empty space where the monster just was.
+  - The passenger door kicks open. Vane leans over from the driver's seat. He's shaking, pale as a ghost, but he manages a wild, adrenaline-fueled smirk.
+  - "Leave the city behind.\r\n                                                            \r\n                                                        \r\n                                                    \r\n                                                \r\n                                            \r\n                                        \r\n                                        /* -------------------------------------------------------------\r\n                                           BRANCH B: PLAYER IS ALONE\r\n                                        ------------------------------------------------------------- */\r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                        With a primal scream, you let go of his left shoulder and drive your fist upward, slamming your weapon directly under his chin. The crack of bone is deafening. The creature goes rigid, then collapses dead-weight on top of you."
+  - "You shove the corpse off and drag yourself to your feet, spitting blood. You stagger toward the blue sedan and punch out the window. It takes you three tries to cross the wires, your hands shaking violently. The engine finally roars to life.\r\n                                                        \r\n                                                        \r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                                Leave the city behind."
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I'll get the car started! Just keep them off me for thirty seconds! And please try not to get blood on the paint!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Five stars for the Uber arrival, right? Get in!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: ATTACK TARGET
+    choiceSubtitle: 
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Look up!
+    choiceSubtitle: Leave the city behind.
+    targetPassage: {fileID: 11400000, guid: 4aec6e936d6b68e44a4b2a14fef07fbc, type: 2}
+    targetPassageId: Act2_TheRoad
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Fight back! [BRUTE FORCE]'
+    choiceSubtitle: Leave the city behind.
+    targetPassage: {fileID: 11400000, guid: 4aec6e936d6b68e44a4b2a14fef07fbc, type: 2}
+    targetPassageId: Act2_TheRoad
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

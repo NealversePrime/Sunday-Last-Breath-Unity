@@ -1,0 +1,639 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act2_5_MarcusCabin
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act2_5_MarcusCabin
+  passageTitle: ACT2 5 MARCUSCABIN
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* ====================================================================\r\n   INITIALIZATION & STATE SETUP\r\n   ==================================================================== */"
+  narrativeBeats:
+  - '/* AUDIO: Crunching gravel, rain, and a tense atmospheric drone */'
+  - "THE NORTHERN RIDGE \u2014 OAKHAVEN CABIN"
+  - /* --- 1. VISUALS (GAMBAR KEDATANGAN AWAL) --- */
+  - "/* --- 2. NARRATIVE --- */\r\n                    The dirt road is treacherous, washing out in the heavy rain, but the sedan powers through. Two miles up the ridge, the trees break, revealing a fortified log cabin. Thin, gray smoke curls from the stone chimney."
+  - "You put the car in park and step out into the freezing rain. \r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                \r\n                                \r\n                                \r\n                                \r\n                                \r\n                                    /* THE FIX: Stop audio stuttering on re-renders */\r\n                                    \r\n                                        \r\n                                        \r\n                                    \r\n                                    \r\n                                    *SNICK-CLACK.*"
+  - The heavy, metallic sound of a bolt-action rifle chambering a round echoes from the pitch-black shadows of the porch.
+  - '"Stop right there," a woman''s voice calls out. It is trembling, but the kind of trembling that comes from adrenaline, not hesitation. "Keep your hands away from your gear."'
+  - Vane steps out of the passenger side, his hands immediately shooting up into the air.
+  - "\"I don't care what you are,\" she snaps back. \"Where is Marcus? He's the only one who knows about this place. Who are you?\"\r\n                                    \r\n                                        You slowly raise your empty hands. Through the gloom, you can barely make out the silhouette of the woman holding a long-barreled hunting rifle. Behind her, through the cabin window, two small faces are peering through the curtains."
+  - '"I said, who are you? Where is Marcus?" she demands.'
+  - "/* --- 3. DYNAMIC HUMANITY MONOLOGUE --- */\r\n                                                    = 70>>\r\n                                                        She's standing out in the freezing rain, gripping that rifle like a lifeline. You know exactly who she is waiting for, and the realization makes your chest ache.\n\r\n                                                        \r\n                                                    \r\n                                                    = 31>>\r\n                                                        Her hands are shaking, but the barrel of the rifle is dead steady. You slowly raise your hands higher, making sure you don't make any sudden movements.\n\r\n                                                        ,\" you say slowly over the sound of the rain. \"I'm not infected. Marcus isn't with me... but I was in his apartment. We need to talk.\">>\r\n                                                    \r\n                                                    \r\n                                                        Her finger is twitching on the trigger. You are freezing, exhausted, and completely out of patience to sugarcoat things while staring down the barrel of a gun."
+  - '[+10 HUMANITY] Let her read his final words herself. It''s the most humane way.'
+  - "i.id === \"Hunting Knife\") or $equip.weapon === \"Hunting Knife\">>\r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    /* THE FIX: Remove the knife and unequip it if equipped */\r\n                                                                    \r\n                                                                        \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                                [+15 HUMANITY] She'll recognize his custom hunting knife from the apartment safe. Surrendering your weapon proves you aren't a threat.\r\n                                                            \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                            \r\n                                                                \r\n                                                                    \r\n                                                                    \r\n                                                                    \r\n                                                                \r\n                                                                Explain that you were in his apartment, and his guns were gone. He never made it out of the building."
+  - '[-10 HUMANITY] Tell her he was trapped behind military lines but is fighting his way out. Give her false hope.'
+  - '[-15 HUMANITY] Give her the brutal facts with zero padding.'
+  - "THE CABIN \u2014 THE PORCH"
+  - You reach into your gear and slowly pull out the high-carbon hunting knifeblood-stained notepad. You hold it out in the rain, offering it to her.
+  - Diane steps out of the shadows of the porch. The moment her eyes lock onto it, the fight drains completely out of her. The hunting rifle slips from her grip, clattering against the wooden floorboards.
+  - She knows what this means. She doesn't scream. She doesn't wail. She just falls to her knees on the hard wood, clutching the item to her chest as the freezing rain washes over her. He died protecting them.
+  - Her grip on the rifle falters. She stares at you, processing the information. The reality of it crashes over her in a wave. If he had his gear and he isn't here yet, he isn't coming.
+  - The weapon slips from her hands, clattering onto the wooden floorboards. She falls to her knees, completely broken.
+  - She lowers the rifle, a desperate, shuddering breath escaping her lips. "He's coming... okay. Okay." She leans against the porch pillar, letting the rain hide her tears of relief.
+  - You drop the harsh truth on her like an anvil. She stares at you, horrified. The hunting rifle slips from her trembling fingers and hits the floorboards. She collapses against the porch railing, hyperventilating.
+  - Vane immediately steps forward. "What the hell is wrong with you?!" he hisses at you, before turning to Diane with his hands raised gently. "Ma'am, I am so sorry. He didn't turn. He went out on his own terms to protect you."
+  - Diane lets out a broken sob, covering her face.
+  - She looks at you with pure disgust, the fight completely gone.
+  - "/* IMAGE & HEADER SWAP MAGIC */\r\n                                \r\n                                THE CABIN \u2014 INTERIOR\r\n                                \r\n                                \r\n                                    /* AUDIO TRIGGER INTERIOR */\r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                \r\n                                    You gently help her inside out of the rain."
+  - The inside of the cabin is warm. A fire roars in the hearth. Two young boys, maybe seven and nine, are huddled on a rug. They look terrified.
+  - Vane kneels down near the fire, a respectful distance from the kids. He pulls a quarter from his pocket.
+  - Within minutes, he has them distracted, pulling the coin from behind their ears, giving Diane the quiet space she desperately needs to process the end of her world.
+  - You have a few hours to rest before morning. What do you do?
+  - "= 2>>\r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                [+15 HUMANITY] [MAX STAMINA] You take over the kitchen. Using your scavenged supplies, you make a rich, warm stew. The boys smile for the first time in days."
+  - "= 2>>\r\n                                             i.id === \"Antibiotics\")>>\r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                    \r\n                                                    [+20 HUMANITY] You notice the youngest boy has a nasty chest infection. You use your Antibiotics to break his fever. Diane looks at you with absolute gratitude."
+  - '[-15 HUMANITY] Point out that staying in this cabin without a secondary bug-out vehicle is a death trap. She will hate you, but she''ll know you''re right.'
+  - '[+50 STAMINA] Keep to yourself. Conserve your energy for tomorrow.'
+  - "THE CABIN \u2014 MORNING"
+  - "/* THE FIX: Stop infinite time skipping and lore farming */\r\n            \r\n                 /* 8 hours of sleep */\r\n                \r\n                \r\n                /* LORE UPDATE: Based on the new timeline */"
+  - The morning light is gray and cold. The rain has stopped, but the fog rolling off the mountains is thick. Diane is sitting at the kitchen table, a mug of black coffee in her hands.
+  - "You sit across from her. \r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                \r\n                                    \"We were out by the edge of the city when the sirens started,\" she says quietly, staring into her mug. \"Marcus told me to take the kids and get out while he drove back to the Ascott to grab his gear. I tried to take the highway out of town.\""
+  - She looks up at you, her eyes hollow. "It was a bloodbath. People were running toward the military checkpoints for help. But the soldiers couldn't tell who was infected and who was just terrified. They opened fire into the crowd. That's what caused the stampede. I grabbed my boys, turned the truck around, and drove off-grid up here."
+  - '[LORE ADDED: The Fall of Interstate 5]'
+  - She takes a deep breath and looks out the window at her mud-splattered pickup truck.
+  - '"Marcus isn''t coming. I know that now. And staying here alone... it''s just a matter of time before those things wander up this road."'
+  - You stand up to pack your gear. It's time to move.
+  - "You look at Diane. You know you should tell her to come with you, but you can't. You lied to her. She is going to wait here for a husband who is never coming home. \r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                She gives you a box of 9mm Ammo for your journey. You drive away, leaving them to their fate.\r\n                                            \r\n                                        \r\n                                        \r\n                                            \r\n                                                Diane refuses to even look at you this morning. She wants you out of her house. \r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                You pack your gear and leave. You don't belong here anyway.\r\n                                            \r\n                                        \r\n                                        \r\n                                            \r\n                                            \r\n                                                You look at Diane. She is strong, but she can't survive out here alone with two kids forever. Not with what's coming.\r\n                                            \r\n                                            \r\n                                            \r\n                                            \r\n                                            = 5>>\r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        /* SET STATUS DIANE SEBAGAI JOINED */"
+  - "[TRUST / CHA 5] You promise to protect them. She packs her truck and follows your sedan down the mountain. [+50 XP]\r\n                                                \r\n                                            \r\n                                                \r\n                                                    Convince Diane to join you\n\r\n                                                    [REQUIRES CHA 5 OR TRUST] You didn't bond with them enough last night to convince her to leave her sanctuary."
+  - She thanks you for the closure and gives you some Canned Food for the road. You drive away.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Whoa! Hey, we're not infected! We're just people!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I was in his apartment. His gun safe was empty. He geared up to come here... but he never made it out of the building. I'm so sorry.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I was in his apartment. He was bitten before he could even leave. He's dead.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Hey guys. You want to see a magic trick?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[+10 HUMANITY] Let her read his final words herself. It''s the most humane way.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Hand over Marcus's Hunting Knife
+    choiceSubtitle: '[+15 HUMANITY] She''ll recognize his custom hunting knife from the apartment safe. Surrendering your weapon proves you aren''t a threat.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Tell her the Truth: His safe was empty'
+    choiceSubtitle: Explain that you were in his apartment, and his guns were gone. He never made it out of the building.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Lie: ''He''s still at the quarantine zone.'''
+    choiceSubtitle: '[-10 HUMANITY] Tell her he was trapped behind military lines but is fighting his way out. Give her false hope.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Cold Truth: ''He was bitten. He''s dead.'''
+    choiceSubtitle: '[-15 HUMANITY] Give her the brutal facts with zero padding.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Help her inside the cabin
+    choiceSubtitle: '[+15 HUMANITY] [MAX STAMINA] You take over the kitchen. Using your scavenged supplies, you make a rich, warm stew. The boys smile for the first time in days.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Treat the youngest boy''s fever [MEDICINE + ANTIBIOTICS]'
+    choiceSubtitle: '[+20 HUMANITY] You notice the youngest boy has a nasty chest infection. You use your Antibiotics to break his fever. Diane looks at you with absolute gratitude.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: medicine
+    requiredSkillLevel: 2
+    requiredTrait: FIELD MEDIC
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Lecture Diane on her lack of preparation [ARROGANT]'
+    choiceSubtitle: '[-15 HUMANITY] Point out that staying in this cabin without a secondary bug-out vehicle is a death trap. She will hate you, but she''ll know you''re right.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: KNOW-IT-ALL
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Rest quietly by the fire
+    choiceSubtitle: '[+50 STAMINA] Keep to yourself. Conserve your energy for tomorrow.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act2_5_MarcusCabin
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: She gives you a box of 9mm Ammo for your journey. You drive away, leaving them to their fate.
+    targetPassage: {fileID: 11400000, guid: 07b721c9d17ab9f458ecf6192cafeb25, type: 2}
+    targetPassageId: Act3_Arrival
+    targetRoomId: town_outskirts
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 9mm Ammo
+    givesItemQty: 10
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Leave them behind
+    choiceSubtitle: You pack your gear and leave. You don't belong here anyway.
+    targetPassage: {fileID: 11400000, guid: 07b721c9d17ab9f458ecf6192cafeb25, type: 2}
+    targetPassageId: Act3_Arrival
+    targetRoomId: town_outskirts
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Convince Diane to join your group
+    choiceSubtitle: '[TRUST / CHA 5] You promise to protect them. She packs her truck and follows your sedan down the mountain. [+50 XP]'
+    targetPassage: {fileID: 11400000, guid: 07b721c9d17ab9f458ecf6192cafeb25, type: 2}
+    targetPassageId: Act3_Arrival
+    targetRoomId: town_outskirts
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Leadership
+    requiredStatValue: 5
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Say your goodbyes and leave alone
+    choiceSubtitle: She thanks you for the closure and gives you some Canned Food for the road. You drive away.
+    targetPassage: {fileID: 11400000, guid: 07b721c9d17ab9f458ecf6192cafeb25, type: 2}
+    targetPassageId: Act3_Arrival
+    targetRoomId: town_outskirts
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Canned Food
+    givesItemQty: 3
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

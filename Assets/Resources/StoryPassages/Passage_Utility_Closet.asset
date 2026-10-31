@@ -1,0 +1,587 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Utility_Closet
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Utility_Closet
+  passageTitle: UTILITY CLOSET
+  associatedRoomId: utility
+  backdropSprite: {fileID: 21300000, guid: a5f7cf3ee421cb245a53906ae095f431, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: '/* AUDIO: Fluorescent hum and dripping water */'
+  narrativeBeats:
+  - /* Variable Defaults (Matching engines.js) */
+  - /* Setup Physical Bypass Costs */
+  - 4TH FLOOR - UTILITY ROOM
+  - 'At the end of the residential corridor, the carpet transitions to bare concrete. Ahead is a heavy, industrial steel door. Fading yellow paint stenciled across the front reads: MAINTENANCE - AUTHORIZED PERSONNEL ONLY.'
+  - The door is sealed tight. Unlike the wooden apartment doors, this one has a reinforced steel frame and a heavy-duty magnetic swipe lock. A faint, sickening smell of industrial bleach and raw copper seeps out from the gap underneath.
+  - Through the thick metal, you hear the erratic buzz of a failing fluorescent light.
+  - "\U0001F527 THE STEEL DOOR IS LOCKED. HOW DO YOU GET IN?"
+  - "\u274C BRUTE FORCE FAILED. You threw your weight against the heavy steel, but the magnetic lock didn't flinch. Your shoulder is bruised."
+  - "[BURGLAR] Cost:  STAMINA. The card reader has a hidden physical cylinder underneath. You pick it clean.\r\n                                \r\n                            \r\n                                \r\n                                    Pick the override cylinder\n\r\n                                    [REQUIRES BURGLAR] You lack the specialized knowledge to bypass industrial locks."
+  - "= 2>>\r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [TECH 2] Cost:  STAMINA. You pop the faceplate off the reader and short the mag-lock circuit.\r\n                                \r\n                            \r\n                                \r\n                                    Hotwire the magnetic reader\n\r\n                                    [REQUIRES TECH 2] You don't know how to bypass an active magnetic lock system."
+  - "\">>\r\n                                        \r\n                                    \r\n                                    [ITEM: ] Cost:  STAMINA. You wedge the heavy steel tool into the gap and use raw leverage to break the magnet's hold.\r\n                                \r\n                            \r\n                                \r\n                                    Pry the steel door\n\r\n                                    [REQUIRES CROWBAR OR TIRE IRON] You cannot pry a commercial steel door with your bare hands or small tools."
+  - "= 7>>\r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [STR /7] Cost:  STAMINA. Your immense strength is enough to violently break the magnetic seal.\r\n                                \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [STR /7] Cost:  STAMINA. You aren't strong enough to just push it open. You'll have to time a massive, full-body slam perfectly."
+  - /* Update hallwaySection target based on your map layout */
+  - 4TH FLOOR - UTILITY ROOM
+  - The heavy door gives way.
+  - The air inside is thick and stinging, saturated with the harsh, chemical smell of industrial bleach. A single, failing fluorescent tube flickers on the ceiling, casting chaotic, strobe-like shadows across bare concrete walls.
+  - 'Heavy metal racks line the perimeter, packed with maintenance supplies: plastic jugs of chemicals, extension cords, and rusted tools. In the center of the room, a yellow mop bucket is tipped over, a puddle of soapy water mixing with a dark, dried smear leading toward the back corner.'
+  - A small metal desk sits tucked against the far wall, buried under schematics and a logbook.
+  - It is quiet in here. Just the electric hum of the light above.
+  - "\U0001F6E0\uFE0F SEARCH THE ROOM"
+  - "[PER +1] The last entry is disturbing. He locked himself in here because he was feeling feverish. He never clocked out.\r\n                        \r\n                    \r\n                        \r\n                            \U0001F4D3 You've already read the log. The janitor turned while locked inside this room."
+  - The cart is a mess, but you manage to salvage an unopened jug of industrial Bleach and a pair of thick Rubber Gloves.
+  - You clear out the useful hardware. A heavy roll of Duct Tape and a bundle of strong nylon Rope. Essential survival gear.
+  - Tucked beneath a pile of blueprints, you find a heavy-duty Flashlight and two spare Batteries.
+  - You have stripped the maintenance room of everything useful. Your bag is heavier, but you are far better equipped for what lies ahead.
+  dialogueLines:
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Janitor's closet. If anyone had tools or master keys to this building, it would be in there.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: Pick the manual override cylinder
+    choiceSubtitle: '[BURGLAR] Cost: > STAMINA. The card reader has a hidden physical cylinder underneath. You pick it clean.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Hotwire the magnetic reader
+    choiceSubtitle: '[TECH 2] Cost: > STAMINA. You pop the faceplate off the reader and short the mag-lock circuit.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: tech
+    requiredSkillLevel: 2
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Pry the steel door with <<print $equip.weapon>>
+    choiceSubtitle: '[ITEM: >] Cost: > STAMINA. You wedge the heavy steel tool into the gap and use raw leverage to break the magnet''s hold.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Shoulder ram the steel door [STR 7/7]'
+    choiceSubtitle: '[STR >/7] Cost: > STAMINA. Your immense strength is enough to violently break the magnetic seal.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Might
+    requiredStatValue: 7
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Shoulder ram the steel door [MINIGAME]'
+    choiceSubtitle: '[STR >/7] Cost: > STAMINA. You aren''t strong enough to just push it open. You''ll have to time a massive, full-body slam perfectly.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 10
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: utility_opened
+    clearsStoryFlagOnExecute: 
+    triggerActionId: TRIGGER_QTE
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Step back into the hallway"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: WIN
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: LOSE
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F4D3 Read the maintenance logbook (2 minutes)"
+    choiceSubtitle: '[PER +1] The last entry is disturbing. He locked himself in here because he was feeling feverish. He never clocked out.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F9FD Search the tipped cleaning cart (2 minutes)"
+    choiceSubtitle: The cart is a mess, but you manage to salvage an unopened jug of industrial Bleach and a pair of thick Rubber Gloves.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Bleach
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F9F0 Scavenge the metal shelves (3 minutes)"
+    choiceSubtitle: You clear out the useful hardware. A heavy roll of Duct Tape and a bundle of strong nylon Rope. Essential survival gear.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Duct Tape
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F526 Check the drawers of the metal desk (2 minutes)"
+    choiceSubtitle: Tucked beneath a pile of blueprints, you find a heavy-duty Flashlight and two spare Batteries.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Utility_Closet
+    targetRoomId: utility
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Flashlight
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Return to the hallway"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

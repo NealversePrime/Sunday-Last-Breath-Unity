@@ -187,6 +187,8 @@ namespace SundayLastBreath.UI
         [SerializeField] private GameObject phoneModal;
         [SerializeField] private Button closePhoneButton;
         [SerializeField] private KeypadPuzzleModal keypadModal;
+        [SerializeField] private QteTimingModal qteModal;
+        [SerializeField] private LockpickingModal lockpickModal;
         [SerializeField] private GameObject radioModal;
         [SerializeField] private Button closeRadioButton;
         [SerializeField] private GameObject hackingModal;
@@ -8215,7 +8217,7 @@ namespace SundayLastBreath.UI
             }
         }
 
-        private void ExecutePassageChoice(SundayLastBreath.Data.PassageChoiceData choice)
+        public void ExecutePassageChoice(SundayLastBreath.Data.PassageChoiceData choice)
         {
             if (choice == null) return;
 
@@ -8263,7 +8265,21 @@ namespace SundayLastBreath.UI
             // Special interactive minigames / triggers
             if (!string.IsNullOrEmpty(choice.triggerActionId))
             {
-                if (string.Equals(choice.triggerActionId, "OPEN_KEYPAD_MODAL", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(choice.triggerActionId, "TRIGGER_QTE", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(choice.triggerActionId, "OPEN_QTE_MODAL", StringComparison.OrdinalIgnoreCase) ||
+                    choice.triggerActionId.IndexOf("QTE", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    OpenQteModal(choice);
+                    return;
+                }
+                else if (string.Equals(choice.triggerActionId, "OPEN_LOCKPICK_MODAL", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(choice.triggerActionId, "LOCKPICK", StringComparison.OrdinalIgnoreCase) ||
+                         choice.triggerActionId.IndexOf("LOCKPICK", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    OpenLockpickingModal(choice);
+                    return;
+                }
+                else if (string.Equals(choice.triggerActionId, "OPEN_KEYPAD_MODAL", StringComparison.OrdinalIgnoreCase))
                 {
                     OpenKeypadPuzzleModal(choice);
                     return;
@@ -8416,6 +8432,223 @@ namespace SundayLastBreath.UI
                     if (CurrentPassage != null)
                     {
                         RenderPassageChoices(CurrentPassage);
+                    }
+                },
+                onCancelled: () =>
+                {
+                    PlayClickSFX();
+                }
+            );
+        }
+
+        private void OpenQteModal(SundayLastBreath.Data.PassageChoiceData choice)
+        {
+            if (qteModal == null)
+            {
+                qteModal = GetComponentInChildren<QteTimingModal>(true);
+                if (qteModal == null)
+                {
+                    Canvas canvas = GetComponentInParent<Canvas>();
+                    if (canvas == null) canvas = FindAnyObjectByType<Canvas>();
+                    GameObject qteObj = new GameObject("QteTimingModal", typeof(RectTransform));
+                    if (canvas != null) qteObj.transform.SetParent(canvas.transform, false);
+                    qteModal = qteObj.AddComponent<QteTimingModal>();
+                }
+            }
+
+            // Calculate difficulty scaling dynamically if stat check is present
+            float speed = 2.4f;
+            float safeWidth = 24f;
+
+            if (!string.IsNullOrEmpty(choice.requiredStat) && currentPlayer != null)
+            {
+                int playerStatVal = 3;
+                string s = choice.requiredStat.ToLowerInvariant();
+                if (s.Contains("might") || s == "str") playerStatVal = currentPlayer.Might;
+                else if (s.Contains("obs") || s == "per") playerStatVal = currentPlayer.Observation;
+                else if (s.Contains("ref") || s == "agi") playerStatVal = currentPlayer.Reflex;
+                else if (s.Contains("tac") || s == "int") playerStatVal = currentPlayer.Tactics;
+                else if (s.Contains("aus") || s == "lck") playerStatVal = currentPlayer.Auspice;
+                else if (s.Contains("lead") || s == "cha") playerStatVal = currentPlayer.Leadership;
+
+                int diff = Mathf.Max(0, choice.requiredStatValue - playerStatVal);
+                speed = Mathf.Clamp(2.0f + (diff * 0.5f), 1.6f, 4.2f);
+                safeWidth = Mathf.Clamp(28f - (diff * 4f), 12f, 36f);
+            }
+
+            string prompt = !string.IsNullOrEmpty(choice.choiceSubtitle) 
+                ? choice.choiceSubtitle 
+                : "Keep the tension steady. Click or hit <b>[SPACE]</b> when the needle enters the <color=#10B981>GREEN safe zone</color>!";
+
+            qteModal.StartQTE(
+                actionTitle: choice.choiceLabel,
+                promptDescription: prompt,
+                speed: speed,
+                safeZoneWidthPercent: safeWidth,
+                safeZoneCenterPercent: 50f,
+                onSuccess: () =>
+                {
+                    PlayClickSFX();
+
+                    // Award loot / item
+                    if (!string.IsNullOrEmpty(choice.givesItem))
+                    {
+                        GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                    }
+
+                    // Consequence flags
+                    if (!string.IsNullOrEmpty(choice.setsStoryFlagOnExecute) && currentPlayer != null)
+                    {
+                        currentPlayer.SetFlag(choice.setsStoryFlagOnExecute, true);
+                    }
+
+                    // Advance clock
+                    gameClock.AddTime(Mathf.Max(1, choice.timeMinutesCost));
+
+                    // Stamina cost
+                    if (choice.staminaCost > 0 && currentPlayer != null)
+                    {
+                        currentPlayer.stamina = Mathf.Max(0, currentPlayer.stamina - choice.staminaCost);
+                        UpdateVitalsUI();
+                        tacticalGearController?.RefreshAll();
+                    }
+
+                    // Transition to success / target passage
+                    if (choice.successPassage != null)
+                    {
+                        PlayStoryPassage(choice.successPassage);
+                    }
+                    else if (choice.targetPassage != null)
+                    {
+                        PlayStoryPassage(choice.targetPassage);
+                    }
+                    else if (CurrentPassage != null)
+                    {
+                        PlayStoryPassage(CurrentPassage);
+                    }
+                },
+                onFailure: () =>
+                {
+                    // Penalize HP / Stamina
+                    int hpDamage = choice.healthCost > 0 ? choice.healthCost : 15;
+                    int staminaDmg = choice.staminaCost > 0 ? choice.staminaCost : 20;
+
+                    if (currentPlayer != null)
+                    {
+                        currentPlayer.hp = Mathf.Max(0, currentPlayer.hp - hpDamage);
+                        currentPlayer.stamina = Mathf.Max(0, currentPlayer.stamina - staminaDmg);
+                        UpdateVitalsUI();
+                        tacticalGearController?.RefreshAll();
+                    }
+
+                    // Advance clock
+                    gameClock.AddTime(Mathf.Max(1, choice.timeMinutesCost));
+
+                    // Set failure flag if in 401
+                    if (CurrentPassage != null && CurrentPassage.passageId.Contains("401") && currentPlayer != null)
+                    {
+                        currentPlayer.SetFlag("room401_lift_fail", true);
+                    }
+
+                    // Transition to failure passage or re-render room
+                    if (choice.failurePassage != null)
+                    {
+                        PlayStoryPassage(choice.failurePassage);
+                    }
+                    else if (CurrentPassage != null)
+                    {
+                        PlayStoryPassage(CurrentPassage);
+                    }
+                },
+                onCancelled: () =>
+                {
+                    PlayClickSFX();
+                }
+            );
+        }
+
+        public void OpenLockpickingModal(SundayLastBreath.Data.PassageChoiceData choice)
+        {
+            if (lockpickModal == null)
+            {
+                lockpickModal = GetComponentInChildren<LockpickingModal>(true);
+                if (lockpickModal == null)
+                {
+                    Canvas canvas = GetComponentInParent<Canvas>();
+                    if (canvas == null) canvas = FindAnyObjectByType<Canvas>();
+                    GameObject lpObj = new GameObject("LockpickingModal", typeof(RectTransform));
+                    if (canvas != null) lpObj.transform.SetParent(canvas.transform, false);
+                    lockpickModal = lpObj.AddComponent<LockpickingModal>();
+                }
+            }
+
+            bool hasLocksmith = currentPlayer != null && currentPlayer.HasTrait("LOCKSMITH");
+            int difficulty = choice.skillDC > 0 ? choice.skillDC : 50;
+            int numPins = difficulty >= 70 ? 5 : (difficulty >= 40 ? 4 : 3);
+            int baseForce = Mathf.Clamp(100 - difficulty, 15, 85);
+
+            lockpickModal.StartLockpick(
+                numPins: numPins,
+                difficulty: difficulty,
+                forcePercent: baseForce,
+                hasLocksmith: hasLocksmith,
+                onUnlocked: () =>
+                {
+                    PlayClickSFX();
+
+                    // Story flag
+                    if (!string.IsNullOrEmpty(choice.setsStoryFlagOnExecute) && currentPlayer != null)
+                    {
+                        currentPlayer.SetFlag(choice.setsStoryFlagOnExecute, true);
+                    }
+
+                    // Loot / item
+                    if (!string.IsNullOrEmpty(choice.givesItem))
+                    {
+                        GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                    }
+
+                    // Time cost
+                    gameClock.AddTime(Mathf.Max(2, choice.timeMinutesCost));
+
+                    // Transition to success / target passage
+                    if (choice.successPassage != null)
+                    {
+                        PlayStoryPassage(choice.successPassage);
+                    }
+                    else if (choice.targetPassage != null)
+                    {
+                        PlayStoryPassage(choice.targetPassage);
+                    }
+                    else if (CurrentPassage != null)
+                    {
+                        PlayStoryPassage(CurrentPassage);
+                    }
+                },
+                onFailed: () =>
+                {
+                    // Advance clock
+                    gameClock.AddTime(5);
+
+                    // Chance to consume / break lockpick
+                    if (!hasLocksmith && currentPlayer != null && currentPlayer.inventory != null)
+                    {
+                        var pick = currentPlayer.inventory.Find(i => i.itemId.IndexOf("lockpick", StringComparison.OrdinalIgnoreCase) >= 0);
+                        if (pick != null)
+                        {
+                            pick.quantity--;
+                            if (pick.quantity <= 0) currentPlayer.inventory.Remove(pick);
+                            tacticalGearController?.RefreshAll();
+                        }
+                    }
+
+                    if (choice.failurePassage != null)
+                    {
+                        PlayStoryPassage(choice.failurePassage);
+                    }
+                    else if (CurrentPassage != null)
+                    {
+                        PlayStoryPassage(CurrentPassage);
                     }
                 },
                 onCancelled: () =>

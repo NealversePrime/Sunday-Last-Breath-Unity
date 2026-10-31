@@ -1,0 +1,470 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Stairwell
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Stairwell
+  passageTitle: STAIRWELL
+  associatedRoomId: f4 entrance
+  backdropSprite: {fileID: 21300000, guid: 9c7262a31e31fb948835d6acc12ea772, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: '/* Default state: Silent */'
+  narrativeBeats:
+  - "if (setup.sound.tracks[\"atmosphere\"]) setup.sound.fade(\"atmosphere\", 2000);\r\n        setup.sound.play(\"firedoor_slam\", \"audio/sfx/firedoor_slam.mp3\", false, 0.8);\r\n        setup.sound.play(\"generator_hum\", \"audio/sfx/generator_hum.mp3\", true, 0.4);"
+  - 4TH FLOOR - STAIRWELL DESCENT
+  - The heavy fire door slams shut behind you, sealing off the 4th floor with a final, echoing *BOOM*.
+  - "The stairwell is bathed in the pulsing, dim red glow of emergency backup lights. It\u2019s hard to see the bottom of the steps. The silence here is heavy, broken only by the distant, vibrating hum of a generator struggling to keep the grid alive."
+  - You need to get down to the ground floor.
+  - "\u2699\uFE0F HOW DO YOU DESCEND?"
+  - "i.id === \"Flashlight\")>>\r\n                             i.id === \"Lighter\")>>"
+  - "[GEAR] Illuminates the path perfectly. Fast and safe.\r\n                                \r\n                            \r\n                                \r\n                                    Use your Flashlight\n\r\n                                    [REQUIRES FLASHLIGHT] You don't have a strong light source."
+  - "[GEAR] A flickering flame. Better than nothing, but forces you to move somewhat slowly.\r\n                                \r\n                            \r\n                                \r\n                                    Use your Lighter\n\r\n                                    [REQUIRES LIGHTER] You have nothing to spark a flame."
+  - '[SAFE] Take it step by step feeling the walls. Uses much more time, but guarantees you won''t fall.'
+  - "= 5>>\r\n                                \r\n                                    /5]\">>\r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    [AGI MET] Get down as fast as possible. Your reflexes are sharp enough to catch yourself if you slip.\r\n                                \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [AGI /5] Get down as fast as possible. You lack agility, so you must time your footing perfectly to avoid a catastrophic fall."
+  - STAIRWELL - THE DESCENT
+  - You take the stairs two at a time, desperate to put distance between yourself and the 4th floor.
+  - '[AGILITY SUCCESS]'
+  - In the flickering strobe light, your boot hovers over a slick, dark patch on the stairs. Your reflexes take over. With a surge of adrenaline, you blindly grab the heavy iron handrail, vaulting over the mess and landing heavily on the landing below.
+  - Under the harsh red emergency lights, whatever you almost stepped in just looks like a dark puddle of dirty water. You decide not to look too closely and keep moving. Ignorance is bliss.
+  - You grip the cold iron handrail, taking it one agonizing step at a time. The emergency strobes paint the stairwell in flashes of harsh crimson and pitch black.
+  - As the light flares, the concrete step below you glistens. Something thick and wet is pooling there. Under the red light, it just looks like a black shadow. You press your back against the wall and carefully step wide, avoiding the slick patch entirely. You don't know what it is, and you don't want to know.
+  - You take the stairs two at a time, desperate to put distance between yourself and the 4th floor.
+  - '[AGILITY FAILED - LOUD NOISE GENERATED]'
+  - In the strobe-lit darkness, you never see the wet, slick patch coating the steps. Your heel slides out from under you. You violently tumble forward, concrete biting into your ribs. You slam into the metal railing with a heavy, echoing CLANG and skid to a halt on the landing below.
+  - -15 HP | -20 STAMINA
+  - You push yourself up, your hands slick with whatever you just slipped in. You lift your palms to the dim red light. It's thick, sticky, and smells strongly of rust. Blood. Arterial and fresh.
+  - "After the carnage upstairs, you just wipe it off your jacket and keep moving.\r\n                    \r\n                        Your stomach drops. Someone was dragged down these stairs. Recently.\r\n                        \n\r\n                        \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        -5 HUMANITY"
+  - "You flick on your flashlight. Its stark white beam cuts through the oppressive, pulsing red of the emergency lights. \r\n                    \r\n                        You flick your lighter. The small, trembling orange flame fights against the oppressive red strobes."
+  - The light sweeps down the concrete stairs and catches a dark reflection. A thick puddle coats the middle of the flight, trailing down the edges like syrup. Keeping the light steady, you safely navigate around the mess.
+  - You reach the landing and shine your light back up. The red emergency bulbs couldn't hide it from your light source. It's blood. Arterial, dark, and fresh.
+  - "After the carnage you left behind upstairs, the sight barely registers. You wipe a stray drop from your shoe and keep moving.\r\n                    \r\n                        Your stomach drops. Until now, the nightmare was just a voice on the radio. But this is real. Someone was dragged down these stairs.\r\n                        \n\r\n                        \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        -5 HUMANITY\r\n                    \r\n                \r\n            \r\n            \r\n            \r\n            \r\n                \r\n                    \r\n                        \r\n                        \r\n                    \r\n                    Continue your descent."
+  - THE BARRICADE
+  - You continue your descent, hoping to push straight through to the ground floor lobby. But halfway between the 2nd and 1st floors, the stairs simply end.
+  - The way down is completely blocked.
+  - Someone dragged heavy oak desks, folding chairs, and a massive glass-front vending machine into the stairwell, wedging them together into an impassable wall of junk.
+  - There are no bodies here. No blood. Just a desperate, silent testament to whatever the residents were trying to keep from coming up the stairs. And by the look of the dented, buckling metal on the front of the vending machine... whatever was trying to get up was incredibly strong.
+  - "[RISK: NOISE] Attempt to force your way through the wreckage.\r\n                    \r\n                \r\n                    \r\n                    \r\n                        [FAILED] You throw your shoulder against the heavy glass-front vending machine and push with everything you have."
+  - '*SCREEEEECH.*'
+  - The metal frame shrieks violently against the concrete wall, echoing up and down the stairwell like a gunshot. The barricade doesn't budge an inch. It's wedged perfectly tight. But that sound... that sound definitely woke something up.
+  - "Try to push the barricade out of the way\n\r\n                        [IMPASSABLE] It's completely stuck. You cannot get through this way."
+  - '[DETOUR] The only other way out of this stairwell is through the 2nd Floor.'
+  dialogueLines: []
+  initialFloorItems: []
+  choices:
+  - choiceLabel: Use your Flashlight (4 minutes)
+    choiceSubtitle: '[GEAR] Illuminates the path perfectly. Fast and safe.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Use your Lighter (6 minutes)
+    choiceSubtitle: '[GEAR] A flickering flame. Better than nothing, but forces you to move somewhat slowly.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Move Slowly and Carefully in the dark (10 minutes)
+    choiceSubtitle: '[SAFE] Take it step by step feeling the walls. Uses much more time, but guarantees you won''t fall.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 9
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Move Quickly down the steps [AGI <<print $agi>>/5]'
+    choiceSubtitle: '[AGI MET] Get down as fast as possible. Your reflexes are sharp enough to catch yourself if you slip.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Reflex
+    requiredStatValue: 5
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Sprint blindly down the steps [MINIGAME]'
+    choiceSubtitle: '[AGI >/5] Get down as fast as possible. You lack agility, so you must time your footing perfectly to avoid a catastrophic fall.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: TRIGGER_QTE
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: WIN
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: LOSE
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Turn the corner to the next landing
+    choiceSubtitle: Continue your descent.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Try to push the barricade out of the way
+    choiceSubtitle: '[RISK: NOISE] Attempt to force your way through the wreckage.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Stairwell
+    targetRoomId: f4 entrance
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Open the fire door to the 2nd Floor
+    choiceSubtitle: '[DETOUR] The only other way out of this stairwell is through the 2nd Floor.'
+    targetPassage: {fileID: 11400000, guid: 7648b2201aca1fa4fa9777bab05ff78b, type: 2}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

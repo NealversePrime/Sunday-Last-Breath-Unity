@@ -1,0 +1,649 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit_402
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Unit_402
+  passageTitle: UNIT 402
+  associatedRoomId: unit_402
+  backdropSprite: {fileID: 21300000, guid: ab3dd012113529a42a6791f925a8ed68, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: /* Start Vinyl Chopin Loop */
+  narrativeBeats:
+  - /* Set Location */
+  - /* Initialize Room State Variables */
+  - "/* Evaluate Item Dependencies */\r\n    \r\n     i.id == \"Multi-Tool\")>>"
+  - /* Setup Physical Bypass Costs */
+  - UNIT 402 - THE CHAIN
+  - "The Andersons. You remember them vaguely \u2014 a middle-aged couple and their teenage daughter. They always dressed too nicely for 8 a.m. on a Sunday. The father wore a tie just to collect his mail."
+  - The door is unlocked. You push it open two inches before it catches on a heavy steel chain lock.
+  - "Through the gap, you see the lights are on. A turntable spins in the corner of the living room. Classical music drifts from the speakers \u2014 a piano piece, slow and mournful, occasionally catching on a scratch in the vinyl. The sound of it sits so wrong against everything happening outside."
+  - And there's a smell. Not decay. Something sharper. Chemical. Clinical. Like a hospital corridor scrubbed too clean with industrial bleach.
+  - "\U0001F517 THE CHAIN BLOCKS YOUR ENTRY. HOW DO YOU GET IN?"
+  - "\u274C BRUTE FORCE FAILED. You slammed your shoulder into the door, but the steel chain held firm. You made a massive racket and bruised yourself for nothing."
+  - "[JOB] Cost:  STAMINA. A rubber band and a thumbtack are all you need to pull the slider back. Silent entry.\r\n                                \r\n                            \r\n                                \r\n                                    Slip the chain lock\n\r\n                                    [REQUIRES BURGLAR] You lack the illicit knowledge to manipulate the lock from the outside."
+  - "[LOCKSMITH/GHOST] Cost:  STAMINA. Chain locks have a weak point. You find it. Silent entry.\r\n                                \r\n                            \r\n                                \r\n                                    Work the gap\n\r\n                                    [REQUIRES LOCKSMITH/GHOST] You lack the specialized infiltration knowledge."
+  - "= 1 and _hasMultiTool>>\r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [TECH 1 + MULTI-TOOL] Cost:  STAMINA. The screws back out cleanly. Silent entry.\r\n                                \r\n                            \r\n                                \r\n                                    Unscrew the mount\n\r\n                                    [REQUIRES TECH 1] You have the tool, but don't know how to dismantle it from this angle.\r\n                                \r\n                            \r\n                                \r\n                                    Unscrew the mount\n\r\n                                    [REQUIRES MULTI-TOOL] You could dismantle the bracket if you had a screwdriver."
+  - "= 5 and _hasKnife>>\r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [AGI 5 + KNIFE] Cost:  STAMINA. Patience and a steady hand. You guide the chain off its track.\r\n                                \r\n                            \r\n                                \r\n                                    Slide the chain\n\r\n                                    [REQUIRES AGI 5] Your hands aren't steady enough to work the blade through the gap.\r\n                                \r\n                            \r\n                                \r\n                                    Slide the chain\n\r\n                                    [REQUIRES THIN BLADE] You don't have a knife equipped."
+  - "= 4>>\r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [STR /4] Cost:  STAMINA. You kick the deadbolt area. The bracket tears from the wall easily. LOUD ENTRY.\r\n                                \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                            \r\n                                            \r\n                                        \r\n                                            \r\n                                        \r\n                                        \r\n                                    \r\n                                    [STR /4 \u2014 70% SUCCESS CHANCE] Cost:  STAMINA. You aren't strong enough to kick it down cleanly. You'll have to slam your shoulder into it and hope the screws give out before your bones do. LOUD ENTRY."
+  - UNIT 402 - THE QUIET ROOM
+  - The chain bracket tears from the wall with a loud *CRACK* that carries through the building. Somewhere below you, something stirs. You are not alone on this floor.
+  - You step inside.
+  - "The piano swells to meet you. Chopin \u2014 Nocturne in E-flat major. The kind of piece that sounds like a formal goodbye. The apartment is immaculate. No signs of struggle. No broken glass. No blood. Every surface is dusted."
+  - The Anderson family is sitting at the dining table.
+  - Mr. Anderson is at the head, hands folded neatly in his lap. Mrs. Anderson is to his right, her head tilted back slightly, eyes closed, as if she simply fell asleep after a long day. Their teenage daughter, Emma, is slumped forward with her cheek resting on her folded arms.
+  - Three wine glasses sit before them. Empty. A faint residue of white powder clings to the bottom of the crystal.
+  - 'On the center of the table is a sheet of notepaper, folded once:'
+  - '"To whoever finds us:'
+  - "We heard the emergency broadcast on the amateur radio. They said the infection has mutated. Airborne. They said the military isn't evacuating the city anymore\u2014they are welding the apartment doors shut and pumping gas through the vents to sterilize the grid."
+  - We refuse to suffocate in the dark. We will not let Emma suffer through that kind of pain. We found a merciful way out before the soldiers reach our floor.
+  - The music is Chopin. We wanted the last thing we felt to be peace. May God forgive us."
+  - There is a small caliber revolver on the floor near Mr. Anderson's foot. He must have loaded it, panicked, and realized he couldn't shoot his own family. He chose the poison instead.
+  - "\U0001F480 WHAT DO YOU TAKE?"
+  - A .38 revolver, fully loaded. Five rounds. He couldn't bring himself to use it. It's yours now.
+  - "The pantry is fully stocked \u2014 they were prepared to survive for weeks before the panic set in. You take two cans and a water bottle."
+  - You find prescription painkillers and a bottle of antiseptic. You try not to look at the empty pill bottles in the trash can.
+  - "[HUMANITY \u221210] She's still wearing it. Taking it feels like crossing a line you can't uncross. You take it anyway."
+  - The four of them at a beach somewhere. All laughing. You don't know why you take it. You just do.
+  - "[PER +1] You log the details into your PDA as a grim reminder: fear will kill you just as fast as the infected.\r\n                        \r\n                    \r\n                        \r\n                            \U0001F4DD You already logged the note. The piano is still playing."
+  - There is nothing left to take. The piano is still playing. You close the door quietly behind you.
+  dialogueLines:
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Chopin. And bleach. Why would someone be deep-cleaning right now?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Airborne? Pumping gas? That... that was a conspiracy rumor floating around the internet before the cell towers fell. It wasn't real. My God... they did this for nothing.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: 'Slip the chain lock [BURGLAR]'
+    choiceSubtitle: '[JOB] Cost: > STAMINA. A rubber band and a thumbtack are all you need to pull the slider back. Silent entry.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Work the gap [TRAIT]'
+    choiceSubtitle: '[LOCKSMITH/GHOST] Cost: > STAMINA. Chain locks have a weak point. You find it. Silent entry.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: LOCKSMITH
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Unscrew the mount [TECH + TOOL]'
+    choiceSubtitle: '[TECH 1 + MULTI-TOOL] Cost: > STAMINA. The screws back out cleanly. Silent entry.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 9
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: tech
+    requiredSkillLevel: 1
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Slide the chain [AGI 5 + KNIFE]'
+    choiceSubtitle: '[AGI 5 + KNIFE] Cost: > STAMINA. Patience and a steady hand. You guide the chain off its track.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Reflex
+    requiredStatValue: 5
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Kick the door to break the mount [STR 4/4]'
+    choiceSubtitle: '[STR >/4] Cost: > STAMINA. You kick the deadbolt area. The bracket tears from the wall easily. LOUD ENTRY.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Might
+    requiredStatValue: 4
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Throw your weight against the door [RNG CHANCE]'
+    choiceSubtitle: "[STR >/4 \u2014 70% SUCCESS CHANCE] Cost: > STAMINA. You aren't strong enough to kick it down cleanly. You'll have to slam your shoulder into it and hope the screws give out before your bones do. LOUD ENTRY."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Leave it and walk away"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F52B Take the revolver from the floor (2 minutes)"
+    choiceSubtitle: A .38 revolver, fully loaded. Five rounds. He couldn't bring himself to use it. It's yours now.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Revolver .38
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F37D\uFE0F Search the kitchen (3 minutes)"
+    choiceSubtitle: "The pantry is fully stocked \u2014 they were prepared to survive for weeks before the panic set in. You take two cans and a water bottle."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Canned Food
+    givesItemQty: 2
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F48A Check the medicine cabinet (2 minutes)"
+    choiceSubtitle: You find prescription painkillers and a bottle of antiseptic. You try not to look at the empty pill bottles in the trash can.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Painkillers
+    givesItemQty: 2
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F48D Take Mrs. Anderson's wedding ring (1 minute)"
+    choiceSubtitle: "[HUMANITY \u221210] She's still wearing it. Taking it feels like crossing a line you can't uncross. You take it anyway."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Gold Ring
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F4F7 Take the family photo from the mantle (1 minute)"
+    choiceSubtitle: The four of them at a beach somewhere. All laughing. You don't know why you take it. You just do.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Family Photo
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F50D Keep the suicide note (1 minute)"
+    choiceSubtitle: '[PER +1] You log the details into your PDA as a grim reminder: fear will kill you just as fast as the infected.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_402
+    targetRoomId: unit_402
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Leave them in peace \u2014 return to the hallway"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

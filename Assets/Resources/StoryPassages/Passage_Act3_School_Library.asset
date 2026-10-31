@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_School_Library
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_School_Library
+  passageTitle: ACT3 SCHOOL LIBRARY
+  associatedRoomId: library
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "1ST FLOOR \u2014 SCHOOL LIBRARY"
+  narrativeBeats:
+  - Towering wooden bookshelves stretch toward the high ceiling, casting deep shadows across rows of heavy oak tables. The air is still and cool, thick with the scent of aged paper, binding glue, and dust.
+  - Surrounded by thousands of quiet volumes, the library feels strangely detached from the apocalypse raging outside the barricaded windows.
+  - "Golden morning sunlight streams through the high skylights, illuminating swirling dust motes. A few refugees sit quietly in the back corner carrels, softly reading to their frightened children to keep them calm.\r\n                \r\n                    Moonlight filters through the high windows, creating silver pools between the pitch-black aisles of books. The wind outside whistles against the double-paned glass, a cold reminder of the night world beyond the school walls."
+  - Near the central circulation desk, someone left several open technical manuals, medical guides, and reference textbooks stacked beside a librarian's desk.
+  - "[LOOT] Collect Manual: Mechanics (+1 Tech) and Textbook (+50 XP).\r\n                        \r\n                    \r\n                \r\n                    The reference desks have already been thoroughly searched. You've collected all the useful instructional materials."
+  - Return to the East Hallway corridor.
+  dialogueLines: []
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Search the library reference manuals \u25BC"
+    choiceSubtitle: '[LOOT] Collect Manual: Mechanics (+1 Tech) and Textbook (+50 XP).'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Library
+    targetRoomId: library
+    timeMinutesCost: 10
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 'Manual: Mechanics'
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Exit Library to Hallway [WEST]"
+    choiceSubtitle: Return to the East Hallway corridor.
+    targetPassage: {fileID: 11400000, guid: e47cd5da9b30be448aeca1f1111e10a7, type: 2}
+    targetPassageId: Act3_School1Floor
+    targetRoomId: hall_1_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

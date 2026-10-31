@@ -1,0 +1,276 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Prologue_Menu
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Prologue_Menu
+  passageTitle: PROLOGUE MENU
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "State.variables.inventory = clone(State.variables.tableStash);\r\n                    State.variables.tableStash = [];\r\n                    State.variables.hasPacked = true;\r\n                    if (!State.variables.houseLootSpawned) {\r\n                        State.variables.floorItems[\"Prologue\"] = [\r\n                            { id: \"Stale Coffee\", qty: 1 },\r\n                            { id: \"Kitchen Knife\", qty: 1 },\r\n                            { id: \"T-Shirt\", qty: 1 }\r\n                        ];\r\n                        State.variables.houseLootSpawned = true;\r\n                    }\r\n                    Engine.play(\"Prologue\");\r\n                \r\n            \r\n            4 Minutes | Gear up. Grab your work equipment by the door and raid the kitchen for anything useful.\r\n        \r\n    \r\n        \r\n        \r\n            \r\n                \u2713 You geared up. You strapped on your heavy equipment, shoved the smaller items into your pockets, and pulled a Kitchen Knife from the block."
+  narrativeBeats:
+  - 1 Minute | See what the internet knows before the grid goes down.
+  - "[JOB: POLICE] 3 Minutes | Monitor encrypted dispatch channels. Find out where the lines are breaking.\r\n            \r\n        = 1 and $int >= 4>>\r\n            \r\n                \r\n                    \r\n                \r\n                [TECH 1 / INT 4] 5 Minutes | Find the dispatch frequency and bypass their scrambling.\r\n            \r\n        \r\n            \r\n                ACCESS EMERGENCY BAND\n\r\n                [REQUIRES POLICE OR TECH 1 & INT 4] You lack the hardware or skills to intercept scrambled radio traffic."
+  - "= 3 and $int >= 6>>\r\n            \r\n                \r\n                    \r\n                \r\n                [TECH 3 / INT 6] 8 Minutes | Breach military-grade encryption to find out what they aren't telling the public.\r\n            \r\n        \r\n            \r\n                BYPASS GOV FIREWALL\n\r\n                [REQUIRES TECH 3 & INT 6] You lack the high-level expertise to breach military encryption."
+  - Exit to the 4th Floor Hallway. Ready your weapon. There is no turning back.
+  dialogueLines: []
+  initialFloorItems: []
+  choices:
+  - choiceLabel: GATHER YOUR GEAR & SUPPLIES
+    choiceSubtitle: 4 Minutes | Gear up. Grab your work equipment by the door and raid the kitchen for anything useful.
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: CHECK NEWS FEED
+    choiceSubtitle: 1 Minute | See what the internet knows before the grid goes down.
+    targetPassage: {fileID: 11400000, guid: 24c46a7b98a1a774395e9c29186a23a7, type: 2}
+    targetPassageId: Prologue_Phone
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'LISTEN TO EMERGENCY BAND [POLICE]'
+    choiceSubtitle: '[JOB: POLICE] 3 Minutes | Monitor encrypted dispatch channels. Find out where the lines are breaking.'
+    targetPassage: {fileID: 11400000, guid: 331ec042ed17feb44a354fe2aa4e8b3b, type: 2}
+    targetPassageId: Prologue_Radio
+    targetRoomId: 
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'HACK LOCAL POLICE CHATTER [TECH 1]'
+    choiceSubtitle: '[TECH 1 / INT 4] 5 Minutes | Find the dispatch frequency and bypass their scrambling.'
+    targetPassage: {fileID: 11400000, guid: 331ec042ed17feb44a354fe2aa4e8b3b, type: 2}
+    targetPassageId: Prologue_Radio
+    targetRoomId: 
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Tactics
+    requiredStatValue: 4
+    requiredSkill: tech
+    requiredSkillLevel: 1
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'BYPASS GOV FIREWALL [TECH 3]'
+    choiceSubtitle: '[TECH 3 / INT 6] 8 Minutes | Breach military-grade encryption to find out what they aren''t telling the public.'
+    targetPassage: {fileID: 11400000, guid: 59328a4b28122014c98fd2e5bf4a0dd7, type: 2}
+    targetPassageId: Prologue_Hacking
+    targetRoomId: 
+    timeMinutesCost: 8
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Tactics
+    requiredStatValue: 6
+    requiredSkill: tech
+    requiredSkillLevel: 3
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: LEAVE APARTMENT
+    choiceSubtitle: Exit to the 4th Floor Hallway. Ready your weapon. There is no turning back.
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

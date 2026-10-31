@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Prologue_Hacking
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Prologue_Hacking
+  passageTitle: PROLOGUE HACKING
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "SYS_ADMIN - SECURE_NODE_04\n                [ENCRYPTED]"
+  narrativeBeats:
+  - '''SECTOR PURGE AT 0600 HOURS.'' The military isn''t trying to contain the outbreak. They are going to wipe the entire city off the map at dawn. You need to leave. Right now.'
+  - But you got something else. A Tier-1 Military Clearance Passkey saved directly to your device. It won't help you fight your way out of this hallway, but if you survive this nightmare... it might be your only ticket into the national safe zones.
+  - Save the Tier-1 Passkey to your PDA and log off.
+  - setup.sound.play("static", "audio/sfx/static.mp3", true, 0.1);
+  - "var hackingText = [\n        \"> BYPASSING 256-BIT AES ENCRYPTION...\",\n        \"> ACCESSING SECURE MILITARY NODE...\",\n        \"> DOWNLOADING CLASSIFIED DIRECTIVE: OPR_WILDFIRE\",\n        \"------------------------------------------------\",\n        \"THREAT LEVEL : CATEGORY 5 (EXTINCTION)\",\n        \"PATHOGEN     : NEURO-AGGRESSIVE MUTAGEN (UNKNOWN ORIGIN)\",\n        \"STATUS       : QUARANTINE FAILED. INFECTION RATE 87%.\",\n        \"DIRECTIVE    : INITIATE SECTOR PURGE (FIREBOMBING) AT 0600 HOURS.\",\n        \"------------------------------------------------\",\n        \"> DOWNLOADING ATTACHMENT: EVAC_PROTOCOLS.DAT\",\n        \"> EXTRACTION POINT 'ECHO' COORDINATES SECURED.\",\n        \"> GENERATING TIER-1 MILITARY CLEARANCE PASSKEY...\",\n        \"------------------------------------------------\",\n        \"[!] WARNING: TRACE DETECTED. SEVERING CONNECTION.\"\n    ];"
+  - "var chars = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>\";\n    var lineIndex = 0;"
+  - "function scrambleLine() {\n        var terminal = document.getElementById(\"scramble-terminal\");\n        if (!terminal) {\n            setup.sound.stop(\"static\");\n            return;\n        }"
+  - "if (lineIndex >= hackingText.length) {\n            var finishBtn = document.getElementById(\"terminal-finish\");\n            if (finishBtn) finishBtn.style.display = \"block\";\n            setup.sound.stop(\"static\");\n            return;\n        }"
+  - "var originalText = hackingText[lineIndex];\n        var lineDiv = document.createElement(\"div\");\n        \n        if (originalText.includes(\"PURGE\") || originalText.includes(\"[!]\")) {\n            lineDiv.style.color = \"var(--accent-red)\";\n            lineDiv.style.textShadow = \"0 0 5px rgba(255, 0, 0, 0.6)\";\n        } else if (originalText.includes(\"TIER-1\")) {\n            lineDiv.style.color = \"var(--accent-gold)\";\n        }"
+  - terminal.appendChild(lineDiv);
+  - "var iterations = 0;\n        var maxIterations = 20; \n        \n        var interval = setInterval(function() {\n            if (!document.getElementById(\"scramble-terminal\")) {\n                clearInterval(interval);\n                return;\n            }"
+  - "var currentText = \"\";\n            for (var i = 0; i  maxIterations) {\n                clearInterval(interval);\n                lineDiv.innerText = originalText; \n                lineIndex++;\n                setTimeout(scrambleLine, 400); \n            }\n        }, 30); \n    }"
+  - setTimeout(scrambleLine, 500);
+  dialogueLines: []
+  initialFloorItems: []
+  choices:
+  - choiceLabel: WIPE DRIVE & CLOSE LAPTOP
+    choiceSubtitle: Save the Tier-1 Passkey to your PDA and log off.
+    targetPassage: {fileID: 11400000, guid: 833835ab7ce582648ac29804ec32a815, type: 2}
+    targetPassageId: Prologue
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

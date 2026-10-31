@@ -1,0 +1,789 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Floor2_Hallway
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Floor2_Hallway
+  passageTitle: FLOOR2 HALLWAY
+  associatedRoomId: f2_hall_
+  backdropSprite: {fileID: 21300000, guid: a764818daded0d34ab97f1933682c79e, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* Only runs the very first time you enter */\r\n    \r\n        /* CEK KONSEKUENSI NOISE DARI TANGGA */"
+  narrativeBeats:
+  - /* Update Map Pin position */
+  - 2ND FLOOR - EAST WING
+  - The heavy fire door clicks shut behind you, sealing you in the 2nd-floor hallway. The emergency backup lights here have failed, leaving only a single, dying fluorescent tube flickering erratically at the far end of the corridor.
+  - You try to steady your breathing.
+  - About twenty feet ahead, standing dead center in the middle of the hall, is a figure. A man in a tattered business suit. He is hunched over, his forehead pressed against the wall.
+  - Rhythmic, wet *thumps* echo through the silence as he repeatedly taps his head against the plaster.
+  - "You wonder. You aren't sure if he's even aware of you yet. Maybe he's just a guy having a breakdown. Maybe he needs help. But maybe... maybe he's something else entirely.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            Close the distance to see if he needs help."
+  - 2ND FLOOR - EAST WING
+  - '[CONSEQUENCE: NOISE DETECTED]'
+  - You burst through the fire door. The loud, echoing noise of your struggle in the stairwell has preceded you. You don't get a second to catch your breath.
+  - "About twenty feet ahead, bathed in flickering fluorescent light, a man in a tattered business suit is standing in the middle of the hallway. He isn't facing away from you. He is staring directly at the door.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    His eyes are clouded and milky. The bottom half of his jaw is entirely torn away, blood dripping down his ruined collar."
+  - "Before your brain can even process the horror of what you're looking at, he lets out a wet, gurgling shriek and launches himself into a full sprint straight at you!\r\n                                    \r\n                                    \r\n                                        \r\n                                            = 4>>\r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                    \r\n                                                    [STR 4] Plant your feet and catch him by the shoulders.\r\n                                                \r\n                                            \r\n                                                \r\n                                                    Brace and Shove\n\r\n                                                    [REQUIRES STR 4] You aren't strong enough."
+  - "= 5>>\r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                    \r\n                                                    [AGI 5] Drop low and pivot out of the way.\r\n                                                \r\n                                            \r\n                                                \r\n                                                    Dive Aside\n\r\n                                                    [REQUIRES AGI 5] You aren't fast enough to dodge."
+  - '[RISK: INJURY] You are neither strong nor fast enough. Prepare for impact.'
+  - 2ND FLOOR - MID-HALLWAY
+  - You take a slow step forward. The floorboards groan under your weight, but the man doesn't react. You approach cautiously.
+  - "The tapping stops.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                /* Audio Jumpscare dimainkan saat teks berganti */\r\n                                \r\n                                \r\n                                \r\n                                \r\n                                    A low, wet rattle builds in the man's throat. He spins around with a sickening *crack* of his neck. Your brain completely short-circuits."
+  - His eyes are clouded, milky white. The bottom half of his jaw is entirely torn away, leaving his tongue lolling grotesquely against his ruined, bloody throat.
+  - "'What is this? Is this a sick prank? A mask?' Your mind screams for an explanation, but there is none. The only thing that registers is the primal, animalistic rage radiating off of him in waves.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                    Before the thought can even finish formulating, the man lets out a gurgling shriek and launches himself at you!\r\n                                                    \r\n                                                    \r\n                                                        \r\n                                                            = 4>>\r\n                                                                \r\n                                                                    \r\n                                                                        \r\n                                                                        \r\n                                                                    \r\n                                                                    [STR 4] Plant your feet and catch him by the shoulders.\r\n                                                                \r\n                                                            \r\n                                                                \r\n                                                                    Brace and Shove\n\r\n                                                                    [REQUIRES STR 4] You aren't strong enough."
+  - "= 5>>\r\n                                                                \r\n                                                                    \r\n                                                                        \r\n                                                                        \r\n                                                                    \r\n                                                                    [AGI 5] Drop low and pivot out of the way.\r\n                                                                \r\n                                                            \r\n                                                                \r\n                                                                    Dive Aside\n\r\n                                                                    [REQUIRES AGI 5] You aren't fast enough."
+  - '[RISK: INJURY] You are neither strong nor fast enough. Prepare for impact.'
+  - 2ND FLOOR - MID-HALLWAY
+  - '[STRENGTH SUCCESS]'
+  - Pure fight-or-flight takes over. You plant your feet and catch him by the shoulders. His skin feels ice-cold and unnaturally greasy.
+  - "You shove him back with everything you have. He stumbles into the wall, giving you precious seconds to draw your weapon!\r\n                \r\n                    [AGILITY SUCCESS]"
+  - "Pure instinct takes over. You drop low, pivoting on your heel. His snapping teeth miss your face by an inch, his momentum carrying him past you. You spring back up, putting distance between you and whatever the hell is wrong with this guy!\r\n                \r\n            \r\n            \r\n            \r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                    \r\n                    Prepare for combat."
+  - 2ND FLOOR - MID-HALLWAY
+  - '[ATTACKED]'
+  - You try to brace yourself, but he hits you like a freight train! The sheer, unhinged force knocks the wind out of you as you crash onto the hard floor. This isn't a prank. He's trying to kill you.
+  - "-15 HP (Tackled)\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    Hot, putrid breath washes over your face. The guy is thrashing wildly on top of you, snapping his jagged upper teeth at your throat. Black blood drips from his ruined jaw onto your clothes. His dead weight is crushing the air out of your lungs. You have to get him off!\r\n                                    \r\n                                    \r\n                                        = 3 or $agi >= 3>>\r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                [STR/AGI MET] Wedge your knee against his chest and throw him off.\r\n                                            \r\n                                        \r\n                                            \r\n                                                Kick him away!\n\r\n                                                [REQUIRES STR 3 OR AGI 3] His dead weight is too heavy to throw off cleanly.\r\n                                            \r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                [RISK: INJURY] You don't have the leverage. He's going to bite."
+  - 2ND FLOOR - MID-HALLWAY
+  - '[SUCCESS]'
+  - "You wedge your knee against his chest and deliver a desperate, powerful kick. He goes sliding backward across the linoleum, leaving a streak of dark gore. You scramble to your feet!\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                    \r\n                    \r\n                    \r\n                    [FAILED]"
+  - You struggle, but he's too heavy! His teeth scrape painfully against your collarbone, tearing flesh! The sudden, blinding pain sends a jolt of pure adrenaline straight into your heart. With a primal scream, you violently heave his body off of you and scramble back to your feet!
+  - -10 HP (Scratched)
+  - Prepare for combat.
+  - "2ND FLOOR - COMBAT\r\n            \r\n            \r\n             0>>\r\n                \r\n                    \r\n                    \r\n                    \r\n                        \r\n                    \r\n                    \r\n                    ENEMIES REMAINING: \r\n                    \r\n                    \r\n                        \r\n                            \r\n                                TARGET: _z.name (Evasion: _z.ev%)"
+  - "EQUIPPED: \r\n                    \r\n                        UNARMED (Fists)\r\n                    \r\n                        $equip.weapon"
+  - "\U0001F480\r\n                    TARGET ELIMINATED\r\n                    \n\r\n                    \r\n                        [+25 XP]"
+  - The man hits the floor and doesn't get back up.
+  - "You stand over the body, your chest heaving, adrenaline burning like battery acid in your veins. Your hands are shaking uncontrollably. Black, thick blood pools rapidly on the linoleum, soaking into the frayed carpet. \r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \n\r\n                                        You stare down at the ruined face, the milky eyes."
+  - "You don't know what the hell is actually going on outside, but the hallway stretches on, dark and silent. You can't stay here.\r\n                                        \r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                     \r\n                                                \r\n                                                Leave the body behind."
+  - 2ND FLOOR - WEST WING EXIT
+  - You reach the far end of the hallway. The air here is colder, carried by a draft from the stairwell ahead. A green "EXIT" sign flickers above the heavy steel door of the West Fire Stairs.
+  - "Beyond that door lies the Lobby. You can hear faint, muffled sounds echoing up from below\u2014shouting, heavy thuds, and the rhythmic *pop-pop-pop* of distant gunfire."
+  - "= 5>>\r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                         \r\n                                                    \r\n                                                    [PER 5] You notice medical supplies hidden under a pile of rags.\r\n                                                \r\n                                            \r\n                                                \r\n                                                    Search the Janitor's Cart\n\r\n                                                    [REQUIRES PER 5] It's too dark to spot anything useful in the mess.\r\n                                                \r\n                                            \r\n                                            \r\n                                            \r\n                                            = 1 or hasTrait(\"SCAVENGER\")>>\r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                    \r\n                                                    [SCAVENGING] You know exactly which bags are worth checking.\r\n                                                \r\n                                            \r\n                                                \r\n                                                    Scour the discarded luggage\n\r\n                                                    [REQUIRES SCAVENGING 1] There are too many bags. You don't have the time.\r\n                                                \r\n                                            \r\n                                        \r\n                                            \r\n                                                You've scavenged everything you could find here. Time to move."
+  - Head down into the gunfire.
+  dialogueLines:
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: It's just a riot. Mass hysteria. People just panicking over the news. I just need to get out of this building.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Drugs? Shock? Mental illness? Who knows... but that noise is really unsettling.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Hey... Buddy? Are you okay? The building isn't safe, we need to\u2014"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Get the hell off me!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: What just happened? Did I just... did I just kill someone?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: No... that wasn't a person anymore. It couldn't be.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Gunfire... The police must be down there. They have to be holding it together. If I can just get to them, I'll be safe.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Close the distance to see if he needs help.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[STR 4] Plant your feet and catch him by the shoulders.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Dive Aside [AGI 5]'
+    choiceSubtitle: '[AGI 5] Drop low and pivot out of the way.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Reflex
+    requiredStatValue: 5
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Try to fight it off [BRUTE FORCE]'
+    choiceSubtitle: '[RISK: INJURY] You are neither strong nor fast enough. Prepare for impact.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[STR 4] Plant your feet and catch him by the shoulders.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Dive Aside [AGI 5]'
+    choiceSubtitle: '[AGI 5] Drop low and pivot out of the way.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Reflex
+    requiredStatValue: 5
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Try to fight it off [BRUTE FORCE]'
+    choiceSubtitle: '[RISK: INJURY] You are neither strong nor fast enough. Prepare for impact.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: READY WEAPON
+    choiceSubtitle: Prepare for combat.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[STR/AGI MET] Wedge your knee against his chest and throw him off.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Desperately struggle [BRUTE FORCE]'
+    choiceSubtitle: '[RISK: INJURY] You don''t have the leverage. He''s going to bite.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: READY WEAPON
+    choiceSubtitle: Prepare for combat.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: ATTACK TARGET
+    choiceSubtitle: 
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Leave the body behind.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[PER 5] You notice medical supplies hidden under a pile of rags.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Bandage
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Scour the discarded luggage [SCAVENGING]'
+    choiceSubtitle: '[SCAVENGING] You know exactly which bags are worth checking.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Floor2_Hallway
+    targetRoomId: f2_hall_
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: scavenging
+    requiredSkillLevel: 1
+    requiredTrait: SCAVENGER
+    requiredItem: 
+    consumesItem: 
+    givesItem: Energy Bar
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Open the door and descend to the LOBBY
+    choiceSubtitle: Head down into the gunfire.
+    targetPassage: {fileID: 11400000, guid: 6a2d5c1f47858564ab4abe037e4d1a28, type: 2}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

@@ -1,0 +1,309 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a88fae75884c3cd47b7055258e0d7570, type: 3}
+  m_Name: FloorMap_Ascott_Lobby
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.TacticalFloorMapData
+  floorId: ascott_lobby
+  floorTitle: "ARCHITECTURAL BLUEPRINT // ASCOTT GRAND RESIDENCY \u2014 MAIN LOBBY & FOYER"
+  floorSubtitle: SCHEMATIC SCALE 1:100 // GROUND FLOOR ENTRY
+  gridCoordinate: 'GRID [G-01:L-01] // BIO-RADAR: ELEVATED THREAT'
+  vectorMapSprite: {fileID: 3286163911610860551, guid: 44d0dee741572d94bb8fa5ebd20a532b, type: 3}
+  rooms:
+  - roomId: nw_room
+    roomCode: NW ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: NW ROOM // RESIDENTIAL
+    position: {x: -70, y: 105}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: NW ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector NW ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - n_room
+    - w_room
+  - roomId: n_room
+    roomCode: N ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: N ROOM // RESIDENTIAL
+    position: {x: 0, y: 105}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: N ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector N ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - nw_room
+    - ne_room
+    - c_room
+  - roomId: ne_room
+    roomCode: NE ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: NE ROOM // RESIDENTIAL
+    position: {x: 70, y: 105}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: NE ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector NE ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - n_room
+    - e_room
+  - roomId: w_room
+    roomCode: W ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: W ROOM // RESIDENTIAL
+    position: {x: -70, y: 35}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: W ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector W ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - nw_room
+    - c_room
+    - sw_room
+  - roomId: c_room
+    roomCode: C ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: C ROOM // RESIDENTIAL
+    position: {x: 0, y: 35}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: C ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector C ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - w_room
+    - n_room
+    - e_room
+    - s_room
+  - roomId: e_room
+    roomCode: E ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: E ROOM // RESIDENTIAL
+    position: {x: 70, y: 35}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: E ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector E ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - c_room
+    - ne_room
+    - se_room
+  - roomId: sw_room
+    roomCode: SW ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: SW ROOM // RESIDENTIAL
+    position: {x: -70, y: -35}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: SW ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector SW ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - w_room
+    - s_room
+  - roomId: s_room
+    roomCode: S ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: S ROOM // RESIDENTIAL
+    position: {x: 0, y: -35}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: S ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector S ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - sw_room
+    - c_room
+    - lobby_exit
+    - se_room
+  - roomId: se_room
+    roomCode: SE ROOM
+    shortSub: RESIDENTIAL
+    fullTitle: SE ROOM // RESIDENTIAL
+    position: {x: 70, y: -35}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: SE ROOM // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector SE ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - s_room
+    - e_room
+  - roomId: lobby_exit
+    roomCode: LOBBY EXIT
+    shortSub: RESIDENTIAL
+    fullTitle: LOBBY EXIT // RESIDENTIAL
+    position: {x: 0, y: -105}
+    size: {x: 50, y: 50}
+    iconType: 0
+    isHallway: 0
+    isStairs: 0
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isDiscovered: 0
+    undiscoveredSub: SECTOR RECON
+    undiscoveredTitle: LOBBY EXIT // RESIDENTIAL
+    statusTag: CLEAR
+    threatLevel: LOW
+    scavengeStatus: UNSEARCHED
+    acousticScan: DEAD SILENCE
+    reconIntel: Architectural sector LOBBY EXIT. Initial tactical scans show potential supply caches and survivor barricades.
+    connectedRoomIds:
+    - s_room
+  doorways:
+  - doorId: door_nw_room_n_room
+    connectedRoomId: n_room
+    position: {x: -35, y: 105}
+    size: {x: 24, y: 4}
+  - doorId: door_n_room_ne_room
+    connectedRoomId: ne_room
+    position: {x: 35, y: 105}
+    size: {x: 24, y: 4}
+  - doorId: door_w_room_nw_room
+    connectedRoomId: nw_room
+    position: {x: -70, y: 70}
+    size: {x: 24, y: 4}
+  - doorId: door_w_room_c_room
+    connectedRoomId: c_room
+    position: {x: -35, y: 35}
+    size: {x: 24, y: 4}
+  - doorId: door_c_room_n_room
+    connectedRoomId: n_room
+    position: {x: 0, y: 70}
+    size: {x: 24, y: 4}
+  - doorId: door_c_room_e_room
+    connectedRoomId: e_room
+    position: {x: 35, y: 35}
+    size: {x: 24, y: 4}
+  - doorId: door_e_room_ne_room
+    connectedRoomId: ne_room
+    position: {x: 70, y: 70}
+    size: {x: 24, y: 4}
+  - doorId: door_sw_room_w_room
+    connectedRoomId: w_room
+    position: {x: -70, y: 0}
+    size: {x: 24, y: 4}
+  - doorId: door_sw_room_s_room
+    connectedRoomId: s_room
+    position: {x: -35, y: -35}
+    size: {x: 24, y: 4}
+  - doorId: door_s_room_c_room
+    connectedRoomId: c_room
+    position: {x: 0, y: 0}
+    size: {x: 24, y: 4}
+  - doorId: door_lobby_exit_s_room
+    connectedRoomId: s_room
+    position: {x: 0, y: -70}
+    size: {x: 24, y: 4}
+  - doorId: door_s_room_se_room
+    connectedRoomId: se_room
+    position: {x: 35, y: -35}
+    size: {x: 24, y: 4}
+  - doorId: door_se_room_e_room
+    connectedRoomId: e_room
+    position: {x: 70, y: 0}
+    size: {x: 24, y: 4}

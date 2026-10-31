@@ -1,0 +1,1535 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Lobby_Entrance
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Lobby_Entrance
+  passageTitle: LOBBY ENTRANCE
+  associatedRoomId: nw_room
+  backdropSprite: {fileID: 21300000, guid: 9fd07e87dc19f0e4eb0cba515eeb86c1, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* ==========================================================================\r\n   0. INITIALIZATION & SETUP\r\n   Sets default variables the first time the player enters the lobby.\r\n============================================================================= */"
+  narrativeBeats:
+  - "/* \u2500\u2500 START AUDIO EXACTLY ONCE \u2500\u2500 */"
+  - "/* ==========================================================================\r\n   1. WEAPON & COMBAT LOGIC SETUP\r\n   Checks equipment and calculates stamina costs before rendering the UI.\r\n============================================================================= */"
+  - "/* \u2500\u2500 WEAPON TYPE DETECTION \u2500\u2500 */"
+  - "/* \u2500\u2500 STAMINA DEDUCTION FOR MOVEMENT (GHOST BAR FIX) \u2500\u2500 */\r\n/* Runs ON LOAD so the animation system captures the old stat and animates downward */"
+  - "/* Reduced movement cost: 2 for high Agility, 5 for low Agility */\r\n    = 5 ? 2 : 5)>>\r\n    \r\n    /* NEW EXERTION WIDGET */\r\n    \r\n    \r\n    \r\n     /* Added HP update for Burn the Muscle */"
+  - "/* \u2500\u2500 COMBAT CHECK \u2500\u2500 */\r\n/* Pre-calculates if the player will win their fight to keep the narrative code cleaner below */"
+  - = 1 or $per >= 4>>
+  - = 4 or $skills.melee >= 1>>
+  - = 6 or $skills.melee >= 2>>
+  - "THE ASCOTT LOBBY \u2014 GROUND FLOOR"
+  - The stairwell door punches open and you stumble through it into the lobby.
+  - "The Ascott Grand's lobby was designed to make you feel small \u2014 fifty feet of vaulted ceiling, polished marble floors the color of old bone, chandeliers that cost more than most people earn in a decade. It was built for first impressions. Right now it is delivering one."
+  - "The smell hits first. Blood and gunpowder and something underneath both \u2014 something animal and wrong.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    Then the sound: screaming layered over screaming, the wet skid of shoe leather on marble, glass shattering somewhere above. The chandeliers are still lit. All those warm amber bulbs still burning like nothing happened, throwing gold light across everything happening below."
+  - You press your back against the stairwell door and take one full second to see it all clearly. One second. That is all you can afford.
+  - Three crises. Right now. Unfolding simultaneously. And you are one person.
+  - "By the elevator banks \u2014 an androgynous young man in designer clothes is making his last stand against an infected with nothing but a heavy hard-shell camera case. He is losing ground with every step.\r\n                                                \r\n                                                \r\n                                                    \r\n                                                        \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                        \r\n                                                        Rush to help the young man."
+  - "At the reception desk \u2014 a brown woman and her young niece are trapped in a shrinking circle behind the counter. The infected is pressing them back against the wall. She is out of space.\r\n                                                \r\n                                                \r\n                                                    \r\n                                                        \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                        \r\n                                                        Rush to help the woman and child."
+  - "At your feet \u2014 a dead man wearing a military-grade backpack that looks completely untouched. Whatever killed him moved on fast.\r\n                                                \r\n                                                \r\n                                                    \r\n                                                        \r\n                                                            \r\n                                                                \r\n                                                                \r\n                                                            \r\n                                                            \r\n                                                        \r\n                                                        Prioritize the supplies. Every second counts."
+  - "At the glass front doors \u2014 two police officers have constructed a barricade. Rifles up. They are twenty feet from people dying and they have not moved once.\r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                    \r\n                                                    Ignore the chaos and head straight for the exit."
+  - "LOBBY \u2014 CROSSING TO THE ELEVATORS"
+  - You break left and run.
+  - "The marble is treacherous \u2014 your first step skids half an inch and your stomach drops, but you find your footing fast and open into a full sprint. The lobby feels enormous when you are trying to cross it in a hurry. Your footfalls crack loud against the stone.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    Fifteen feet. Ten. You can hear him now \u2014 ragged, panicked breathing, the heavy thwack of a hard-shell Pelican camera case connecting with something. Five feet. You see his face properly. Young. Dyed hair plastered to his forehead with sweat, wearing clothes far too stylish for an apocalypse. Eyes wide and very dark, still fighting even though every rational part of him has clearly given up."
+  - "He catches sight of you closing the distance and something shifts in his expression \u2014 not relief yet. Just a held breath. A very small, desperate adjustment from this is it to maybe not yet."
+  - "The infected does not see you. Its entire world has narrowed to the man in front of it.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            Engage the infected."
+  - "LOBBY \u2014 ELEVATOR RESCUE"
+  - "The young man's back connects with the elevator doors with a hollow metallic thud. He is out of room. The heavy camera case is too cumbersome to keep swinging one-handed and his arms are shaking. The creature is right there \u2014 jaws open, hands clawing, close enough that you can see half its face is ruined."
+  - "[COMBAT \u2014 SUCCESS] [+25 XP]"
+  - "You come in from the creature's left. Your  is up. One round into the marble ceiling directly above its head \u2014 the crack of the shot in the enclosed space is enormous. The creature flinches. You use that half-second completely. You close the remaining distance, press the barrel hard to its temple, and squeeze. The creature drops straight down.\r\n                        \r\n                            You close the gap without slowing. Your  finds the back of its neck before it registers you are there. It seizes \u2014 a full-body spasm \u2014 and its legs buckle. It takes the blade down with it. You put your boot flat on its shoulder, brace, and wrench the weapon free.\r\n                        \r\n                            You do not break stride. Your  is back over your shoulder before you reach it. The impact when it connects is dense and terrible, and the creature staggers sideways into the elevator door frame. You bring it down again, harder. Then it is not moving anymore.\r\n                        \r\n                            You hit it at a dead sprint \u2014 wrapping yourself around its midsection and driving it off from him and sideways into the wall. You hit the marble hard. You get your hands up on its throat, take the top, pin it with your knees. You bring your elbow down on its skull until your arm goes numb and it finally stops moving."
+  - "He slides slowly down the elevator doors until he is sitting on the floor. He does not say anything for a long moment. He stares at the thing beside him, then at his own hands, still shaking at the wrists. Then he looks at you \u2014 really looks at you, the way people look at someone when they are updating an entire model of how the world works."
+  - A long, controlled breath goes out of him.
+  - He manages a tired, faintly embarrassed almost-smile.
+  - "He looks up at you. Waiting.\r\n                                        \r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Take him with you.\r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Leave him here to hide.\r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                [HUMANITY -5] Abandon him."
+  - "[COMBAT \u2014 FAILED]"
+  - "You raise your  and the geometry is immediately wrong \u2014 he is directly behind the creature, pinned against the elevator doors. You sidestep, searching for the shot. The half-second you spend repositioning is the half-second that decides it. By the time you find a clean line, there is nothing left on the other side of the creature that you need to protect."
+  - You lunge with your  and the creature twists at exactly the wrong moment. Your blade finds air, then the elevator door behind it with a shriek of metal. By the time you recover for a second attempt, the moment has closed.
+  - "You swing your  hard and wide and the creature lurches forward into him at exactly the same moment \u2014 and your weapon swings through empty space, clanging off the elevator door. When you look up, the angle of his body has changed."
+  - You throw yourself at it, trying to haul it backward. It is stronger than it has any right to be and it shrugs you off without breaking its focus on him. You hit the marble floor. By the time you are back on your feet, the sound from the elevator bank has stopped, and the silence is worse than the screaming was.
+  - -STAMINA (Struggle)
+  - You cannot stop it. You pull back from the elevator bank. You do not look at what is on the floor.
+  - "The camera case is still sitting on the marble. It is just sitting there.\r\n                                        \r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Retreat before it notices you."
+  - "LOBBY \u2014 CROSSING TO RECEPTION"
+  - You break right, angling across the wide open floor.
+  - "The screaming is louder here. A woman's voice and a child's voice braided together. The woman calling out to the girl, trying to keep the girl's attention on her face. The child is not responding anymore. She has gone somewhere else in her head.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    The infected that cornered them vaulted the reception desk like it was not there. It is on their side of the counter now, between you and them, its back to you. The woman has her niece pressed against the wall behind her and her arm out, palm extended, like sheer determination might hold it back. It will not. She is out of room."
+  - "She sees you coming across the lobby. You watch it happen on her face \u2014 the whole arc of it, from past despair to something fragile and new. Her arm stays out but her eyes have changed."
+  - "The infected has its back to you. Its entire world is the two people against the wall. That is the opening.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            Engage the infected."
+  - "LOBBY \u2014 RECEPTION RESCUE"
+  - You do not have much time. You do not waste any of it.
+  - "[COMBAT \u2014 SUCCESS] [+25 XP]"
+  - "One round into the marble ceiling directly above the creature's head. The creature stops. Completely. You vault the reception counter in that second and come down behind it pressing your  to the back of its skull. You pull the trigger once. It drops across the counter like its strings were cut.\r\n                        \r\n                            You clear the counter in one motion, and your  finds the creature's back before it registers your presence. It wheels on you immediately, jaws snapping \u2014 exactly what you needed. You draw it out toward the open space, buying the woman separation, then drive the blade home a second time at the base of the skull.\r\n                        \r\n                            You come around the side of the desk rather than over it and catch the creature mid-turn with your  swung fully into the back of its skull. The crack is the loudest sound in the lobby. The creature folds across the desk and stays there.\r\n                        \r\n                            You come over the counter and get your arms around the creature from behind. You haul it backward, away from the woman. When you have enough separation you drive it face-first into the edge of the marble counter with everything you have. It does not get back up."
+  - "The woman drops to her knees on the other side of the counter and puts both arms completely around the little girl. A long moment of just breathing \u2014 both of them holding on like the hold itself is the only solid thing left in the building."
+  - Thirty seconds go by. Then she looks up at you over the girl's shoulder. Her eyes are dry.
+  - Maya puts a slow hand over Lily's ear, gently, like she is blocking sounds the child has already heard.
+  - "Convince her to come with you.\r\n                                            \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Leave her here to hide."
+  - "[COMBAT \u2014 FAILED]"
+  - "You raise your  and the geometry is immediately wrong \u2014 the woman and her niece are directly behind the creature. Every angle goes through the wrong bodies. You look for the shot. By the time you accept it does not exist, what is happening at the wall has already happened.\r\n                        \r\n                            You slash at the creature as it rounds the edge of the desk and your  catches its forearm \u2014 a real cut \u2014 but it does not slow. It is already moving and cuts mean nothing to something that does not feel them.\r\n                        \r\n                            You swing your  in the hardest arc you can manage and the creature ducks under it by pure animal instinct. Your weapon catches the edge of the reception desk instead. The impact rattles from your wrists to your jaw.\r\n                        \r\n                            You throw yourself over the counter after it and try to get a grip from behind. It shrugs you off without looking. Your grip peels away. You hit the surface of the desk and go over the far edge onto the floor."
+  - "The woman's scream cuts across the whole lobby \u2014 sharp and particular and desperate, a sound that silences everything else for one terrible second. And then it stops."
+  - You cannot help them. You fall back from the desk.
+  - "-STAMINA (Struggle)\r\n                                        \r\n                                        \r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                Retreat before it notices you."
+  - "LOBBY \u2014 RECEPTION"
+  - "Maya looks past you. Her gaze goes across the open lobby floor to the police barricade at the front doors, and she holds it there for a moment like she is doing math. When she looks back at you there is already a decision behind her eyes.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                    \n\r\n                                    She says it carefully, with the considered weight of someone who has already run the argument in her head."
+  - "She glances briefly at the chaos still unfolding across the lobby floor, then puts a hand briefly on your forearm \u2014 quick, deliberate, a real touch."
+  - "Maya begins picking her way carefully across the lobby toward the barricade, avoiding the marble in the worst places. Lily peeks back at you once. Big dark eyes, fully present again now that she is moving. She holds your gaze for a long moment. Then she turns away.\r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            Watch them head for the barricade."
+  - "LOBBY \u2014 THE DEAD MAN"
+  - You do not have to go far. He is almost at your feet.
+  - "You cover the distance in a few quick steps and crouch over the body. Up close, the man is worse than he looked from across the lobby \u2014 the damage to his face is extensive and recent, the kind that happens fast when the infected are in a frenzy.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    The backpack is completely untouched. Military-grade webbing, properly tensioned, MOLLE loops loaded the way someone who actually knows gear would load them."
+  - "There is a sound somewhere behind you \u2014 wet, directionless, getting less directionless. One of the infected has noticed you crouching over something and is slowly recalibrating toward your position. You have maybe ten or fifteen seconds before that becomes an immediate problem.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            Loot quickly and get out."
+  - "LOBBY \u2014 LOOTING THE DEAD"
+  - "You drop to your knees and work the zipper fast. Both hands. No time to be careful about it. You go by touch \u2014 pull what your hands find, move fast, keep your head up between grabs."
+  - "Found: 1\xD7 First Aid Kit, 12\xD7 9mm Ammo."
+  - You are pulling the shoulder straps free when you feel it.
+  - "Fingers. Around your wrist.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    Cold. Very strong. Grip like something that has forgotten what letting go means."
+  - "The dead man is looking up at you. His eyes are filmed over white and they are absolutely, unambiguously focused on your face. There is a sound coming from somewhere deep inside his chest \u2014 a low, wet, resonant gurgling, like something trying to remember what lungs are for. His mouth opens. His grip on your wrist does not loosen. It tightens."
+  - CRACK.
+  - "A shot from the direction of the police barricade. The grip releases. You feel the spray before you understand what happened \u2014 warm, fine, across the side of your face and the back of your hand."
+  - "Somewhere behind you, a second shot \u2014 the infected that had been closing in drops without ceremony. You did not even hear it coming. You do not move for one full second. Then you wipe your face with the back of your wrist. You stand up slowly."
+  - "\"STAY BACK FROM THE BODIES!\" An officer's voice, cracking at the high end. \"I said stay the hell back from the bodies \u2014 what is wrong with you!\""
+  - "You look across the lobby at him. He is still aiming in your direction, muzzle tracking you as you rise, hands not steady. You meet his eyes. He does not lower the gun. You hold his gaze for one flat second, then pick up the pack and sling it over your shoulder.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            Check your surroundings."
+  - /* Check if Vane, Maya, or the Backpack are still un-resolved */
+  - "/* ==== OPTION A: PLAYER CAN TAKE ANOTHER ACTION ==== */\r\n            = 5>>"
+  - "LOBBY \u2014 CENTER"
+  - You pull back to the middle of the lobby, lungs working hard. Your pulse is loud in your temples. The marble underfoot is slick in ways you have been actively not thinking about.
+  - "You stop for two seconds \u2014 just two, no more \u2014 and take a full read of the room. The chaos is evolving. The lobby is in slow, terrible motion around a still point, and you are the still point. Your eyes move automatically: location, distance, threat, status. Old reflex. Useful one."
+  - "Vane keeps pace just off your right shoulder. He has adjusted his grip on the camera case \u2014 holding it by the body now, flat, like a shield rather than a weapon. He does not say anything. He tracks where your eyes go. He is learning."
+  - "[AGILITY \u2014 You're fast enough. There's still time for one more move.]"
+  - You know what is left and where it is.
+  - "By the elevator banks \u2014 an androgynous young man in designer clothes is making his last stand against an infected with nothing but a heavy hard-shell camera case. He is losing ground with every step.\r\n                            \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    Rush to help the young man."
+  - "At the reception desk \u2014 a brown woman and her young niece are trapped in a shrinking circle behind the counter. The infected is pressing them back against the wall. She is out of space.\r\n                            \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    Rush to help the woman and child."
+  - "Across the floor \u2014 a dead man wearing a military-grade backpack that looks completely untouched. Whatever killed him moved on fast.\r\n                            \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                        \r\n                                    \r\n                                    Prioritize the supplies. Every second counts."
+  - "At the glass front doors \u2014 two police officers have constructed a barricade. Rifles up. They are twenty feet from people dying and they have not moved once.\r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                \r\n                                Ignore the chaos and head straight for the exit."
+  - "/* ==== OPTION B: OUT OF TIME / OUT OF AGILITY ==== */\r\n            \r\n                /* Auto-force to exit if nothing remains, or Agility too low */"
+  - "LOBBY \u2014 CROSSING TO THE FRONT DOORS"
+  - "You put your hand out \u2014 flat, backward, a single clear gesture \u2014 and Vane reads it without needing it explained. He falls in close behind your right shoulder and matches your pace. He is getting better at this. Better than he was two minutes ago, anyway."
+  - "You cross the lobby toward the glass front doors. You are careful about it \u2014 picking lines through the chaos, skirting the edge of the open floor where you can, staying low and quiet when quiet matters. The marble is a problem the whole way and you move anyway."
+  - You pass close to where it happened. You do not look. Looking would not change anything and you need your eyes forward. But your feet know the distance and your body slows for half a step anyway, something in you registering the weight of it even when your mind has already moved on. You keep walking.
+  - Somewhere behind you, someone is still screaming. You hear it the whole way across the floor. You do not stop. The decision was made the moment you chose the doors over them, and second-guessing it now costs you both. You keep your eyes on the glass. You keep walking.
+  - The chandeliers are still lit. Warm amber. Gold on everything. The lobby is technically still beautiful. That has not gotten less strange.
+  - "The front doors grow as you approach. Through the glass you can see the street beyond \u2014 lit, distant chaos, smoke rising somewhere upwind, but outside. Open air. Exits that are not this building. The doors are locked from the inside. The officers at the barricade have the key."
+  - "Ten feet out, you stop. You look at them clearly for the first time at close range.\r\n                                    \r\n                                    \r\n                                        \r\n                                            \r\n                                                \r\n                                                \r\n                                                \r\n                                                \r\n                                            \r\n                                            Walk up to the barricade."
+  - "LOBBY \u2014 THE FRONT DOORS"
+  - Up close, the officers look worse than they did from across the room.
+  - "The taller one is maybe forty. Military posture, the kind that gets trained in and never fully leaves. His face is performing authority the way an actor performs authority \u2014 technically correct, deeply unconvincing if you look at the eyes. The younger one is mid-twenties at most. His face has given up on performing anything. He is just scared, clearly, holding a rifle with hands that have not stopped moving since he picked it up. Both muzzles are roughly aimed at your chest. Neither barrel is steady.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    Behind the barricade: the glass front doors, and the city beyond them. Still lit. Still out there. The locks are on this side. These two men have the keys."
+  - Vane is close at your right shoulder, camera case held at his side, willing every muscle in his face to look like this is fine. He is not fine. He is doing a credible impression of fine.
+  - "Maya and Lily are already behind the barricade, sitting against a luggage cart. Maya looks up when she sees you coming. Her face does something complicated \u2014 relief and guilt and gratitude all occupying the same expression at once. She does not say anything. Lily does not look up."
+  - Somewhere in the lobby behind you there is a place you are not going to look at again. These two officers watched what happened there from twenty feet away with loaded weapons and clear sight lines. They know that you know that. The younger one is not meeting your eyes.
+  - '"Hold it right there." The taller officer''s voice has the flattened quality of someone reciting protocol. Muscle memory doing the work while the brain tries to catch up. "Building is on full lockdown. Nobody in, nobody out. Quarantine protocol. Step back from the doors."'
+  - '"You''re sealing us in here with those things," you say. Not an argument. Just a fact, stated at normal volume, because it is simply true.'
+  - '"Those are our orders." The younger officer''s grip on his rifle shifts. "Please stand down and step away from the door." He means the please. That is almost worse.'
+  - Behind you, somewhere in the lobby, something crashes. Glass breaks. Something screams and then does not. The younger officer's eyes snap toward the sound and then back to you, fast, like if he looks away long enough you will do something.
+  - There is a way through this. There is always a way through.
+  - "= 6 or $skills.melee >= 2>>\r\n                                            \r\n                                                \r\n                                                    \r\n                                                    \r\n                                                    \r\n                                                \r\n                                                [STR 6 / MELEE 2] You have the size or the combat experience to make him back down.\r\n                                            \r\n                                        \r\n                                            \r\n                                                Step into the barrel and stare him down\n\r\n                                                [REQUIRES STR 6 OR MELEE 2] You don't have the physical presence or combat experience to successfully intimidate a man with a gun."
+  - '[CHARISMA CHECK] Attempt to reason with them calmly.'
+  - "[POLICE OFFICER] Use your badge to take control of the situation.\r\n                                            \r\n                                        \r\n                                            \r\n                                                Pull rank on them\n\r\n                                                [REQUIRES POLICE OFFICER] You are a civilian. You have no authority here."
+  - '[RISK: CONFRONTATION] Force your way past the barricade. Costs 5 STAMINA.'
+  - "LOBBY \u2014 THE FRONT DOORS"
+  - You walk straight into the rifle barrel.
+  - "You do not rush it. You just walk, steady pace, until the muzzle contacts your chest and stops you. The officer flinches. You do not. His finger is on the trigger and his brain is not, and you can see the gap between those two things clearly on his face. People who are actually going to shoot you do not advertise it like this.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    You let the silence breathe for two full seconds. Long enough that he registers it is intentional."
+  - '"You stood there," you say. Quiet. Completely even. "You watched them die. You had a loaded weapon and a clear position and you followed your procedure and watched people die twenty feet away from you." You hold his eyes. "You are not going to shoot me. We both know that. Open the door."'
+  - "A long, still silence. The younger officer takes a very small step backward without seeming to decide to. The taller one's jaw works. Something in his posture \u2014 the part that has been performing authority for the last ten minutes \u2014 deflates, just slightly, like a slow leak finding its exit point."
+  - '"...Fine." The rifle lowers. It goes down slowly, like he is hoping no one notices the movement. "Get out. You''re on your own out there. I''m not opening this door again."'
+  - '"Good," you say.'
+  - Exit the Ascott Residency.
+  - "LOBBY \u2014 THE FRONT DOORS"
+  - "= 5 or hasTrait(\"DEBATER\")>>\r\n                        You put both hands up slowly. Clear. Non-threatening."
+  - "\"Here is the problem with what you are doing right now.\" Your voice stays even, conversational. Not loud. Not urgent. Just talking, like this is a reasonable discussion between reasonable people. \"Your perimeter is already breached. You are two people. Every extra civilian in this building is someone else you are responsible for keeping alive tonight, and you have already seen how that math is working out.\" \r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                        You pause. Let that sit. \"I walk out that door and you have one less problem. One less body to account for. Your job gets easier by exactly the amount of me. That is all I am asking for. Let me go.\""
+  - The two officers look at each other. It is a long look, and a lot passes through it. The logic is simple enough to be hard to argue with, and they are tired and scared and not operating anywhere near their best. The younger one's rifle is already dropping before the older one finishes the nod.
+  - '"Fine," the younger one mutters. He shoves a luggage cart aside with his boot and produces a key ring from his vest. His hands are still not steady but he gets the lock on the second try. "Go. Fast. I''m locking it the second you''re through."'
+  - "[CHARISMA \u2014 SUCCESS]"
+  - Exit the Ascott Residency.
+  - "You start talking. You lay out the logic clearly \u2014 the perimeter, the math, what you are actually asking for, every angle you can find. You make good points. They are genuinely good points."
+  - "The older officer shakes his head and talks straight over you.\r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                        \"I don't care.\" Flat. Final. \"Nobody leaves. Those are the orders. I don't write them, I follow them.\" He steps forward, shortening the space between you, making himself larger in the way that trained officers make themselves larger when they want someone to stop talking. \"Back away from the door. Last warning.\""
+  - Your words are not landing. He has put something up behind his eyes and locked it and he is not letting anything in. You can hear yourself still talking and you already know it is not working.
+  - "[CHARISMA \u2014 FAILED]"
+  - "Different approach, then.\r\n                                        \r\n                                        \r\n                                            = 6 or $skills.melee >= 2>>\r\n                                                \r\n                                                    \r\n                                                        \r\n                                                        \r\n                                                        \r\n                                                    \r\n                                                    [STR 6 / MELEE 2] Use your physical presence to force his hand.\r\n                                                \r\n                                            \r\n                                                \r\n                                                    Enough talking. Stare him down.\n\r\n                                                    [REQUIRES STR 6 OR MELEE 2] You lack the physical intimidation factor to make him back down."
+  - "[POLICE OFFICER] Use your badge to bypass the argument.\r\n                                                \r\n                                            \r\n                                                \r\n                                                    Pull rank\n\r\n                                                    [REQUIRES POLICE OFFICER] You have no authority to pull rank."
+  - '[RISK: CONFRONTATION] Force your way past the barricade. Costs 5 STAMINA.'
+  - "LOBBY \u2014 THE FRONT DOORS"
+  - You flip your badge open and hold it up where they can both read it without squinting.
+  - "The room goes quiet for a beat \u2014 not the lobby, the lobby is never quiet, but this small square of it, this ten feet between you and these two men. Both of them are reading the shield. Both of them are updating.\r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    \"I'm on the job,\" you say. \"And you two are a goddamn embarrassment to the uniform.\" You do not raise your voice. You do not have to. You let your gaze go briefly to the center of the lobby \u2014 to what happened there, to the thing nobody stopped \u2014 and then back."
+  - '"Civilians were dying twenty feet away from your position. Twenty feet. You had weapons, you had cover, and you ran your procedure while people died in front of you." You let that settle. "You want to put that in a report, or do you want to open this lock right now and let this stop being a conversation?"'
+  - "The taller officer goes red from the collar upward. It is not anger. It is shame, which is a far more useful emotion in this particular moment. His hands move to the luggage cart before his brain has finished the calculation \u2014 muscle memory in the presence of a superior, training overriding panic. He is already moving."
+  - "\"Yes, Officer. I'm sorry. We didn't know what to\u2014\""
+  - '"Save it," you say. "Get the lock."'
+  - Exit the Ascott Residency.
+  - "LOBBY \u2014 THE FRONT DOORS"
+  - You are done talking. There is nothing left to say that you have not already considered and discarded. You just walk.
+  - "\"I said hold\u2014\""
+  - "You reach out and take hold of the rifle barrel with one hand \u2014 not snatching, just a steady deliberate grip \u2014 and push it firmly and completely to the side. \r\n                    \r\n                    \r\n                        \r\n                            \r\n                                \r\n                                    The officer stumbles back a half-step, genuinely surprised, the kind of surprise that goes deeper than the physical. For one full, completely frozen second, his finger is still on the trigger and the muzzle is swinging in an arc that passes the younger officer's head, and everyone in that particular three feet of space is holding something very still."
+  - He does not pull it. His brain catches up with his body in time, by a narrow margin. The muzzle completes its arc and keeps going down. He is staring at you with an expression that does not have a common name.
+  - You already knew he would not pull it. You knew that before you reached for the barrel.
+  - You put your shoulder into the glass door. The lock is engaged but the door is old and the frame is not as solid as it looks, and under steady pressure it yields. The door swings outward and cold air hits your face immediately.
+  - You step through. The lobby noise drops away behind you like a switch being thrown.
+  - Vane comes through the door a half-second behind you and stops beside you on the sidewalk, blinking in the open air. He looks at the door. He looks at you. He breathes out, very slowly, through his nose. "Right," he says. "Okay. Still alive." He adjusts his grip on his camera case. "What now."
+  - Don't look back.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I hauled a three-thousand-dollar Pelican camera case down four flights of stairs in the dark... Turns out it's actually fantastic for bludgeoning dead people. Good to know.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I'm Vane. I'd tell you to follow my channel, but I'm pretty sure the internet just died. Thank you. Seriously. I was absolutely not winning that.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I'm Maya. And this is Lily... my niece.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: My sister didn't make it out of our floor. She made me promise to get Lily out. It's just been a day. Thank you... I didn't think we were going to make it.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: No. I'm sorry. I promised her mother I would keep her safe.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Those officers have guns and something solid in front of them. Right now that is what Lily needs \u2014 walls. I can't drag her back out into the open streets. Not right now."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Maya
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 3f4fef84dea53102746a7c74a08b6fb7, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You go. You clearly know what you are doing. More than I do.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Rush to help the young man.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Sprint to Reception
+    choiceSubtitle: Rush to help the woman and child.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Loot the Backpack
+    choiceSubtitle: Prioritize the supplies. Every second counts.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Head to Front Doors
+    choiceSubtitle: Ignore the chaos and head straight for the exit.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Engage the infected.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Take him with you.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: '''Stay low and out of sight. I''ve got more to do here.'''
+    choiceSubtitle: Leave him here to hide.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: '''You''re on your own from here.'''
+    choiceSubtitle: '[HUMANITY -5] Abandon him.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Retreat before it notices you.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Engage the infected.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Convince her to come with you.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: '''Stay low. Keep her quiet. I''ve got more to do.'''
+    choiceSubtitle: Leave her here to hide.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Retreat before it notices you.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Watch them head for the barricade.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Loot quickly and get out.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Look down
+    choiceSubtitle: Check your surroundings.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Sprint to Elevators
+    choiceSubtitle: Rush to help the young man.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Sprint to Reception
+    choiceSubtitle: Rush to help the woman and child.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Loot the Backpack
+    choiceSubtitle: Prioritize the supplies. Every second counts.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Head to Front Doors
+    choiceSubtitle: Ignore the chaos and head straight for the exit.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Walk up to the barricade.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[STR 6 / MELEE 2] You have the size or the combat experience to make him back down.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Talk your way through
+    choiceSubtitle: '[CHARISMA CHECK] Attempt to reason with them calmly.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Pull rank on them
+    choiceSubtitle: '[POLICE OFFICER] Use your badge to take control of the situation.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Shove through \u2014 you're not asking permission"
+    choiceSubtitle: '[RISK: CONFRONTATION] Force your way past the barricade. Costs 5 STAMINA.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 5
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Exit the Ascott Residency.
+    targetPassage: {fileID: 11400000, guid: 4ef649e41142f694b805521b5f6565db, type: 2}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Exit the Ascott Residency.
+    targetPassage: {fileID: 11400000, guid: 4ef649e41142f694b805521b5f6565db, type: 2}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: '[STR 6 / MELEE 2] Use your physical presence to force his hand.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Pull rank
+    choiceSubtitle: '[POLICE OFFICER] Use your badge to bypass the argument.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Shove through \u2014 done with this"
+    choiceSubtitle: '[RISK: CONFRONTATION] Force your way past the barricade. Costs 5 STAMINA.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Lobby_Entrance
+    targetRoomId: nw_room
+    timeMinutesCost: 1
+    staminaCost: 5
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Exit the Ascott Residency.
+    targetPassage: {fileID: 11400000, guid: 4ef649e41142f694b805521b5f6565db, type: 2}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: Don't look back.
+    targetPassage: {fileID: 11400000, guid: 4ef649e41142f694b805521b5f6565db, type: 2}
+    targetPassageId: Act2_TheStreet
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

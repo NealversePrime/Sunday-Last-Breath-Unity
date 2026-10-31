@@ -1,0 +1,673 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit_401
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Unit_401
+  passageTitle: UNIT 401
+  associatedRoomId: unit_401
+  backdropSprite: {fileID: 21300000, guid: db64ef4147af9134f8e35ae94909642a, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: '/* AUDIO: Muffled Pop Music Loop */'
+  narrativeBeats:
+  - /* Default Room Variables */
+  - /* Setup Physical Bypass Costs */
+  - UNIT 401 - THE PARTY THAT ENDED
+  - The door is wide open. The music hits you before the smell does. "...and we danced all night to the best song ever..."
+  - "Red solo cups are everywhere \u2014 crushed on the floor, stacked on the kitchen counter, floating in a punch bowl filled with something pink and congealed. The air is dense with stale beer and cheap cologne."
+  - You follow the hallway to the living room. That's where you find him.
+  - A massive oak entertainment center has toppled forward, catching a young, blond man across the chest and pinning him flat to the floor. The heavy wood must weigh at least three hundred pounds. His chest is not moving.
+  - His right arm is outstretched. His fingers are still loosely curled around a set of car keys.
+  - Looking at the deep scuff marks on the hardwood floor, it suddenly clicks. The rustling and heavy footsteps you heard from your room earlier... it was a stampede. When the panic started, everyone scrambled for the door. In the blind rush to escape, someone shoved the massive shelf, bringing it down on him as he was reaching for his keys. They left him behind.
+  - Behind the wreckage, the speakers keep going. "...danced all night to the best song ever..."
+  - "\U0001FA91 THE SHELF IS CRUSHING HIM. YOU NEED TO MOVE IT TO REACH THE KEYS."
+  - "\u274C LIFT FAILED. The oak shelf slipped from your grip and slammed back down. You tore a muscle in your back and lost HP."
+  - "[JOB] Cost:  STAMINA. You know exactly where the center of mass is. You tilt it easily.\r\n                                \r\n                            \r\n                                \r\n                                    Leverage weak points\n\r\n                                    [REQUIRES CONSTRUCTION WORKER] You lack the occupational knowledge to find the pivot point."
+  - "[BREACHER/IRON GRIP] Cost:  STAMINA. You lift it like it's cheap furniture.\r\n                                \r\n                            \r\n                                \r\n                                    Lift it clean\n\r\n                                    [REQUIRES BREACHER/IRON GRIP] You don't have the specialized physical training to lift this safely."
+  - "= 2>>\r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                    \r\n                                    [TECH 2] Cost:  STAMINA. You pop the hinges and break the shelf apart in pieces.\r\n                                \r\n                            \r\n                                \r\n                                    Dismantle the joints\n\r\n                                    [REQUIRES TECH 2] You don't know how to break down this furniture without tools."
+  - "\">>\r\n                                        \r\n                                        \r\n                                    \r\n                                    [ITEM] Cost:  STAMINA. You wedge the steel under the frame and use it as a fulcrum.\r\n                                \r\n                            \r\n                                \r\n                                    Pry it up with a tool\n\r\n                                    [REQUIRES PRYING TOOL] You don't have a crowbar or tire iron to create leverage."
+  - "= 6>>\r\n                                \r\n                                    \r\n                                        \r\n                                        \r\n                                    \r\n                                    [STR /6] Cost:  STAMINA. You plant your feet and muscle it upward. You are strong enough to do this cleanly.\r\n                                \r\n                            \r\n                                \r\n                                    \r\n                                        \r\n                                    \r\n                                    [STR /6] Cost:  STAMINA. You have no leverage and lack the raw strength. You will have to time your surge perfectly to avoid tearing a muscle."
+  - UNIT 401 - THE PARTY THAT ENDED
+  - The heavy oak shelf is off him.
+  - You straighten up slowly, hands shaking, lower back screaming from the effort. The car keys are safely in your palm. You don't remember prying them from his stiff fingers. Your hands just did it on autopilot.
+  - You look at his face once. Then you look away.
+  - The music keeps playing.
+  - '"...danced all night to the best song ever..."'
+  - The same three seconds loop over and over from a scratched CD. The apartment smells like beer, grief, and the particular staleness of a party that ended in sheer terror. You are the only living thing left in here. The place is yours.
+  - "\U0001F3B5 THE APARTMENT IS YOURS. WHAT DO YOU DO?"
+  - "Two energy bars and a sealed water bottle shoved to the back of a cabinet. Party food. Not much \u2014 but unopened."
+  - Painkillers and a bandage roll. Someone came to this party already hurting. Now you're taking their meds.
+  - Full bottles. Vodka for wounds, whiskey for everything else. Both make decent Molotov material.
+  - "A crumpled bill and a lighter. You leave the cash \u2014 money means nothing anymore. You take the lighter."
+  - "Turn off the music on this unit then the silence will replaces the noise.\r\n                        \r\n                    \r\n                        \r\n                            \U0001F507 The music is off. The silence in here is complete. It's worse."
+  - There's nothing left here. Just the body, the dark, and the silence where the music used to be.
+  dialogueLines:
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: '''He''s somebody''s kid. I didn''t know him. I''m not going to start crying for him now.'''
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: 'Leverage weak points [CONSTRUCTION]'
+    choiceSubtitle: '[JOB] Cost: > STAMINA. You know exactly where the center of mass is. You tilt it easily.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Car Keys
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Lift it clean [TRAIT]'
+    choiceSubtitle: '[BREACHER/IRON GRIP] Cost: > STAMINA. You lift it like it''s cheap furniture.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: BREACHER
+    requiredItem: 
+    consumesItem: 
+    givesItem: Car Keys
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Dismantle the joints [TECH 2]'
+    choiceSubtitle: '[TECH 2] Cost: > STAMINA. You pop the hinges and break the shelf apart in pieces.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 4
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: tech
+    requiredSkillLevel: 2
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Car Keys
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Pry it up with <<print $equip.weapon>>
+    choiceSubtitle: '[ITEM] Cost: > STAMINA. You wedge the steel under the frame and use it as a fulcrum.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Car Keys
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Deadlift with raw strength [STR 6/6]'
+    choiceSubtitle: '[STR >/6] Cost: > STAMINA. You plant your feet and muscle it upward. You are strong enough to do this cleanly.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Might
+    requiredStatValue: 6
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Car Keys
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: 'Throw your entire body weight into it [MINIGAME]'
+    choiceSubtitle: '[STR >/6] Cost: > STAMINA. You have no leverage and lack the raw strength. You will have to time your surge perfectly to avoid tearing a muscle.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 15
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: shelf_lifted
+    clearsStoryFlagOnExecute: 
+    triggerActionId: TRIGGER_QTE
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Car Keys
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Leave \u2014 the keys aren't worth the injury"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: WIN
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Car Keys
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: LOSE
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F355 Raid the kitchen (2 minutes)"
+    choiceSubtitle: "Two energy bars and a sealed water bottle shoved to the back of a cabinet. Party food. Not much \u2014 but unopened."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Energy Bar
+    givesItemQty: 2
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001FAA5 Check the medicine cabinet (2 minutes)"
+    choiceSubtitle: Painkillers and a bandage roll. Someone came to this party already hurting. Now you're taking their meds.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Painkillers
+    givesItemQty: 2
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F37A Take the alcohol from the counter (2 minutes)"
+    choiceSubtitle: Full bottles. Vodka for wounds, whiskey for everything else. Both make decent Molotov material.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Bottle of Vodka
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F50D Go through his jacket pockets (1 minute)"
+    choiceSubtitle: "A crumpled bill and a lighter. You leave the cash \u2014 money means nothing anymore. You take the lighter."
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Lighter
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F507 Turn off the music (1 minute)"
+    choiceSubtitle: Turn off the music on this unit then the silence will replaces the noise.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Unit_401
+    targetRoomId: unit_401
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Leave the apartment and return to the hallway"
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
+    targetPassageId: Hallway
+    targetRoomId: hallway_
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

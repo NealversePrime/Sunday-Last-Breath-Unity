@@ -1,0 +1,579 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_Armory_GearUp
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_Armory_GearUp
+  passageTitle: ACT3 ARMORY GEARUP
+  associatedRoomId: screening
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: /* DYNAMIC LEADER CONFIGURATION */
+  narrativeBeats:
+  - /* 1. INITIALIZE SANCTUARY STORAGE CHEST (RE-STYLE ITEM BOX) */
+  - /* 2. AUTOMATICALLY UNSEAL AND RETURN CONFISCATED WEAPONS */
+  - 0>>
+  - /* 3. ISSUE MILITARY TACTICAL HARNESS (+4 BAG SLOTS EXPANSION) */
+  - /* 4. TRACK SORTIE SELECTION & ONE-TIME GEAR UP FLAG */
+  - "GROUND FLOOR \u2014 SCREENING &amp; TACTICAL ARMORY CAGE"
+  - 'The overhead PA speaker in the screening cage pops and hums with harsh feedback. Evelyn''s voice cuts through the static, raw and breathless:'
+  - "\"Vance! Arthur's kid made it\u2014$firstName is alive! Break the seal on the intake lockers and release their confiscated gear immediately! Open the tier-one munitions crate. They are rolling with Reyes to Route 9 right now to get their father!\"\r\n                    \r\n                        \"Vance! _leaderName's partner is here\u2014it's $firstName! Release their weapons right now! Open the tier-one munitions crate. They are deploying with Reyes to Route 9 to get _leaderName back!\"\r\n                    \r\n                        \"Vance! It's Code Red\u2014Hayes's squad is pinned down! Give $firstName their weapons back immediately and open the heavy weapons crate! They are rolling with Reyes to Route 9 right now to get Hayes out!\""
+  - Sgt. Vance kicks the chain-link gate open before the transmission even finishes. The sharp scent of gun solvent, copper, and cosmoline fills the air. He drops your heavy canvas duffel onto the steel counter with a metallic clatter, his eyes darting between the masking-tape tag on the fabric and your face.
+  - He shakes his head, staring at you in sheer disbelief as he slashes the zip-tie seals on your bag with a combat blade.
+  - He shakes his head, staring at you in disbelief as he slashes the zip-tie seals on your bag with a combat blade.
+  - heard your voice, and Evelyn calls down... You're the one  wouldn't stop talking about since the convoy reached Timberline.">>
+  - left. Kept asking the gate guards if anyone matching your description had been spotted. Go bring  back in one piece.">>
+  - He slashes the zip-tie seals on your bag with a combat blade and dumps your iron onto the counter.
+  - He shoves a heavy, reinforced tactical chest harness across the scratched steel.
+  - "\u2714 CONFISCATED ARSENAL RESTORED: All personal weapons returned to your hands.\r\n                        \n\r\n                        \u2714 COMBAT HARNESS EQUIPPED: Carrying capacity expanded to  Slots (Current:  / ).\r\n                         0>>\r\n                            \n\r\n                            \U0001F4E6 SECURE LOCKER:  items stashed in Vance's cage."
+  - Vance drops a reinforced military footlocker onto the table, popping the heavy latches with his thumb.
+  - Sgt. Vance is hurriedly racking spare magazines into a secondary ammo box, sweat beading on his temple under the humming fluorescent tubes.
+  - "\u2714 SORTIE LOADOUT READY:  KIT LOCKED.\r\n                        \n\r\n                        \u2714 GEAR CAPACITY:  /  Slots in use.\r\n                         0>>\r\n                            \n\r\n                            \U0001F4E6 SECURE LOCKER:  items stashed in Vance's cage."
+  - "setup.items[i.id] && setup.items[i.id].type !== \"weapon\" && setup.items[i.id].type !== \"ammo\" && !setup.items[i.id].desc.includes(\"Medical\") && !setup.items[i.id].desc.includes(\"heals\") && i.id !== \"First Aid Kit\" && i.id !== \"Bandage\" && i.id !== \"Antibiotics\" && i.id !== \"Painkillers\")>>\r\n                \r\n                    \r\n                        \r\n                        = 0; _i-->>\r\n                            \r\n                            \r\n                            \r\n                                \r\n                                \r\n                            \r\n                        \r\n                        \r\n                    \r\n                    [BASE LOCKER] Stash non-essential books, trade items, and scrap into Vance's locked locker to maximize combat carrying capacity."
+  - "0>>\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                        \r\n                    \r\n                    [BASE LOCKER] Retrieve all items currently stored in Vance's lockbox."
+  - '[CQB SPECIALIST] Devastating close-quarters stopping power inside the convenience store. Blows through barricades and stops infected in their tracks.'
+  - '[RAPID FIREPOWER] High-velocity military carbine with lethal mid-range precision. Suppresses armed scavengers and cuts through body armor.'
+  - '[STEALTH FLANK] Silent takedowns and reusable arrows. Perfect for slipping through the alley behind the convenience store undetected.'
+  - '[FIELD MEDIC] Heavy emergency surgical supplies. Vital for stabilizing wounded survivors and patching catastrophic gunshot trauma.'
+  - "\U0001F512 Rescue Vehicle Locked: Select one of the emergency supply kits above to complete your preparations and unlock the departure vehicle.\r\n                \r\n            \r\n                \r\n                \r\n                    \r\n                        \r\n                            \r\n                            \r\n                            \r\n                            \r\n                        \r\n                        [ROLL OUT] Weapon ready, rig secured. Jump into the shotgun seat with Reyes and haul ass to Route 9!"
+  - Check on other survivors or visit the infirmary before departing.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: When you came through my screening desk an hour ago, I just saw another exhausted survivor with road mud on your boots. Wrote '$firstName $lastName' on the tape, tossed your bag onto the intake shelf, and told you to move along...
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: 'Then the radio room patches Arthur''s broadcast through, screaming your name over the horn, and Evelyn calls down sobbing... I looked down at this tag: $lastName. Holy hell. You''re Arthur and Evelyn''s kid.'
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Your old man checked that intake gate fifty times before he rolled out this morning. Kept asking the guards at the gate if any cars had come down the valley road. He was worried sick about you, kid. Now go drag him back out of that freezer.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: When you came through intake an hour ago, I didn't think twice. Tagged your bag, tossed it on the rack, and shoved you toward the foyer...
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Then the radio room patches the Route 9 distress call through, the whole floor hears _leaderName breaking down over the static when they heard your voice, and Evelyn calls down... You're the one they wouldn't stop talking about since the convoy reached Timberline.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: _leaderName practically wore a trench in my concrete pacing this room before they left. Kept asking the gate guards if anyone matching your description had been spotted. Go bring them back in one piece.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Then the radio room patches the Route 9 distress call through, the whole floor hears _leaderName breaking down over the static when <<print _subj>> heard your voice, and Evelyn calls down... You're the one <<print _subj>> wouldn't stop talking about since the convoy reached Timberline.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: _leaderName practically wore a trench in my concrete pacing this room before <<print _subj>> left. Kept asking the gate guards if anyone matching your description had been spotted. Go bring <<print _obj>> back in one piece.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: When you came through screening with Reyes, I figured you were just another mouth to feed. Now Evelyn calls down Code Red and Reyes tells me you're the one who dragged her through the road ambushes.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Commander Hayes didn't want to leave the perimeter, but the hospital ward was going dark. We can't afford to lose our chief tactician on that highway. Let's see what you've got.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You rolled in after sunrise with the valley roads crawling, barely got through intake, and now Evelyn's got you gearing right back up for broad daylight combat.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: You barely came in out of that freezing rain, boots still dripping wet from the road, and now Evelyn's got you rolling straight back out into the dark.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "No requisition slips, no signatures today. Here's your iron\u2014clean firing pins, full springs."
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Strap this on. Eight modular pouches and double utility sleeves. Don't go fumbling through a civilian backpack while some scav is dumping buckshot into your windshield.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "I don't care about the harness, Vance\u2014my dad has minutes left in that cooler. What kind of heavy ordnance did Evelyn clear for us?"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "I don't care about the harness, Vance\u2014_leaderName is holding that door with six bullets. What kind of fire did Evelyn authorize?"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Save the lecture, Vance. If we're breaching that 7-Eleven, we need serious stopping power. Show me what Evelyn authorized.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Listen close. That 7-Eleven is a damn kill box. You've got shattered plate glass, tight snack aisles, and an overturned fuel tanker leaking near the diesel pumps. One stray spark and the whole block turns into a funeral pyre.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Evelyn cleared ONE heavy loadout from our reserve crates. You want raw stopping power for the front door, range to countersnipe the scavs, stealth to flank the alley, or field trauma kits to patch up the wounded? Pick your package and lock it in\u2014Reyes is already revving the engine!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "You're loaded for bear, partner. Reyes has the truck idling by the back gate\u2014stop standing around staring at me! Every second you burn here is another second of glass bowing in that cooler. Get out there and bring them back!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "\U0001F4E6 Stash Non-Combat Clutter into Armory Locker - ITEM BOX"
+    choiceSubtitle: '[BASE LOCKER] Stash non-essential books, trade items, and scrap into Vance''s locked locker to maximize combat carrying capacity.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F4E6 Retrieve All Items from Armory Locker - ITEM BOX"
+    choiceSubtitle: '[BASE LOCKER] Retrieve all items currently stored in Vance''s lockbox.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F4A5 Requisition: Breacher Kit - REMINGTON 870 SHOTGUN + 12 SHELLS"
+    choiceSubtitle: '[CQB SPECIALIST] Devastating close-quarters stopping power inside the convenience store. Blows through barricades and stops infected in their tracks.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Remington 870
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F3AF Requisition: Marksman Kit - M4A1 ASSAULT RIFLE + 60 ROUNDS 5.56MM"
+    choiceSubtitle: '[RAPID FIREPOWER] High-velocity military carbine with lethal mid-range precision. Suppresses armed scavengers and cuts through body armor.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: M4A1
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F977 Requisition: Silent Infiltrator Kit - COMPOUND BOW + COMBAT KNIFE"
+    choiceSubtitle: '[STEALTH FLANK] Silent takedowns and reusable arrows. Perfect for slipping through the alley behind the convenience store undetected.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: Compound Bow
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F489 Requisition: Field Trauma Kit - 2 FIRST AID KITS, 3 BANDAGES, 1 ANTIBIOTICS"
+    choiceSubtitle: '[FIELD MEDIC] Heavy emergency surgical supplies. Vital for stabilizing wounded survivors and patching catastrophic gunshot trauma.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_Armory_GearUp
+    targetRoomId: screening
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: First Aid Kit
+    givesItemQty: 2
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F697 Mount up with Reyes in the Pickup & Roll Out - ROUTE 9 RESCUE"
+    choiceSubtitle: '[ROLL OUT] Weapon ready, rig secured. Jump into the shotgun seat with Reyes and haul ass to Route 9!'
+    targetPassage: {fileID: 11400000, guid: 9134829226e360b4aa284d04a8bd82d1, type: 2}
+    targetPassageId: Act3_7Eleven_Arrival
+    targetRoomId: seven_eleven
+    timeMinutesCost: 15
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F3EB Step back into Ground Floor Corridor - HUB"
+    choiceSubtitle: Check on other survivors or visit the infirmary before departing.
+    targetPassage: {fileID: 11400000, guid: 53c56bda0d2fecc46b3938a6bd856d17, type: 2}
+    targetPassageId: Act3_SchoolGFloor
+    targetRoomId: hall_g_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

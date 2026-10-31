@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Debug_Room
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Debug_Room
+  passageTitle: DEBUG ROOM
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "DEBUG / CHEAT ROOM - WITH PERK SWAPPER\n   ================================================================= */"
+  narrativeBeats:
+  - /* 1. FORCE GAME STATE VARIABLES */
+  - "\U0001F6E0\uFE0F DEBUG / CHEAT ROOM\n\"Simulation Mode Active. State: LIVE.\""
+  - 'Warning: Adding too many items will fill your bag. Use "CLEAR BAG" first.'
+  - "/* ===== PANEL 1: CHARACTER BUILD ===== */\n    \n        1. SET JOB"
+  - "/* ===== PANEL 1B: QUICK PERK SWAPPER ===== */\n    \n        \U0001F9EA PERK SWAPPER (Quick Test)"
+  - 'Current Perk:'
+  - "/* ===== PANEL 2: WEAPONS ===== */\n    \n        2. WEAPONS"
+  - "/* ===== PANEL 3: GEAR & AMMO ===== */\n    \n        3. GEAR / AMMO"
+  - "/* ===== PANEL 4: CONSUMABLES (USE TEST) ===== */\n    \n        4. TEST 'USE'"
+  - "/* ===== PANEL 5: TOOLS & JUNK ===== */\n    \n        5. UTILITY"
+  - "/* ===== PANEL 6: CONTROLS ===== */\n    \n        6. CONTROLS"
+  - "\U0001F4D6 TESTING GUIDE:"
+  - 'AUTOMATIC TRAITS (Test Immediately):'
+  - "STEADY HANDS: Pick a gun. Note hit % WITHOUT perk. Swap to STEADY HANDS. Hit % should be +15. \u2705\n    FIELD MEDIC: Get low HP. Use First Aid Kit WITHOUT perk (heals 15). Clear perk. Use FIELD MEDIC perk (heals 30). \u2705\n    GARDENER: Use Energy Bar WITHOUT perk (50 stamina). Use with GARDENER perk (75 stamina). \u2705\n    BASEBALL: Start combat. Without perk, crits ~15%. With BASEBALL, crits ~30%. \u2705\n    BOXER: Start combat unarmed. Without perk: \"\U0001F44A You shoved/stomped...\" With perk: \"\U0001F44A\U0001F4A5 BRUTAL!\" \u2705\n    WATCHMAN: Time doesn't pass in debug, but logic checks for night (7 PM - 6 AM). \u2705\n    ADRENALINE: Get HP below 50%. Start combat. Skill bonus should be +10. \u2705\n    GAMER: Look at sidebar - should show \"\U0001F4CA Hit Chance: XX%\" when GAMER is active. \u2705\n    GAMBLER: Combat - 10% crit, 10% auto-miss for chaotic moments. \u2705"
+  - 'STORY-GATING TRAITS:'
+  - "Create passages with locked doors, vehicles, etc.\n    Use the copy-paste patterns from STORY_GATING_QUICK_REFERENCE.txt\n    Test with and without perks to confirm gating works"
+  - "\u2B07 CHECK FLOOR ITEMS BELOW \u2B07"
+  dialogueLines: []
+  initialFloorItems: []
+  choices: []

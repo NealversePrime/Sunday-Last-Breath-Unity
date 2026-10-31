@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Title
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Title
+  passageTitle: TITLE
+  associatedRoomId: title-screen
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: /* START MAIN MENU MUSIC */
+  narrativeBeats:
+  - "EARLY ACCESS v1.0.0 | BUILD 2026 \n\r\n    COPYRIGHT \xA9 2026 NEALVERSE STUDIO"
+  - "PART I : DAY ZERO \n\r\n        \"The world ends today. Survival starts tomorrow.\"\r\n        \r\n        \r\n        \r\n        \r\n            \r\n            /* Stop music and jump to game! */"
+  dialogueLines: []
+  initialFloorItems: []
+  choices: []

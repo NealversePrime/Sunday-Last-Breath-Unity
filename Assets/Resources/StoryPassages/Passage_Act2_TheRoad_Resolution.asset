@@ -1,0 +1,280 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act2_TheRoad_Resolution
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act2_TheRoad_Resolution
+  passageTitle: ACT2 THEROAD RESOLUTION
+  associatedRoomId: 
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: THE DESTINATION
+  narrativeBeats:
+  - "/* =================================================================\r\n               BRANCH A: VANE IS WITH THE PLAYER\r\n            ================================================================= */\r\n            \r\n                \r\n                \n\r\n                \r\n                \r\n                \r\n                    \r\n                    \n\r\n                    Vane leans his head against the window, watching the smoke rise in the distance. He lets out a dry breath."
+  - Vane manages a faint, tired smile.
+  - Vane manages a faint, tired smile.
+  - Vane manages a faint, tired smile.
+  - Vane manages a faint, tired smile.
+  - "/* =================================================================\r\n               BRANCH B: ALONE (NO VANE)\r\n            ================================================================= */\r\n            \r\n                \r\n                \r\n                    You say it aloud to the empty car. \"Nowhere.\""
+  - "You don't have anyone waiting for you. There is no tragic rescue mission in your future. There is only the road, the fuel in the tank, and your own heartbeat. You are going to survive because you refuse to die here. That has to be enough.\r\n                    \r\n                \r\n                    You close your eyes for a brief second. You picture your folks. Safe, hopefully. Far away from the concrete and the sirens and the blood."
+  - If anyone is okay out there, it's them. Your dad's been preparing for doomsday since the 90s, and your mom is terrifying when her routine is interrupted. You guarantee they took over the neighborhood block watch by breakfast.
+  - "You promised you'd be there. If you die in this city, you break that promise. The thought acts like a physical brace against your spine. The shaking in your hands stops. Your grip on the wheel becomes iron.\r\n                    \r\n                \r\n                    You close your eyes for a brief second. You picture your $anchor_rel, $anchor_name. Safe, hopefully. Far away from the concrete and the sirens and the blood."
+  - If anyone is okay out there, it's her. She's a high school vice principal. You think this chaos is a crisis? Try managing five hundred teenagers during a fire drill. Give her a megaphone and she'll have a militia organized by lunch.
+  - "You promised you'd be there. If you die in this city, you break that promise. The thought acts like a physical brace against your spine. The shaking in your hands stops. Your grip on the wheel becomes iron.\r\n                    \r\n                \r\n                    You close your eyes for a brief second. You picture your $anchor_rel, $anchor_name. Safe, hopefully. Far away from the concrete and the sirens and the blood."
+  - If anyone is okay out there, it's him. He's a high school athletic director. Too stubborn to die. He's used to screaming at people until they get in line and follow the play. Give him five minutes and he'd probably have the whole neighborhood drafted into a defensive line.
+  - "You promised you'd be there. If you die in this city, you break that promise. The thought acts like a physical brace against your spine. The shaking in your hands stops. Your grip on the wheel becomes iron.\r\n                    \r\n                \r\n                    You close your eyes for a brief second. You picture your $anchor_rel, $anchor_name. Safe, hopefully. Far away from the concrete and the sirens and the blood."
+  - If anyone is okay out there, it's them. They're a high school counselor, an absolute force of nature. You think this chaos is bad? Try dealing with three hundred panicking kids. Give them five minutes and they'll have a fortified commune up and running.
+  - You promised you'd be there. If you die in this city, you break that promise. The thought acts like a physical brace against your spine. The shaking in your hands stops. Your grip on the wheel becomes iron.
+  - "/* --- STAT RECOVERY & TRANSITION --- */\r\n            \r\n                [+10 HUMANITY] [+20 STAMINA]"
+  - You shift the car into gear. You don't look back at the burning city. You drive into the night.
+  - /* --- Final Button to next Act --- */
+  dialogueLines:
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Okay. So. We have a car, we have... whatever this is. Where exactly are we going?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Nowhere. I don't have anyone waiting for me. We just drive until we hit the mountains. We find somewhere defensible, and we survive. That's the plan.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Right. No itinerary. No brand guidelines. Just survive. Honestly... sounds better than my last press tour. Let's do it.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Out of the city. We're finding my folks.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Think they're okay out there?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: If anyone is, it's them. My dad's been preparing for doomsday since the 90s, and my mom is terrifying when her routine is interrupted. I guarantee they took over the neighborhood block watch by breakfast.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Terrifying is good. Terrifying is what we need. Maybe she can adopt me. My management team definitely isn't returning my emails right now. Let's go find them.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Out of the city. We're finding my $anchor_rel, $anchor_name.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Think she's okay out there?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Honestly? I'm more worried about whatever gets in her way. She's a high school vice principal. You think this chaos is a crisis? Try managing five hundred teenagers during a fire drill.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: A high school vice principal? Oh, yeah. She's definitely fine. Anyone who can handle that level of teen angst is probably running her own warlord compound by now. Let's go find her.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Out of the city. We're finding my $anchor_rel, $anchor_name.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Think he's okay out there?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Honestly? I'm more worried about whatever gets in his way. He's a high school athletic director. He's used to screaming at people until they get in line and follow the play.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: An athletic director? So, basically a professional yeller. Yeah, he's fine. He's probably drafted the entire cul-de-sac into a defensive perimeter by now. Let's go find him.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Out of the city. We're finding my $anchor_rel, $anchor_name.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Think they're okay out there?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: You
+    side: 0
+    avatarSprite: {fileID: 21300000, guid: 04a95c7136264fc6d4e69cfcfe253bf5, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Honestly? I'm more worried about whatever gets in their way. They're a high school counselor. You think this chaos is bad? Try dealing with three hundred panicking kids. They know exactly how to make people listen.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Vane
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: bb691f92d5ba23e60c2959dde5ee2a01, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: A high school counselor? Dealing with teen drama is basically psychological warfare. They definitely know how to manipulate people into surviving. Let's go find them.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: 'CONTINUE TO ACT 2: EXODUS'
+    choiceSubtitle: 
+    targetPassage: {fileID: 11400000, guid: 9c108d1c05930ad4f8818c9d699931f5, type: 2}
+    targetPassageId: Act2_Highway
+    targetRoomId: 
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

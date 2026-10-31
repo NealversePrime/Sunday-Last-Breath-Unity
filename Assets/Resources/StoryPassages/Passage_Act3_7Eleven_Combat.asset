@@ -1,0 +1,272 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_7Eleven_Combat
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_7Eleven_Combat
+  passageTitle: ACT3 7ELEVEN COMBAT
+  associatedRoomId: seven_eleven_interior
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: '/* Initialize combat enemies */
+
+    /* DYNAMIC LEADER CONFIGURATION */'
+  narrativeBeats:
+  - /* Initialize combat enemies if not already set */
+  - "7-ELEVEN \u2014 MAIN CONVENIENCE STORE FLOOR"
+  - "7-ELEVEN \u2014 INTERIOR BREACH &amp; COMBAT"
+  - "0>>\r\n    You and Reyes kick through the shattered double glass doors, firing into the smoke!"
+  - Toppled snack shelves, spilled soda cans, and bloodstained linoleum fill the store. Two armed scavengers and a snarling infected turn toward you with raised weapons!
+  - Behind the thick glass of the walk-in beverage cooler at the back, Commander Miller and his surviving guard bleed on the floor, holding the steel door shut!
+  - "HOSTILES REMAINING: \r\n        \r\n            \r\n                \r\n                    TARGET: _e.name (HP: _e.hp/_e.maxHp)"
+  - "/* Deal damage to first enemy */\r\n                \r\n                \r\n                    \r\n                \r\n                \r\n            \r\n            Engage the hostiles pinning down Commander Miller.\r\n        \r\n    \r\n        \r\n            \r\n                 0>>\r\n                    You and Reyes kick straight through the jagged glass doorway, rolling behind toppled merchandise racks as automatic fire chews through the ceiling tiles!"
+  - Shattered snack jars, sticky syrup, and pools of blood coat the floor tiles. Armed scavengers scream in surprise while infected tear at the counter barricades!
+  - Behind the bullet-pocked glass of the walk-in beverage cooler at the far wall,  and an injured scout are crouched low, holding the steel handle against the mob.
+  - "HOSTILES ENGAGED:  REMAINING\r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    _e.name\r\n                                    HP: _e.hp / _e.maxHp"
+  - "\U0001F480\r\n        ALL HOSTILES ELIMINATED\r\n        \n\r\n        [+50 XP] [+25 TRUST]\r\n        \r\n        \r\n    \r\n                \r\n                    \r\n                    \r\n                        \U0001F480\r\n                        ALL HOSTILES NEUTRALIZED\r\n                        \r\n                            [+50 XP] &bull; [+25 TRUST] &bull; COMBAT OBJECTIVE CLEARED"
+  - The gunshots die down, replaced by the hiss of leaking refrigerator freon and dying groans.
+  - "The heavy steel walk-in cooler door creaks open. Commander Miller steps out, a bloodied bandage wrapped tight around his shoulder, holding a shotgun in one hand and a heavy jerrycan of diesel fuel in the other.\r\n                    The sharp crackle of gunfire fades, replaced by the low hiss of leaking refrigerator freon and the steady drizzle of rain outside."
+  - With a metallic heave, the heavy walk-in cooler door clangs open.  emerges into the smoke, a makeshift tourniquet tied around one arm, gripping a pump-action shotgun in one hand and a heavy jerrycan of diesel fuel in the other.
+  - /* REWARD LIFECYCLE */
+  - /* COMPLETE RESCUE OBJECTIVE */
+  - "[MISSION COMPLETE] Return triumphantly to the high school sanctuary.\r\n        \r\n        \r\n             0>>\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                        \r\n                            \r\n                        \r\n                        \r\n                    \r\n                    [TARGET ENGAGEMENT] Concentrate fire with Reyes on the lead hostile pinning down the cooler.\r\n                \r\n            \r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                    \r\n                    [VICTORY RETURN] Load the fuel and escort the Sanctuary Leader safely back to command."
+  dialogueLines:
+  - introNarration: 
+    speakerName: Commander Miller (Cooler)
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Reyes! Flank the shooters! Don't let them hit the fuel canisters!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Dad
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 55a158dea642682c29a4feceded6d2cc, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: $firstName?! God Almighty... is that really you?! Your mother told me you were lost in the valley! You fought your way all the way out here for me!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Commander Hayes
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 303440381b4c9b01134bffd26dd5e479, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Outstanding shooting, $firstName. If you and Reyes hadn't breached when you did, we'd be dog meat in that cooler. Timberline owes you everything.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Commander Miller
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Good shooting, kid. If you and Reyes hadn't breached when you did, we'd be dog meat in that cooler.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Commander Miller
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I heard you got into Timberline late after sunrise. You've already proven your worth twice over.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Commander Miller
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: I heard you arrived early before the rain started. Fast on your feet and steady under fire. Exactly what Timberline needs.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "\U0001F4A5 Open Fire on the Scavengers"
+    choiceSubtitle: Engage the hostiles pinning down Commander Miller.
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_7Eleven_Combat
+    targetRoomId: seven_eleven_interior
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F697 Escort Commander Miller back to Timberline Sanctuary"
+    choiceSubtitle: '[MISSION COMPLETE] Return triumphantly to the high school sanctuary.'
+    targetPassage: {fileID: 0}
+    targetPassageId: 
+    targetRoomId: 
+    timeMinutesCost: 15
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F4A5 Open Fire on Hostiles [ATTACK]"
+    choiceSubtitle: '[TARGET ENGAGEMENT] Concentrate fire with Reyes on the lead hostile pinning down the cooler.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_7Eleven_Combat
+    targetRoomId: seven_eleven_interior
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F697 Escort Leader & Fuel Back to Timberline High School [MISSION COMPLETE]"
+    choiceSubtitle: '[VICTORY RETURN] Load the fuel and escort the Sanctuary Leader safely back to command.'
+    targetPassage: {fileID: 11400000, guid: 26a97faf525dcd5429251fbea2c30c41, type: 2}
+    targetPassageId: Act3_7Eleven_RescueSuccess
+    targetRoomId: headmaster_office
+    timeMinutesCost: 15
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

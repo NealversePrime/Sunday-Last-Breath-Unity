@@ -1,0 +1,174 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_School_Screening
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_School_Screening
+  passageTitle: ACT3 SCHOOL SCREENING
+  associatedRoomId: screening
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "GROUND FLOOR \u2014 SCREENING ROOM"
+  narrativeBeats:
+  - Sgt. Vance rubs his bloodshot eyes and takes a slow drink from a thermos of cold coffee. He mechanically inspects incoming gear and logs refugee contraband. He doesn't even look up from his clipboard as you walk past.
+  - "Sgt. Vance is yelling over the arguments of fresh, panicked refugees. He aggressively inspects incoming gear and logs refugee contraband, keeping one hand resting on his sidearm just in case someone loses their nerve.\r\n                \r\n            \r\n        \r\n        \r\n             0>>\r\n                \r\n                    \r\n                        \r\n                        \r\n                        \r\n                        \r\n                    \r\n                    [ITEM BOX] Take back all items stored in Vance's base lockbox.\r\n                \r\n            \r\n            \r\n                \r\n                    \r\n                    \r\n                \r\n                Walk straight into the Main Security Foyer.\r\n            \r\n            \r\n                \r\n                    \r\n                    \r\n                \r\n                Return to the Screening Junction corridor."
+  dialogueLines:
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Hands visible. Weapons tagged. Don't make me repeat it... I'm too tired to repeat it.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Sgt. Vance
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 75ddbd3fc3b3df6ee8d282c35e71fe95, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Keep your hands visible while you're in the foyer! All heavy weapons stay tagged in the locker! Step back!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "\U0001F4E6 Retrieve Stashed Items from Sanctuary Locker - ITEM BOX"
+    choiceSubtitle: '[ITEM BOX] Take back all items stored in Vance''s base lockbox.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_Screening
+    targetRoomId: screening
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Exit Screening to Foyer - WEST"
+    choiceSubtitle: Walk straight into the Main Security Foyer.
+    targetPassage: {fileID: 11400000, guid: d280d2ac325b42e49b49a5add6bb370c, type: 2}
+    targetPassageId: Act3_School_Foyer
+    targetRoomId: security_foyer
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\u2B06\uFE0F Exit Screening to East Hallway - NORTH"
+    choiceSubtitle: Return to the Screening Junction corridor.
+    targetPassage: {fileID: 11400000, guid: 53c56bda0d2fecc46b3938a6bd856d17, type: 2}
+    targetPassageId: Act3_SchoolGFloor
+    targetRoomId: hall_g_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

@@ -1,0 +1,284 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_School_RadioRoom
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_School_RadioRoom
+  passageTitle: ACT3 SCHOOL RADIOROOM
+  associatedRoomId: radio_room
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "1ST FLOOR \u2014 SECURITY COMMS & RADIO ROOM"
+  narrativeBeats:
+  - The school's former audio-visual control booth has been converted into an emergency communications center. Heavy coaxial cables snake out through an open acoustic vent toward the rooftop antenna array, taped to the floor with yellow hazard markers.
+  - Banks of surplus transceivers and scanner monitors flicker against the wall, their needle meters twitching erratically through static.
+  - "Cold morning light washes through the high ventilation grate. The booth is filled with the dull, continuous thrum of the emergency generator and the smell of warm electrical plastic. The airwaves are eerily quiet\u2014the chaotic live distress calls of the midnight outbreak have died away, leaving only automated loops.\r\n                \r\n                    The booth is bathed in the amber glow of vacuum tubes and radio dials. Through the wall speakers, broken radio calls hiss and pop violently\u2014distant sirens, frantic civilian transmissions, and shouted police codes echoing from the dark valley below."
+  - Hunched over the primary transceiver is a young woman in an oversized jacket, wearing heavy dual-cup headphones. Her hands move rapidly across the frequency dials, desperately fighting through the background squeal.
+  - She lowers her headset around her neck and rubs exhausted, bloodshot eyes as you step inside.
+  - She hears your boots on the linoleum, rips one earcup back from her ear, and looks up with wide, adrenaline-fueled eyes.
+  - The transmitter console hums smoothly now. The transformer's status LED burns a steady, reassuring green. Chloe looks up from the monitor desk with a relieved smile.
+  - She hands you a secondary pair of monitoring headphones connected to the console.
+  - "[LORE UNLOCKED] Listen to regional military feeds on Highway 99.\r\n                            \r\n                        \r\n                    \r\n                        \r\n                            \r\n                                You recall the chilling automated message: \"All civilian evacuation corridors across Western Washington are declared uncontained. Surviving safe zones are instructed to hold in place. There is no active perimeter.\"\r\n                            \r\n                                You recall the frantic screams over the radio: \"Barricade Nine is overrun! Fall back across the river, blow the spans!\" The entire highway corridor out of the city is gone."
+  - Chloe is staring helplessly at the scorched transformer box beneath the primary receiver console.
+  - "i.id === \"Fuse\" || i.id === \"Batteries\" || i.id === \"Multi-Tool\")>>\r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                     i.id === \"Fuse\")>>\r\n                                        \r\n                                     i.id === \"Batteries\")>>\r\n                                        \r\n                                    \r\n                                    \r\n                                \r\n                                [+20 TRUST] [+35 XP] Splice the wiring and restore the receiver transformer.\r\n                            \r\n                        \r\n                        \r\n                            \r\n                                \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                    \r\n                                \r\n                                Agree to look for electrical components in the school (MEP mechanical space / lab)."
+  - Return to West Hallway 2.
+  dialogueLines:
+  - introNarration: 
+    speakerName: Radio Operator
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Static... endless static. Where did everyone go?
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Radio Operator
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Didn't hear you come in. The live channels went dead hours before sunrise. I'm Chloe. Our backup generator surged overnight and fried the HF receiver circuit. I'm trying to catch the automated morning military beacons, but without parts to bridge the transformer, we have no idea if any safe zones are still standing outside this valley.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Radio Operator
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: Come on, lock in... don't drop out on me! Stay on channel!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Radio Operator
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Sorry! The municipal grid blew thirty minutes ago and sent a surge that cracked our antenna bridge! I was actively tracking Sheriff dispatch at the south bridge\u2014they're falling back right now! I'm Chloe. I'm trying to hold this rig together, but without replacement parts, we're completely blind to the escape routes!"
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Chloe
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: That replacement component saved the rig. I finally locked onto the regional high-frequency emergency broadcast. It's automated, but... you need to hear this.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Chloe
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: That part stabilized the bridge just in time! The antenna is pulling live tactical transmissions from the highway units right now. Put this on.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Chloe
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The generator spikes melted my circuit trace. If you can scavenge a Fuse, Batteries, or a Multi-Tool from the school workshops, I can rewire the high-frequency tuner and see if anyone outside is responding to our calls.
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  - introNarration: 
+    speakerName: Chloe
+    side: 1
+    avatarSprite: {fileID: 21300000, guid: 18bd2a9c51ba5d9b554c4f68d578bf88, type: 3}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: The power surge fried my transformer bridge. If you've got a Fuse, Batteries, or a Multi-Tool from downstairs, I can splice the line and catch the evacuation orders before the towers go dead!
+    outroNarration: 
+    requiresStoryFlag: 
+    requiresNotFlag: 
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Listen to regional radio transmissions [LORE] \u25BC"
+    choiceSubtitle: '[LORE UNLOCKED] Listen to regional military feeds on Highway 99.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_RadioRoom
+    targetRoomId: radio_room
+    timeMinutesCost: 10
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Fix Chloe's radio relay with your electrical parts [INVENTORY] \u25BC"
+    choiceSubtitle: '[+20 TRUST] [+35 XP] Splice the wiring and restore the receiver transformer.'
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_RadioRoom
+    targetRoomId: radio_room
+    timeMinutesCost: 15
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Offer to find replacement parts for the relay \u25BC"
+    choiceSubtitle: Agree to look for electrical components in the school (MEP mechanical space / lab).
+    targetPassage: {fileID: 11400000}
+    targetPassageId: Act3_School_RadioRoom
+    targetRoomId: radio_room
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "\U0001F6AA Exit Radio Room to Hallway [EAST]"
+    choiceSubtitle: Return to West Hallway 2.
+    targetPassage: {fileID: 11400000, guid: e47cd5da9b30be448aeca1f1111e10a7, type: 2}
+    targetPassageId: Act3_School1Floor
+    targetRoomId: hall_1_center
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

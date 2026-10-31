@@ -1,0 +1,176 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Act3_Arrival
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: Act3_Arrival
+  passageTitle: ACT3 ARRIVAL
+  associatedRoomId: town_outskirts
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: 
+  storyText: "/* =====================================================================\r\n     ACT 3: ARRIVAL \u2014 INITIALIZATION & STATE CHECK\r\n     =====================================================================\r\n*/"
+  narrativeBeats:
+  - /* Act 3 one-time state init */
+  - /* 1. AUDIO TRANSITION */
+  - /* 2. ARRIVAL TIME LOGIC */
+  - /* 3. MODULAR DIALOGUE PRE-PROCESSING */
+  - 'ACT 3: TIMBERLINE OUTSKIRTS'
+  - /* --- VISUALS --- */
+  - "/* --- 1. ATMOSPHERIC ARRIVAL TEXT --- */\r\n                \r\n                    The sedan's engine idles in a low, sputtering rattle as you coast down the hill. A pale, freezing mist rises off the wet asphalt, lit by a weak gray morning sun struggling to pierce the thick canopy of pines."
+  - "You slept a few hours at the cabin, but exhaustion still sits heavy in your joints. The air out here carries the smell of pine resin and dead leaves. Clean, compared to the smoke-choked city. But it is too quiet. The kind of quiet that means all the birds left.\r\n                \r\n                    You have been driving on fumes for hours\u2014steering through freezing rain until it died into a thick, suffocating fog. The road is pitch black, headlights cutting weak cones through mist that swallows landmarks whole."
+  - It is the dead of night. The cold, hollow hours before dawn when even your own breathing feels like a violation of the silence. Your eyes burn.
+  - 'You bring the car to a crawl at a skewed intersection. A rusted metal signpost hangs from a bent post overhead, bullet-pocked and tilted from what might have been a vehicle impact days ago:'
+  - "WELCOME TO TIMBERLINE \u2014 POP. 4,200"
+  - The outskirts. Less dense than the concrete maze you fled, but the virus doesn't care about zip codes. The ditches are littered with abandoned cars, doors left wide open to the cold as if their owners simply stepped out and never came back.
+  - "/* --- 2. THE STAKES (INDEPENDENT COMPANION CHECKS) --- */\r\n                                                \r\n                                                    Vane nervously taps the dashboard fuel gauge. The needle is buried entirely past the red line. \"We're completely out of gas. Whatever we pick here, we're committing on foot if we're wrong.\""
+  - In the back of your sedan, Maya rubs her seven-year-old niece's arms. Lily's lips are pale from the dropping temperature. "Lily is freezing. We need to get inside somewhere. Just pick a safe door."
+  - Outside, Diane's pickup truck rolls to a stop alongside your sedan. She rolls down her rain-slicked window, glancing back at her sleeping twins in her backseat. "My boys need to get out of this cold. Pick a door, I'll follow your lead."
+  - You tap the dashboard. The fuel gauge is dead. The silence inside the cabin is heavy and suffocating. You are completely alone, and whatever you choose here, you are committing to it on foot.
+  - You cut the headlights. Through the fogged windshield, two structures emerge from the mist at the fork in the road.
+  - 'To the left: a squat, reinforced concrete block of a building behind a chain-link fence. Barred windows. A heavy steel door. A rusted blue star emblem on the facade, too dirty to read from here. No lights visible. The front approach is partially blocked by what looks like a pile of dark debris.'
+  - 'To the right: an overgrown cul-de-sac winds into a dark suburban development. Prominent at the corner, a large two-story colonial home. In the mist, you can see one of the ground-floor windows has been covered from the inside with what appears to be a dark curtain or blanket. The front door is closed. The porch light is dead.'
+  - Two options. Very different silences. You need to decide.
+  - /* --- 3. CHOICE MENU --- */
+  - "/* Option A: Sheriff Substation */\r\n                                                    \r\n                                                        \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                        \r\n                                                        The reinforced structure behind the fence. It looks like it was built to last."
+  - "/* Option B: Suburban Home */\r\n                                                    \r\n                                                        \r\n                                                            \r\n                                                            \r\n                                                            \r\n                                                        \r\n                                                        The colonial house with the intact windows. Someone covered the ground floor from the inside."
+  - "/* Option C: Observe First */\r\n                                                    = 5 or hasTrait(\"NIGHT OWL\") or hasTrait(\"TRACKER\") or $skills.stealth >= 2>>\r\n                                                        \r\n                                                            \r\n                                                                \r\n                                                                \r\n                                                                \r\n                                                            \r\n                                                            [PER 5 / STEALTH 2 / TRACKER] 10 Minutes. Spend time tracking and reading the environment for hidden tactical details before committing.\r\n                                                        \r\n                                                    \r\n                                                        \r\n                                                            Observe from a distance first\n\r\n                                                            [REQUIRES PER 5 / STEALTH 2 / TRACKER] You lack the trained eye to read the environment for hidden clues before moving."
+  dialogueLines: []
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Next \u25BC"
+    choiceSubtitle: The reinforced structure behind the fence. It looks like it was built to last.
+    targetPassage: {fileID: 11400000, guid: 94ba0632fa4355e45ab68120bdae3097, type: 2}
+    targetPassageId: Act3_Sheriff
+    targetRoomId: 
+    timeMinutesCost: 15
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Search the two-story home to the right
+    choiceSubtitle: The colonial house with the intact windows. Someone covered the ground floor from the inside.
+    targetPassage: {fileID: 11400000, guid: be7c548b340c2ef498d9edbfb1d4ef94, type: 2}
+    targetPassageId: Act3_Home
+    targetRoomId: 
+    timeMinutesCost: 15
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: 
+    requiredStatValue: 0
+    requiredSkill: 
+    requiredSkillLevel: 0
+    requiredTrait: 
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: Kill the engine and observe both locations first
+    choiceSubtitle: '[PER 5 / STEALTH 2 / TRACKER] 10 Minutes. Spend time tracking and reading the environment for hidden tactical details before committing.'
+    targetPassage: {fileID: 11400000, guid: 600debc96e8aab9459b02776ef4dd461, type: 2}
+    targetPassageId: Act3_Arrival_Observe
+    targetRoomId: town_outskirts
+    timeMinutesCost: 10
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 
+    requiresNotFlag: 
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 
+    clearsStoryFlagOnExecute: 
+    triggerActionId: 
+    requirementMode: 0
+    requiredStat: Observation
+    requiredStatValue: 5
+    requiredSkill: stealth
+    requiredSkillLevel: 2
+    requiredTrait: NIGHT OWL
+    requiredItem: 
+    consumesItem: 
+    givesItem: 
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: 
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
