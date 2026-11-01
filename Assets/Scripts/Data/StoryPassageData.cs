@@ -169,9 +169,15 @@ namespace SundayLastBreath.Data
         public string clearsStoryFlagOnExecute = "";
 
         [Header("Interactive Minigames & Special Triggers")]
-        [Tooltip("Special action ID triggered instead of standard immediate transition (e.g. 'OPEN_KEYPAD_MODAL').")]
+        [Tooltip("Special action ID triggered instead of standard immediate transition (e.g. 'OPEN_KEYPAD_MODAL', 'OPEN_LOCKPICK_MODAL', 'OPEN_COMBAT_MODAL').")]
         [TriggerActionDropdown]
         public string triggerActionId = "";
+
+        [Tooltip("Optional list of Enemy Profile assets to spawn when triggerActionId is 'OPEN_COMBAT_MODAL'. Drag & drop CombatEnemyProfile assets here!")]
+        public List<CombatEnemyProfile> combatEnemies = new List<CombatEnemyProfile>();
+
+        [Tooltip("Optional comma-separated enemy IDs to spawn if combatEnemies list is empty (e.g. 'zombie_commuter,zombie_guard').")]
+        public string combatEnemyIdsCsv = "";
 
         [Header("RPG Checks (M.O.R.T.A.L., Skills & Traits)")]
         [Tooltip("If AnyCanBeMet, fulfilling ANY one requirement (Stat, Skill, Trait, or Item) allows this choice. If AllMustBeMet, ALL specified requirements must be met.")]

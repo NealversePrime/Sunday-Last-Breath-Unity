@@ -623,6 +623,12 @@ namespace SundayLastBreath.Editor
                 {
                     choice.triggerActionId = "OPEN_LOCKPICK_MODAL";
                 }
+                else if (body.IndexOf("combatTurn", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         label.IndexOf("ATTACK TARGET", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         label.IndexOf("ENGAGE HOSTILE", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    choice.triggerActionId = "OPEN_COMBAT_MODAL";
+                }
 
                 // Extract Preceding Requirements (Trait / Job / Skill / Stat)
                 int checkWindow = Mathf.Min(350, m.Index);

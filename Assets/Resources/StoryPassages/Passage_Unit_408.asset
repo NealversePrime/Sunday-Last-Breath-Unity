@@ -456,7 +456,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Give up and return to the hallway"
+  - choiceLabel: "[DOOR] Give up and return to the hallway"
     choiceSubtitle: 
     targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
     targetPassageId: Hallway
@@ -776,7 +776,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Leave the study and return to the hallway"
+  - choiceLabel: "[DOOR] Leave the study and return to the hallway"
     choiceSubtitle: 
     targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
     targetPassageId: Hallway

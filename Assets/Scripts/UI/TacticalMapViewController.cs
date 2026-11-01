@@ -93,9 +93,25 @@ namespace SundayLastBreath.UI
             public Button button;
         }
 
+        [System.Serializable]
+        public class DoorwayUIHolder
+        {
+            public string doorId;
+            public string roomA;
+            public string roomB;
+            public Vector2 position;
+            public Vector2 size;
+            public GameObject rootObj;
+            public Image lineImg;
+            public Image glowImg;
+            public bool isGlowing;
+        }
+
         [Header("Runtime State")]
         [SerializeField] private string currentLocationId = "unit_407";
+        [SerializeField] private string currentThresholdRoomId = null;
         [SerializeField] private string selectedNodeId = "unit_407";
+        private readonly List<DoorwayUIHolder> doorwayHolders = new List<DoorwayUIHolder>();
 
         [Header("Modular Floor Data (Optional ScriptableObject)")]
         [SerializeField] private TacticalFloorMapData currentFloorData;
@@ -611,26 +627,51 @@ namespace SundayLastBreath.UI
                     if (!isAscott4F)
                     {
                         holder.rootObj.SetActive(false);
+                        continue;
                     }
-                    else
-                    {
-                        holder.rootObj.SetActive(true);
 
-                        if (holder.bgImage != null)
+                    // Check if this holder's node is actually used in current floor
+                    bool isRoomInFloor = false;
+                    if (currentFloorData != null && currentFloorData.rooms != null)
+                    {
+                        for (int rIdx = 0; rIdx < currentFloorData.rooms.Count; rIdx++)
                         {
-                            holder.bgImage.color = new Color(0f, 0f, 0f, 0f);
+                            var rm = currentFloorData.rooms[rIdx];
+                            if (rm == null) continue;
+                            if (string.Equals(rm.roomId, holder.nodeId, StringComparison.OrdinalIgnoreCase)
+                                || (rm.roomId == "blocked_stairs" && holder.nodeId == "empty_bot")
+                                || (rm.roomId == "unit_406" && (holder.nodeId == "unit_406" || holder.nodeId == "unit_408"))
+                                || (rm.roomId == "unit_404" && holder.nodeId == "unit_404")
+                                || (rm.roomId == "unit_402" && holder.nodeId == "unit_402"))
+                            {
+                                isRoomInFloor = true;
+                                break;
+                            }
                         }
-                        if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(false);
-                        if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
-                        if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
-                        if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
-                        if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
-                        if (holder.beaconObj != null) holder.beaconObj.SetActive(false);
-                        if (holder.doorTickImage != null)
-                        {
-                            Transform dtParent = holder.doorTickImage.transform.parent;
-                            if (dtParent != null) dtParent.gameObject.SetActive(false);
-                        }
+                    }
+
+                    if (currentFloorData != null && !isRoomInFloor)
+                    {
+                        holder.rootObj.SetActive(false);
+                        continue;
+                    }
+
+                    holder.rootObj.SetActive(true);
+
+                    if (holder.bgImage != null)
+                    {
+                        holder.bgImage.color = new Color(0f, 0f, 0f, 0f);
+                    }
+                    if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(false);
+                    if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
+                    if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
+                    if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
+                    if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
+                    if (holder.beaconObj != null) holder.beaconObj.SetActive(false);
+                    if (holder.doorTickImage != null)
+                    {
+                        Transform dtParent = holder.doorTickImage.transform.parent;
+                        if (dtParent != null) dtParent.gameObject.SetActive(false);
                     }
                 }
             }
@@ -644,6 +685,33 @@ namespace SundayLastBreath.UI
         private void Update()
         {
             if (!gameObject.activeInHierarchy) return;
+
+            // Pulse active glowing doorway connecting lines
+            if (doorwayHolders != null && doorwayHolders.Count > 0)
+            {
+                float pulse = Mathf.PingPong(Time.unscaledTime * 3.5f, 0.40f) + 0.60f;
+                for (int i = 0; i < doorwayHolders.Count; i++)
+                {
+                    var d = doorwayHolders[i];
+                    if (d == null) continue;
+
+                    if (d.isGlowing)
+                    {
+                        if (d.rootObj != null && !d.rootObj.activeSelf) d.rootObj.SetActive(true);
+                        if (d.lineImg != null) d.lineImg.color = new Color(0.0f, 0.95f, 1.0f, 1.0f);
+                        if (d.glowImg != null)
+                        {
+                            if (!d.glowImg.gameObject.activeSelf) d.glowImg.gameObject.SetActive(true);
+                            d.glowImg.color = new Color(0.0f, 0.90f, 1.0f, pulse * 0.45f);
+                        }
+                    }
+                    else
+                    {
+                        // Clean Blueprint: Hide line overlay completely when idle (zero redundant dark rectangles)
+                        if (d.rootObj != null && d.rootObj.activeSelf) d.rootObj.SetActive(false);
+                    }
+                }
+            }
 
             bool up = false, down = false, left = false, right = false;
 
@@ -953,12 +1021,26 @@ namespace SundayLastBreath.UI
             {
                 if (r == null || string.IsNullOrEmpty(r.roomId)) continue;
 
-                // On Ascott 4F, if serializedHolders already binds this room, wire it and continue
-                if (isAscott4F && uiHolders.TryGetValue(r.roomId, out var existingHolder) && existingHolder != null && existingHolder.rootObj != null)
+                // On Ascott 4F, if serializedHolders already binds this room, wire it, snap transform to vector map coords, and continue
+                string lookupId = r.roomId;
+                if (!uiHolders.ContainsKey(lookupId))
+                {
+                    if (lookupId == "blocked_stairs" && uiHolders.ContainsKey("empty_bot")) lookupId = "empty_bot";
+                    else if (lookupId == "unit_406" && uiHolders.ContainsKey("unit_408")) lookupId = "unit_408";
+                    else if (lookupId == "unit_408" && uiHolders.ContainsKey("unit_406")) lookupId = "unit_406";
+                }
+
+                if (isAscott4F && uiHolders.TryGetValue(lookupId, out var existingHolder) && existingHolder != null && existingHolder.rootObj != null)
                 {
                     if (nodeRegistry.TryGetValue(r.roomId, out NodeModel m))
                     {
                         existingHolder.model = m;
+                    }
+                    RectTransform srt = existingHolder.rootObj.GetComponent<RectTransform>();
+                    if (srt != null)
+                    {
+                        srt.anchoredPosition = r.position;
+                        srt.sizeDelta = (r.size.x > 5f && r.size.y > 5f) ? r.size : new Vector2(35.1f, 35.1f);
                     }
                     continue;
                 }
@@ -1007,6 +1089,161 @@ namespace SundayLastBreath.UI
                 uiHolders[r.roomId] = dynamicHolder;
                 dynamicRoomHitboxes.Add(nodeObj);
             }
+
+            InitializeDoorwayLines();
+            UpdateDoorwayVisuals();
+        }
+
+        public void InitializeDoorwayLines()
+        {
+            if (doorwayHolders != null && doorwayHolders.Count > 0)
+            {
+                foreach (var d in doorwayHolders)
+                {
+                    if (d != null && d.rootObj != null)
+                    {
+                        if (Application.isPlaying) Destroy(d.rootObj);
+                        else DestroyImmediate(d.rootObj);
+                    }
+                }
+                doorwayHolders.Clear();
+            }
+
+            if (currentFloorData == null || currentFloorData.doorways == null || floorplanCanvasRect == null)
+            {
+                return;
+            }
+
+            foreach (var dt in currentFloorData.doorways)
+            {
+                if (dt == null || string.IsNullOrEmpty(dt.doorId)) continue;
+
+                GameObject doorObj = new GameObject("DoorwayLine_" + dt.doorId, typeof(RectTransform));
+                doorObj.transform.SetParent(floorplanCanvasRect, false);
+
+                if (vectorMapBackdropImage != null)
+                {
+                    doorObj.transform.SetSiblingIndex(vectorMapBackdropImage.transform.GetSiblingIndex() + 1);
+                }
+
+                RectTransform rt = doorObj.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0.5f, 0.5f);
+                rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.anchoredPosition = dt.position;
+
+                bool isHorizontal = dt.size.x >= dt.size.y;
+                Vector2 lineSize = isHorizontal ? new Vector2(dt.size.x, 2.0f) : new Vector2(2.0f, dt.size.y);
+                Vector2 glowSize = isHorizontal ? new Vector2(dt.size.x, 4.5f) : new Vector2(4.5f, dt.size.y);
+                rt.sizeDelta = lineSize;
+
+                Image lineImg = doorObj.AddComponent<Image>();
+                lineImg.color = new Color(0.0f, 0.95f, 1.0f, 1.0f);
+                lineImg.raycastTarget = false;
+
+                // Pulsing Halo Glow child
+                GameObject glowObj = new GameObject("Glow", typeof(RectTransform));
+                glowObj.transform.SetParent(doorObj.transform, false);
+                RectTransform grt = glowObj.GetComponent<RectTransform>();
+                grt.anchorMin = new Vector2(0.5f, 0.5f);
+                grt.anchorMax = new Vector2(0.5f, 0.5f);
+                grt.pivot = new Vector2(0.5f, 0.5f);
+                grt.anchoredPosition = Vector2.zero;
+                grt.sizeDelta = glowSize;
+
+                Image glowImg = glowObj.AddComponent<Image>();
+                glowImg.color = new Color(0.0f, 0.90f, 1.0f, 0f);
+                glowImg.raycastTarget = false;
+                glowObj.SetActive(false);
+
+                // Start inactive: zero redundant rectangles drawn over blueprint lines when idle
+                doorObj.SetActive(false);
+
+                string rA = "", rB = "";
+                string cleanDoor = dt.doorId.StartsWith("door_") ? dt.doorId.Substring(5) : dt.doorId;
+                if (currentFloorData.rooms != null)
+                {
+                    foreach (var rm in currentFloorData.rooms)
+                    {
+                        if (cleanDoor.Contains(rm.roomId))
+                        {
+                            if (string.IsNullOrEmpty(rA)) rA = rm.roomId;
+                            else if (string.IsNullOrEmpty(rB) && rm.roomId != rA) rB = rm.roomId;
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(rB) && !string.IsNullOrEmpty(dt.connectedRoomId))
+                {
+                    rB = dt.connectedRoomId;
+                }
+
+                var holder = new DoorwayUIHolder
+                {
+                    doorId = dt.doorId,
+                    roomA = rA,
+                    roomB = rB,
+                    position = dt.position,
+                    size = dt.size,
+                    rootObj = doorObj,
+                    lineImg = lineImg,
+                    glowImg = glowImg,
+                    isGlowing = false
+                };
+                doorwayHolders.Add(holder);
+            }
+        }
+
+        public void UpdateDoorwayVisuals()
+        {
+            if (doorwayHolders == null || doorwayHolders.Count == 0) return;
+
+            foreach (var d in doorwayHolders)
+            {
+                if (d == null) continue;
+                bool shouldGlow = false;
+
+                if (!string.IsNullOrEmpty(currentThresholdRoomId))
+                {
+                    // Player is standing at the threshold of a specific room from a hallway
+                    bool connectsCurrentHall = string.Equals(d.roomA, currentLocationId, StringComparison.OrdinalIgnoreCase) ||
+                                              string.Equals(d.roomB, currentLocationId, StringComparison.OrdinalIgnoreCase);
+                    bool connectsTargetRoom = string.Equals(d.roomA, currentThresholdRoomId, StringComparison.OrdinalIgnoreCase) ||
+                                              string.Equals(d.roomB, currentThresholdRoomId, StringComparison.OrdinalIgnoreCase) ||
+                                              d.doorId.IndexOf(currentThresholdRoomId, StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    if (connectsCurrentHall && connectsTargetRoom)
+                    {
+                        shouldGlow = true;
+                    }
+                }
+                else if (currentLocationId.StartsWith("hallway", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Player is navigating the corridor without inspecting a specific exterior door
+                    bool connectsCurrent = string.Equals(d.roomA, currentLocationId, StringComparison.OrdinalIgnoreCase) ||
+                                           string.Equals(d.roomB, currentLocationId, StringComparison.OrdinalIgnoreCase);
+                    if (connectsCurrent)
+                    {
+                        // ONLY vertical corridor spine connections glow to illuminate player's corridor path (room doorways stay unlit)
+                        bool isVerticalSpine = d.size.y > d.size.x;
+                        bool connectsTwoHallways = !string.IsNullOrEmpty(d.roomA) && d.roomA.StartsWith("hallway", StringComparison.OrdinalIgnoreCase)
+                                                && !string.IsNullOrEmpty(d.roomB) && d.roomB.StartsWith("hallway", StringComparison.OrdinalIgnoreCase);
+                        if (isVerticalSpine || connectsTwoHallways)
+                        {
+                            shouldGlow = true;
+                        }
+                    }
+                }
+
+                d.isGlowing = shouldGlow;
+                if (d.rootObj != null)
+                {
+                    d.rootObj.SetActive(shouldGlow);
+                }
+                if (d.glowImg != null)
+                {
+                    d.glowImg.gameObject.SetActive(shouldGlow);
+                }
+            }
         }
 
         private void InitializeDataModel()
@@ -1030,12 +1267,12 @@ namespace SundayLastBreath.UI
             }
 
             // Built-in Default Floor: Ascott Residency 4th Floor
-            // ROW 0: North Wing (Unit 407 <-> Hallway 1 <-> Unit 406/408)
+            // ROW 0: North Wing (Unit 406/408 <-> Hallway 1 <-> Unit 407)
             var u407 = new NodeModel(
                 "unit_407", "UNIT 407", "SAFEHOUSE", "YOUR RESIDENCE (SAFEHOUSE)", "SECURED",
                 "NONE", "LOOTED / SECURE", "TV STATIC HUM",
                 "Your residential apartment. The television flickers with civil defense emergency alert white noise. Heavy reinforced deadbolt held firm during the initial outbreak chaos. Direct exit to North Spine Corridor.",
-                isAccessible: true, isDiscovered: true, row: 0, col: 0, iconType: TacticalRoomIconType.Home,
+                isAccessible: true, isDiscovered: true, row: 0, col: 2, iconType: TacticalRoomIconType.Home,
                 undiscoveredSub: "SAFEHOUSE", undiscoveredTitle: "YOUR RESIDENCE (SAFEHOUSE)");
 
             var h1 = new NodeModel(
@@ -1049,15 +1286,15 @@ namespace SundayLastBreath.UI
                 "unit_406", "UNIT 406", "PROFESSOR", "DR. ALISTAIR'S RESIDENCE", "DEADBOLT LOCKED",
                 "UNKNOWN", "HIGH INTEL / LORE", "DEAD SILENCE",
                 "Belongs to Dr. Alistair, retired university historian. Known to keep rare archival notes and emergency radio gear. Heavy brass keypad/deadbolt is engaged from within.",
-                isAccessible: false, isDiscovered: false, row: 0, col: 2, iconType: TacticalRoomIconType.Locked, isLocked: true,
+                isAccessible: false, isDiscovered: false, row: 0, col: 0, iconType: TacticalRoomIconType.Locked, isLocked: true,
                 undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 406");
 
-            // ROW 1: Mid-North Wing (Unit 405 <-> Hallway 2 <-> Unit 404)
+            // ROW 1: Mid-North Wing (Unit 404 <-> Hallway 2 <-> Unit 405)
             var u405 = new NodeModel(
                 "unit_405", "UNIT 405", "HUNTER'S APT", "MARCUS'S APARTMENT", "REINFORCED LOCK",
                 "UNKNOWN", "WEAPONS / AMMO", "METALLIC CLICK",
                 "Residence of Marcus, an experienced outdoorsman and big-game hunter. Faint scent of gun oil and cordite seeps beneath the steel-reinforced door frame. High-priority supply cache.",
-                isAccessible: false, isDiscovered: false, row: 1, col: 0, iconType: TacticalRoomIconType.Locked, isLocked: true,
+                isAccessible: false, isDiscovered: false, row: 1, col: 2, iconType: TacticalRoomIconType.Locked, isLocked: true,
                 undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 405");
 
             var h2 = new NodeModel(
@@ -1071,15 +1308,15 @@ namespace SundayLastBreath.UI
                 "unit_404", "UNIT 404", "BARRICADED", "QUARANTINED NEIGHBOR", "BARRICADED",
                 "HIGH", "INACCESSIBLE", "HEAVY THUMPING",
                 "Doorway violently nailed shut from the inside with timber planks and heavy furniture. Deep, frantic gouge marks score the outer mahogany veneer. Do not breach.",
-                isAccessible: false, isDiscovered: false, row: 1, col: 2, iconType: TacticalRoomIconType.Hazard, isBlocked: true,
+                isAccessible: false, isDiscovered: false, row: 1, col: 0, iconType: TacticalRoomIconType.Hazard, isBlocked: true,
                 undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 404");
 
-            // ROW 2: Mid-South Wing (Unit 403 <-> Hallway 3 <-> Unit 402)
+            // ROW 2: Mid-South Wing (Unit 402 <-> Hallway 3 <-> Unit 403)
             var u403 = new NodeModel(
                 "unit_403", "UNIT 403", "BIOHAZARD", "CONTAMINATED RESIDENCE", "BIOHAZARD",
                 "DANGER", "UNKNOWN", "FLIES / SILENCE",
                 "A dark coagulated smear of blood trails down the brass handle onto the threshold. The door frame is warped and jammed shut. Entering without bio-protective gear is lethal.",
-                isAccessible: false, isDiscovered: false, row: 2, col: 0, iconType: TacticalRoomIconType.Hazard, isBlocked: true,
+                isAccessible: false, isDiscovered: false, row: 2, col: 2, iconType: TacticalRoomIconType.Hazard, isBlocked: true,
                 undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 403");
 
             var h3 = new NodeModel(
@@ -1093,15 +1330,15 @@ namespace SundayLastBreath.UI
                 "unit_402", "UNIT 402", "DOOR AJAR", "ANDERSONS' RESIDENCE", "DOOR AJAR",
                 "LOW", "MEDICAL / RATIONS", "RUNNING WATER",
                 "The safety chain is snapped and the door hangs open two inches. Sound of an overflowing sink inside. High probability of salvageable first-aid supplies and canned provisions.",
-                isAccessible: true, isDiscovered: false, row: 2, col: 2, iconType: TacticalRoomIconType.DoorAjar,
+                isAccessible: true, isDiscovered: false, row: 2, col: 0, iconType: TacticalRoomIconType.DoorAjar,
                 undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 402");
 
-            // ROW 3: South Wing (Unit 401 <-> Hallway 4 <-> Utility Closet)
+            // ROW 3: South Wing (Utility Closet <-> Hallway 4 <-> Unit 401)
             var u401 = new NodeModel(
                 "unit_401", "UNIT 401", "CORNER APT", "STUDENT RESIDENCE 401", "UNLOCKED",
                 "LOW", "KEYS / VALUABLES", "WIND THROUGH GLASS",
                 "South-west corner apartment. Unopened mail and flyers are piled on the welcome mat. Latch appears unlocked following the post-party evacuation.",
-                isAccessible: true, isDiscovered: false, row: 3, col: 0, iconType: TacticalRoomIconType.Apartment,
+                isAccessible: true, isDiscovered: false, row: 3, col: 2, iconType: TacticalRoomIconType.Apartment,
                 undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 401");
 
             var h4 = new NodeModel(
@@ -1115,15 +1352,15 @@ namespace SundayLastBreath.UI
                 "utility", "UTILITY", "MAINTENANCE", "ELECTRICAL & SERVICE CLOSET", "SERVICE ACCESS",
                 "LOW", "TOOLS / FUSES", "TRANSFORMER HUM",
                 "Building maintenance alcove with a heavy steel louver door. Houses the 4th floor master breaker panel, backup fuses, and janitorial hardware lockers.",
-                isAccessible: true, isDiscovered: false, row: 3, col: 2, iconType: TacticalRoomIconType.Utility,
+                isAccessible: true, isDiscovered: false, row: 3, col: 0, iconType: TacticalRoomIconType.Utility,
                 undiscoveredSub: "SERVICE ROOM", undiscoveredTitle: "UTILITY SERVICE BAY");
 
-            // ROW 4: Exit Foyer (Stairwell <-> Hallway End <-> Collapsed East Wing)
+            // ROW 4: Exit Foyer (Collapsed East Wing <-> Hallway End <-> Stairwell)
             var stairs = new NodeModel(
                 "stairs", "STAIRWELL", "FIRE EXIT", "WEST EMERGENCY STAIRWELL", "ESCAPE ROUTE",
                 "MEDIUM", "PRIMARY EXIT", "ECHOING GROANS",
                 "Reinforced concrete fire stairwell descending to the 2nd Floor and Ground Lobby. Emergency push-bar door is operational. Descending past this point commits to leaving the 4th floor.",
-                isAccessible: true, isDiscovered: false, row: 4, col: 0, iconType: TacticalRoomIconType.Stairs, isStairs: true,
+                isAccessible: true, isDiscovered: false, row: 4, col: 2, iconType: TacticalRoomIconType.Stairs, isStairs: true,
                 undiscoveredSub: "FIRE EXIT", undiscoveredTitle: "WEST FIRE STAIRWELL");
 
             var hEnd = new NodeModel(
@@ -1137,7 +1374,7 @@ namespace SundayLastBreath.UI
                 "empty_bot", "EAST WING", "EAST WING", "COLLAPSED EAST ALCOVE", "STRUCTURAL FAIL",
                 "IMPASSABLE", "NONE", "SETTLING CONCRETE",
                 "Load-bearing ceiling beams and concrete slabs have caved in, completely sealing the south-east service shaft. Impassable without heavy excavation equipment.",
-                isAccessible: false, isDiscovered: false, row: 4, col: 2, iconType: TacticalRoomIconType.Collapsed, isBlocked: true,
+                isAccessible: false, isDiscovered: false, row: 4, col: 0, iconType: TacticalRoomIconType.Collapsed, isBlocked: true,
                 undiscoveredSub: "EAST WING", undiscoveredTitle: "EAST RESIDENTIAL WING");
 
             // Connect Orthogonal Floorplan Graph
@@ -1164,6 +1401,8 @@ namespace SundayLastBreath.UI
             foreach (var n in list) nodeRegistry[n.id] = n;
             // Seamless alias support for narrative/lore variants
             nodeRegistry["unit_408"] = u406;
+            nodeRegistry["blocked_stairs"] = blocked;
+            nodeRegistry["empty_bot"] = blocked;
             nodeRegistry["utility_closet"] = util;
         }
 
@@ -1271,24 +1510,30 @@ namespace SundayLastBreath.UI
         }
 
         public string CurrentLocationId => currentLocationId;
+        public string CurrentThresholdRoomId => currentThresholdRoomId;
 
         private string NormalizeLocationId(string locId)
         {
             if (string.IsNullOrEmpty(locId)) return "unit_407";
             if (string.Equals(locId, "unit_408", StringComparison.OrdinalIgnoreCase)) return "unit_406";
             if (string.Equals(locId, "utility_closet", StringComparison.OrdinalIgnoreCase)) return "utility";
+            if (nodeRegistry != null && nodeRegistry.ContainsKey(locId)) return locId;
             return locId;
         }
 
         private bool TryGetUIHolder(string roomId, out NodeUIHolder holder)
         {
             if (string.IsNullOrEmpty(roomId)) { holder = null; return false; }
-            if (uiHolders.TryGetValue(roomId, out holder)) return true;
+            if (uiHolders.TryGetValue(roomId, out holder) && holder != null && holder.rootObj != null) return true;
             string norm = NormalizeLocationId(roomId);
-            if (!string.Equals(norm, roomId, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(norm, roomId, StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue(norm, out holder) && holder != null && holder.rootObj != null)
             {
-                return uiHolders.TryGetValue(norm, out holder);
+                return true;
             }
+            if (string.Equals(roomId, "unit_406", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("unit_408", out holder) && holder != null && holder.rootObj != null) return true;
+            if (string.Equals(roomId, "unit_408", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("unit_406", out holder) && holder != null && holder.rootObj != null) return true;
+            if (string.Equals(roomId, "blocked_stairs", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("empty_bot", out holder) && holder != null && holder.rootObj != null) return true;
+            if (string.Equals(roomId, "empty_bot", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("blocked_stairs", out holder) && holder != null && holder.rootObj != null) return true;
             holder = null;
             return false;
         }
@@ -1311,13 +1556,38 @@ namespace SundayLastBreath.UI
 
             if (!nodeRegistry.ContainsKey(locationId)) return;
             currentLocationId = locationId;
+            currentThresholdRoomId = null;
             selectedNodeId = locationId;
 
             DiscoverRoom(locationId);
             DiscoverAdjacentRooms(locationId);
             RefreshAllNodes();
             SelectNode(locationId);
+            UpdateDoorwayVisuals();
             OnPlayerLocationChanged?.Invoke(locationId, nodeRegistry[locationId]);
+        }
+
+        public void SetThresholdLocation(string hallwayLocationId, string inspectingRoomId)
+        {
+            EnsureRuntimeBindings();
+            hallwayLocationId = NormalizeLocationId(hallwayLocationId);
+            inspectingRoomId = NormalizeLocationId(inspectingRoomId);
+
+            if (!nodeRegistry.ContainsKey(hallwayLocationId)) return;
+            currentLocationId = hallwayLocationId;
+            currentThresholdRoomId = inspectingRoomId;
+            selectedNodeId = inspectingRoomId;
+
+            DiscoverRoom(hallwayLocationId);
+            DiscoverAdjacentRooms(hallwayLocationId);
+            if (!string.IsNullOrEmpty(inspectingRoomId))
+            {
+                DiscoverRoom(inspectingRoomId);
+            }
+            RefreshAllNodes();
+            SelectNode(inspectingRoomId);
+            UpdateDoorwayVisuals();
+            OnPlayerLocationChanged?.Invoke(hallwayLocationId, nodeRegistry[hallwayLocationId]);
         }
 
         public void DiscoverRoom(string roomId)
@@ -1406,8 +1676,10 @@ namespace SundayLastBreath.UI
                 ApplyVisualState(kvp.Value);
             }
 
-            bool isCurrent = string.Equals(model.id, currentLocationId, StringComparison.OrdinalIgnoreCase);
-            bool isDiscovered = model.isDiscovered || isCurrent;
+            bool isPhysicallyInside = string.Equals(model.id, currentLocationId, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(currentThresholdRoomId);
+            bool isCurrent = isPhysicallyInside;
+            bool isAtThreshold = !string.IsNullOrEmpty(currentThresholdRoomId) && string.Equals(model.id, currentThresholdRoomId, StringComparison.OrdinalIgnoreCase);
+            bool isDiscovered = model.isDiscovered || isPhysicallyInside || isAtThreshold;
 
             // Update Blueprint Coordinate & Footer Readout
             if (blueprintCoordTmp != null)
@@ -1417,19 +1689,33 @@ namespace SundayLastBreath.UI
                 blueprintCoordTmp.text = $"GRID [{gridX}:{gridY}] // BIO-RADAR: ACTIVE";
             }
 
-            if (blueprintFooterLocationTmp != null && nodeRegistry.TryGetValue(currentLocationId, out NodeModel playerNode))
+            if (blueprintFooterLocationTmp != null)
             {
-                blueprintFooterLocationTmp.text =
-                    $"<color=#00e5ff><b>PLAYER POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                if (!string.IsNullOrEmpty(currentThresholdRoomId) && nodeRegistry.TryGetValue(currentThresholdRoomId, out NodeModel thresholdNode))
+                {
+                    string hallName = nodeRegistry.TryGetValue(currentLocationId, out NodeModel hNode) ? hNode.roomCode : currentLocationId.ToUpper();
+                    blueprintFooterLocationTmp.text =
+                        $"<color=#00e5ff><b>PLAYER POS:</b> {hallName} (THRESHOLD // {thresholdNode.roomCode})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                }
+                else if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel playerNode))
+                {
+                    blueprintFooterLocationTmp.text =
+                        $"<color=#00e5ff><b>PLAYER POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                }
             }
 
             // Update Right Dossier Header & Icon
             if (intelHeaderIcon != null)
             {
-                if (isCurrent)
+                if (isPhysicallyInside)
                 {
                     intelHeaderIcon.sprite = GetRoomIconSprite(model.iconType);
                     intelHeaderIcon.color = new Color(0.0f, 0.90f, 1.0f);
+                }
+                else if (isAtThreshold)
+                {
+                    intelHeaderIcon.sprite = GetRoomIconSprite(model.iconType);
+                    intelHeaderIcon.color = new Color(0.98f, 0.72f, 0.18f);
                 }
                 else if (isDiscovered)
                 {
@@ -1446,7 +1732,7 @@ namespace SundayLastBreath.UI
 
             if (intelSectorTitleText != null)
             {
-                if (isCurrent || isDiscovered)
+                if (isPhysicallyInside || isAtThreshold || isDiscovered)
                 {
                     intelSectorTitleText.text = $"<b>{model.roomCode} // {model.title}</b>";
                 }
@@ -1458,9 +1744,15 @@ namespace SundayLastBreath.UI
 
             if (intelStatusBadgeText != null)
             {
-                if (isCurrent)
+                if (isPhysicallyInside)
                 {
-                    intelStatusBadgeText.text = "<color=#00e5ff><b>[ CURRENT SECTOR // SAFEHOUSE ]</b></color>";
+                    intelStatusBadgeText.text = "<color=#00e5ff><b>[ CURRENT SECTOR // OCCUPIED ]</b></color>";
+                }
+                else if (isAtThreshold)
+                {
+                    string colorHex = model.isLocked ? "#f39c12" : (model.isBlocked ? "#e74c3c" : "#38bdf8");
+                    string tag = model.isLocked ? "DOORWAY // LOCKED EXTERIOR" : (model.isBlocked ? "DOORWAY // BARRED ENTRY" : "DOORWAY // THRESHOLD ACCESS");
+                    intelStatusBadgeText.text = $"<color={colorHex}><b>[ {tag} ]</b></color>";
                 }
                 else if (isDiscovered)
                 {
@@ -1475,9 +1767,13 @@ namespace SundayLastBreath.UI
 
             if (intelThreatText != null)
             {
-                if (isCurrent)
+                if (isPhysicallyInside)
                 {
-                    intelThreatText.text = "<color=#94a3b8>THREAT:</color> <color=#2ecc71><b>NONE</b></color>";
+                    intelThreatText.text = "<color=#94a3b8>THREAT:</color> <color=#2ecc71><b>NONE (INTERIOR SECURED)</b></color>";
+                }
+                else if (isAtThreshold)
+                {
+                    intelThreatText.text = $"<color=#94a3b8>THREAT:</color> <color=#f39c12><b>ACTIVE (STANDING AT EXTERIOR)</b></color>";
                 }
                 else if (isDiscovered)
                 {
@@ -1550,7 +1846,7 @@ namespace SundayLastBreath.UI
                 if (isCurrent)
                 {
                     transitActionBg.color = new Color(0.04f, 0.14f, 0.18f, 0.95f);
-                    transitActionBtnText.text = "<color=#00e5ff><b>[ CURRENT LOCATION // SAFEHOUSE 407 ]</b></color>";
+                    transitActionBtnText.text = $"<color=#00e5ff><b>[ CURRENT LOCATION // {model.title.ToUpper()} ]</b></color>";
                 }
                 else if (!isDiscovered)
                 {
@@ -1623,9 +1919,13 @@ namespace SundayLastBreath.UI
         {
             if (holder == null || holder.model == null) return;
 
-            bool isCurrent = string.Equals(holder.model.id, currentLocationId, StringComparison.OrdinalIgnoreCase);
+            bool isPlayerPhysicallyInside = string.Equals(holder.model.id, currentLocationId, StringComparison.OrdinalIgnoreCase)
+                && string.IsNullOrEmpty(currentThresholdRoomId);
+            bool isCurrent = isPlayerPhysicallyInside;
             bool isSelected = string.Equals(holder.model.id, selectedNodeId, StringComparison.OrdinalIgnoreCase);
-            bool isDiscovered = holder.model.isDiscovered || isCurrent;
+            bool isThresholdInspected = !string.IsNullOrEmpty(currentThresholdRoomId)
+                && string.Equals(holder.model.id, currentThresholdRoomId, StringComparison.OrdinalIgnoreCase);
+            bool isDiscovered = holder.model.isDiscovered || isPlayerPhysicallyInside || isThresholdInspected;
 
             bool hasVectorMap = currentFloorData != null && currentFloorData.vectorMapSprite != null;
 
@@ -1633,7 +1933,7 @@ namespace SundayLastBreath.UI
             {
                 if (holder.bgImage != null)
                 {
-                    holder.bgImage.color = new Color(0f, 0f, 0f, 0f);
+                    holder.bgImage.color = isPlayerPhysicallyInside ? new Color(0.04f, 0.22f, 0.32f, 0.85f) : new Color(0f, 0f, 0f, 0f);
                 }
                 if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(false);
                 if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
@@ -1644,13 +1944,13 @@ namespace SundayLastBreath.UI
 
                 if (holder.outline != null)
                 {
-                    if (isCurrent)
+                    if (isPlayerPhysicallyInside)
                     {
                         holder.outline.enabled = true;
                         holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 0.95f);
                         holder.outline.effectDistance = new Vector2(2f, -2f);
                     }
-                    else if (isSelected)
+                    else if (isThresholdInspected || isSelected)
                     {
                         holder.outline.enabled = true;
                         holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 0.90f);

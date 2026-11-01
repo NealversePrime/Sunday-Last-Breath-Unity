@@ -273,7 +273,7 @@ MonoBehaviour:
     hideWhenUnavailable: 0
     setsStoryFlagOnExecute: 
     clearsStoryFlagOnExecute: 
-    triggerActionId: 
+    triggerActionId: OPEN_COMBAT_MODAL
     requirementMode: 0
     requiredStat: 
     requiredStatValue: 0

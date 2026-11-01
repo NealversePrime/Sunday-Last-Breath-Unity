@@ -653,7 +653,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Exit Infirmary to Hallway [WEST]"
+  - choiceLabel: "[DOOR] Exit Infirmary to Hallway [WEST]"
     choiceSubtitle: Leave Dr. Thorne's triage ward.
     targetPassage: {fileID: 11400000, guid: 53c56bda0d2fecc46b3938a6bd856d17, type: 2}
     targetPassageId: Act3_SchoolGFloor

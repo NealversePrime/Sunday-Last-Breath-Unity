@@ -24,6 +24,7 @@ namespace SundayLastBreath.UI
     public class ApartmentHubScreen : ScreenBase
     {
         [Header("Top HUD (Twine Style)")]
+        [SerializeField] private GameObject topHUDContainer;
         [SerializeField] private Button pdaMenuButton;
         [SerializeField] private Image hpBarFill;
         [SerializeField] private TextMeshProUGUI hpValueText;
@@ -189,6 +190,7 @@ namespace SundayLastBreath.UI
         [SerializeField] private KeypadPuzzleModal keypadModal;
         [SerializeField] private QteTimingModal qteModal;
         [SerializeField] private LockpickingModal lockpickModal;
+        [SerializeField] private TacticalCombatModal combatModal;
         [SerializeField] private GameObject radioModal;
         [SerializeField] private Button closeRadioButton;
         [SerializeField] private GameObject hackingModal;
@@ -298,6 +300,13 @@ namespace SundayLastBreath.UI
             if (!isInHallway) return "unit_407";
             if (!string.IsNullOrEmpty(currentInspectedRoom))
             {
+                // When examining from the hallway outside a closed door, the player's physical location remains the hallway
+                if (currentInspectedRoom == "407") return $"hallway_{hallwaySection}";
+                if (currentInspectedRoom == "408" && !room408_opened) return $"hallway_{hallwaySection}";
+                if (currentInspectedRoom == "405" && !room405_opened) return $"hallway_{hallwaySection}";
+                if (currentInspectedRoom == "402" && !room402_opened) return $"hallway_{hallwaySection}";
+                if (currentInspectedRoom == "utility" && !utility_opened) return $"hallway_{hallwaySection}";
+
                 if (currentInspectedRoom.StartsWith("unit_")) return currentInspectedRoom;
                 if (currentInspectedRoom == "utility" || currentInspectedRoom == "stairs") return currentInspectedRoom;
                 return "unit_" + currentInspectedRoom;
@@ -700,6 +709,9 @@ namespace SundayLastBreath.UI
                 pdaTabLoreBtn.onClick.RemoveAllListeners();
                 pdaTabLoreBtn.onClick.AddListener(() => SwitchPDATab("LORE"));
             }
+
+            // Initialize default PDA tab state to STATUS
+            SwitchPDATab("STATUS", playSound: false);
 
             if (pdaVolumeSlider != null)
             {
@@ -2088,10 +2100,7 @@ namespace SundayLastBreath.UI
             introSeen = false;
             awakeningStep = 1;
 
-            if (situationBoxText != null)
-            {
-                situationBoxText.text = "\"Sirens wail across the Seattle skyline in the blackout. In the dark of my apartment, the deadbolt on the front door is locked tight. My apartment keys, wallet, and everyday items are still sitting on the coffee table.\"";
-            }
+            SetSituationNarration("\"Sirens wail across the Seattle skyline in the blackout. In the dark of my apartment, the deadbolt on the front door is locked tight. My apartment keys, wallet, and everyday items are still sitting on the coffee table.\"");
 
             if (floorItemsCard != null && tacticalGearController == null) floorItemsCard.SetActive(false);
             if (searchKitchenButton != null) searchKitchenButton.gameObject.SetActive(true);
@@ -2467,6 +2476,7 @@ namespace SundayLastBreath.UI
 
         public enum ConsoleMode { Narrative, PDA, Gear }
         private ConsoleMode currentConsoleMode = ConsoleMode.Narrative;
+        private string currentPDATab = "STATUS";
 
         public void SwitchConsoleMode(ConsoleMode mode, bool playSound = true)
         {
@@ -2477,7 +2487,11 @@ namespace SundayLastBreath.UI
 
             UpdateModeButtonVisuals();
 
-            if (mode == ConsoleMode.PDA) RefreshAllPDAPanels();
+            if (mode == ConsoleMode.PDA)
+            {
+                SwitchPDATab(string.IsNullOrEmpty(currentPDATab) ? "STATUS" : currentPDATab, playSound: false);
+                RefreshAllPDAPanels();
+            }
             else if (mode == ConsoleMode.Gear) RefreshRightGearPanel();
 
             if (playSound) PlayClickSFX();
@@ -2627,7 +2641,7 @@ namespace SundayLastBreath.UI
 #if ENABLE_INPUT_SYSTEM
             if (Keyboard.current != null)
             {
-                if (Keyboard.current.tabKey.wasPressedThisFrame || Keyboard.current.pKey.wasPressedThisFrame || Keyboard.current.f2Key.wasPressedThisFrame)
+                if (Keyboard.current.tabKey.wasPressedThisFrame || Keyboard.current.pKey.wasPressedThisFrame)
                 {
                     SwitchConsoleMode(currentConsoleMode == ConsoleMode.PDA ? ConsoleMode.Narrative : ConsoleMode.PDA);
                 }
@@ -2645,7 +2659,7 @@ namespace SundayLastBreath.UI
                 }
             }
 #else
-            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.P) || Input.GetKeyDown(KeyCode.F2))
+            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.P))
             {
                 SwitchConsoleMode(currentConsoleMode == ConsoleMode.PDA ? ConsoleMode.Narrative : ConsoleMode.PDA);
             }
@@ -2671,11 +2685,19 @@ namespace SundayLastBreath.UI
             {
                 testShake = Keyboard.current.f6Key.wasPressedThisFrame;
                 testLowHum = Keyboard.current.f7Key.wasPressedThisFrame;
+                if (Keyboard.current.f8Key.wasPressedThisFrame)
+                {
+                    TacticalCombatModal.TriggerCombat("zombie_commuter,zombie_guard");
+                }
             }
 #endif
 #if !ENABLE_INPUT_SYSTEM || ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetKeyDown(KeyCode.F6)) testShake = true;
             if (Input.GetKeyDown(KeyCode.F7)) testLowHum = true;
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                TacticalCombatModal.TriggerCombat("zombie_commuter,zombie_guard");
+            }
 #endif
             if (testShake) PlayScreenShake();
             if (testLowHum) DebugTestDamageFeedback();
@@ -2764,6 +2786,7 @@ namespace SundayLastBreath.UI
         #region Left & Right Embedded Survivor PDA Logic
         private void SwitchPDATab(string tabName, bool playSound = true)
         {
+            currentPDATab = tabName;
             if (playSound) PlayClickSFX();
 
             if (pdaPanelStatus != null) pdaPanelStatus.SetActive(tabName == "STATUS");
@@ -2774,11 +2797,18 @@ namespace SundayLastBreath.UI
 
             if (tabName == "MAP" && tacticalMapController != null)
             {
-                string targetLoc = !string.IsNullOrEmpty(currentPlayer?.currentLocationId)
-                    ? currentPlayer.currentLocationId
-                    : GetCurrentLocationId();
-                tacticalMapController.SetCurrentLocation(targetLoc);
-                tacticalMapController.SelectNode(targetLoc);
+                string targetLoc = GetCurrentLocationId();
+                if (currentPlayer != null) currentPlayer.currentLocationId = targetLoc;
+
+                if (!string.IsNullOrEmpty(currentInspectedRoom))
+                {
+                    string inspectId = currentInspectedRoom.StartsWith("unit_") ? currentInspectedRoom : (currentInspectedRoom == "utility" || currentInspectedRoom == "stairs" ? currentInspectedRoom : "unit_" + currentInspectedRoom);
+                    tacticalMapController.SetThresholdLocation(targetLoc, inspectId);
+                }
+                else
+                {
+                    tacticalMapController.SetCurrentLocation(targetLoc);
+                }
                 tacticalMapController.RefreshAllNodes();
             }
             if (tabName == "SKILLS" && tacticalSkillsController != null && currentPlayer != null)
@@ -2804,6 +2834,14 @@ namespace SundayLastBreath.UI
                     : new Color(0.08f, 0.09f, 0.11f, 0.95f);
             }
 
+            Outline outline = btn.GetComponent<Outline>();
+            if (outline != null)
+            {
+                outline.effectColor = isActive
+                    ? new Color(0.95f, 0.48f, 0.12f, 0.75f)
+                    : new Color(0.20f, 0.22f, 0.26f, 0.75f);
+            }
+
             Transform accent = btn.transform.Find("BottomAccent");
             if (accent != null) accent.gameObject.SetActive(isActive);
 
@@ -2825,7 +2863,7 @@ namespace SundayLastBreath.UI
             RefreshRightGearPanel();
         }
 
-        private void RefreshPDAStatusTab()
+        public void RefreshPDAStatusTab()
         {
             if (currentPlayer != null)
             {
@@ -2835,11 +2873,19 @@ namespace SundayLastBreath.UI
                 int hum = Mathf.Clamp(currentPlayer.humanity, 0, 100);
                 if (pdaHumanityBarFill != null) pdaHumanityBarFill.fillAmount = hum / 100f;
                 if (pdaHumanityValueText != null) pdaHumanityValueText.text = $"{hum}/100";
-            }
 
-            if (pdaLevelText != null) pdaLevelText.text = "LVL 1";
-            if (pdaXpText != null) pdaXpText.text = "0/100 XP";
-            if (pdaXpBarFill != null) pdaXpBarFill.fillAmount = 0f;
+                int req = Mathf.Max(1, currentPlayer.xpRequired);
+                int curXp = Mathf.Clamp(currentPlayer.xp, 0, req);
+                if (pdaLevelText != null) pdaLevelText.text = $"LVL {currentPlayer.level}";
+                if (pdaXpText != null) pdaXpText.text = $"{curXp}/{req} XP";
+                if (pdaXpBarFill != null) pdaXpBarFill.fillAmount = Mathf.Clamp01((float)curXp / req);
+            }
+            else
+            {
+                if (pdaLevelText != null) pdaLevelText.text = "LVL 1";
+                if (pdaXpText != null) pdaXpText.text = "0/100 XP";
+                if (pdaXpBarFill != null) pdaXpBarFill.fillAmount = 0f;
+            }
 
             if (pdaActiveLogsText != null && objectiveSystem != null)
             {
@@ -4022,10 +4068,7 @@ namespace SundayLastBreath.UI
 
             AppendStoryLog(gameClock.GetTimeString(), "APARTMENT 407 // GATHERED ESSENTIALS",
                 $"I picked up my apartment keys, wallet, phone, and belongings off the coffee table. Outside, sirens echo through the pitch-black streets.");
-            if (situationBoxText != null)
-            {
-                situationBoxText.text = $"\"<color=#10B981>✓ Pocketed my apartment keys and gathered my things off the table ({gatheredCount} items).</color> The apartment door is now ready to be unlocked. I can check the rest of the apartment first if there's anything else I need.\"";
-            }
+            SetSituationNarration($"\"<color=#10B981>✓ Pocketed my apartment keys and gathered my things off the table ({gatheredCount} items).</color> The apartment door is now ready to be unlocked. I can check the rest of the apartment first if there's anything else I need.\"");
 
             if (packedSuccessBanner != null)
             {
@@ -4064,10 +4107,7 @@ namespace SundayLastBreath.UI
             AppendStoryLog(gameClock.GetTimeString(), "KITCHEN // SUPPLIES FOUND",
                 "I opened the cabinets and fridge in the dark. Placed two bottles of water, canned tuna, a can opener, and stale coffee on the counter. When I turned the tap, only brown silt sputtered out.");
 
-            if (situationBoxText != null)
-            {
-                situationBoxText.text = "\"<color=#F59E0B>✓ Kitchen checked.</color> Found bottled water (x2), canned tuna, a can opener, and coffee. Placed on counter. Open <color=#F59E0B>BACKPACK & ITEMS [I]</color> to choose what to bring.\"";
-            }
+            SetSituationNarration("\"<color=#F59E0B>✓ Kitchen checked.</color> Found bottled water (x2), canned tuna, a can opener, and coffee. Placed on counter. Open <color=#F59E0B>BACKPACK & ITEMS [I]</color> to choose what to bring.\"");
 
             UpdateFloorItemsNotification();
             RefreshRightGearPanel();
@@ -4091,10 +4131,7 @@ namespace SundayLastBreath.UI
             AppendStoryLog(gameClock.GetTimeString(), "BATHROOM // MEDICINE CABINET",
                 "I felt my way into the dark bathroom and opened the medicine cabinet. Placed painkillers, bandages, and rubbing alcohol on the vanity counter.");
 
-            if (situationBoxText != null)
-            {
-                situationBoxText.text = "\"<color=#10B981>✓ Medicine cabinet checked.</color> Found painkillers, bandages (x2), and rubbing alcohol. Placed on vanity. Open <color=#10B981>BACKPACK & ITEMS [I]</color> to choose what to bring.\"";
-            }
+            SetSituationNarration("\"<color=#10B981>✓ Medicine cabinet checked.</color> Found painkillers, bandages (x2), and rubbing alcohol. Placed on vanity. Open <color=#10B981>BACKPACK & ITEMS [I]</color> to choose what to bring.\"");
 
             UpdateFloorItemsNotification();
             RefreshRightGearPanel();
@@ -4118,10 +4155,7 @@ namespace SundayLastBreath.UI
             AppendStoryLog(gameClock.GetTimeString(), "FRONT CLOSET // COAT & SUPPLIES",
                 "I reached onto the top shelf of the coat closet and set down my heavy rain poncho, duct tape, and a box of matches on the hall bench.");
 
-            if (situationBoxText != null)
-            {
-                situationBoxText.text = "\"<color=#38BDF8>✓ Front closet checked.</color> Found my heavy rain poncho, duct tape, and matches. Placed on hall bench. Open <color=#38BDF8>BACKPACK & ITEMS [I]</color> to choose what to bring.\"";
-            }
+            SetSituationNarration("\"<color=#38BDF8>✓ Front closet checked.</color> Found my heavy rain poncho, duct tape, and matches. Placed on hall bench. Open <color=#38BDF8>BACKPACK & ITEMS [I]</color> to choose what to bring.\"");
 
             UpdateFloorItemsNotification();
             RefreshRightGearPanel();
@@ -4940,7 +4974,7 @@ namespace SundayLastBreath.UI
             wbOl.effectColor = new Color(0.85f, 0.22f, 0.22f, 0.75f);
 
             TextMeshProUGUI warnHeader = CreateSysTMP(warnBox.transform, "WarnHeader",
-                "⚠  UNSAVED PROGRESS WARNING — CONFIRM EXIT",
+                "[!] UNSAVED PROGRESS WARNING — CONFIRM EXIT",
                 13.5f, FontStyles.Bold, new Color(0.98f, 0.42f, 0.42f), TextAlignmentOptions.TopLeft, sharedFont);
             RectTransform whRect = warnHeader.rectTransform;
             whRect.anchorMin = Vector2.zero;
@@ -5595,10 +5629,7 @@ namespace SundayLastBreath.UI
             if (!canExit)
             {
                 PlayBeepSFX();
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "\"<color=#EF4444><b>The deadbolt is engaged and locked tight.</b></color> My apartment keys and belongings are still sitting on the coffee table. I can't leave without my keys—I would lock myself out in a dark hallway during a citywide blackout.\"";
-                }
+                SetSituationNarration("\"<color=#EF4444><b>The deadbolt is engaged and locked tight.</b></color> My apartment keys and belongings are still sitting on the coffee table. I can't leave without my keys—I would lock myself out in a dark hallway during a citywide blackout.\"");
                 return;
             }
 
@@ -5629,11 +5660,40 @@ namespace SundayLastBreath.UI
         private CanvasGroup doorTransitionCanvasGroup;
         private TextMeshProUGUI doorTransitionTitleTmp;
         private TextMeshProUGUI doorTransitionDescTmp;
+        private TextMeshProUGUI doorTransitionSkipPromptTmp;
         private GameObject doorTransitionContentBox;
         private CanvasGroup doorTransitionContentCanvasGroup;
         private UnityEngine.Video.VideoPlayer doorVideoPlayer;
         private RawImage doorVideoRawImage;
         private RenderTexture doorVideoRenderTexture;
+
+#if ENABLE_INPUT_SYSTEM
+        private bool CheckDoorTransitionSkipInput()
+        {
+            if (Keyboard.current != null)
+            {
+                var kb = Keyboard.current;
+                if (kb.anyKey.wasPressedThisFrame) return true;
+            }
+            if (Mouse.current != null)
+            {
+                var m = Mouse.current;
+                if (m.leftButton.wasPressedThisFrame || m.rightButton.wasPressedThisFrame) return true;
+            }
+            if (Gamepad.current != null)
+            {
+                var pad = Gamepad.current;
+                if (pad.buttonSouth.wasPressedThisFrame || pad.startButton.wasPressedThisFrame) return true;
+            }
+            return false;
+        }
+#else
+        private bool CheckDoorTransitionSkipInput()
+        {
+            if (Input.anyKeyDown || Input.GetMouseButtonDown(0)) return true;
+            return false;
+        }
+#endif
 
         private void EnsureDoorTransitionOverlay()
         {
@@ -5683,8 +5743,9 @@ namespace SundayLastBreath.UI
             doorVideoPlayer.targetTexture = doorVideoRenderTexture;
             doorVideoPlayer.audioOutputMode = UnityEngine.Video.VideoAudioOutputMode.Direct;
 
-            // Try loading VideoClip or file path
-            var clip = Resources.Load<UnityEngine.Video.VideoClip>("Videos/room403_door_transition");
+            // Try loading VideoClip or file path (unit407_door_transition with fallback to legacy room403)
+            var clip = Resources.Load<UnityEngine.Video.VideoClip>("Videos/unit407_door_transition");
+            if (clip == null) clip = Resources.Load<UnityEngine.Video.VideoClip>("Videos/room403_door_transition");
             if (clip != null)
             {
                 doorVideoPlayer.source = UnityEngine.Video.VideoSource.VideoClip;
@@ -5692,7 +5753,8 @@ namespace SundayLastBreath.UI
             }
             else
             {
-                string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "room403_door_transition.mp4").Replace("\\", "/");
+                string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "unit407_door_transition.mp4").Replace("\\", "/");
+                if (!System.IO.File.Exists(filePath)) filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "room403_door_transition.mp4").Replace("\\", "/");
                 if (System.IO.File.Exists(filePath))
                 {
                     doorVideoPlayer.source = UnityEngine.Video.VideoSource.Url;
@@ -5743,6 +5805,23 @@ namespace SundayLastBreath.UI
             doorTransitionDescTmp.color = new Color(0.88f, 0.90f, 0.94f);
             doorTransitionDescTmp.text = "You insert the key into the heavy deadbolt...";
 
+            // Subtle Skip Prompt in bottom-right corner
+            GameObject skipObj = new GameObject("SkipPromptText", typeof(RectTransform), typeof(TextMeshProUGUI));
+            skipObj.transform.SetParent(doorTransitionOverlay.transform, false);
+            RectTransform skipRt = skipObj.GetComponent<RectTransform>();
+            skipRt.anchorMin = new Vector2(0.5f, 0.02f);
+            skipRt.anchorMax = new Vector2(0.98f, 0.08f);
+            skipRt.offsetMin = Vector2.zero;
+            skipRt.offsetMax = Vector2.zero;
+
+            doorTransitionSkipPromptTmp = skipObj.GetComponent<TextMeshProUGUI>();
+            doorTransitionSkipPromptTmp.fontSize = 12f;
+            doorTransitionSkipPromptTmp.fontStyle = FontStyles.Bold;
+            doorTransitionSkipPromptTmp.alignment = TextAlignmentOptions.BottomRight;
+            doorTransitionSkipPromptTmp.color = new Color(0.40f, 0.48f, 0.58f, 0.75f);
+            doorTransitionSkipPromptTmp.text = "<color=#64748B>[SPACE / CLICK TO SKIP]</color>";
+            skipObj.SetActive(false);
+
             doorTransitionOverlay.SetActive(false);
         }
 
@@ -5763,11 +5842,22 @@ namespace SundayLastBreath.UI
             {
                 if (doorVideoPlayer.clip == null && string.IsNullOrEmpty(doorVideoPlayer.url))
                 {
-                    string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "room403_door_transition.mp4").Replace("\\", "/");
-                    if (System.IO.File.Exists(filePath))
+                    var c = Resources.Load<UnityEngine.Video.VideoClip>("Videos/unit407_door_transition");
+                    if (c == null) c = Resources.Load<UnityEngine.Video.VideoClip>("Videos/room403_door_transition");
+                    if (c != null)
                     {
-                        doorVideoPlayer.source = UnityEngine.Video.VideoSource.Url;
-                        doorVideoPlayer.url = filePath;
+                        doorVideoPlayer.source = UnityEngine.Video.VideoSource.VideoClip;
+                        doorVideoPlayer.clip = c;
+                    }
+                    else
+                    {
+                        string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "unit407_door_transition.mp4").Replace("\\", "/");
+                        if (!System.IO.File.Exists(filePath)) filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", "room403_door_transition.mp4").Replace("\\", "/");
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            doorVideoPlayer.source = UnityEngine.Video.VideoSource.Url;
+                            doorVideoPlayer.url = filePath;
+                        }
                     }
                 }
                 doorVideoPlayer.Prepare();
@@ -5850,45 +5940,75 @@ namespace SundayLastBreath.UI
                     }
                     if (doorVideoRawImage != null) doorVideoRawImage.color = Color.white;
 
-                    // Track video playback
-                    yield return new WaitForSecondsRealtime(0.2f);
+                    // Show skip prompt
+                    if (doorTransitionSkipPromptTmp != null) doorTransitionSkipPromptTmp.gameObject.SetActive(true);
+
+                    // Track video playback with instant skip support
                     float vidLength = (float)doorVideoPlayer.length;
                     if (vidLength <= 0.5f) vidLength = 4.5f;
 
-                    // Play footsteps as the door swings open into darkness
                     float midTime = vidLength * 0.55f;
                     float elapsed = 0.2f + vidFadeIn;
-                    if (midTime > elapsed)
-                    {
-                        yield return new WaitForSecondsRealtime(midTime - elapsed);
-                    }
-                    if (doorTransitionPlayFootstepSFX)
-                    {
-                        if (doorTransitionFootstepSFX != null) PlaySFX(doorTransitionFootstepSFX, 0.8f);
-                        else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
-                    }
+                    bool playedFootstep = false;
+                    bool skipped = false;
 
-                    float remain = Mathf.Max(0.2f, vidLength - midTime - 0.4f);
-                    yield return new WaitForSecondsRealtime(remain);
-                    if (doorTransitionPlaySlamSFX)
+                    while (elapsed < vidLength - 0.35f)
                     {
-                        if (doorTransitionSlamSFX != null) PlaySFX(doorTransitionSlamSFX, 0.65f);
-                        else PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
-                    }
+                        if (CheckDoorTransitionSkipInput())
+                        {
+                            skipped = true;
+                            break;
+                        }
 
-                    // Smoothly fade video out to darkness as door slams shut
-                    float vidFadeOut = 0.35f;
-                    for (float t = 0; t < vidFadeOut; t += Time.unscaledDeltaTime)
-                    {
-                        float a = Mathf.Lerp(1f, 0f, t / vidFadeOut);
-                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                        if (!playedFootstep && elapsed >= midTime)
+                        {
+                            playedFootstep = true;
+                            if (doorTransitionPlayFootstepSFX)
+                            {
+                                if (doorTransitionFootstepSFX != null) PlaySFX(doorTransitionFootstepSFX, 0.8f);
+                                else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+                            }
+                        }
+
+                        elapsed += Time.unscaledDeltaTime;
                         yield return null;
                     }
-                    if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
 
-                    if (doorTransitionPostVideoPause > 0f)
+                    if (doorTransitionSkipPromptTmp != null) doorTransitionSkipPromptTmp.gameObject.SetActive(false);
+
+                    if (skipped)
                     {
-                        yield return new WaitForSecondsRealtime(doorTransitionPostVideoPause);
+                        if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
+                        if (doorTransitionPlaySlamSFX)
+                        {
+                            if (doorTransitionSlamSFX != null) PlaySFX(doorTransitionSlamSFX, 0.75f);
+                            else PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.75f);
+                        }
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+                        yield return new WaitForSecondsRealtime(0.05f);
+                    }
+                    else
+                    {
+                        if (doorTransitionPlaySlamSFX)
+                        {
+                            if (doorTransitionSlamSFX != null) PlaySFX(doorTransitionSlamSFX, 0.65f);
+                            else PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
+                        }
+
+                        // Smoothly fade video out to darkness as door slams shut
+                        float vidFadeOut = 0.35f;
+                        for (float t = 0; t < vidFadeOut; t += Time.unscaledDeltaTime)
+                        {
+                            float a = Mathf.Lerp(1f, 0f, t / vidFadeOut);
+                            if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                            yield return null;
+                        }
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+
+                        if (doorTransitionPostVideoPause > 0f)
+                        {
+                            yield return new WaitForSecondsRealtime(doorTransitionPostVideoPause);
+                        }
                     }
                 }
             }
@@ -5965,6 +6085,229 @@ namespace SundayLastBreath.UI
             src.Stop();
         }
 
+        public void PlayDoorTransition(string videoResourcePath, string roomTitle, string narrativeSubtitle, bool playKeySFX, System.Action onReachedDestination, bool playSlam = false)
+        {
+            if (isDoorTransitioning)
+            {
+                onReachedDestination?.Invoke();
+                return;
+            }
+            StartCoroutine(GenericDoorTransitionRoutine(videoResourcePath, roomTitle, narrativeSubtitle, playKeySFX, onReachedDestination, playSlam));
+        }
+
+        private IEnumerator GenericDoorTransitionRoutine(string videoResourcePath, string roomTitle, string narrativeSubtitle, bool playKeySFX, System.Action onReachedDestination, bool playSlam = false)
+        {
+            isDoorTransitioning = true;
+            EnsureDoorTransitionOverlay();
+            doorTransitionOverlay.SetActive(true);
+            doorTransitionOverlay.transform.SetAsLastSibling();
+            doorTransitionCanvasGroup.alpha = 0f;
+
+            doorTransitionContentBox?.SetActive(true);
+            if (doorTransitionContentCanvasGroup != null) doorTransitionContentCanvasGroup.alpha = 1f;
+            if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+
+            // Configure video if supplied
+            bool hasVideo = false;
+            if (!string.IsNullOrEmpty(videoResourcePath) && doorVideoPlayer != null)
+            {
+                string cleanRes = videoResourcePath;
+                if (cleanRes.StartsWith("Videos/")) cleanRes = cleanRes.Substring(7);
+
+                var clip = Resources.Load<UnityEngine.Video.VideoClip>("Videos/" + cleanRes);
+                if (clip != null)
+                {
+                    doorVideoPlayer.source = UnityEngine.Video.VideoSource.VideoClip;
+                    doorVideoPlayer.clip = clip;
+                    hasVideo = true;
+                }
+                else
+                {
+                    string filePath = System.IO.Path.Combine(Application.dataPath, "Resources", "Videos", cleanRes + ".mp4").Replace("\\", "/");
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        doorVideoPlayer.source = UnityEngine.Video.VideoSource.Url;
+                        doorVideoPlayer.url = filePath;
+                        hasVideo = true;
+                    }
+                }
+
+                if (hasVideo) doorVideoPlayer.Prepare();
+            }
+
+            // Step 1: Smooth fade to black with audio
+            doorTransitionTitleTmp.text = roomTitle;
+            doorTransitionDescTmp.text = narrativeSubtitle;
+            if (playKeySFX)
+            {
+                if (doorTransitionKeySFX != null) PlaySFX(doorTransitionKeySFX, 0.9f);
+                else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/Keys1.wav", 0.9f);
+            }
+
+            float fadeTime = Mathf.Max(0.05f, doorTransitionFadeOutDuration);
+            for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
+            {
+                doorTransitionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, t / fadeTime);
+                yield return null;
+            }
+            doorTransitionCanvasGroup.alpha = 1f;
+
+            if (doorTransitionTextToVideoDelay > 0f)
+            {
+                yield return new WaitForSecondsRealtime(doorTransitionTextToVideoDelay);
+            }
+
+            float textFadeTime = Mathf.Max(0.05f, doorTransitionTextFadeOutDuration);
+            if (doorTransitionContentCanvasGroup != null)
+            {
+                for (float t = 0; t < textFadeTime; t += Time.unscaledDeltaTime)
+                {
+                    doorTransitionContentCanvasGroup.alpha = Mathf.Lerp(1f, 0f, t / textFadeTime);
+                    yield return null;
+                }
+                doorTransitionContentCanvasGroup.alpha = 0f;
+            }
+            doorTransitionContentBox?.SetActive(false);
+
+            yield return new WaitForSecondsRealtime(0.12f);
+
+            // Step 2: Play Video if available
+            bool playedVideo = false;
+            if (hasVideo && doorVideoPlayer != null)
+            {
+                float prepTimer = 0f;
+                while (!doorVideoPlayer.isPrepared && prepTimer < 1.5f)
+                {
+                    prepTimer += Time.unscaledDeltaTime;
+                    yield return null;
+                }
+
+                if (doorVideoPlayer.isPrepared)
+                {
+                    playedVideo = true;
+                    if (doorTransitionPlayKnobSFX)
+                    {
+                        if (doorTransitionKnobSFX != null) PlaySFX(doorTransitionKnobSFX, 0.95f);
+                        else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.95f);
+                    }
+                    if (doorTransitionFadeAmbience && atmosphereSource != null && atmosphereSource.isPlaying)
+                    {
+                        StartCoroutine(FadeOutAudio(atmosphereSource, 0.8f));
+                    }
+
+                    doorVideoPlayer.Play();
+
+                    float vidFadeIn = Mathf.Max(0.05f, doorTransitionVideoFadeInDuration);
+                    for (float t = 0; t < vidFadeIn; t += Time.unscaledDeltaTime)
+                    {
+                        float a = Mathf.Lerp(0f, 1f, t / vidFadeIn);
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                        yield return null;
+                    }
+                    if (doorVideoRawImage != null) doorVideoRawImage.color = Color.white;
+
+                    // Show skip prompt
+                    if (doorTransitionSkipPromptTmp != null) doorTransitionSkipPromptTmp.gameObject.SetActive(true);
+
+                    float vidLength = (float)doorVideoPlayer.length;
+                    if (vidLength <= 0.5f) vidLength = 4.5f;
+
+                    float midTime = vidLength * 0.55f;
+                    float elapsed = 0.2f + vidFadeIn;
+                    bool playedFootstep = false;
+                    bool skipped = false;
+
+                    while (elapsed < vidLength - 0.35f)
+                    {
+                        if (CheckDoorTransitionSkipInput())
+                        {
+                            skipped = true;
+                            break;
+                        }
+
+                        if (!playedFootstep && elapsed >= midTime)
+                        {
+                            playedFootstep = true;
+                            if (doorTransitionPlayFootstepSFX)
+                            {
+                                if (doorTransitionFootstepSFX != null) PlaySFX(doorTransitionFootstepSFX, 0.8f);
+                                else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+                            }
+                        }
+
+                        elapsed += Time.unscaledDeltaTime;
+                        yield return null;
+                    }
+
+                    if (doorTransitionSkipPromptTmp != null) doorTransitionSkipPromptTmp.gameObject.SetActive(false);
+
+                    if (skipped)
+                    {
+                        if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
+                        if (playSlam && doorTransitionPlaySlamSFX)
+                        {
+                            if (doorTransitionSlamSFX != null) PlaySFX(doorTransitionSlamSFX, 0.75f);
+                            else PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.75f);
+                        }
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+                        yield return new WaitForSecondsRealtime(0.05f);
+                    }
+                    else
+                    {
+                        if (playSlam && doorTransitionPlaySlamSFX)
+                        {
+                            if (doorTransitionSlamSFX != null) PlaySFX(doorTransitionSlamSFX, 0.65f);
+                            else PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.65f);
+                        }
+
+                        float vidFadeOut = 0.35f;
+                        for (float t = 0; t < vidFadeOut; t += Time.unscaledDeltaTime)
+                        {
+                            float a = Mathf.Lerp(1f, 0f, t / vidFadeOut);
+                            if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                            yield return null;
+                        }
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+
+                        if (doorTransitionPostVideoPause > 0f)
+                        {
+                            yield return new WaitForSecondsRealtime(doorTransitionPostVideoPause);
+                        }
+                    }
+                }
+            }
+
+            // Fallback audio if video wasn't played
+            if (!playedVideo)
+            {
+                if (doorTransitionPlayKnobSFX)
+                {
+                    if (doorTransitionKnobSFX != null) PlaySFX(doorTransitionKnobSFX, 0.95f);
+                    else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.95f);
+                }
+                yield return new WaitForSecondsRealtime(0.6f);
+            }
+
+            // Step 3: Switch scene/room behind the black curtain!
+            onReachedDestination?.Invoke();
+
+            // Step 4: Fade in to reveal the room
+            fadeTime = Mathf.Max(0.05f, doorTransitionFadeInDuration);
+            for (float t = 0; t < fadeTime; t += Time.unscaledDeltaTime)
+            {
+                doorTransitionCanvasGroup.alpha = Mathf.Lerp(1f, 0f, t / fadeTime);
+                yield return null;
+            }
+            doorTransitionCanvasGroup.alpha = 0f;
+
+            if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
+            if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+            if (doorTransitionContentCanvasGroup != null) doorTransitionContentCanvasGroup.alpha = 1f;
+            doorTransitionContentBox?.SetActive(true);
+            doorTransitionOverlay.SetActive(false);
+            isDoorTransitioning = false;
+        }
+
         #region Hallway & Exploration Implementation
         public void EnterHallwayMode(int section = 1)
         {
@@ -5987,13 +6330,6 @@ namespace SundayLastBreath.UI
 
             // Hide apartment buttons
             SetApartmentButtonsVisible(false);
-
-            // Ensure situation box preferred height accommodates rich corridor narration
-            if (situationBox != null)
-            {
-                LayoutElement sle = situationBox.GetComponent<LayoutElement>();
-                if (sle != null) sle.preferredHeight = 110f;
-            }
 
             // Ensure console is in narrative mode
             currentConsoleMode = ConsoleMode.Narrative;
@@ -6086,12 +6422,10 @@ namespace SundayLastBreath.UI
                     tacticalMapController?.DiscoverAdjacentRooms("hallway_1");
                     if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_406_407");
 
-                    if (situationBoxText != null)
-                    {
-                        situationBoxText.text = "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> The emergency lights above are failing, casting long, twitching shadows across the cheap carpet. It's too quiet here, making every distant scream outside echo through the vents. To your right is your unit (407). To your left is <b>Unit 408</b>.";
-                    }
+                    SetSituationNarration("The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> The emergency lights above are failing, casting long, twitching shadows across the cheap carpet. It's too quiet here, making every distant scream outside echo through the vents. To your right is your unit (407). To your left is <b>Unit 406</b>.");
 
-                    SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 408 <color=#9CA3AF>— The Professor's door. Electronic lock. Total silence inside.</color>", () => InspectUnit408());
+                    SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 406 <color=#9CA3AF>— The Professor's door. Electronic lock. Total silence inside.</color>", () => InspectUnit408());
+                    SetHallwayChoice(choiceIdx++, "EXAMINE UNIT 407 (YOUR DOOR) <color=#9CA3AF>— Your apartment door. Locked tight behind you.</color>", () => InspectUnit407Exterior());
                     SetHallwayChoice(choiceIdx++, "▼ ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Mid-Hallway.</color>", () => AdvanceDownHall());
                     break;
 
@@ -6100,10 +6434,7 @@ namespace SundayLastBreath.UI
                     tacticalMapController?.DiscoverAdjacentRooms("hallway_2");
                     if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_404_405");
 
-                    if (situationBoxText != null)
-                    {
-                        situationBoxText.text = "<color=#93C5FD><b>MID-HALLWAY.</b></color> Dust motes dance in the flickering light. You can hear a dog barking relentlessly from behind door 404, its claws scratching desperately against the wood. Across the hall, the reinforced door of <b>Unit 405</b> stands silent. The air here smells faintly of gunpowder.";
-                    }
+                    SetSituationNarration("<color=#93C5FD><b>MID-HALLWAY.</b></color> Dust motes dance in the flickering light. You can hear a dog barking relentlessly from behind door 404, its claws scratching desperately against the wood. Across the hall, the reinforced door of <b>Unit 405</b> stands silent. The air here smells faintly of gunpowder.");
 
                     SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 405 <color=#9CA3AF>— The Hunter's door. Heavy steel frame. Faint cordite.</color>", () => InspectUnit405());
                     SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Upper Hallway & Unit 407.</color>", () => RetreatUpHall());
@@ -6115,10 +6446,7 @@ namespace SundayLastBreath.UI
                     tacticalMapController?.DiscoverAdjacentRooms("hallway_3");
                     if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_402_403");
 
-                    if (situationBoxText != null)
-                    {
-                        situationBoxText.text = "<color=#93C5FD><b>LOWER HALLWAY.</b></color> The lights are completely dead in this section. The metallic, coppery tang of blood mixes with the smell of ozone. Jarringly, soft classical music plays from behind the chained door of <b>Unit 402</b>. Across from it is <b>Unit 403</b>.";
-                    }
+                    SetSituationNarration("<color=#93C5FD><b>LOWER HALLWAY.</b></color> The lights are completely dead in this section. The metallic, coppery tang of blood mixes with the smell of ozone. Jarringly, soft classical music plays from behind the chained door of <b>Unit 402</b>. Across from it is <b>Unit 403</b>.");
 
                     SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 402 <color=#9CA3AF>— The Andersons' door. Chained from the inside. Classical music.</color>", () => InspectUnit402());
                     SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Mid-Hallway.</color>", () => RetreatUpHall());
@@ -6130,10 +6458,7 @@ namespace SundayLastBreath.UI
                     tacticalMapController?.DiscoverAdjacentRooms("hallway_4");
                     if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_end");
 
-                    if (situationBoxText != null)
-                    {
-                        situationBoxText.text = "<color=#93C5FD><b>HALLWAY END.</b></color> The corridor terminates at the heavy fire doors leading to the stairwell. Bloody handprints smear the glass viewing pane. From <b>Unit 401</b>, loud, obnoxious pop music thumps through the wood, completely masking the sounds of the nightmare happening outside.";
-                    }
+                    SetSituationNarration("<color=#93C5FD><b>HALLWAY END.</b></color> The corridor terminates at the heavy fire doors leading to the stairwell. Bloody handprints smear the glass viewing pane. From <b>Unit 401</b>, loud, obnoxious pop music thumps through the wood, completely masking the sounds of the nightmare happening outside.");
 
                     SetHallwayChoice(choiceIdx++, "INVESTIGATE UNIT 401 <color=#9CA3AF>— The Party door. Slightly ajar. Music is loud.</color>", () => InspectUnit401());
                     SetHallwayChoice(choiceIdx++, "CHECK UTILITY CLOSET <color=#9CA3AF>— Maintenance room. The handle feels jammed.</color>", () => InspectUtilityCloset());
@@ -6167,43 +6492,68 @@ namespace SundayLastBreath.UI
             }
         }
 
+        public void InspectUnit407Exterior()
+        {
+            currentInspectedRoom = "407";
+            ClearHallwayChoices();
+            int choiceIdx = 0;
+
+            SetLocation("hallway_1", "YOUR APARTMENT (DOORWAY)", "unit_407");
+            UpdateLocationDisplay("UNIT 407", "YOUR APARTMENT (DOORWAY)");
+            if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_406_407");
+            PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.9f);
+
+            SetSituationNarration("You grip the brass handle of Unit 407 and give it a firm twist. It doesn't budge.\n\n<color=#EF4444><b>*RATTLE-CLACK*</b></color>\n\nThe heavy deadbolt engaged automatically when the door clicked shut behind you. You left your keys on the counter inside during the rush to pack. There is no going back inside without kicking the frame down or making a racket that would alert every infected on this floor.\n\nYour apartment is sealed. Your only way is forward.");
+
+            SetHallwayChoice(choiceIdx++, "[BACK] Return to Upper Hallway", () => EnterHallwayMode(1));
+            ReindexActiveChoiceHotkeys();
+        }
+
+        private void OpenUnit408Door()
+        {
+            room408_opened = true;
+            PlayClickSFX();
+            PlayDoorTransition(
+                "Videos/unit408_door_transition",
+                "[ UNIT 406 // PROFESSOR'S STUDY ]",
+                "The electronic keypad beeps twice with a soft green indicator light.\n<color=#94A3B8>The heavy internal deadbolt retracts, and the door clicks open into darkness...</color>",
+                false,
+                () => InspectUnit408(),
+                false
+            );
+        }
+
         public void InspectUnit408()
         {
-            currentInspectedRoom = "408";
+            currentInspectedRoom = "406";
             ClearHallwayChoices();
             int choiceIdx = 0;
 
             if (!room408_opened)
             {
-                SetLocation("unit_408", "UNIT 408 // THE KEYPAD");
-                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_406_407");
+                SetLocation("hallway_1", "THE KEYPAD", "unit_406");
+                UpdateLocationDisplay("UNIT 406", "THE KEYPAD");
+                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit408_door");
                 PlaySFX("Audio/SFX/tick", 0.4f);
 
                 string lockoutMsg = room408_locked_out 
-                    ? "\n\n<color=#EF4444><b>⛔ PERMANENTLY LOCKED OUT.</b> The keypad triggered its security failsafe. The software is sealed. You will have to bypass it physically.</color>"
-                    : (failed_408_attempts > 0 ? $"\n\n<color=#F59E0B>⚠️ WRONG CODE. Attempts remaining: {3 - failed_408_attempts}.</color>" : "");
+                    ? "\n\n<color=#EF4444><b>[LOCKED OUT] PERMANENTLY LOCKED OUT.</b> The keypad triggered its security failsafe. The software is sealed. You will have to bypass it physically.</color>"
+                    : (failed_408_attempts > 0 ? $"\n\n<color=#F59E0B>[!] WRONG CODE. Attempts remaining: {3 - failed_408_attempts}.</color>" : "");
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = $"Professor Harmon taught history and behavioral sociology at the university. He talked about the psychology of collapsing civilizations as inevitable and fascinating.\n\nThe door is sealed with a heavy electronic lock. A small keypad glows faintly in the dark hallway, its LEDs casting a cold blue light. Four blank digits. Waiting.\n\nTaped above the scanner is a note: <i>\"If I'm not answering, I'm either dead or I finally took my own advice and ran. Either way, you're not getting in.\"</i>{lockoutMsg}";
-                }
+                SetSituationNarration($"Professor Harmon taught history and behavioral sociology at the university. He talked about the psychology of collapsing civilizations as inevitable and fascinating.\n\nThe door is sealed with a heavy electronic lock. A small keypad glows faintly in the dark hallway, its LEDs casting a cold blue light. Four blank digits. Waiting.\n\nTaped above the scanner is a note: <i>\"If I'm not answering, I'm either dead or I finally took my own advice and ran. Either way, you're not getting in.\"</i>{lockoutMsg}");
 
                 if (!room408_locked_out)
                 {
-                    SetHallwayChoice(choiceIdx++, "📱 Enter the code from your phone (8445) <color=#9CA3AF>— You saw his text earlier.</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[PHONE] Enter code from your phone (8445) <color=#9CA3AF>— You saw his text earlier.</color>", () =>
                     {
-                        room408_opened = true;
                         gameClock?.AddTime(1);
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
 
-                    SetHallwayChoice(choiceIdx++, "🔢 Enter keypad code manually [8445] <color=#9CA3AF>— Four digits. 3 attempts limit.</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[CODE] Enter keypad code manually [8445] <color=#9CA3AF>— Four digits. 3 attempts limit.</color>", () =>
                     {
-                        room408_opened = true;
                         gameClock?.AddTime(1);
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
                 }
 
@@ -6220,9 +6570,7 @@ namespace SundayLastBreath.UI
                     {
                         ExertStamina(7);
                         gameClock?.AddTime(2);
-                        room408_opened = true;
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
                 }
 
@@ -6232,9 +6580,7 @@ namespace SundayLastBreath.UI
                     {
                         ExertStamina(7);
                         gameClock?.AddTime(3);
-                        room408_opened = true;
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
                 }
 
@@ -6244,9 +6590,7 @@ namespace SundayLastBreath.UI
                     {
                         ExertStamina(7);
                         gameClock?.AddTime(4);
-                        room408_opened = true;
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
                 }
 
@@ -6256,9 +6600,7 @@ namespace SundayLastBreath.UI
                     {
                         ExertStamina(7);
                         gameClock?.AddTime(3);
-                        room408_opened = true;
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
                 }
 
@@ -6266,9 +6608,7 @@ namespace SundayLastBreath.UI
                 {
                     SetHallwayChoice(choiceIdx++, "Read finger smudges [PER 6] <color=#10B981>(0 Stamina, instant)</color>", () =>
                     {
-                        room408_opened = true;
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
                 }
 
@@ -6278,9 +6618,7 @@ namespace SundayLastBreath.UI
                     {
                         ExertStamina(15);
                         gameClock?.AddTime(3);
-                        room408_opened = true;
-                        PlayClickSFX();
-                        InspectUnit408();
+                        OpenUnit408Door();
                     });
                 }
                 else
@@ -6292,37 +6630,30 @@ namespace SundayLastBreath.UI
                         gameClock?.AddTime(3);
                         if (UnityEngine.Random.Range(1, 101) <= chance)
                         {
-                            room408_opened = true;
-                            PlayClickSFX();
-                            InspectUnit408();
+                            OpenUnit408Door();
                         }
                         else
                         {
                             PlayBeepSFX();
                             TakeDamage(5, "Blunt trauma to hands");
-                            if (situationBoxText != null)
-                            {
-                                situationBoxText.text = "<color=#EF4444><b>BRUTE FORCE FAILED.</b></color> You battered the housing, but the internal deadbolt didn't budge. Your hands are bruised and bleeding.";
-                            }
+                            SetSituationNarration("<color=#EF4444><b>BRUTE FORCE FAILED.</b></color> You battered the housing, but the internal deadbolt didn't budge. Your hands are bruised and bleeding.");
                         }
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Give up and return to the hallway", () => EnterHallwayMode(1));
+                SetHallwayChoice(choiceIdx++, "[BACK] Give up and return to hallway", () => EnterHallwayMode(1));
             }
             else
             {
-                SetLocation("unit_408", "UNIT 408 // PROFESSOR'S STUDY");
+                SetLocation("unit_406", "PROFESSOR'S STUDY");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit408");
+                PlayHubBGM("Audio/SFX/tick", 0.25f, true);
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "The heavy door swings open into darkness. The smell reaches you first: old paper, dust, and peppermint. Drawers are pulled open. His heavy coat and hiking backpack are gone.\n\nFloor-to-ceiling shelves line all four walls. His reading glasses sit folded on an open book — <i>The Fall of Rome</i>, marked with a yellow sticky note:\n\n<i>\"Every empire ends. We're just living in the intermission. Take what you need.\"</i>";
-                }
+                SetSituationNarration("The heavy door swings open into darkness. The smell reaches you first: old paper, dust, and peppermint. Drawers are pulled open. His heavy coat and hiking backpack are gone.\n\nFloor-to-ceiling shelves line all four walls. His reading glasses sit folded on an open book — <i>The Fall of Rome</i>, marked with a yellow sticky note:\n\n<i>\"Every empire ends. We're just living in the intermission. Take what you need.\"</i>");
 
                 if (!studied_408_mechanics)
                 {
-                    SetHallwayChoice(choiceIdx++, "📖 Skim 'Advanced Mechanics' notes <color=#10B981>[TECH +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[STUDY] Skim 'Advanced Mechanics' notes <color=#10B981>[TECH +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
                     {
                         studied_408_mechanics = true;
                         gameClock?.AddTime(20);
@@ -6335,7 +6666,7 @@ namespace SundayLastBreath.UI
 
                 if (!studied_408_anatomy)
                 {
-                    SetHallwayChoice(choiceIdx++, "📖 Skim 'Gray's Anatomy' notes <color=#10B981>[MEDICINE +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[STUDY] Skim 'Gray's Anatomy' notes <color=#10B981>[MEDICINE +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
                     {
                         studied_408_anatomy = true;
                         gameClock?.AddTime(20);
@@ -6348,7 +6679,7 @@ namespace SundayLastBreath.UI
 
                 if (!read_408_journal)
                 {
-                    SetHallwayChoice(choiceIdx++, "📓 Read his personal journal <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~10 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LORE] Read personal journal <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~10 min)</color>", () =>
                     {
                         read_408_journal = true;
                         gameClock?.AddTime(10);
@@ -6363,7 +6694,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_408_kitchen)
                 {
-                    SetHallwayChoice(choiceIdx++, "🍵 Search the abandoned kitchen <color=#9CA3AF>(Canned Food x1, Energy Bar x1, Bottled Water x2)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Search abandoned kitchen <color=#9CA3AF>(Canned Food x1, Energy Bar x1, Bottled Water x2)</color>", () =>
                     {
                         looted_408_kitchen = true;
                         gameClock?.AddTime(5);
@@ -6378,7 +6709,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_408)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔍 Raid the desk drawers <color=#9CA3AF>(Encyclopedia x1, Flashlight x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Raid desk drawers <color=#9CA3AF>(Encyclopedia x1, Flashlight x1)</color>", () =>
                     {
                         looted_408 = true;
                         gameClock?.AddTime(5);
@@ -6390,7 +6721,7 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Leave the study and return to the hallway", () => EnterHallwayMode(1));
+                SetHallwayChoice(choiceIdx++, "[BACK] Leave study and return to hallway", () => EnterHallwayMode(1));
             }
 
             ReindexActiveChoiceHotkeys();
@@ -6404,18 +6735,16 @@ namespace SundayLastBreath.UI
 
             if (!room405_opened)
             {
-                SetLocation("unit_405", "UNIT 405 // THE BOOBY TRAP");
+                SetLocation("hallway_2", "THE BOOBY TRAP", "unit_405");
+                UpdateLocationDisplay("UNIT 405", "THE BOOBY TRAP");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_404_405");
                 PlayHubBGM("Audio/BGM/tension_drone", 0.4f);
 
                 string trapStatus = room405_trap_triggered 
-                    ? "\n\n<color=#EF4444><b>❌ TRAP TRIGGERED.</b> Your ears are ringing. The blank shell detonated, echoing down the floor. The wire is burned away.</color>" 
+                    ? "\n\n<color=#EF4444><b>[TRAP TRIGGERED]</b> Your ears are ringing. The blank shell detonated, echoing down the floor. The wire is burned away.</color>" 
                     : "";
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = $"This is Marcus's place. An ex-military survivalist who reinforced his walls. The door is unlocked, sitting ajar by a fraction of an inch. The sharp smell of cordite and gun oil leaks into the hallway.\n\nYou push the door gently. It stops with a faint metallic <i>*clink*</i>.\n\nA monofilament fishing line is tied from the doorknob to the pin of a flashbang grenade and a makeshift 12-gauge blank shell. Opening this normally will blow your eardrums out and alert every infected on this floor.{trapStatus}";
-                }
+                SetSituationNarration($"This is Marcus's place. An ex-military survivalist who reinforced his walls. The door is unlocked, sitting ajar by a fraction of an inch. The sharp smell of cordite and gun oil leaks into the hallway.\n\nYou push the door gently. It stops with a faint metallic <i>*clink*</i>.\n\nA monofilament fishing line is tied from the doorknob to the pin of a flashbang grenade and a makeshift 12-gauge blank shell. Opening this normally will blow your eardrums out and alert every infected on this floor.{trapStatus}");
 
                 bool isBurglar = currentPlayer != null && string.Equals(currentPlayer.job, "Burglar", StringComparison.OrdinalIgnoreCase);
                 bool hasLocksmith = currentPlayer != null && currentPlayer.HasTrait("LOCKSMITH");
@@ -6494,21 +6823,18 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Step back and return to the hallway", () => EnterHallwayMode(2));
+                SetHallwayChoice(choiceIdx++, "[BACK] Step back and return to hallway", () => EnterHallwayMode(2));
             }
             else
             {
-                SetLocation("unit_405", "UNIT 405 // THE HUNTER'S SANCTUARY");
+                SetLocation("unit_405", "THE HUNTER'S SANCTUARY");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit405");
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "You step into Marcus's apartment. It looks like a staging ground. A heavy wooden reloading bench is dusted with gunpowder and brass shavings. In the corner, a massive steel gun safe sits wide open — completely stripped of rifles.\n\nOn the wall is a topographical map tracing a route avoiding highways to <i>'Oakhaven Cabin'</i>. Underneath is a HAM radio with a notepad on the mic. Near the safe, a small wooden toy car lies forgotten on the rug.";
-                }
+                SetSituationNarration("You step into Marcus's apartment. It looks like a staging ground. A heavy wooden reloading bench is dusted with gunpowder and brass shavings. In the corner, a massive steel gun safe sits wide open — completely stripped of rifles.\n\nOn the wall is a topographical map tracing a route avoiding highways to <i>'Oakhaven Cabin'</i>. Underneath is a HAM radio with a notepad on the mic. Near the safe, a small wooden toy car lies forgotten on the rug.");
 
                 if (!read_marcus_log)
                 {
-                    SetHallwayChoice(choiceIdx++, "📝 Read the notepad by the radio <color=#EF4444>[LORE]</color> <color=#9CA3AF>(~5 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LORE] Read notepad by the radio <color=#EF4444>[LORE]</color> <color=#9CA3AF>(~5 min)</color>", () =>
                     {
                         read_marcus_log = true;
                         gameClock?.AddTime(5);
@@ -6522,7 +6848,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_405_bench)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔍 Sweep the reloading bench <color=#9CA3AF>(Pistol Ammo x12, Scrap Metal x3)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Sweep the reloading bench <color=#9CA3AF>(Pistol Ammo x12, Scrap Metal x3)</color>", () =>
                     {
                         looted_405_bench = true;
                         gameClock?.AddTime(5);
@@ -6536,7 +6862,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_405_safe)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔪 Check the bottom of the gun safe <color=#9CA3AF>(Hunting Knife x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Check bottom of gun safe <color=#9CA3AF>(Hunting Knife x1)</color>", () =>
                     {
                         looted_405_safe = true;
                         gameClock?.AddTime(3);
@@ -6547,7 +6873,7 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Leave the apartment and return to the hallway", () => EnterHallwayMode(2));
+                SetHallwayChoice(choiceIdx++, "[BACK] Leave apartment and return to hallway", () => EnterHallwayMode(2));
             }
 
             ReindexActiveChoiceHotkeys();
@@ -6561,14 +6887,12 @@ namespace SundayLastBreath.UI
 
             if (!room402_opened)
             {
-                SetLocation("unit_402", "UNIT 402 // THE CHAIN");
+                SetLocation("hallway_3", "THE CHAIN", "unit_404");
+                UpdateLocationDisplay("UNIT 402", "THE CHAIN");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_402_403");
                 PlayHubBGM("Audio/BGM/chopin", 0.45f);
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "The Andersons. A middle-aged couple and their teenage daughter. The door is unlocked. You push it open two inches before it catches on a heavy steel chain lock.\n\nThrough the gap, the lights are on. A turntable spins in the corner playing Chopin — slow, mournful piano. And there's a sharp chemical smell: clinical bleach, like a hospital scrubbed too clean.";
-                }
+                SetSituationNarration("The Andersons. A middle-aged couple and their teenage daughter. The door is unlocked. You push it open two inches before it catches on a heavy steel chain lock.\n\nThrough the gap, the lights are on. A turntable spins in the corner playing Chopin — slow, mournful piano. And there's a sharp chemical smell: clinical bleach, like a hospital scrubbed too clean.");
 
                 bool isBurglar = currentPlayer != null && string.Equals(currentPlayer.job, "Burglar", StringComparison.OrdinalIgnoreCase);
                 bool hasLocksmithOrGhost = currentPlayer != null && (currentPlayer.HasTrait("LOCKSMITH") || currentPlayer.HasTrait("GHOST"));
@@ -6667,11 +6991,11 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Leave it and walk away", () => EnterHallwayMode(3));
+                SetHallwayChoice(choiceIdx++, "[BACK] Leave it and walk away", () => EnterHallwayMode(3));
             }
             else
             {
-                SetLocation("unit_402", "UNIT 402 // THE QUIET ROOM");
+                SetLocation("unit_402", "THE QUIET ROOM");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit402");
                 PlayHubBGM("Audio/BGM/chopin", 0.45f);
 
@@ -6679,14 +7003,11 @@ namespace SundayLastBreath.UI
                     ? "<color=#EF4444><i>The chain bracket tore from the wall with a loud CRACK that echoed through the building. Somewhere below, something stirred.</i></color>\n\n" 
                     : "";
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = $"{loudNotice}You step inside. The piano swells — Chopin, <i>Nocturne in E-flat major</i>. The apartment is immaculate. No struggle. No blood. Every surface is dusted.\n\nThe Anderson family is sitting at the dining table: Mr. and Mrs. Anderson, and their teenage daughter Emma. Three empty wine glasses sit before them with white powder residue.\n\nOn the center of the table is a note: they believed a broadcast claiming the military was gassing the building. They chose peace over suffocating in the dark. Misinformation killed them.\n\nA .38 revolver lies on the floor near Mr. Anderson's foot.";
-                }
+                SetSituationNarration($"{loudNotice}You step inside. The piano swells — Chopin, <i>Nocturne in E-flat major</i>. The apartment is immaculate. No struggle. No blood. Every surface is dusted.\n\nThe Anderson family is sitting at the dining table: Mr. and Mrs. Anderson, and their teenage daughter Emma. Three empty wine glasses sit before them with white powder residue.\n\nOn the center of the table is a note: they believed a broadcast claiming the military was gassing the building. They chose peace over suffocating in the dark. Misinformation killed them.\n\nA .38 revolver lies on the floor near Mr. Anderson's foot.");
 
                 if (!looted_402_weapon)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔫 Take the revolver from the floor <color=#9CA3AF>(Revolver .38, .38 Ammo x5)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[TAKE] Take revolver from floor <color=#9CA3AF>(Revolver .38, .38 Ammo x5)</color>", () =>
                     {
                         looted_402_weapon = true;
                         gameClock?.AddTime(1);
@@ -6700,7 +7021,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_402_kitchen)
                 {
-                    SetHallwayChoice(choiceIdx++, "🍽️ Search the kitchen pantry <color=#9CA3AF>(Canned Food x2, Bottled Water x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Search kitchen pantry <color=#9CA3AF>(Canned Food x2, Bottled Water x1)</color>", () =>
                     {
                         looted_402_kitchen = true;
                         gameClock?.AddTime(2);
@@ -6714,7 +7035,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_402_bathroom)
                 {
-                    SetHallwayChoice(choiceIdx++, "💊 Check the medicine cabinet <color=#9CA3AF>(Painkillers x2, Antiseptic x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Check medicine cabinet <color=#9CA3AF>(Painkillers x2, Antiseptic x1)</color>", () =>
                     {
                         looted_402_bathroom = true;
                         gameClock?.AddTime(1);
@@ -6728,7 +7049,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_402_ring)
                 {
-                    SetHallwayChoice(choiceIdx++, "💍 Take Mrs. Anderson's wedding ring <color=#EF4444>[HUMANITY −10]</color> <color=#9CA3AF>(Gold Ring x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[TAKE] Take Mrs. Anderson's wedding ring <color=#EF4444>[HUMANITY −10]</color> <color=#9CA3AF>(Gold Ring x1)</color>", () =>
                     {
                         looted_402_ring = true;
                         gameClock?.AddTime(1);
@@ -6743,7 +7064,7 @@ namespace SundayLastBreath.UI
 
                 if (!took_402_photo)
                 {
-                    SetHallwayChoice(choiceIdx++, "📷 Take the family photo from the mantle <color=#9CA3AF>(Family Photo x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[TAKE] Take family photo from mantle <color=#9CA3AF>(Family Photo x1)</color>", () =>
                     {
                         took_402_photo = true;
                         gameClock?.AddTime(1);
@@ -6756,7 +7077,7 @@ namespace SundayLastBreath.UI
 
                 if (!read_402_note)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔍 Keep the suicide note <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~1 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LORE] Keep suicide note <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~1 min)</color>", () =>
                     {
                         read_402_note = true;
                         gameClock?.AddTime(1);
@@ -6769,7 +7090,7 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Leave them in peace — return to the hallway", () => EnterHallwayMode(3));
+                SetHallwayChoice(choiceIdx++, "[BACK] Leave them in peace — return to hallway", () => EnterHallwayMode(3));
             }
 
             ReindexActiveChoiceHotkeys();
@@ -6787,10 +7108,7 @@ namespace SundayLastBreath.UI
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_end");
                 if (!turned_off_music) PlayHubBGM("Audio/SFX/bestsongeversample", 0.6f);
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "The door is wide open. Loud pop music blares from within: <i>'...and we danced all night to the best song ever...'</i>\n\nRed solo cups litter the floor. In the living room, a massive 300-pound oak entertainment center has toppled forward, crushing a young man flat to the floor. His outstretched fingers are loosely curled around a set of <b>Car Keys</b>.\n\nA stampede of panicked partiers crushed him as they scrambled for the door. The scratched CD keeps looping endlessly.";
-                }
+                SetSituationNarration("The door is wide open. Loud pop music blares from within: <i>'...and we danced all night to the best song ever...'</i>\n\nRed solo cups litter the floor. In the living room, a massive 300-pound oak entertainment center has toppled forward, crushing a young man flat to the floor. His outstretched fingers are loosely curled around a set of <b>Car Keys</b>.\n\nA stampede of panicked partiers crushed him as they scrambled for the door. The scratched CD keeps looping endlessly.");
 
                 bool isConstruction = currentPlayer != null && string.Equals(currentPlayer.job, "Construction Worker", StringComparison.OrdinalIgnoreCase);
                 bool hasBreacherOrGrip = currentPlayer != null && (currentPlayer.HasTrait("BREACHER") || currentPlayer.HasTrait("IRON GRIP"));
@@ -6880,15 +7198,12 @@ namespace SundayLastBreath.UI
                         {
                             PlayBeepSFX();
                             TakeDamage(15, "Oak shelf collapse on back");
-                            if (situationBoxText != null)
-                            {
-                                situationBoxText.text = "<color=#EF4444><b>LIFT FAILED.</b></color> The oak shelf slipped from your grip and slammed back down. You tore a muscle in your back.";
-                            }
+                            SetSituationNarration("<color=#EF4444><b>LIFT FAILED.</b></color> The oak shelf slipped from your grip and slammed back down. You tore a muscle in your back.");
                         }
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Leave — the keys aren't worth the injury", () =>
+                SetHallwayChoice(choiceIdx++, "[BACK] Leave — keys not worth injury", () =>
                 {
                     StopHubBGM();
                     EnterHallwayMode(4);
@@ -6896,18 +7211,15 @@ namespace SundayLastBreath.UI
             }
             else
             {
-                SetLocation("unit_401", "UNIT 401 // THE PARTY THAT ENDED");
+                SetLocation("unit_401", "THE PARTY THAT ENDED");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("unit401");
                 if (!turned_off_music) PlayHubBGM("Audio/SFX/bestsongeversample", 0.6f);
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "The heavy oak shelf is off him. The <b>Car Keys</b> are safely in your pocket. The music loops endlessly from the player.\n\n<i>'...danced all night to the best song ever...'</i>\n\nThe apartment smells like beer, grief, and stale panic. You are the only living thing left here.";
-                }
+                SetSituationNarration("The heavy oak shelf is off him. The <b>Car Keys</b> are safely in your pocket. The music loops endlessly from the player.\n\n<i>'...danced all night to the best song ever...'</i>\n\nThe apartment smells like beer, grief, and stale panic. You are the only living thing left here.");
 
                 if (!looted_401_kitchen)
                 {
-                    SetHallwayChoice(choiceIdx++, "🍕 Raid the kitchen <color=#9CA3AF>(Energy Bar x2, Bottled Water x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Raid the kitchen <color=#9CA3AF>(Energy Bar x2, Bottled Water x1)</color>", () =>
                     {
                         looted_401_kitchen = true;
                         gameClock?.AddTime(2);
@@ -6921,7 +7233,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_401_bathroom)
                 {
-                    SetHallwayChoice(choiceIdx++, "🪥 Check medicine cabinet <color=#9CA3AF>(Painkillers x2, Bandage x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Check medicine cabinet <color=#9CA3AF>(Painkillers x2, Bandage x1)</color>", () =>
                     {
                         looted_401_bathroom = true;
                         gameClock?.AddTime(2);
@@ -6935,7 +7247,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_401_alcohol)
                 {
-                    SetHallwayChoice(choiceIdx++, "🍺 Take alcohol from counter <color=#9CA3AF>(Bottle of Vodka x1, Whiskey x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Take alcohol from counter <color=#9CA3AF>(Bottle of Vodka x1, Whiskey x1)</color>", () =>
                     {
                         looted_401_alcohol = true;
                         gameClock?.AddTime(2);
@@ -6949,7 +7261,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_401_pockets)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔍 Go through his jacket pockets <color=#9CA3AF>(Lighter x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[SEARCH] Search jacket pockets <color=#9CA3AF>(Lighter x1)</color>", () =>
                     {
                         looted_401_pockets = true;
                         gameClock?.AddTime(1);
@@ -6962,7 +7274,7 @@ namespace SundayLastBreath.UI
 
                 if (!turned_off_music)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔇 Turn off the blaring stereo music", () =>
+                    SetHallwayChoice(choiceIdx++, "[MUTE] Turn off blaring stereo music", () =>
                     {
                         turned_off_music = true;
                         gameClock?.AddTime(1);
@@ -6972,7 +7284,7 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Leave the apartment and return to hallway", () =>
+                SetHallwayChoice(choiceIdx++, "[BACK] Leave apartment and return to hallway", () =>
                 {
                     StopHubBGM();
                     EnterHallwayMode(4);
@@ -6990,14 +7302,12 @@ namespace SundayLastBreath.UI
 
             if (!utility_opened)
             {
-                SetLocation("utility", "4TH FLOOR // UTILITY ROOM");
+                SetLocation("hallway_4", "MAINTENANCE DOOR", "utility");
+                UpdateLocationDisplay("UTILITY", "MAINTENANCE DOOR");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("hall_end");
                 PlayHubBGM("Audio/BGM/neon_flicker_buzz", 0.45f);
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "At the end of the corridor, the carpet transitions to bare concrete. Ahead is a heavy, industrial steel door: <b>MAINTENANCE - AUTHORIZED PERSONNEL ONLY</b>.\n\nThe reinforced door has a heavy-duty magnetic swipe lock. Bleach and raw copper seep from underneath. Inside, a failing fluorescent light buzzes erratically.";
-                }
+                SetSituationNarration("At the end of the corridor, the carpet transitions to bare concrete. Ahead is a heavy, industrial steel door: <b>MAINTENANCE - AUTHORIZED PERSONNEL ONLY</b>.\n\nThe reinforced door has a heavy-duty magnetic swipe lock. Bleach and raw copper seep from underneath. Inside, a failing fluorescent light buzzes erratically.");
 
                 bool isBurglar = currentPlayer != null && string.Equals(currentPlayer.job, "Burglar", StringComparison.OrdinalIgnoreCase);
                 bool hasTech2 = currentPlayer != null && currentPlayer.tech >= 2;
@@ -7068,15 +7378,12 @@ namespace SundayLastBreath.UI
                         {
                             PlayBeepSFX();
                             TakeDamage(10, "Blunt impact against industrial steel door");
-                            if (situationBoxText != null)
-                            {
-                                situationBoxText.text = "<color=#EF4444><b>BRUTE FORCE FAILED.</b></color> You threw your weight against the heavy steel, but the magnetic lock didn't flinch. Your shoulder is badly bruised.";
-                            }
+                            SetSituationNarration("<color=#EF4444><b>BRUTE FORCE FAILED.</b></color> You threw your weight against the heavy steel, but the magnetic lock didn't flinch. Your shoulder is badly bruised.");
                         }
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Step back into the hallway", () =>
+                SetHallwayChoice(choiceIdx++, "[BACK] Step back into hallway", () =>
                 {
                     StopHubBGM();
                     EnterHallwayMode(4);
@@ -7084,18 +7391,15 @@ namespace SundayLastBreath.UI
             }
             else
             {
-                SetLocation("utility", "4TH FLOOR // UTILITY ROOM");
+                SetLocation("utility", "UTILITY ROOM");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("utility_room");
                 PlayHubBGM("Audio/BGM/neon_flicker_buzz", 0.45f);
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "The heavy door gives way. The air is thick and stinging with industrial bleach. A single failing fluorescent tube flickers on bare concrete.\n\nHeavy metal racks line the room, packed with maintenance supplies. In the center, a yellow mop bucket is tipped over, a dark smear leading toward the back corner. A metal desk sits buried under blueprints and a logbook.";
-                }
+                SetSituationNarration("The heavy door gives way. The air is thick and stinging with industrial bleach. A single failing fluorescent tube flickers on bare concrete.\n\nHeavy metal racks line the room, packed with maintenance supplies. In the center, a yellow mop bucket is tipped over, a dark smear leading toward the back corner. A metal desk sits buried under blueprints and a logbook.");
 
                 if (!read_utility_log)
                 {
-                    SetHallwayChoice(choiceIdx++, "📓 Read the maintenance logbook <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~2 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LORE] Read maintenance logbook <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~2 min)</color>", () =>
                     {
                         read_utility_log = true;
                         gameClock?.AddTime(2);
@@ -7110,7 +7414,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_utility_bleach)
                 {
-                    SetHallwayChoice(choiceIdx++, "🧽 Search the tipped cleaning cart <color=#9CA3AF>(Bleach x1, Work Gloves x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Search tipped cleaning cart <color=#9CA3AF>(Bleach x1, Work Gloves x1)</color>", () =>
                     {
                         looted_utility_bleach = true;
                         gameClock?.AddTime(2);
@@ -7124,7 +7428,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_utility_tape)
                 {
-                    SetHallwayChoice(choiceIdx++, "🧰 Scavenge metal shelves <color=#9CA3AF>(Duct Tape x1, Rope x1)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Scavenge metal shelves <color=#9CA3AF>(Duct Tape x1, Rope x1)</color>", () =>
                     {
                         looted_utility_tape = true;
                         gameClock?.AddTime(3);
@@ -7138,7 +7442,7 @@ namespace SundayLastBreath.UI
 
                 if (!looted_utility_flashlight)
                 {
-                    SetHallwayChoice(choiceIdx++, "🔦 Check drawers of the metal desk <color=#9CA3AF>(Flashlight x1, Batteries x2)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[LOOT] Check drawers of metal desk <color=#9CA3AF>(Flashlight x1, Batteries x2)</color>", () =>
                     {
                         looted_utility_flashlight = true;
                         gameClock?.AddTime(2);
@@ -7150,7 +7454,7 @@ namespace SundayLastBreath.UI
                     });
                 }
 
-                SetHallwayChoice(choiceIdx++, "🚪 Return to the hallway", () =>
+                SetHallwayChoice(choiceIdx++, "[BACK] Return to hallway", () =>
                 {
                     StopHubBGM();
                     EnterHallwayMode(4);
@@ -7177,10 +7481,7 @@ namespace SundayLastBreath.UI
                 objectiveSystem?.CompleteObjective("escape_building");
                 objectiveSystem?.AddObjective("descend_stairs", "Descend through the stairwell to ground floor", ObjectiveStatus.Active);
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "The heavy fire door slams shut behind you, sealing off the 4th floor with a final, echoing <b>*BOOM*</b>.\n\nThe stairwell is bathed in the pulsing, dim red glow of emergency backup lights. It's hard to see the bottom of the steps. The silence is broken only by the distant, vibrating hum of a struggling generator.\n\nYou need to get down to the ground floor.";
-                }
+                SetSituationNarration("The heavy fire door slams shut behind you, sealing off the 4th floor with a final, echoing <b>*BOOM*</b>.\n\nThe stairwell is bathed in the pulsing, dim red glow of emergency backup lights. It's hard to see the bottom of the steps. The silence is broken only by the distant, vibrating hum of a struggling generator.\n\nYou need to get down to the ground floor.");
 
                 bool hasFlashlight = currentPlayer != null && currentPlayer.HasItem("Flashlight");
                 bool hasLighter = currentPlayer != null && currentPlayer.HasItem("Lighter");
@@ -7286,10 +7587,7 @@ namespace SundayLastBreath.UI
                     descText = "<color=#10B981><b>[LIGHT SOURCE]</b></color> Your light sweeps down the stairs and catches a thick dark reflection. A pool of arterial blood coats the middle of the flight. Keeping the beam steady, you safely navigate around the mess.";
                 }
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = descText;
-                }
+                SetSituationNarration(descText);
 
                 SetHallwayChoice(choiceIdx++, "Turn the corner to the next landing", () =>
                 {
@@ -7303,10 +7601,7 @@ namespace SundayLastBreath.UI
                 SetLocation("stairs", "STAIRWELL // THE BARRICADE");
                 if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell_barricade");
 
-                if (situationBoxText != null)
-                {
-                    situationBoxText.text = "You continue your descent, hoping to reach the ground floor. But halfway between the 2nd and 1st floors, the stairs simply end.\n\n<color=#F59E0B><b>The way down is completely blocked.</b></color>\n\nHeavy oak desks, folding chairs, and a massive glass-front vending machine are wedged together into an impassable wall of junk. The dented, buckling steel shows whatever was trying to come up was monstrously strong.";
-                }
+                SetSituationNarration("You continue your descent, hoping to reach the ground floor. But halfway between the 2nd and 1st floors, the stairs simply end.\n\n<color=#F59E0B><b>The way down is completely blocked.</b></color>\n\nHeavy oak desks, folding chairs, and a massive glass-front vending machine are wedged together into an impassable wall of junk. The dented, buckling steel shows whatever was trying to come up was monstrously strong.");
 
                 if (!barricade_pushed)
                 {
@@ -7315,10 +7610,7 @@ namespace SundayLastBreath.UI
                         barricade_pushed = true;
                         gameClock?.AddTime(1);
                         PlaySFX("Audio/SFX/firedoor_slam", 0.8f);
-                        if (situationBoxText != null)
-                        {
-                            situationBoxText.text = "<color=#EF4444><b>[FAILED - IMPASSABLE]</b></color> You throw your shoulder against the vending machine. The metal shrieks violently against concrete, echoing like a gunshot. The barricade doesn't budge an inch. But that shriek definitely woke something up below.";
-                        }
+                        SetSituationNarration("<color=#EF4444><b>[FAILED - IMPASSABLE]</b></color> You throw your shoulder against the vending machine. The metal shrieks violently against concrete, echoing like a gunshot. The barricade doesn't budge an inch. But that shriek definitely woke something up below.");
                         InspectStairwell();
                     });
                 }
@@ -7329,10 +7621,7 @@ namespace SundayLastBreath.UI
                     objectiveSystem?.CompleteObjective("descend_stairs");
                     objectiveSystem?.AddObjective("detour_2f", "Cross the 2nd Floor to find the East Wing stairs", ObjectiveStatus.Active);
                     AppendStoryLog(gameClock?.GetTimeString() ?? "00:40", "STAIRWELL // 2ND FLOOR DETOUR", "The 1st floor descent was completely barricaded with heavy office furniture. Forced to take the fire door into the 2nd Floor corridor.");
-                    if (situationBoxText != null)
-                    {
-                        situationBoxText.text = "<color=#10B981><b>FIRE DOOR UNLATCHED.</b></color> You step through the heavy emergency door onto the 2nd Floor corridor. The air is cold and smells of wet plaster. Ahead, the corridor stretches into darkness.";
-                    }
+                    SetSituationNarration("<color=#10B981><b>FIRE DOOR UNLATCHED.</b></color> You step through the heavy emergency door onto the 2nd Floor corridor. The air is cold and smells of wet plaster. Ahead, the corridor stretches into darkness.");
                     ClearHallwayChoices();
                     SetHallwayChoice(0, "Proceed into 2nd Floor Corridor...", () =>
                     {
@@ -7680,27 +7969,46 @@ namespace SundayLastBreath.UI
             if (situationBoxText != null)
             {
                 situationBoxText.text = formattedText;
-                situationBoxText.ForceMeshUpdate();
-
-                // Dynamic height: TopRow is 26px + 4px offset, plus bottom padding of 6px
-                float preferredTextH = situationBoxText.preferredHeight;
-                float targetH = Mathf.Clamp(preferredTextH + 38f, 54f, 135f);
-
-                LayoutElement le = situationBox.GetComponent<LayoutElement>();
-                if (le != null)
-                {
-                    le.preferredHeight = targetH;
-                    le.minHeight = targetH;
-                    le.flexibleHeight = 0f;
-                }
 
                 RectTransform sbtRect = situationBoxText.rectTransform;
                 if (sbtRect != null)
                 {
-                    sbtRect.offsetMin = new Vector2(16f, 4f);
-                    sbtRect.offsetMax = new Vector2(-16f, -30f);
+                    sbtRect.anchorMin = Vector2.zero;
+                    sbtRect.anchorMax = Vector2.one;
+                    sbtRect.offsetMin = new Vector2(16f, 10f);
+                    sbtRect.offsetMax = new Vector2(-16f, -32f);
+                }
+
+                situationBoxText.ForceMeshUpdate();
+
+                // Dynamic height: TopRow is 28px + offset, plus bottom padding of 14px
+                float preferredTextH = situationBoxText.preferredHeight;
+                float targetH = Mathf.Clamp(preferredTextH + 46f, 58f, 320f);
+
+                LayoutElement le = situationBox.GetComponent<LayoutElement>();
+                if (le == null) le = situationBox.AddComponent<LayoutElement>();
+                le.preferredHeight = targetH;
+                le.minHeight = targetH;
+                le.flexibleHeight = 0f;
+
+                // Add RectMask2D on situationBox if not present to cleanly clip if ever exceeded
+                if (situationBox.GetComponent<RectMask2D>() == null)
+                {
+                    situationBox.AddComponent<RectMask2D>();
+                }
+
+                // Force layout rebuild so hubMenuContainer immediately reflows ChoiceSubHeader and choices below
+                LayoutRebuilder.ForceRebuildLayoutImmediate(situationBox.GetComponent<RectTransform>());
+                if (hubMenuContainer != null)
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(hubMenuContainer.GetComponent<RectTransform>());
                 }
             }
+        }
+
+        public void SetSituationNarration(string formattedText)
+        {
+            UpdateSituationBoxTextAndHeight(formattedText);
         }
 
         public void SetChoiceSubHeaderVisible(bool visible, string customText = null)
@@ -8279,6 +8587,13 @@ namespace SundayLastBreath.UI
                     OpenLockpickingModal(choice);
                     return;
                 }
+                else if (string.Equals(choice.triggerActionId, "OPEN_COMBAT_MODAL", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(choice.triggerActionId, "COMBAT", StringComparison.OrdinalIgnoreCase) ||
+                         choice.triggerActionId.IndexOf("COMBAT", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    OpenTacticalCombatModal(choice);
+                    return;
+                }
                 else if (string.Equals(choice.triggerActionId, "OPEN_KEYPAD_MODAL", StringComparison.OrdinalIgnoreCase))
                 {
                     OpenKeypadPuzzleModal(choice);
@@ -8658,6 +8973,106 @@ namespace SundayLastBreath.UI
             );
         }
 
+        public void OpenTacticalCombatModal(SundayLastBreath.Data.PassageChoiceData choice)
+        {
+            if (combatModal == null)
+            {
+                combatModal = GetComponentInChildren<TacticalCombatModal>(true);
+                if (combatModal == null)
+                {
+                    Canvas canvas = GetComponentInParent<Canvas>();
+                    if (canvas == null) canvas = FindAnyObjectByType<Canvas>();
+                    GameObject cbObj = new GameObject("TacticalCombatModal", typeof(RectTransform));
+                    if (canvas != null) cbObj.transform.SetParent(canvas.transform, false);
+                    combatModal = cbObj.AddComponent<TacticalCombatModal>();
+                }
+            }
+
+            var enemies = new List<TacticalCombatModal.CombatEnemyData>();
+            string pid = CurrentPassage != null && !string.IsNullOrEmpty(CurrentPassage.passageId) ? CurrentPassage.passageId : "";
+
+            // 1. Check if specific CombatEnemyProfile ScriptableObjects are assigned on the choice in Inspector
+            if (choice != null && choice.combatEnemies != null && choice.combatEnemies.Count > 0)
+            {
+                foreach (var prof in choice.combatEnemies)
+                {
+                    if (prof != null) enemies.Add(TacticalCombatModal.FromProfile(prof));
+                }
+            }
+
+            // 2. Check if comma-separated enemy IDs are specified on the choice
+            if (enemies.Count == 0 && choice != null && !string.IsNullOrWhiteSpace(choice.combatEnemyIdsCsv))
+            {
+                var ids = choice.combatEnemyIdsCsv.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var id in ids)
+                {
+                    enemies.Add(TacticalCombatModal.CreateEnemyById(id.Trim()));
+                }
+            }
+
+            // 3. Fallback to contextual passage enemies (loaded from CombatEnemyProfile assets if present!)
+            if (enemies.Count == 0)
+            {
+                if (pid.IndexOf("7Eleven", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    enemies.Add(TacticalCombatModal.CreateEnemyById("zombie_motorist"));
+                    enemies.Add(TacticalCombatModal.CreateEnemyById("zombie_passenger"));
+                }
+                else if (pid.IndexOf("Road", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    enemies.Add(TacticalCombatModal.CreateEnemyById("zombie_motorist"));
+                }
+                else
+                {
+                    enemies.Add(TacticalCombatModal.CreateEnemyById("zombie_commuter"));
+                    enemies.Add(TacticalCombatModal.CreateEnemyById("zombie_guard"));
+                }
+            }
+
+            combatModal.StartEncounter(
+                playerData: currentPlayer,
+                enemies: enemies,
+                onVictory: () =>
+                {
+                    PlayClickSFX();
+                    UpdateVitalsUI();
+                    tacticalGearController?.RefreshAll();
+
+                    if (choice != null)
+                    {
+                        if (!string.IsNullOrEmpty(choice.setsStoryFlagOnExecute) && currentPlayer != null)
+                        {
+                            currentPlayer.SetFlag(choice.setsStoryFlagOnExecute, true);
+                        }
+                        if (!string.IsNullOrEmpty(choice.givesItem))
+                        {
+                            GiveOrDropItem(choice.givesItem, Mathf.Max(1, choice.givesItemQty));
+                        }
+                        if (choice.successPassage != null)
+                        {
+                            PlayStoryPassage(choice.successPassage);
+                            return;
+                        }
+                        if (choice.targetPassage != null)
+                        {
+                            PlayStoryPassage(choice.targetPassage);
+                            return;
+                        }
+                    }
+
+                    if (CurrentPassage != null) PlayStoryPassage(CurrentPassage);
+                },
+                onDefeat: () =>
+                {
+                    UpdateVitalsUI();
+                    if (choice != null && choice.failurePassage != null)
+                    {
+                        PlayStoryPassage(choice.failurePassage);
+                    }
+                }
+            );
+        }
+
         private IEnumerator PlayPassageVideoTransition(SundayLastBreath.Data.PassageChoiceData choice, SundayLastBreath.Data.StoryPassageData targetPassage)
         {
             if (targetPassage == null || choice == null) yield break;
@@ -8758,40 +9173,70 @@ namespace SundayLastBreath.UI
                 }
                 if (doorVideoRawImage != null) doorVideoRawImage.color = Color.white;
 
-                yield return new WaitForSecondsRealtime(0.2f);
+                // Show skip prompt
+                if (doorTransitionSkipPromptTmp != null) doorTransitionSkipPromptTmp.gameObject.SetActive(true);
+
                 float vidLen = (float)doorVideoPlayer.length;
                 if (vidLen <= 0.5f) vidLen = 3.5f;
 
-                // Play footsteps / step SFX as door opens into the dark room
                 float midTime = vidLen * 0.55f;
                 float elapsed = 0.2f + vidFadeIn;
-                if (midTime > elapsed)
+                bool playedStep = false;
+                bool skipped = false;
+
+                while (elapsed < vidLen - 0.35f)
                 {
-                    yield return new WaitForSecondsRealtime(midTime - elapsed);
-                }
-                if (choice.transitionStepSFX != null) PlaySFX(choice.transitionStepSFX, 0.85f);
-                else if (doorTransitionFootstepSFX != null) PlaySFX(doorTransitionFootstepSFX, 0.8f);
-                else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+                    if (CheckDoorTransitionSkipInput())
+                    {
+                        skipped = true;
+                        break;
+                    }
 
-                float playDuration = Mathf.Max(0.3f, vidLen - midTime - 0.35f);
-                yield return new WaitForSecondsRealtime(playDuration);
+                    if (!playedStep && elapsed >= midTime)
+                    {
+                        playedStep = true;
+                        if (choice.transitionStepSFX != null) PlaySFX(choice.transitionStepSFX, 0.85f);
+                        else if (doorTransitionFootstepSFX != null) PlaySFX(doorTransitionFootstepSFX, 0.8f);
+                        else PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Footsteps/FootstepWood1.wav", 0.8f);
+                    }
 
-                // Play end / slam SFX if provided
-                if (choice.transitionEndSFX != null) PlaySFX(choice.transitionEndSFX, 0.9f);
-
-                // Fade video out to black
-                float vidFadeOut = 0.35f;
-                for (float t = 0; t < vidFadeOut; t += Time.unscaledDeltaTime)
-                {
-                    float a = Mathf.Lerp(1f, 0f, t / vidFadeOut);
-                    if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                    elapsed += Time.unscaledDeltaTime;
                     yield return null;
                 }
-                if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
 
-                // Brief post-video pause
-                float postPause = choice.postVideoPause > 0f ? choice.postVideoPause : 0.3f;
-                yield return new WaitForSecondsRealtime(postPause);
+                if (doorTransitionSkipPromptTmp != null) doorTransitionSkipPromptTmp.gameObject.SetActive(false);
+
+                if (skipped)
+                {
+                    if (doorVideoPlayer != null && doorVideoPlayer.isPlaying) doorVideoPlayer.Stop();
+                    if (choice.transitionEndSFX != null) PlaySFX(choice.transitionEndSFX, 0.9f);
+                    else if (doorTransitionPlaySlamSFX)
+                    {
+                        if (doorTransitionSlamSFX != null) PlaySFX(doorTransitionSlamSFX, 0.75f);
+                        else PlaySFX("Audio/SFX/firedoor_slam.mp3", 0.75f);
+                    }
+                    if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+                    yield return new WaitForSecondsRealtime(0.05f);
+                }
+                else
+                {
+                    // Play end / slam SFX if provided
+                    if (choice.transitionEndSFX != null) PlaySFX(choice.transitionEndSFX, 0.9f);
+
+                    // Fade video out to black
+                    float vidFadeOut = 0.35f;
+                    for (float t = 0; t < vidFadeOut; t += Time.unscaledDeltaTime)
+                    {
+                        float a = Mathf.Lerp(1f, 0f, t / vidFadeOut);
+                        if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, a);
+                        yield return null;
+                    }
+                    if (doorVideoRawImage != null) doorVideoRawImage.color = new Color(1f, 1f, 1f, 0f);
+
+                    // Brief post-video pause
+                    float postPause = choice.postVideoPause > 0f ? choice.postVideoPause : 0.3f;
+                    yield return new WaitForSecondsRealtime(postPause);
+                }
             }
 
             // Transition passage behind dark curtain
@@ -8841,7 +9286,7 @@ namespace SundayLastBreath.UI
         /// 3. CharacterData persistent location
         /// 4. Tactical Map controller bio-radar beacon & node selection
         /// </summary>
-        public void SetLocation(string roomId, string customSectorSubtitle = null)
+        public void SetLocation(string roomId, string customSectorSubtitle = null, string thresholdTargetRoomId = null)
         {
             if (string.IsNullOrEmpty(roomId)) roomId = "unit_407";
 
@@ -8850,7 +9295,15 @@ namespace SundayLastBreath.UI
 
             if (tacticalMapController != null)
             {
-                tacticalMapController.SetCurrentLocation(roomId);
+                if (!string.IsNullOrEmpty(thresholdTargetRoomId))
+                {
+                    tacticalMapController.SetThresholdLocation(roomId, thresholdTargetRoomId);
+                }
+                else
+                {
+                    tacticalMapController.SetCurrentLocation(roomId);
+                }
+
                 var node = tacticalMapController.GetNode(roomId);
                 if (node != null)
                 {
@@ -8863,6 +9316,7 @@ namespace SundayLastBreath.UI
             }
 
             UpdateLocationDisplay(roomDisplay, sectorSubtitle);
+            UpdateSituationBoxHeader(sectorSubtitle);
 
             if (currentPlayer != null)
             {
@@ -8885,7 +9339,15 @@ namespace SundayLastBreath.UI
 
             if (!string.IsNullOrEmpty(sectorSubtitle))
             {
-                formattedTop += $" // {sectorSubtitle.ToUpper()}";
+                string sub = sectorSubtitle.ToUpper();
+                if (sub.StartsWith(displayTitle + " // "))
+                {
+                    formattedTop = $"■ {sub}";
+                }
+                else
+                {
+                    formattedTop += $" // {sub}";
+                }
             }
             else if (!displayTitle.Contains("ASCOTT"))
             {
@@ -8917,7 +9379,7 @@ namespace SundayLastBreath.UI
             }
         }
 
-        private void UpdateVitalsUI()
+        public void UpdateVitalsUI()
         {
             if (currentPlayer == null) return;
 
@@ -8937,6 +9399,38 @@ namespace SundayLastBreath.UI
             // Legacy HUD fields
             if (vitalsHpText != null) vitalsHpText.text = $"<color=#FF5555><b>HP</b></color> {currentPlayer.hp}/{currentPlayer.hpMax}";
             if (vitalsStaminaText != null) vitalsStaminaText.text = $"<color=#55FF88><b>STM</b></color> {currentPlayer.stamina}/{currentPlayer.staminaMax}";
+        }
+
+        public void SetTopHUDVisible(bool visible)
+        {
+            if (topHUDContainer == null)
+            {
+                Transform found = transform.Find("TopHUD");
+                if (found == null && hpBarFill != null)
+                {
+                    Transform curr = hpBarFill.transform;
+                    while (curr != null && curr != transform)
+                    {
+                        if (curr.name.IndexOf("TopHUD", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            found = curr;
+                            break;
+                        }
+                        curr = curr.parent;
+                    }
+                    if (found == null && hpBarFill.transform.parent != null)
+                    {
+                        found = hpBarFill.transform.parent;
+                        if (found.parent != null && found.parent != transform) found = found.parent;
+                    }
+                }
+                if (found != null) topHUDContainer = found.gameObject;
+            }
+
+            if (topHUDContainer != null)
+            {
+                topHUDContainer.SetActive(visible);
+            }
         }
 
         private void UpdateObjectiveUI()

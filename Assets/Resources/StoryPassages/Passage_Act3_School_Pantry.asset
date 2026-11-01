@@ -73,7 +73,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Exit Pantry to Canteen [NORTH]"
+  - choiceLabel: "[DOOR] Exit Pantry to Canteen [NORTH]"
     choiceSubtitle: 
     targetPassage: {fileID: 11400000, guid: 50dd82357f05b424585a8183c613cabe, type: 2}
     targetPassageId: Act3_School_Canteen

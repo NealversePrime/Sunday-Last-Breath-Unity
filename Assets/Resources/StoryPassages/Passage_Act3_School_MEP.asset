@@ -75,7 +75,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Exit MEP Space to Locker Room [SOUTH]"
+  - choiceLabel: "[DOOR] Exit MEP Space to Locker Room [SOUTH]"
     choiceSubtitle: Step back into the athletic locker room.
     targetPassage: {fileID: 11400000, guid: 067f7da71d4c7ac4085b7dffcd6c5a5b, type: 2}
     targetPassageId: Act3_School_LockerRoom

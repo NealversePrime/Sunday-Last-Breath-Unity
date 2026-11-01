@@ -215,7 +215,7 @@ namespace SundayLastBreath.UI
                 // SUCCESS
                 isUnlocked = true;
                 if (lcdStatusText != null)
-                    lcdStatusText.text = "<color=#10B981>✔ ACCESS GRANTED</color>";
+                    lcdStatusText.text = "<color=#10B981>[OK] ACCESS GRANTED</color>";
                 if (lcdDisplayText != null)
                     lcdDisplayText.text = $"<color=#10B981>[ {enteredCode} ]</color>";
 
@@ -232,7 +232,7 @@ namespace SundayLastBreath.UI
                 PlayErrorBuzzer();
 
                 if (lcdStatusText != null)
-                    lcdStatusText.text = "<color=#EF4444>⛔ INVALID CODE</color>";
+                    lcdStatusText.text = "<color=#EF4444>[!] INVALID CODE</color>";
                 if (lcdDisplayText != null)
                     lcdDisplayText.text = "<color=#EF4444>[ ERR ]</color>";
 

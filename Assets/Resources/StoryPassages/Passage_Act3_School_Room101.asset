@@ -31,7 +31,7 @@ MonoBehaviour:
   dialogueLines: []
   initialFloorItems: []
   choices:
-  - choiceLabel: "\U0001F6AA Exit Classroom 101 to Hallway [EAST]"
+  - choiceLabel: "[DOOR] Exit Classroom 101 to Hallway [EAST]"
     choiceSubtitle: 
     targetPassage: {fileID: 11400000, guid: 53c56bda0d2fecc46b3938a6bd856d17, type: 2}
     targetPassageId: Act3_SchoolGFloor

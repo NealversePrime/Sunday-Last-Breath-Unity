@@ -205,7 +205,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA ENTER MAIN SECURITY FOYER - SOUTH"
+  - choiceLabel: "[DOOR] ENTER MAIN SECURITY FOYER - SOUTH"
     choiceSubtitle: Main Entrance / Refugee Intake Area.
     targetPassage: {fileID: 11400000, guid: d280d2ac325b42e49b49a5add6bb370c, type: 2}
     targetPassageId: Act3_School_Foyer
@@ -325,7 +325,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA ENTER CLASSROOM 101 - WEST"
+  - choiceLabel: "[DOOR] ENTER CLASSROOM 101 - WEST"
     choiceSubtitle: Refugee sleeping quarters.
     targetPassage: {fileID: 11400000, guid: d74e15cf9aea7ad4f91f61338b700c73, type: 2}
     targetPassageId: Act3_School_Room101
@@ -365,7 +365,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA ENTER CLASSROOM 102 - NORTH-WEST"
+  - choiceLabel: "[DOOR] ENTER CLASSROOM 102 - NORTH-WEST"
     choiceSubtitle: Temporary medical overflow / sleeping cots.
     targetPassage: {fileID: 11400000, guid: 7ad501be355d1294297f88104b9710fb, type: 2}
     targetPassageId: Act3_School_Room102

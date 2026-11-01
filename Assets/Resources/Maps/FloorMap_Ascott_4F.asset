@@ -22,8 +22,8 @@ MonoBehaviour:
     roomCode: UNIT 407
     shortSub: SAFEHOUSE
     fullTitle: UNIT 407 // SAFEHOUSE
-    position: {x: -55, y: 114}
-    size: {x: 33, y: 33}
+    position: {x: 58.3, y: 119.4}
+    size: {x: 35.1, y: 35.1}
     iconType: 1
     isHallway: 0
     isStairs: 0
@@ -44,8 +44,8 @@ MonoBehaviour:
     roomCode: HALLWAY 1
     shortSub: CORRIDOR
     fullTitle: HALLWAY 1 // CORRIDOR
-    position: {x: 0, y: 114}
-    size: {x: 33, y: 33}
+    position: {x: 0.0, y: 119.4}
+    size: {x: 35.1, y: 35.1}
     iconType: 7
     isHallway: 1
     isStairs: 0
@@ -62,40 +62,40 @@ MonoBehaviour:
     reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
     connectedRoomIds:
     - unit_407
-    - unit_408
+    - unit_406
     - hallway_2
-  - roomId: unit_408
-    roomCode: UNIT 408
-    shortSub: KEYPAD SCANNER
-    fullTitle: UNIT 408 // KEYPAD SCANNER
-    position: {x: 55, y: 114}
-    size: {x: 33, y: 33}
-    iconType: 0
+  - roomId: unit_406
+    roomCode: UNIT 406
+    shortSub: PROFESSOR'S LAB
+    fullTitle: UNIT 406 // PROFESSOR'S LAB
+    position: {x: -58.3, y: 119.4}
+    size: {x: 35.1, y: 35.1}
+    iconType: 2
     isHallway: 0
     isStairs: 0
-    isLocked: 0
+    isLocked: 1
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
     undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 408 // KEYPAD SCANNER
+    undiscoveredTitle: UNIT 406 // PROFESSOR'S LAB
     statusTag: CLEAR
     threatLevel: LOW
-    scavengeStatus: UNSEARCHED
+    scavengeStatus: HIGH INTEL
     acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector UNIT 408. Initial tactical scans show potential supply caches and survivor barricades.
+    reconIntel: Residence of Dr. Alistair / Prof. Harmon. Features a heavy electronic keypad deadbolt lock. Known repository of archival biological research.
     connectedRoomIds:
     - hallway_1
   - roomId: unit_405
     roomCode: UNIT 405
     shortSub: HUNTER'S APT
     fullTitle: UNIT 405 // HUNTER'S APT
-    position: {x: -55, y: 58}
-    size: {x: 33, y: 33}
+    position: {x: 58.3, y: 59.7}
+    size: {x: 35.1, y: 35.1}
     iconType: 0
     isHallway: 0
     isStairs: 0
-    isLocked: 0
+    isLocked: 1
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
@@ -103,17 +103,17 @@ MonoBehaviour:
     undiscoveredTitle: UNIT 405 // HUNTER'S APT
     statusTag: CLEAR
     threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector UNIT 405. Initial tactical scans show potential supply caches and survivor barricades.
+    scavengeStatus: WEAPONS / AMMO
+    acousticScan: METALLIC CLICK
+    reconIntel: Residence of Marcus, an experienced outdoorsman and hunter. Reinforced steel frame door. High-priority cache for firearms and ammunition.
     connectedRoomIds:
     - hallway_2
   - roomId: hallway_2
     roomCode: HALLWAY 2
     shortSub: CORRIDOR
     fullTitle: HALLWAY 2 // CORRIDOR
-    position: {x: 0, y: 58}
-    size: {x: 33, y: 33}
+    position: {x: 0.0, y: 59.7}
+    size: {x: 35.1, y: 35.1}
     iconType: 7
     isHallway: 1
     isStairs: 0
@@ -131,14 +131,14 @@ MonoBehaviour:
     connectedRoomIds:
     - hallway_1
     - unit_405
-    - blocked_406
+    - unit_404
     - hallway_3
-  - roomId: blocked_406
-    roomCode: BLOCKED 406
-    shortSub: BIOHAZARD
-    fullTitle: BLOCKED 406 // BIOHAZARD
-    position: {x: 55, y: 58}
-    size: {x: 33, y: 33}
+  - roomId: unit_404
+    roomCode: UNIT 404
+    shortSub: BARRICADED
+    fullTitle: UNIT 404 // BARRICADED
+    position: {x: -58.3, y: 59.7}
+    size: {x: 35.1, y: 35.1}
     iconType: 3
     isHallway: 0
     isStairs: 0
@@ -147,20 +147,20 @@ MonoBehaviour:
     isAccessible: 0
     isDiscovered: 0
     undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: BLOCKED 406 // BIOHAZARD
+    undiscoveredTitle: UNIT 404 // BARRICADED
     statusTag: BLOCKED
     threatLevel: HIGH
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Critical biohazard quarantine or structural cave-in. Passage blocked by severe debris or viral contamination.
+    scavengeStatus: INACCESSIBLE
+    acousticScan: HEAVY THUMPING
+    reconIntel: Doorway violently nailed shut from the inside with heavy structural timber planks. Frantic gouge marks on door frame. Completely impassable.
     connectedRoomIds:
     - hallway_2
-  - roomId: blocked_403
-    roomCode: BLOCKED 403
+  - roomId: unit_403
+    roomCode: UNIT 403
     shortSub: BIOHAZARD
-    fullTitle: BLOCKED 403 // BIOHAZARD
-    position: {x: -55, y: 2}
-    size: {x: 33, y: 33}
+    fullTitle: UNIT 403 // BIOHAZARD
+    position: {x: 58.3, y: 0.0}
+    size: {x: 35.1, y: 35.1}
     iconType: 3
     isHallway: 0
     isStairs: 0
@@ -169,20 +169,20 @@ MonoBehaviour:
     isAccessible: 0
     isDiscovered: 0
     undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: BLOCKED 403 // BIOHAZARD
+    undiscoveredTitle: UNIT 403 // BIOHAZARD
     statusTag: BLOCKED
     threatLevel: HIGH
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Critical biohazard quarantine or structural cave-in. Passage blocked by severe debris or viral contamination.
+    scavengeStatus: INACCESSIBLE
+    acousticScan: FLIES / SILENCE
+    reconIntel: Severe biological quarantine hazard. Dark coagulated substance beneath warped door frame. Entry without protective hazmat suit is lethal.
     connectedRoomIds:
     - hallway_3
   - roomId: hallway_3
     roomCode: HALLWAY 3
     shortSub: CORRIDOR
     fullTitle: HALLWAY 3 // CORRIDOR
-    position: {x: 0, y: 2}
-    size: {x: 33, y: 33}
+    position: {x: 0.0, y: 0.0}
+    size: {x: 35.1, y: 35.1}
     iconType: 7
     isHallway: 1
     isStairs: 0
@@ -199,16 +199,16 @@ MonoBehaviour:
     reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
     connectedRoomIds:
     - hallway_2
-    - blocked_403
-    - unit_404
+    - unit_403
+    - unit_402
     - hallway_4
-  - roomId: unit_404
-    roomCode: UNIT 404
-    shortSub: RESIDENTIAL
-    fullTitle: UNIT 404 // RESIDENTIAL
-    position: {x: 55, y: 2}
-    size: {x: 33, y: 33}
-    iconType: 0
+  - roomId: unit_402
+    roomCode: UNIT 402
+    shortSub: ANDERSONS' APT
+    fullTitle: UNIT 402 // ANDERSONS' APT
+    position: {x: -58.3, y: 0.0}
+    size: {x: 35.1, y: 35.1}
+    iconType: 4
     isHallway: 0
     isStairs: 0
     isLocked: 0
@@ -216,20 +216,20 @@ MonoBehaviour:
     isAccessible: 1
     isDiscovered: 0
     undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 404 // RESIDENTIAL
+    undiscoveredTitle: UNIT 402 // ANDERSONS' APT
     statusTag: CLEAR
     threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector UNIT 404. Initial tactical scans show potential supply caches and survivor barricades.
+    scavengeStatus: MEDICAL / RATIONS
+    acousticScan: RUNNING WATER
+    reconIntel: The door safety chain is broken and the door stands slightly ajar. Overflowing tap sound inside. Salvageable medical supplies and canned food.
     connectedRoomIds:
     - hallway_3
   - roomId: unit_401
     roomCode: UNIT 401
-    shortSub: RESIDENTIAL
-    fullTitle: UNIT 401 // RESIDENTIAL
-    position: {x: -55, y: -54}
-    size: {x: 33, y: 33}
+    shortSub: CORNER APT
+    fullTitle: UNIT 401 // CORNER APT
+    position: {x: 58.3, y: -59.7}
+    size: {x: 35.1, y: 35.1}
     iconType: 0
     isHallway: 0
     isStairs: 0
@@ -238,20 +238,20 @@ MonoBehaviour:
     isAccessible: 1
     isDiscovered: 0
     undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 401 // RESIDENTIAL
+    undiscoveredTitle: UNIT 401 // CORNER APT
     statusTag: CLEAR
     threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector UNIT 401. Initial tactical scans show potential supply caches and survivor barricades.
+    scavengeStatus: KEYS / VALUABLES
+    acousticScan: WIND THROUGH GLASS
+    reconIntel: South-west corner residential unit. Unopened letters scattered by the entrance. Door latch is unlocked following hurried evacuation.
     connectedRoomIds:
     - hallway_4
   - roomId: hallway_4
     roomCode: HALLWAY 4
     shortSub: CORRIDOR
     fullTitle: HALLWAY 4 // CORRIDOR
-    position: {x: 0, y: -54}
-    size: {x: 33, y: 33}
+    position: {x: 0.0, y: -59.7}
+    size: {x: 35.1, y: 35.1}
     iconType: 7
     isHallway: 1
     isStairs: 0
@@ -264,18 +264,20 @@ MonoBehaviour:
     statusTag: CLEAR
     threatLevel: MEDIUM
     scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    acousticScan: OZONE & SMOKE
+    reconIntel: Southern junction bordering the utility electrical closet and stairwell entrance. Acrid scent of electrical discharge in the air.
     connectedRoomIds:
     - unit_401
     - hallway_3
     - utility
+    - stairs
+    - blocked_stairs
   - roomId: utility
     roomCode: UTILITY BAY
     shortSub: SERVICE ROOM
     fullTitle: UTILITY BAY // SERVICE ROOM
-    position: {x: 55, y: -54}
-    size: {x: 33, y: 33}
+    position: {x: -58.3, y: -59.7}
+    size: {x: 35.1, y: 35.1}
     iconType: 5
     isHallway: 0
     isStairs: 0
@@ -287,17 +289,17 @@ MonoBehaviour:
     undiscoveredTitle: UTILITY BAY // SERVICE ROOM
     statusTag: CLEAR
     threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
+    scavengeStatus: TOOLS / FUSES
+    acousticScan: TRANSFORMER HUM
     reconIntel: Facility service closet and breaker substation. Houses fuse boxes, spare cables, and building maintenance gear.
     connectedRoomIds:
     - hallway_4
   - roomId: stairs
-    roomCode: STAIRWELL W
+    roomCode: STAIRWELL
     shortSub: FIRE EXIT
-    fullTitle: STAIRWELL W // FIRE EXIT
-    position: {x: -55, y: -110}
-    size: {x: 33, y: 33}
+    fullTitle: STAIRWELL // FIRE EXIT
+    position: {x: 58.3, y: -119.4}
+    size: {x: 35.1, y: 35.1}
     iconType: 6
     isHallway: 0
     isStairs: 1
@@ -306,118 +308,90 @@ MonoBehaviour:
     isAccessible: 1
     isDiscovered: 0
     undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: STAIRWELL W // FIRE EXIT
+    undiscoveredTitle: STAIRWELL // FIRE EXIT
     statusTag: CLEAR
     threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Emergency fire exit stairwell. Heavy reinforced fire doors provide vertical access between facility floors.
-    connectedRoomIds: []
+    scavengeStatus: ESCAPE ROUTE
+    acousticScan: ECHOING GROANS
+    reconIntel: Emergency fire exit stairwell. Heavy reinforced fire door with functioning push-bar. Primary route descending to 3rd and Ground floors.
+    connectedRoomIds:
+    - hallway_4
   - roomId: blocked_stairs
     roomCode: BLOCKED STAIRS
-    shortSub: FIRE EXIT
-    fullTitle: BLOCKED STAIRS // FIRE EXIT
-    position: {x: 55, y: -110}
-    size: {x: 33, y: 33}
+    shortSub: COLLAPSED
+    fullTitle: BLOCKED STAIRS // COLLAPSED
+    position: {x: -58.3, y: -119.4}
+    size: {x: 35.1, y: 35.1}
     iconType: 6
     isHallway: 0
     isStairs: 1
     isLocked: 0
-    isBlocked: 0
-    isAccessible: 1
+    isBlocked: 1
+    isAccessible: 0
     isDiscovered: 0
     undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: BLOCKED STAIRS // FIRE EXIT
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Emergency fire exit stairwell. Heavy reinforced fire doors provide vertical access between facility floors.
-    connectedRoomIds: []
-  - roomId: stairwell_exit_bg
-    roomCode: STAIRWELL EXIT BG
-    shortSub: FIRE EXIT
-    fullTitle: STAIRWELL EXIT BG // FIRE EXIT
-    position: {x: -18, y: -18}
-    size: {x: 39, y: 33}
-    iconType: 6
-    isHallway: 0
-    isStairs: 1
-    isLocked: 0
-    isBlocked: 0
-    isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: STAIRWELL EXIT BG // FIRE EXIT
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Emergency fire exit stairwell. Heavy reinforced fire doors provide vertical access between facility floors.
-    connectedRoomIds: []
-  - roomId: stairwell_exit_fg
-    roomCode: STAIRWELL EXIT FG
-    shortSub: FIRE EXIT
-    fullTitle: STAIRWELL EXIT FG // FIRE EXIT
-    position: {x: -18, y: -18}
-    size: {x: 39, y: 33}
-    iconType: 6
-    isHallway: 0
-    isStairs: 1
-    isLocked: 0
-    isBlocked: 0
-    isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: STAIRWELL EXIT FG // FIRE EXIT
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Emergency fire exit stairwell. Heavy reinforced fire doors provide vertical access between facility floors.
-    connectedRoomIds: []
+    undiscoveredTitle: BLOCKED STAIRS // COLLAPSED
+    statusTag: COLLAPSED
+    threatLevel: IMPASSABLE
+    scavengeStatus: NONE
+    acousticScan: SETTLING CONCRETE
+    reconIntel: Load-bearing ceiling collapse has completely crushed the western stairwell shaft under reinforced concrete slabs. Impassable.
+    connectedRoomIds:
+    - hallway_4
   doorways:
-  - doorId: door_unit_407_hallway_1
-    connectedRoomId: hallway_1
-    position: {x: -27.5, y: 114}
-    size: {x: 24, y: 4}
-  - doorId: door_hallway_1_unit_408
-    connectedRoomId: unit_408
-    position: {x: 27.5, y: 114}
-    size: {x: 24, y: 4}
+  - doorId: door_hallway_1_unit_407
+    connectedRoomId: unit_407
+    position: {x: 29.2, y: 119.4}
+    size: {x: 23.2, y: 2.0}
+  - doorId: door_hallway_1_unit_406
+    connectedRoomId: unit_406
+    position: {x: -29.2, y: 119.4}
+    size: {x: 23.2, y: 2.0}
   - doorId: door_hallway_1_hallway_2
     connectedRoomId: hallway_2
-    position: {x: 0, y: 86}
-    size: {x: 24, y: 4}
+    position: {x: 0.0, y: 89.6}
+    size: {x: 2.0, y: 24.6}
   - doorId: door_hallway_2_unit_405
     connectedRoomId: unit_405
-    position: {x: -27.5, y: 58}
-    size: {x: 24, y: 4}
-  - doorId: door_hallway_2_blocked_406
-    connectedRoomId: blocked_406
-    position: {x: 27.5, y: 58}
-    size: {x: 24, y: 4}
+    position: {x: 29.2, y: 59.7}
+    size: {x: 23.2, y: 2.0}
+  - doorId: door_hallway_2_unit_404
+    connectedRoomId: unit_404
+    position: {x: -29.2, y: 59.7}
+    size: {x: 23.2, y: 2.0}
   - doorId: door_hallway_2_hallway_3
     connectedRoomId: hallway_3
-    position: {x: 0, y: 30}
-    size: {x: 24, y: 4}
-  - doorId: door_blocked_403_hallway_3
-    connectedRoomId: hallway_3
-    position: {x: -27.5, y: 2}
-    size: {x: 24, y: 4}
-  - doorId: door_hallway_4_unit_401
-    connectedRoomId: unit_401
-    position: {x: -27.5, y: -54}
-    size: {x: 24, y: 4}
-  - doorId: door_hallway_3_unit_404
-    connectedRoomId: unit_404
-    position: {x: 27.5, y: 2}
-    size: {x: 24, y: 4}
+    position: {x: 0.0, y: 29.9}
+    size: {x: 2.0, y: 24.6}
+  - doorId: door_hallway_3_unit_403
+    connectedRoomId: unit_403
+    position: {x: 29.2, y: 0.0}
+    size: {x: 23.2, y: 2.0}
+  - doorId: door_hallway_3_unit_402
+    connectedRoomId: unit_402
+    position: {x: -29.2, y: 0.0}
+    size: {x: 23.2, y: 2.0}
   - doorId: door_hallway_3_hallway_4
     connectedRoomId: hallway_4
-    position: {x: 0, y: -26}
-    size: {x: 24, y: 4}
+    position: {x: 0.0, y: -29.9}
+    size: {x: 2.0, y: 24.6}
+  - doorId: door_hallway_4_unit_401
+    connectedRoomId: unit_401
+    position: {x: 29.2, y: -59.7}
+    size: {x: 23.2, y: 2.0}
   - doorId: door_hallway_4_utility
     connectedRoomId: utility
-    position: {x: 27.5, y: -54}
-    size: {x: 24, y: 4}
+    position: {x: -29.2, y: -59.7}
+    size: {x: 23.2, y: 2.0}
+  - doorId: door_hallway_4_stairs
+    connectedRoomId: stairs
+    position: {x: 29.2, y: -119.4}
+    size: {x: 23.2, y: 2.0}
+  - doorId: door_hallway_4_blocked_stairs
+    connectedRoomId: blocked_stairs
+    position: {x: -29.2, y: -119.4}
+    size: {x: 23.2, y: 2.0}
+  - doorId: door_hallway_4_spine_down
+    connectedRoomId: stairs
+    position: {x: 0.0, y: -89.6}
+    size: {x: 2.0, y: 24.6}

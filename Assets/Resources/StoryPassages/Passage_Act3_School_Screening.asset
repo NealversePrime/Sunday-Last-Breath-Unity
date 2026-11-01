@@ -92,7 +92,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Exit Screening to Foyer - WEST"
+  - choiceLabel: "[DOOR] Exit Screening to Foyer - WEST"
     choiceSubtitle: Walk straight into the Main Security Foyer.
     targetPassage: {fileID: 11400000, guid: d280d2ac325b42e49b49a5add6bb370c, type: 2}
     targetPassageId: Act3_School_Foyer

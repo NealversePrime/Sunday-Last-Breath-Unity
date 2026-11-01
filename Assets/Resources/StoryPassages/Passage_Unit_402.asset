@@ -327,7 +327,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Leave it and walk away"
+  - choiceLabel: "[DOOR] Leave it and walk away"
     choiceSubtitle: 
     targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
     targetPassageId: Hallway
@@ -607,7 +607,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Leave them in peace \u2014 return to the hallway"
+  - choiceLabel: "[DOOR] Leave them in peace \u2014 return to the hallway"
     choiceSubtitle: 
     targetPassage: {fileID: 11400000, guid: 5e76c0cf3e08ae8409253213ebea2498, type: 2}
     targetPassageId: Hallway

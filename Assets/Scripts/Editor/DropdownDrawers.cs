@@ -273,6 +273,7 @@ namespace SundayLastBreath.Editor
     {
         private static readonly List<(string value, string display)> _options = new List<(string, string)>
         {
+            ("OPEN_COMBAT_MODAL", "OPEN_COMBAT_MODAL (Fear & Hunger Tactical Limb-Targeting Combat)"),
             ("OPEN_LOCKPICK_MODAL", "OPEN_LOCKPICK_MODAL (Interactive Pin Tumbler Lockpicking Minigame)"),
             ("TRIGGER_QTE", "TRIGGER_QTE (Tension / Safe Zone Timing Bar Minigame)"),
             ("OPEN_KEYPAD_MODAL", "OPEN_KEYPAD_MODAL (Interactive Electronic Keypad Minigame)"),

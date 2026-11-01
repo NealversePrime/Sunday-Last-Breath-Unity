@@ -76,7 +76,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "\U0001F6AA Exit Library to Hallway [WEST]"
+  - choiceLabel: "[DOOR] Exit Library to Hallway [WEST]"
     choiceSubtitle: Return to the East Hallway corridor.
     targetPassage: {fileID: 11400000, guid: e47cd5da9b30be448aeca1f1111e10a7, type: 2}
     targetPassageId: Act3_School1Floor

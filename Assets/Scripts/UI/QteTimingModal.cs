@@ -243,7 +243,7 @@ namespace SundayLastBreath.UI
         private IEnumerator SuccessRoutine()
         {
             if (actionBtnText != null)
-                actionBtnText.text = "<color=#10B981><b>✔ SUCCESS! TENSION HELD.</b></color>";
+                actionBtnText.text = "<color=#10B981><b>[OK] SUCCESS! TENSION HELD.</b></color>";
 
             if (safeZoneImage != null)
                 safeZoneImage.color = new Color(0.1f, 1f, 0.5f, 0.85f);
@@ -262,7 +262,7 @@ namespace SundayLastBreath.UI
         private IEnumerator FailureRoutine()
         {
             if (actionBtnText != null)
-                actionBtnText.text = "<color=#EF4444><b>❌ FAILED! TENSION LOST.</b></color>";
+                actionBtnText.text = "<color=#EF4444><b>[X] FAILED! TENSION LOST.</b></color>";
 
             if (needleImage != null)
                 needleImage.color = new Color(1f, 0.1f, 0.1f, 1f);
