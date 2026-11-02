@@ -1,0 +1,298 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit406_Door
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_406_door
+  passageTitle: UNIT 406 // ENTRY DOOR
+  associatedRoomId: hallway_1
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: ad7eae3aee96415438f5ca9f41c97be9, type: 3}
+  - {fileID: 21300000, guid: 4498d8a028011424baf4e4fb993f13f7, type: 3}
+  - {fileID: 21300000, guid: 549913481e2ed014689ca9e5608ccaa0, type: 3}
+  - {fileID: 21300000, guid: 830d68bee654a03479d7d703bc6ca145, type: 3}
+  - {fileID: 21300000, guid: 6a1604bd04a56f544890095e25086338, type: 3}
+  - {fileID: 21300000, guid: 35725694bb19f2f4aaa256fdb961e3ba, type: 3}
+  - {fileID: 21300000, guid: 7bb3c247fe09fab4d8386502ac19a1bf, type: 3}
+  - {fileID: 21300000, guid: 8ffe05441c8ad2241949aea933eeca42, type: 3}
+  - {fileID: 21300000, guid: bb2493ee4114df94ea523aa5d0012691, type: 3}
+  - {fileID: 21300000, guid: 3fab0f661424fae4d9182479e51ab7b5, type: 3}
+  - {fileID: 21300000, guid: 51baf8e9548f819438f75d7c33042e00, type: 3}
+  - {fileID: 21300000, guid: 411b5f4b41e002944aedeb9abef0bbd3, type: 3}
+  - {fileID: 21300000, guid: aa477ceb4e9d6f8409628533b3836c1f, type: 3}
+  - {fileID: 21300000, guid: dc1dc6d63241f304592da501dfa91720, type: 3}
+  - {fileID: 21300000, guid: efc1f0c7a4b04bf42ab0402523ea932a, type: 3}
+  - {fileID: 21300000, guid: bff01fae537cbd445922b116386a4a76, type: 3}
+  - {fileID: 21300000, guid: 5a43dc3c193ceda438f5e1442e214668, type: 3}
+  - {fileID: 21300000, guid: 253190c3a38704040813cbc1be216bbb, type: 3}
+  - {fileID: 21300000, guid: 9dd0b2634a4e0cb49a531de31d2c22fc, type: 3}
+  - {fileID: 21300000, guid: 4cae5da877e651e4582cb0c19989e45b, type: 3}
+  - {fileID: 21300000, guid: 6e2a140754aa3c34e9d385c66e40341b, type: 3}
+  - {fileID: 21300000, guid: 6cb994fe715a9e945a739a859aab99f0, type: 3}
+  - {fileID: 21300000, guid: 3bfa4e5e9ff17de40a7eb2777935842f, type: 3}
+  - {fileID: 21300000, guid: cd38ec48e22748b45b3442b51c552102, type: 3}
+  - {fileID: 21300000, guid: 5cc0bba28990f164599b821b7302dc67, type: 3}
+  - {fileID: 21300000, guid: 218dd21c7c64882438d89acee13a700b, type: 3}
+  - {fileID: 21300000, guid: 03e0ecf162f64bf4b944a2f8c6c8f4ba, type: 3}
+  - {fileID: 21300000, guid: 8e2cc8b91f2a9e84da32bd940ec5fcd5, type: 3}
+  - {fileID: 21300000, guid: cf1209c9006e24c4782668a35d2be267, type: 3}
+  - {fileID: 21300000, guid: adc809a7863638f468be323f938662fb, type: 3}
+  - {fileID: 21300000, guid: 2f25a23a9815c1647881aa8ea2d5d755, type: 3}
+  - {fileID: 21300000, guid: 95661f81f1f6b4c47b5e1775846d499b, type: 3}
+  - {fileID: 21300000, guid: 2c05e6f505c66c8499b17efb4933dde6, type: 3}
+  - {fileID: 21300000, guid: 6c4b0dbfbea401341a4076c77558e0b3, type: 3}
+  - {fileID: 21300000, guid: c6724bbbe5f00aa48be5ec294658c6be, type: 3}
+  - {fileID: 21300000, guid: a78e8d3507db6f149864497362b2b7db, type: 3}
+  - {fileID: 21300000, guid: ec3b71e0865990a46a71fd0da2534017, type: 3}
+  - {fileID: 21300000, guid: 74b06028da8e8194e8118b246ba2495a, type: 3}
+  - {fileID: 21300000, guid: 434de8435ac0b0742b565ea3f083a3b4, type: 3}
+  - {fileID: 21300000, guid: 7cfac24fe7db5ff48a02ecb64925cbbc, type: 3}
+  - {fileID: 21300000, guid: a1a167b56d6cac343ad724f9a5adcfd1, type: 3}
+  - {fileID: 21300000, guid: b315b813a769dc1438f73f06e97bb63a, type: 3}
+  - {fileID: 21300000, guid: 5a727a347fc3f17418f4fd8d35d3e51d, type: 3}
+  - {fileID: 21300000, guid: 78d95cf5901e27e40b00a9ff216bfb11, type: 3}
+  - {fileID: 21300000, guid: 04f55c8baf5092a4fa940a85c8c4e47d, type: 3}
+  - {fileID: 21300000, guid: 95899b922ea1a3f4191f6f8f0ceb7d8d, type: 3}
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a modern electronic keypad lock. The blue backlight on the keypad pulses weakly.\n\nA handwritten note taped beside the keypad in spidery ink reads: <i>'If you're reading this, don't look outside. Get to the basement.'</i>"
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Harmon texted me the emergency passcode earlier: 8-4-6-5. Let's see if the keypad's backup battery is still alive."
+    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+    requiresStoryFlag: 'checked_phone_harmon'
+    requiresNotFlag: ''
+  - introNarration: "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "A heavy electronic deadbolt seals Harmon's door. Total silence inside... I don't know his code, but maybe I can deduce it from the worn keys, bypass the latch, or force it open."
+    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+    requiresStoryFlag: ''
+    requiresNotFlag: 'checked_phone_harmon'
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Enter passcode from phone (8465)"
+    choiceSubtitle: "Type Harmon's emergency passcode into the pulsing electronic keypad."
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_406'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: 'checked_phone_harmon'
+    requiresNotFlag: ''
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'room406_opened'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 32900000, guid: 32a3f00d2db48ef4eb0fb0675d907897, type: 3}
+    transitionVideoPath: "Videos/unit406_door_transition"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Enter passcode manually (Keypad Minigame)"
+    choiceSubtitle: "Inspect the worn electronic keypad. 3 attempts before security lockout."
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_406'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'room406_locked_out'
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: 'OPEN_KEYPAD_MODAL'
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 32900000, guid: 32a3f00d2db48ef4eb0fb0675d907897, type: 3}
+    transitionVideoPath: "Videos/unit406_door_transition"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Bypass electronic latch [HACK / LOCKPICK]"
+    choiceSubtitle: "Disassemble the circuit or exploit mechanical failsafe. (INT 6, Tech 2, Locksmith, Burglar, or Multi-Tool)"
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_406'
+    timeMinutesCost: 3
+    staminaCost: 7
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'room406_opened'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 1
+    requiredStat: 'Tactics'
+    requiredStatValue: 6
+    requiredSkill: 'tech'
+    requiredSkillLevel: 2
+    requiredTrait: 'LOCKSMITH'
+    requiredItem: 'Multi-Tool'
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 32900000, guid: 32a3f00d2db48ef4eb0fb0675d907897, type: 3}
+    transitionVideoPath: "Videos/unit406_door_transition"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Force the door frame [BRUTE FORCE]"
+    choiceSubtitle: "Lever the strike plate or batter the heavy deadbolt. (STR 6, Brawn, or Crowbar)"
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_406'
+    timeMinutesCost: 3
+    staminaCost: 15
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: 'room406_opened'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 1
+    requiredStat: 'Might'
+    requiredStatValue: 6
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: 'BRAWN'
+    requiredItem: 'crowbar'
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 32900000, guid: 32a3f00d2db48ef4eb0fb0675d907897, type: 3}
+    transitionVideoPath: "Videos/unit406_door_transition"
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Return to Upper Hallway"
+    choiceSubtitle: "Step back into the corridor."
+    targetPassage: {fileID: 11400000, guid: 3d8ebf1e8e3258543b88026777e8d1d7, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_1'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

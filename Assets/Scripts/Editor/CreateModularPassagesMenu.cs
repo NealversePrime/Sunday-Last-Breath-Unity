@@ -31,7 +31,7 @@ namespace SundayLastBreath.Editor
         [MenuItem("Sunday's Last Breath/Force Reimport All Act 1 Passages", priority = 201)]
         public static void ForceReimportAct1()
         {
-            string animFolder = "Assets/Resources/Act1/Unit408Door_Anim";
+            string animFolder = "Assets/Resources/Act1/Unit406Door_Anim";
             if (Directory.Exists(animFolder))
             {
                 AssetDatabase.ImportAsset(animFolder, ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);

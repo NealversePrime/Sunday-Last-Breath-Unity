@@ -1,0 +1,172 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit406_Inside
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_406_inside
+  passageTitle: UNIT 406 // HARMON'S STUDY
+  associatedRoomId: unit_406
+  backdropSprite: {fileID: 0}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames:
+  - {fileID: 21300000, guid: 773ce49d3d8720d42be91693bf19ed7b, type: 3}
+  - {fileID: 21300000, guid: 8831eeb65217be241a9535d391a314b4, type: 3}
+  - {fileID: 21300000, guid: 8a6a5b103dd34004c82be0abfdd70a5c, type: 3}
+  - {fileID: 21300000, guid: d2ad4b651a9880d43b17d089a12df6ad, type: 3}
+  - {fileID: 21300000, guid: f152628a378922543a217c8b742bec5e, type: 3}
+  - {fileID: 21300000, guid: 4b7ceb7a368c61146861562807499caf, type: 3}
+  - {fileID: 21300000, guid: c9306bc986581a0468b4087a7e0ed11c, type: 3}
+  - {fileID: 21300000, guid: 9b0528f0f25a4c34c98865a9d7301adf, type: 3}
+  - {fileID: 21300000, guid: 252254a2e94201b42a1c7fe77dcfede6, type: 3}
+  - {fileID: 21300000, guid: acb0ca4b72cf27140a3f0bd02dfd68e1, type: 3}
+  - {fileID: 21300000, guid: 485bc95c606d263449526e794a7a1143, type: 3}
+  - {fileID: 21300000, guid: d455cffc668a1f54bbe89ad21a71672b, type: 3}
+  - {fileID: 21300000, guid: 89f9d5a20cfc4a34284f8247fa2de499, type: 3}
+  - {fileID: 21300000, guid: 6e583a8893e5dbb46bd286456887182a, type: 3}
+  - {fileID: 21300000, guid: 0e174d17ebdc1084dbdf870196141975, type: 3}
+  - {fileID: 21300000, guid: 6d4205bc71c20584cbd209aec04ef293, type: 3}
+  - {fileID: 21300000, guid: a4caf56c8b005104293f7b48e077dd03, type: 3}
+  - {fileID: 21300000, guid: d55e632609d6c474288eb48027855c7c, type: 3}
+  - {fileID: 21300000, guid: 0bbbc7e5a31cdb648bdacc2321db7f2b, type: 3}
+  - {fileID: 21300000, guid: 13fef7ef7078d3349a5a61e22223527a, type: 3}
+  - {fileID: 21300000, guid: 3c93036da05ebfa4eadf8ce7229fecbd, type: 3}
+  - {fileID: 21300000, guid: 808579a01c17ab94fa553d9a2d40d972, type: 3}
+  - {fileID: 21300000, guid: 3fba2ca8d78a8be41a098e1898e550a7, type: 3}
+  - {fileID: 21300000, guid: e2239682d4109e742bdd64681f7cd245, type: 3}
+  - {fileID: 21300000, guid: 7feb9165dc99d3f42b749ba801c10c0d, type: 3}
+  - {fileID: 21300000, guid: 5ed64519ff7f1ff4688d31f88333a3e1, type: 3}
+  - {fileID: 21300000, guid: d12755b95070b9e4eb87867c9ba78c34, type: 3}
+  - {fileID: 21300000, guid: 8ed2a1ed49f73864cbbc3a21e5067706, type: 3}
+  - {fileID: 21300000, guid: 3450e58b7728ccb43aaaade1368779b9, type: 3}
+  - {fileID: 21300000, guid: e0f6cd0a0f4fbd342b302a95cbd2664b, type: 3}
+  - {fileID: 21300000, guid: 769c2ec2e6d9b44408e7f8aaa38ccefd, type: 3}
+  - {fileID: 21300000, guid: c31ac01203a575747b5f483db2fdd789, type: 3}
+  - {fileID: 21300000, guid: a6a79b349c4c0594aa1e6dea9572db11, type: 3}
+  - {fileID: 21300000, guid: 08fcca2417a0e0c42a1c5f888ccc7265, type: 3}
+  - {fileID: 21300000, guid: b83b2686cfa505b449a988ee7f23efcf, type: 3}
+  - {fileID: 21300000, guid: 5155d1d6730eddc458660bdceb4c769c, type: 3}
+  - {fileID: 21300000, guid: 0edafae23b9aabf4ca1805ebb33d81b5, type: 3}
+  - {fileID: 21300000, guid: 6dbebe5ac1119424db785cc4649a794e, type: 3}
+  - {fileID: 21300000, guid: 14cc30a645e71c74f8b3fc6a3255552b, type: 3}
+  - {fileID: 21300000, guid: bc1433587d06aa248a26ab3c8dcec265, type: 3}
+  - {fileID: 21300000, guid: 884eba9e3cfa30441ad3dbe5b93db069, type: 3}
+  - {fileID: 21300000, guid: 8f211b2f84bb7994986ca9f10dc91413, type: 3}
+  - {fileID: 21300000, guid: a348326fa9f856146be5281a64669793, type: 3}
+  - {fileID: 21300000, guid: 2ae2356466980ba48b39b7628f39f525, type: 3}
+  - {fileID: 21300000, guid: 4398d3999feacb44f90df2b9826aeb02, type: 3}
+  - {fileID: 21300000, guid: d2c1eda682cec1b44aab364525831e2e, type: 3}
+  animationFPS: 8
+  musicAction: 1
+  backgroundMusicOrAmbience: {fileID: 8300000, guid: 818303d7eaf18a5499deb9372579a6be, type: 3}
+  musicVolume: 0.45
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "The electronic lock chirps, and the heavy door unlatches.\n\n<color=#93C5FD><b>HARMON'S STUDY.</b></color> The apartment has been turned upside down. Bookshelves are emptied onto the carpet, blueprints cover the dining table, and the faint stench of burned copper hangs in the air.\n\nHarmon fled in a panic, but his workbench drawers are still half-open."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "The electronic lock chirps, and the door swings open into darkness.\n\n<color=#93C5FD><b>HARMON'S STUDY.</b></color> Books and papers are scattered everywhere."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "He definitely knew something was coming. The entire desk is covered in emergency frequency notes. I should grab whatever medical supplies and rations he left behind."
+    outroNarration: "Blueprints for the city's power grid are scattered across the drafting table."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "Scavenge Harmon's Desk"
+    choiceSubtitle: "Search the drafting table drawers for supplies."
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_406'
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "bandage"
+      quantity: 2
+    - itemId: "whiskey"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Leave Apartment (Return to Hallway)"
+    choiceSubtitle: "Step back out into Upper Hallway."
+    targetPassage: {fileID: 11400000, guid: 3d8ebf1e8e3258543b88026777e8d1d7, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_1'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

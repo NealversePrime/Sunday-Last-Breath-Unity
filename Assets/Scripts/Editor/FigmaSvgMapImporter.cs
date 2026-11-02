@@ -69,7 +69,7 @@ namespace SundayLastBreath.Editor
             EditorGUILayout.Space(8);
             GUILayout.Label("FIGMA SVG MAP IMPORTER // SUNDAY'S LAST BREATH", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
-                "Draw your floorplan in Figma with labeled rectangles/frames (e.g. 'unit_407', 'unit_408', 'hall_1') " +
+                "Draw your floorplan in Figma with labeled rectangles/frames (e.g. 'unit_407', 'unit_406', 'hall_1') " +
                 "and connecting lines for hallways. Export as SVG, drop it into Unity, and click 'Generate Modular Map Asset' below!",
                 MessageType.Info);
             EditorGUILayout.Space(6);
@@ -518,7 +518,6 @@ namespace SundayLastBreath.Editor
 
             // Canonical mapping for standard Sunday Last Breath rooms
             if (s == "407" || s == "safehouse") return "unit_407";
-            if (s == "408") return "unit_408";
             if (s == "406") return "unit_406";
             if (s == "405") return "unit_405";
             if (s == "404") return "unit_404";
@@ -572,7 +571,6 @@ namespace SundayLastBreath.Editor
             string s = id.ToLowerInvariant();
             if (s.Contains("406")) return "PROFESSOR";
             if (s.Contains("405")) return "HUNTER'S APT";
-            if (s.Contains("408")) return "KEYPAD SCANNER";
             if (s.Contains("office")) return "OFFICE";
             if (s.Contains("canteen") || s.Contains("kitchen")) return "CANTEEN";
             if (s.Contains("library")) return "LIBRARY";

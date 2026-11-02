@@ -236,10 +236,10 @@ namespace SundayLastBreath.Editor
             ("listened_radio_407", "listened_radio_407 (Police Radio Intercepted)"),
             ("hacked_terminal_407", "hacked_terminal_407 (Government Terminal Infiltrated)"),
 
-            // Unit 408 (Harmon's Lab)
-            ("room408_opened", "room408_opened (Unit 408 Electronic Deadbolt Unlocked)"),
-            ("room408_locked_out", "room408_locked_out (Unit 408 Keypad Circuit Tripped)"),
-            ("room408_searched", "room408_searched (Harmon's Lab Scavenged)"),
+            // Unit 406 (Harmon's Lab)
+            ("room406_opened", "room406_opened (Unit 406 Electronic Deadbolt Unlocked)"),
+            ("room406_locked_out", "room406_locked_out (Unit 406 Keypad Circuit Tripped)"),
+            ("room406_searched", "room406_searched (Harmon's Lab Scavenged)"),
 
             // Unit 405
             ("room405_opened", "room405_opened (Unit 405 Door Unlocked)"),
@@ -291,11 +291,11 @@ namespace SundayLastBreath.Editor
         private static readonly List<(string value, string display)> _options = new List<(string, string)>
         {
             ("unit_407", "unit_407 (Safehouse Apartment)"),
-            ("hallway_1", "hallway_1 (4F North Corridor / Units 407 & 408)"),
+            ("hallway_1", "hallway_1 (4F North Corridor / Units 407 & 406)"),
             ("hallway_2", "hallway_2 (4F Mid Corridor / Units 404 & 405)"),
             ("hallway_3", "hallway_3 (4F South Corridor / Units 401 & 402)"),
             ("hallway_4", "hallway_4 (4F Utility Alcove)"),
-            ("unit_408", "unit_408 (Professor Harmon's Residence & Lab)"),
+            ("unit_406", "unit_406 (Professor Harmon's Residence & Lab)"),
             ("unit_405", "unit_405 (Abandoned Apartment)"),
             ("unit_402", "unit_402 (Apartment)"),
             ("unit_401", "unit_401 (Apartment)"),

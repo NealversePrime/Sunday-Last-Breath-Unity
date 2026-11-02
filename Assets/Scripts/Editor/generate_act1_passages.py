@@ -23,8 +23,8 @@ frames_h1 = get_frames("Hall406_407_Anim")
 frames_h2 = get_frames("Hall404_405_Anim")
 frames_h3 = get_frames("Hall402_403_Anim")
 frames_h4 = get_frames("HallEnd_Anim")
-frames_u408_door = get_frames("Unit408Door_Anim")
-frames_u408_in = get_frames("Unit408Inside_Anim")
+frames_u406_door = get_frames("Unit406Door_Anim")
+frames_u406_in = get_frames("Unit406Inside_Anim")
 frames_u405_in = get_frames("Unit405Inside_Anim")
 frames_u402_in = get_frames("Unit402Inside_Anim")
 frames_u401_in = get_frames("Unit401Inside_Anim")
@@ -38,7 +38,7 @@ GUID_PARTY_SFX = "a3219d36b7b366948bd8eaafdb51ffc8"
 GUID_UTILITY_HUM = "c1917460b7c07ad46b9e0d88a1a7a8a7"
 GUID_GENERATOR_HUM = "2794956e369c942429eea4d53b73aa65"
 GUID_FIREDOOR_SLAM = "421b0a9a95a97d241b55c3ff4ac54d05"
-GUID_DOOR_408_VIDEO = "2a97efa723e746cdbf04e4ce829d482c"
+GUID_DOOR_406_VIDEO = "32a3f00d2db48ef4eb0fb0675d907897"
 
 passages_meta = {
     "Passage_Prologue_WakeUp": "01100001b5696ff4eada863cecea8452",
@@ -48,8 +48,8 @@ passages_meta = {
     "Passage_Hallway_2": "a1102002b5696ff4eada863cecea8452",
     "Passage_Hallway_3": "a1103003b5696ff4eada863cecea8452",
     "Passage_Hallway_4": "a1104004b5696ff4eada863cecea8452",
-    "Passage_Unit408_Door": "05759b3026c90954b9a12ac1fa9633a0",
-    "Passage_Unit408_Inside": "18f5aa56867a7e446a64c8b657e81029",
+    "Passage_Unit406_Door": "05759b3026c90954b9a12ac1fa9633a0",
+    "Passage_Unit406_Inside": "18f5aa56867a7e446a64c8b657e81029",
     "Passage_Unit405_Door": "b1105001b5696ff4eada863cecea8452",
     "Passage_Unit405_Inside": "b1105002b5696ff4eada863cecea8452",
     "Passage_Unit402_Door": "c1102001b5696ff4eada863cecea8452",
@@ -262,21 +262,21 @@ h1_def = {
     "musicVolume": 0.5,
     "frames": frames_h1,
     "fps": 10,
-    "storyText": "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY (4TH FLOOR).</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air. Shadows twitch across the worn carpet.\n\nTo your right is your unit (407). Directly opposite is <b>Unit 408</b>. In front of you, the corridor stretches south into darkness.",
+    "storyText": "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY (4TH FLOOR).</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air. Shadows twitch across the worn carpet.\n\nTo your right is your unit (407). Directly opposite is <b>Unit 406</b>. In front of you, the corridor stretches south into darkness.",
     "dialogueLines": [
         {
             "introNarration": "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air.",
             "speakerName": "YOU",
             "side": 0, # Left (Player)
-            "dialogueText": "Deadbolt clicked shut... no turning back now. Harmon's door is right across the hall at 408. I should check if he's still inside before heading down.",
+            "dialogueText": "Deadbolt clicked shut... no turning back now. Harmon's door is right across the hall at 406. I should check if he's still inside before heading down.",
             "outroNarration": "Every distant siren outside echoes through the ventilation grates. In front of you, the hallway stretches south toward the middle wing."
         }
     ],
     "choices": [
         {
-            "choiceLabel": "INVESTIGATE UNIT 408",
+            "choiceLabel": "INVESTIGATE UNIT 406",
             "choiceSubtitle": "The Professor's door. Electronic lock. Total silence inside.",
-            "targetPassage": "Passage_Unit408_Door",
+            "targetPassage": "Passage_Unit406_Door",
             "targetRoomId": "hallway_1",
             "timeMinutesCost": 1
         },
@@ -436,19 +436,19 @@ h4_def = {
     ]
 }
 
-# 5. Unit 408 Door
-u408_door_def = {
-    "name": "Passage_Unit408_Door",
-    "passageId": "unit_408_door",
-    "passageTitle": "UNIT 408 // ENTRY DOOR",
+# 5. Unit 406 Door
+u406_door_def = {
+    "name": "Passage_Unit406_Door",
+    "passageId": "unit_406_door",
+    "passageTitle": "UNIT 406 // ENTRY DOOR",
     "associatedRoomId": "hallway_1",
     "musicAction": 0,
-    "frames": frames_u408_door,
+    "frames": frames_u406_door,
     "fps": 8,
-    "storyText": "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a modern electronic keypad lock. The blue backlight on the keypad pulses weakly.\n\nA handwritten note taped beside the keypad in spidery ink reads: <i>'If you're reading this, don't look outside. Get to the basement.'</i>",
+    "storyText": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a modern electronic keypad lock. The blue backlight on the keypad pulses weakly.\n\nA handwritten note taped beside the keypad in spidery ink reads: <i>'If you're reading this, don't look outside. Get to the basement.'</i>",
     "dialogueLines": [
         {
-            "introNarration": "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
+            "introNarration": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
             "speakerName": "YOU",
             "side": 0,
             "dialogueText": "Harmon texted me the emergency passcode earlier: 8-4-6-5. Let's see if the keypad's backup battery is still alive.",
@@ -456,7 +456,7 @@ u408_door_def = {
             "requiresStoryFlag": "checked_phone_harmon"
         },
         {
-            "introNarration": "<color=#93C5FD><b>UNIT 408 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
+            "introNarration": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
             "speakerName": "YOU",
             "side": 0,
             "dialogueText": "A heavy electronic deadbolt seals Harmon's door. Total silence inside... I don't know his code, but maybe I can deduce it from the worn keys, bypass the latch, or force it open.",
@@ -470,23 +470,23 @@ u408_door_def = {
             "choiceSubtitle": "Type Harmon's emergency passcode into the pulsing electronic keypad.",
             "requiresStoryFlag": "checked_phone_harmon",
             "hideWhenUnavailable": True,
-            "setsStoryFlagOnExecute": "room408_opened",
-            "targetPassage": "Passage_Unit408_Inside",
-            "targetRoomId": "unit_408",
+            "setsStoryFlagOnExecute": "room406_opened",
+            "targetPassage": "Passage_Unit406_Inside",
+            "targetRoomId": "unit_406",
             "timeMinutesCost": 1,
-            "transitionVideo": GUID_DOOR_408_VIDEO,
-            "transitionVideoPath": "Videos/door_408_enter.mp4"
+            "transitionVideo": GUID_DOOR_406_VIDEO,
+            "transitionVideoPath": "Videos/unit406_door_transition"
         },
         {
             "choiceLabel": "Enter passcode manually (Keypad Minigame)",
             "choiceSubtitle": "Inspect the worn electronic keypad. 3 attempts before security lockout.",
-            "requiresNotFlag": "room408_locked_out",
+            "requiresNotFlag": "room406_locked_out",
             "triggerActionId": "OPEN_KEYPAD_MODAL",
-            "targetPassage": "Passage_Unit408_Inside",
-            "targetRoomId": "unit_408",
+            "targetPassage": "Passage_Unit406_Inside",
+            "targetRoomId": "unit_406",
             "timeMinutesCost": 1,
-            "transitionVideo": GUID_DOOR_408_VIDEO,
-            "transitionVideoPath": "Videos/door_408_enter.mp4"
+            "transitionVideo": GUID_DOOR_406_VIDEO,
+            "transitionVideoPath": "Videos/unit406_door_transition"
         },
         {
             "choiceLabel": "Bypass electronic latch [HACK / LOCKPICK]",
@@ -500,11 +500,11 @@ u408_door_def = {
             "requiredItem": "Multi-Tool",
             "staminaCost": 7,
             "timeMinutesCost": 3,
-            "setsStoryFlagOnExecute": "room408_opened",
-            "targetPassage": "Passage_Unit408_Inside",
-            "targetRoomId": "unit_408",
-            "transitionVideo": GUID_DOOR_408_VIDEO,
-            "transitionVideoPath": "Videos/door_408_enter.mp4"
+            "setsStoryFlagOnExecute": "room406_opened",
+            "targetPassage": "Passage_Unit406_Inside",
+            "targetRoomId": "unit_406",
+            "transitionVideo": GUID_DOOR_406_VIDEO,
+            "transitionVideoPath": "Videos/unit406_door_transition"
         },
         {
             "choiceLabel": "Force the door frame [BRUTE FORCE]",
@@ -516,11 +516,11 @@ u408_door_def = {
             "requiredItem": "crowbar",
             "staminaCost": 15,
             "timeMinutesCost": 3,
-            "setsStoryFlagOnExecute": "room408_opened",
-            "targetPassage": "Passage_Unit408_Inside",
-            "targetRoomId": "unit_408",
-            "transitionVideo": GUID_DOOR_408_VIDEO,
-            "transitionVideoPath": "Videos/door_408_enter.mp4"
+            "setsStoryFlagOnExecute": "room406_opened",
+            "targetPassage": "Passage_Unit406_Inside",
+            "targetRoomId": "unit_406",
+            "transitionVideo": GUID_DOOR_406_VIDEO,
+            "transitionVideoPath": "Videos/unit406_door_transition"
         },
         {
             "choiceLabel": "Return to Upper Hallway",
@@ -533,16 +533,16 @@ u408_door_def = {
     ]
 }
 
-# 6. Unit 408 Inside
-u408_in_def = {
-    "name": "Passage_Unit408_Inside",
-    "passageId": "unit_408_inside",
-    "passageTitle": "UNIT 408 // HARMON'S STUDY",
-    "associatedRoomId": "unit_408",
+# 6. Unit 406 Inside
+u406_in_def = {
+    "name": "Passage_Unit406_Inside",
+    "passageId": "unit_406_inside",
+    "passageTitle": "UNIT 406 // HARMON'S STUDY",
+    "associatedRoomId": "unit_406",
     "musicAction": 1,
     "bgm_guid": GUID_TENSION_BGM,
     "musicVolume": 0.45,
-    "frames": frames_u408_in,
+    "frames": frames_u406_in,
     "fps": 8,
     "storyText": "The electronic lock chirps, and the heavy door unlatches.\n\n<color=#93C5FD><b>HARMON'S STUDY.</b></color> The apartment has been turned upside down. Bookshelves are emptied onto the carpet, blueprints cover the dining table, and the faint stench of burned copper hangs in the air.\n\nHarmon fled in a panic, but his workbench drawers are still half-open.",
     "dialogueLines": [
@@ -558,8 +558,8 @@ u408_in_def = {
         {
             "choiceLabel": "Scavenge Harmon's Desk",
             "choiceSubtitle": "Search the drafting table drawers for supplies.",
-            "targetPassage": "Passage_Unit408_Inside",
-            "targetRoomId": "unit_408",
+            "targetPassage": "Passage_Unit406_Inside",
+            "targetRoomId": "unit_406",
             "timeMinutesCost": 2,
             "givesLootList": [
                 {"id": "bandage", "qty": 2},
@@ -1023,8 +1023,8 @@ all_passages = [
     h2_def,
     h3_def,
     h4_def,
-    u408_door_def,
-    u408_in_def,
+    u406_door_def,
+    u406_in_def,
     u405_door_def,
     u405_in_def,
     u402_door_def,

@@ -1156,7 +1156,7 @@ namespace SundayLastBreath.UI
             CreateWarpRow(content.transform, "Passage: Unit 401 Inside", () => WarpToPassage("Act1/Passage_Unit401_Inside"));
             CreateWarpRow(content.transform, "Passage: Unit 402 Inside", () => WarpToPassage("Act1/Passage_Unit402_Inside"));
             CreateWarpRow(content.transform, "Passage: Unit 405 Inside (Marcus)", () => WarpToPassage("Act1/Passage_Unit405_Inside"));
-            CreateWarpRow(content.transform, "Passage: Unit 408 Inside", () => WarpToPassage("Act1/Passage_Unit408_Inside"));
+            CreateWarpRow(content.transform, "Passage: Unit 406 Inside", () => WarpToPassage("Act1/Passage_Unit406_Inside"));
             CreateWarpRow(content.transform, "Passage: Utility Maintenance Inside", () => WarpToPassage("Act1/Passage_Utility_Inside"));
 
             CreateSectionHeader(content.transform, "LOWER FLOORS & EXTERIOR");

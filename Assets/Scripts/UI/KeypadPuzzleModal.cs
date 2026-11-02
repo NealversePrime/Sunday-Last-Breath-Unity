@@ -346,7 +346,7 @@ namespace SundayLastBreath.UI
             hRect.anchoredPosition = new Vector2(0f, -20f);
 
             TextMeshProUGUI hTmp = headerObj.GetComponent<TextMeshProUGUI>();
-            hTmp.text = "<color=#94A3B8>// SEC-LOCK v4.2 //</color> <color=#38BDF8><b>UNIT 408 DEADBOLT</b></color>";
+            hTmp.text = "<color=#94A3B8>// SEC-LOCK v4.2 //</color> <color=#38BDF8><b>UNIT 406 DEADBOLT</b></color>";
             hTmp.fontSize = 15f;
             hTmp.alignment = TextAlignmentOptions.Center;
 

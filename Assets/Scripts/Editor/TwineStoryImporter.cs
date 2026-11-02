@@ -423,7 +423,7 @@ namespace SundayLastBreath.Editor
 
         private static string ExtractRoomId(string title, string tags, string content)
         {
-            // 1. Check tags e.g. [unit_407], [unit_408], [hallway_1]
+            // 1. Check tags e.g. [unit_407], [unit_406], [hallway_1]
             if (!string.IsNullOrEmpty(tags))
             {
                 string[] tagParts = tags.Split(new[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
@@ -431,7 +431,6 @@ namespace SundayLastBreath.Editor
                 {
                     string tl = t.ToLowerInvariant();
                     if (tl.Contains("407") || tl.Contains("safehouse")) return "unit_407";
-                    if (tl.Contains("408")) return "unit_408";
                     if (tl.Contains("406")) return "unit_406";
                     if (tl.Contains("405")) return "unit_405";
                     if (tl.Contains("404")) return "unit_404";
@@ -452,7 +451,6 @@ namespace SundayLastBreath.Editor
             {
                 string loc = locMatch.Groups[1].Value.ToLowerInvariant();
                 if (loc == "407") return "unit_407";
-                if (loc == "408") return "unit_408";
                 if (loc == "406") return "unit_406";
                 if (loc == "405") return "unit_405";
                 if (loc == "404") return "unit_404";
@@ -466,7 +464,6 @@ namespace SundayLastBreath.Editor
             // 3. Infer from Title
             string tlTitle = title.ToLowerInvariant();
             if (tlTitle.Contains("407") || tlTitle.Contains("safehouse")) return "unit_407";
-            if (tlTitle.Contains("408")) return "unit_408";
             if (tlTitle.Contains("406")) return "unit_406";
             if (tlTitle.Contains("405")) return "unit_405";
             if (tlTitle.Contains("404")) return "unit_404";
@@ -734,7 +731,7 @@ namespace SundayLastBreath.Editor
             Sprite pSprite = FindSpriteByName(normPassage);
             if (pSprite != null) return pSprite;
 
-            // 3. Try by room ID (e.g. unit_408 -> unit408)
+            // 3. Try by room ID (e.g. unit_406 -> unit406)
             if (!string.IsNullOrEmpty(roomId))
             {
                 string normRoom = roomId.Replace("_", "").ToLowerInvariant();

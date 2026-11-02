@@ -29,7 +29,7 @@ MonoBehaviour:
   narrativeBeats:
   - THE ASCOTT RESIDENCY - 4TH FLOOR
   - The door to your apartment clicks shut behind you, sealing away the only safe place you have left.
-  - "UPPER HALLWAY. The emergency lights above are failing, casting long, twitching shadows across the cheap carpet. It's too quiet here, making every distant scream outside echo through the vents. To your right is your unit (407). To your left is Unit 408.\r\n            \r\n            \r\n                MID-HALLWAY. Dust motes dance in the flickering light. You can hear a dog barking relentlessly from behind door 404, its claws scratching desperately against the wood. Across the hall, the reinforced door of Unit 405 stands silent. The air here smells faintly of gunpowder.\r\n            \r\n            \r\n                LOWER HALLWAY. The lights are completely dead in this section. The metallic, coppery tang of blood mixes with the smell of ozone. Jarringly, soft classical music plays from behind the chained door of Unit 402. Across from it is Unit 403.\r\n            \r\n            \r\n                HALLWAY END. The corridor terminates at the heavy fire doors leading to the stairwell. Bloody handprints smear the glass viewing pane. From Unit 401, loud, obnoxious pop music thumps through the wood, completely masking the sounds of the nightmare happening outside."
+  - "UPPER HALLWAY. The emergency lights above are failing, casting long, twitching shadows across the cheap carpet. It's too quiet here, making every distant scream outside echo through the vents. To your right is your unit (407). To your left is Unit 406.\r\n            \r\n            \r\n                MID-HALLWAY. Dust motes dance in the flickering light. You can hear a dog barking relentlessly from behind door 404, its claws scratching desperately against the wood. Across the hall, the reinforced door of Unit 405 stands silent. The air here smells faintly of gunpowder.\r\n            \r\n            \r\n                LOWER HALLWAY. The lights are completely dead in this section. The metallic, coppery tang of blood mixes with the smell of ozone. Jarringly, soft classical music plays from behind the chained door of Unit 402. Across from it is Unit 403.\r\n            \r\n            \r\n                HALLWAY END. The corridor terminates at the heavy fire doors leading to the stairwell. Bloody handprints smear the glass viewing pane. From Unit 401, loud, obnoxious pop music thumps through the wood, completely masking the sounds of the nightmare happening outside."
   - The Professor's door. Electronic lock. Total silence inside.
   - The Hunter's door. Heavy steel frame. Faint smell of cordite.
   - The Andersons' door. Chained from the inside. Classical music playing.
@@ -39,11 +39,11 @@ MonoBehaviour:
   dialogueLines: []
   initialFloorItems: []
   choices:
-  - choiceLabel: INVESTIGATE UNIT 408
+  - choiceLabel: INVESTIGATE UNIT 406
     choiceSubtitle: The Professor's door. Electronic lock. Total silence inside.
     targetPassage: {fileID: 11400000, guid: 1b869dd7e26eea44f9974e3882c3421d, type: 2}
-    targetPassageId: Unit_408
-    targetRoomId: unit_408
+    targetPassageId: Unit_406
+    targetRoomId: unit_406
     timeMinutesCost: 1
     staminaCost: 0
     healthCost: 0

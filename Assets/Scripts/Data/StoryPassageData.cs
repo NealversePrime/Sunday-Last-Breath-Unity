@@ -133,7 +133,7 @@ namespace SundayLastBreath.Data
         public string targetPassageId = "";
 
         [Header("Location & Map Update")]
-        [Tooltip("If set, selecting this choice updates player location, HUD sector title, and tactical map beacon (e.g. 'unit_408', 'hallway_1').")]
+        [Tooltip("If set, selecting this choice updates player location, HUD sector title, and tactical map beacon (e.g. 'unit_406', 'hallway_1').")]
         [RoomIdDropdown]
         public string targetRoomId = "";
 
@@ -152,7 +152,7 @@ namespace SundayLastBreath.Data
         [StoryFlagDropdown]
         public string requiresStoryFlag = "";
 
-        [Tooltip("If set, choice is unavailable/hidden if player HAS this story flag (e.g. 'room408_locked_out', 'room408_opened').")]
+        [Tooltip("If set, choice is unavailable/hidden if player HAS this story flag (e.g. 'room406_locked_out', 'room406_opened').")]
         [StoryFlagDropdown]
         public string requiresNotFlag = "";
 
@@ -160,7 +160,7 @@ namespace SundayLastBreath.Data
         public bool hideWhenUnavailable = false;
 
         [Header("Story Flag Consequences")]
-        [Tooltip("Story flag to set when this choice is executed (e.g. 'room408_opened', 'knows_basement_safe').")]
+        [Tooltip("Story flag to set when this choice is executed (e.g. 'room406_opened', 'knows_basement_safe').")]
         [StoryFlagDropdown]
         public string setsStoryFlagOnExecute = "";
 
@@ -244,7 +244,7 @@ namespace SundayLastBreath.Data
         [Tooltip("Optional VideoClip played when this choice is executed (e.g. door opening, staircase descent, elevator).")]
         public UnityEngine.Video.VideoClip transitionVideo;
 
-        [Tooltip("Optional fallback Resources path for video if loading dynamically (e.g. 'Videos/unit408_door_transition').")]
+        [Tooltip("Optional fallback Resources path for video if loading dynamically (e.g. 'Videos/unit406_door_transition').")]
         public string transitionVideoPath = "";
 
         [Header("Transition Audio & SFX Customization")]
@@ -277,13 +277,13 @@ namespace SundayLastBreath.Data
     public class StoryPassageData : ScriptableObject
     {
         [Header("1. Passage Identity & Map Linking")]
-        [Tooltip("Unique ID for this passage (e.g. 'unit_408_door', 'hallway_sec1').")]
+        [Tooltip("Unique ID for this passage (e.g. 'unit_406_door', 'hallway_sec1').")]
         public string passageId = "new_passage";
 
-        [Tooltip("Sector / room title displayed on top HUD and map (e.g. 'UNIT 408 // KEYPAD SCANNER').")]
+        [Tooltip("Sector / room title displayed on top HUD and map (e.g. 'UNIT 406 // KEYPAD SCANNER').")]
         public string passageTitle = "LOCATION TITLE";
 
-        [Tooltip("Map Room ID on the Tactical Blueprint (e.g. 'unit_407', 'unit_408', 'hallway_1'). Auto-syncs player beacon.")]
+        [Tooltip("Map Room ID on the Tactical Blueprint (e.g. 'unit_407', 'unit_406', 'hallway_1'). Auto-syncs player beacon.")]
         [RoomIdDropdown]
         public string associatedRoomId = "";
 

@@ -640,7 +640,7 @@ namespace SundayLastBreath.UI
                             if (rm == null) continue;
                             if (string.Equals(rm.roomId, holder.nodeId, StringComparison.OrdinalIgnoreCase)
                                 || (rm.roomId == "blocked_stairs" && holder.nodeId == "empty_bot")
-                                || (rm.roomId == "unit_406" && (holder.nodeId == "unit_406" || holder.nodeId == "unit_408"))
+                                || (rm.roomId == "unit_406" && holder.nodeId == "unit_406")
                                 || (rm.roomId == "unit_404" && holder.nodeId == "unit_404")
                                 || (rm.roomId == "unit_402" && holder.nodeId == "unit_402"))
                             {
@@ -1026,8 +1026,6 @@ namespace SundayLastBreath.UI
                 if (!uiHolders.ContainsKey(lookupId))
                 {
                     if (lookupId == "blocked_stairs" && uiHolders.ContainsKey("empty_bot")) lookupId = "empty_bot";
-                    else if (lookupId == "unit_406" && uiHolders.ContainsKey("unit_408")) lookupId = "unit_408";
-                    else if (lookupId == "unit_408" && uiHolders.ContainsKey("unit_406")) lookupId = "unit_406";
                 }
 
                 if (isAscott4F && uiHolders.TryGetValue(lookupId, out var existingHolder) && existingHolder != null && existingHolder.rootObj != null)
@@ -1267,7 +1265,7 @@ namespace SundayLastBreath.UI
             }
 
             // Built-in Default Floor: Ascott Residency 4th Floor
-            // ROW 0: North Wing (Unit 406/408 <-> Hallway 1 <-> Unit 407)
+            // ROW 0: North Wing (Unit 406 <-> Hallway 1 <-> Unit 407)
             var u407 = new NodeModel(
                 "unit_407", "UNIT 407", "SAFEHOUSE", "YOUR RESIDENCE (SAFEHOUSE)", "SECURED",
                 "NONE", "LOOTED / SECURE", "TV STATIC HUM",
@@ -1400,7 +1398,6 @@ namespace SundayLastBreath.UI
             var list = new[] { u407, h1, u406, u405, h2, u404, u403, h3, u402, u401, h4, util, stairs, hEnd, blocked };
             foreach (var n in list) nodeRegistry[n.id] = n;
             // Seamless alias support for narrative/lore variants
-            nodeRegistry["unit_408"] = u406;
             nodeRegistry["blocked_stairs"] = blocked;
             nodeRegistry["empty_bot"] = blocked;
             nodeRegistry["utility_closet"] = util;
@@ -1515,7 +1512,6 @@ namespace SundayLastBreath.UI
         private string NormalizeLocationId(string locId)
         {
             if (string.IsNullOrEmpty(locId)) return "unit_407";
-            if (string.Equals(locId, "unit_408", StringComparison.OrdinalIgnoreCase)) return "unit_406";
             if (string.Equals(locId, "utility_closet", StringComparison.OrdinalIgnoreCase)) return "utility";
             if (nodeRegistry != null && nodeRegistry.ContainsKey(locId)) return locId;
             return locId;
@@ -1530,8 +1526,6 @@ namespace SundayLastBreath.UI
             {
                 return true;
             }
-            if (string.Equals(roomId, "unit_406", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("unit_408", out holder) && holder != null && holder.rootObj != null) return true;
-            if (string.Equals(roomId, "unit_408", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("unit_406", out holder) && holder != null && holder.rootObj != null) return true;
             if (string.Equals(roomId, "blocked_stairs", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("empty_bot", out holder) && holder != null && holder.rootObj != null) return true;
             if (string.Equals(roomId, "empty_bot", StringComparison.OrdinalIgnoreCase) && uiHolders.TryGetValue("blocked_stairs", out holder) && holder != null && holder.rootObj != null) return true;
             holder = null;

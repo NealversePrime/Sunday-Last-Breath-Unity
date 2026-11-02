@@ -52,7 +52,7 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY (4TH FLOOR).</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air. Shadows twitch across the worn carpet.\n\nTo your right is your unit (407). Directly opposite is <b>Unit 408</b>. In front of you, the corridor stretches south into darkness."
+  storyText: "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY (4TH FLOOR).</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air. Shadows twitch across the worn carpet.\n\nTo your right is your unit (407). Directly opposite is <b>Unit 406</b>. In front of you, the corridor stretches south into darkness."
   narrativeBeats: []
   dialogueLines:
   - introNarration: "The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> Emergency lights flicker overhead, buzzing faintly in the stagnant air."
@@ -61,13 +61,13 @@ MonoBehaviour:
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "Deadbolt clicked shut... no turning back now. Harmon's door is right across the hall at 408. I should check if he's still inside before heading down."
+    dialogueText: "Deadbolt clicked shut... no turning back now. Harmon's door is right across the hall at 406. I should check if he's still inside before heading down."
     outroNarration: "Every distant siren outside echoes through the ventilation grates. In front of you, the hallway stretches south toward the middle wing."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
-  - choiceLabel: "INVESTIGATE UNIT 408"
+  - choiceLabel: "INVESTIGATE UNIT 406"
     choiceSubtitle: "The Professor's door. Electronic lock. Total silence inside."
     targetPassage: {fileID: 11400000, guid: 05759b3026c90954b9a12ac1fa9633a0, type: 2}
     targetPassageId: ''
