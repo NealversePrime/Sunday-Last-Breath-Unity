@@ -318,6 +318,7 @@ namespace SundayLastBreath.Core
                     ES3.Save<bool>("apartment_phone_visited", hub.PhoneVisited, file);
                     ES3.Save<bool>("apartment_radio_visited", hub.RadioVisited, file);
                     ES3.Save<bool>("apartment_hacking_visited", hub.HackingVisited, file);
+                    hub.SaveWorldState(file);
                 }
 
                 // 5. Rich Console Telemetry Output
@@ -426,12 +427,20 @@ namespace SundayLastBreath.Core
 
                     if (ES3.KeyExists("apartment_phone_visited", file))
                         hub.PhoneVisited = ES3.Load<bool>("apartment_phone_visited", file);
+                    else
+                        hub.PhoneVisited = false;
 
                     if (ES3.KeyExists("apartment_radio_visited", file))
                         hub.RadioVisited = ES3.Load<bool>("apartment_radio_visited", file);
+                    else
+                        hub.RadioVisited = false;
 
                     if (ES3.KeyExists("apartment_hacking_visited", file))
                         hub.HackingVisited = ES3.Load<bool>("apartment_hacking_visited", file);
+                    else
+                        hub.HackingVisited = false;
+
+                    hub.LoadWorldState(file);
                 }
 
                 // 5. Apply to Game State

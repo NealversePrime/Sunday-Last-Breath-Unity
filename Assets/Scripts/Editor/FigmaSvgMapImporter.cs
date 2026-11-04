@@ -560,17 +560,21 @@ namespace SundayLastBreath.Editor
 
         private static string FormatShortSub(string id, TacticalRoomIconType type)
         {
-            if (type == TacticalRoomIconType.Home) return "SAFEHOUSE";
+            if (type == TacticalRoomIconType.Home) return "MY APARTMENT";
             if (type == TacticalRoomIconType.Stairs) return "FIRE EXIT";
             if (type == TacticalRoomIconType.Corridor) return "CORRIDOR";
-            if (type == TacticalRoomIconType.Utility) return "SERVICE ROOM";
-            if (type == TacticalRoomIconType.Hazard) return "BIOHAZARD";
-            if (type == TacticalRoomIconType.Collapsed) return "COLLAPSED";
+            if (type == TacticalRoomIconType.Utility) return "MAINTENANCE";
+            if (type == TacticalRoomIconType.Hazard) return "BARRICADED";
+            if (type == TacticalRoomIconType.Collapsed) return "CAVED IN";
             if (type == TacticalRoomIconType.Locked) return "DEADBOLT LOCKED";
 
             string s = id.ToLowerInvariant();
-            if (s.Contains("406")) return "PROFESSOR";
-            if (s.Contains("405")) return "HUNTER'S APT";
+            if (s.Contains("406")) return "PROF. HARMON";
+            if (s.Contains("405")) return "MARCUS";
+            if (s.Contains("404")) return "MRS. GABLE";
+            if (s.Contains("403")) return "SARAH";
+            if (s.Contains("402")) return "THE ANDERSONS";
+            if (s.Contains("401")) return "PARTY FLAT";
             if (s.Contains("office")) return "OFFICE";
             if (s.Contains("canteen") || s.Contains("kitchen")) return "CANTEEN";
             if (s.Contains("library")) return "LIBRARY";
@@ -590,17 +594,17 @@ namespace SundayLastBreath.Editor
         private static string GenerateDefaultIntel(string id, TacticalRoomIconType type)
         {
             if (type == TacticalRoomIconType.Home)
-                return "Your residential apartment. Reinforced deadbolt held through the initial outbreak chaos. Emergency broadcasts flicker over television.";
+                return "Your residential apartment. Deadbolt engaged when you stepped out. TV flickers with civil defense alert static.";
             if (type == TacticalRoomIconType.Stairs)
-                return "Emergency fire exit stairwell. Heavy reinforced fire doors provide vertical access between facility floors.";
+                return "Emergency fire exit stairwell. Heavy reinforced fire doors provide access to the lower floors.";
             if (type == TacticalRoomIconType.Corridor)
-                return "Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.";
+                return "Corridor hallway. Low emergency amber illumination. Scattered belongings show residents evacuated in haste.";
             if (type == TacticalRoomIconType.Utility)
-                return "Facility service closet and breaker substation. Houses fuse boxes, spare cables, and building maintenance gear.";
+                return "Carl's service closet and breaker panel. Houses fuse boxes, spare cables, and building maintenance gear.";
             if (type == TacticalRoomIconType.Hazard)
-                return "Critical biohazard quarantine or structural cave-in. Passage blocked by severe debris or viral contamination.";
+                return "Barricaded room or structural cave-in. Impassable without clearing heavy obstructions.";
 
-            return $"Architectural sector {FormatRoomCode(id)}. Initial tactical scans show potential supply caches and survivor barricades.";
+            return $"Apartment {FormatRoomCode(id)}. Belonging to building residents. Knock or inspect the door to check on neighbors.";
         }
 
         private static string GetAssetNameForFloorId(string id)

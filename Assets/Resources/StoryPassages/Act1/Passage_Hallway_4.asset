@@ -61,13 +61,13 @@ MonoBehaviour:
     animatedAvatarFrames: []
     avatarFPS: 8
     dialogueText: "Unit 401 was having a party before the blackout hit. That music is deafening. And those bloody streaks on the stairwell door... people were desperate to get down."
-    outroNarration: "Next to the stairwell is the Utility Closet with an authorized personnel swipe lock."
+    outroNarration: "Next to the stairwell is Carl's maintenance utility closet with an authorized personnel lock."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "INVESTIGATE UNIT 401"
-    choiceSubtitle: "The Party door. Slightly ajar. Blaring pop music hides footsteps."
+    choiceSubtitle: "The students' party flat. Door wide open. Blaring pop music hides footsteps."
     targetPassage: {fileID: 11400000, guid: d1101001b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
     targetRoomId: 'hallway_4'

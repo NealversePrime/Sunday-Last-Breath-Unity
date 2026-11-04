@@ -71,23 +71,23 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "You sever the security chain and push the door open.\n\n<color=#93C5FD><b>THE ANDERSON RESIDENCE.</b></color> The apartment smells overpowering of household bleach. Every piece of furniture is draped in white cotton drop sheets, creating ghost-like silhouettes in the dark.\n\nA vintage turntable continues spinning in the corner. On the dining table sits a pristine red first aid kit."
+  storyText: "You step inside. The piano swells — Chopin, <i>Nocturne in E-flat major</i>. The apartment is immaculate. No struggle. No blood. Every surface is dusted.\n\nThe Anderson family is sitting at the dining table: Mr. and Mrs. Anderson, and their teenage daughter Emma. Three empty wine glasses sit before them with white powder residue.\n\nOn the center of the table is a note: they believed a broadcast claiming the military was gassing the building. They chose peace over suffocating in the dark. Misinformation killed them.\n\nA .38 revolver lies on the floor near Mr. Anderson's foot."
   narrativeBeats: []
   dialogueLines:
-  - introNarration: "You push through the door into <b>Unit 402</b>.\n\n<color=#93C5FD><b>THE ANDERSON RESIDENCE.</b></color> White drop sheets cover every piece of furniture."
+  - introNarration: "The haunting sound of Chopin piano swells through the clean apartment."
     speakerName: "YOU"
     side: 0
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "They scrubbed this place down with bleach before they vanished. That first aid kit on the table has sterile gauze and hospital-grade painkillers."
-    outroNarration: "The turntable needle scratches at the end of the groove."
+    dialogueText: "Airborne? Pumping gas? That was a fake conspiracy rumor floating around before the cells failed. My God... they took poison for nothing."
+    outroNarration: "Three empty crystal glasses sit on the dusted dining table."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
-  - choiceLabel: "Take Medical Kit from Table"
-    choiceSubtitle: "Gather sterile bandages and heavy painkillers."
+  - choiceLabel: "Take Revolver from Floor"
+    choiceSubtitle: "A loaded civilian defense six-shooter (.38 Revolver, 5 ammo)."
     targetPassage: {fileID: 11400000, guid: c1102002b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
     targetRoomId: 'unit_402'
@@ -95,9 +95,9 @@ MonoBehaviour:
     staminaCost: 0
     healthCost: 0
     requiresStoryFlag: ''
-    requiresNotFlag: ''
-    hideWhenUnavailable: 0
-    setsStoryFlagOnExecute: ''
+    requiresNotFlag: 'looted_402_weapon'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_402_weapon'
     clearsStoryFlagOnExecute: ''
     triggerActionId: ''
     requirementMode: 0
@@ -111,10 +111,10 @@ MonoBehaviour:
     givesItem: ''
     givesItemQty: 1
     givesLootList:
-    - itemId: "bandage"
-      quantity: 2
-    - itemId: "painkillers"
-      quantity: 2
+    - itemId: "Revolver .38"
+      quantity: 1
+    - itemId: ".38 Ammo"
+      quantity: 5
     dropLootDirectlyToFloor: 0
     skillCheckType: 0
     skillDC: 10
@@ -130,8 +130,96 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "▲ Return to Lower Hallway"
-    choiceSubtitle: "Step back out into Section 3."
+  - choiceLabel: "Search Kitchen Pantry"
+    choiceSubtitle: "They were prepared to survive for weeks (Canned Food x2, Bottled Water x1)."
+    targetPassage: {fileID: 11400000, guid: c1102002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_402'
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_402_kitchen'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_402_kitchen'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Canned Food"
+      quantity: 2
+    - itemId: "Bottled Water"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Check Medicine Cabinet"
+    choiceSubtitle: "Prescription painkillers and antiseptic (Painkillers x2, Antiseptic x1)."
+    targetPassage: {fileID: 11400000, guid: c1102002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_402'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_402_bathroom'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_402_bathroom'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Painkillers"
+      quantity: 2
+    - itemId: "Antiseptic"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Leave Them in Peace (Return to Hallway)"
+    choiceSubtitle: "Quietly close the door and return to Lower Hallway."
     targetPassage: {fileID: 11400000, guid: a1103003b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
     targetRoomId: 'hallway_3'

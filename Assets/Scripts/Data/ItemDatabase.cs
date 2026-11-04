@@ -239,6 +239,10 @@ namespace SundayLastBreath.Data
             RegisterDef(new ItemDefinition { id = "Bandage", displayName = "Bandage", category = ItemCategory.MedicalConsumable, stackable = true, maxStack = 10, heal = 25, weight = 0.1f, description = "Sterile elastic compression dressing. Halts active hemorrhaging and wraps fractured limbs." });
             RegisterDef(new ItemDefinition { id = "Canned Tuna", displayName = "Canned Tuna", category = ItemCategory.FoodRation, stackable = true, maxStack = 8, heal = 15, hunger = 35, weight = 0.3f, description = "Preserved tuna in oil. High protein, long shelf-life survival ration." });
             RegisterDef(new ItemDefinition { id = "Canned Beans", displayName = "Canned Beans", category = ItemCategory.FoodRation, stackable = true, maxStack = 8, heal = 15, hunger = 40, weight = 0.4f, description = "Hearty baked beans in tomato sauce. Substantial nourishment that requires a can opener." });
+            RegisterDef(new ItemDefinition { id = "Pistol Ammo", displayName = "9mm Ammo", category = ItemCategory.Ammunition, stackable = true, maxStack = 60, weight = 0.02f, description = "Standard 9x19mm Parabellum handgun cartridges." });
+            RegisterDef(new ItemDefinition { id = "Scrap Metal", displayName = "Scrap Metal", category = ItemCategory.ToolUtility, stackable = true, maxStack = 20, weight = 0.5f, description = "Discarded steel brackets and sheet metal fragments for crafting and barricading." });
+            RegisterDef(new ItemDefinition { id = "Antiseptic", displayName = "Antiseptic", category = ItemCategory.MedicalConsumable, stackable = true, maxStack = 5, heal = 10, weight = 0.3f, description = "Medical-grade disinfectant solution. Prevents wound infection and septic shock." });
+            RegisterDef(new ItemDefinition { id = "Rubber Gloves", displayName = "Rubber Gloves", category = ItemCategory.ToolUtility, weight = 0.2f, description = "Heavy chemical-resistant janitorial gloves. Shields hands from biohazards and caustic bleach." });
         }
 
         private static void RegisterDef(ItemDefinition def)
@@ -358,10 +362,25 @@ namespace SundayLastBreath.Data
             { "Revolver .38", "revolver_38" },
             { "Remington 870", "remington" },
             { "9mm Ammo", "9mm" },
+            { "Pistol Ammo", "9mm" },
+            { "Ammo", "9mm" },
             { "5.56mm Ammo", "5.56" },
-            { ".38 Ammo", ".38" },
-            { ".500 Magnum", ".500" },
-            { ".50 Cal", ".50" },
+            { ".38 Ammo", "ammo_38" },
+            { "38 Ammo", "ammo_38" },
+            { ".38", "ammo_38" },
+            { "38", "ammo_38" },
+            { ".500 Magnum", "ammo_500" },
+            { "500 Magnum", "ammo_500" },
+            { ".500", "ammo_500" },
+            { "500", "ammo_500" },
+            { ".50 Cal", "ammo_50" },
+            { "50 Cal", "ammo_50" },
+            { ".50", "ammo_50" },
+            { "50", "ammo_50" },
+            { "Scrap Metal", "scrap_metal" },
+            { "Scrap", "scrap_metal" },
+            { "Antiseptic", "antiseptic" },
+            { "Rubber Gloves", "gloves" },
             { "Shotgun Shells", "shotgunshell" },
             { "Compound Bow", "bow" },
             { "Arrows", "arrows" },

@@ -60,16 +60,56 @@ MonoBehaviour:
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "A dog is barking frantically behind door 404... poor thing is trapped. And across the hall, Marcus reinforced 405 like a bunker."
+    dialogueText: "Mrs. Gable's golden retriever Buster is barking frantically behind door 404... she must have barricaded herself inside. And across the hall, Marcus reinforced 405 like a bunker."
     outroNarration: "The air here smells faintly of gunpowder and cold copper. Claws scrape desperately against the inside of door 404."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
   - choiceLabel: "INVESTIGATE UNIT 405"
-    choiceSubtitle: "The Hunter's door. Heavy steel frame. Faint smell of cordite."
+    choiceSubtitle: "Marcus's place. Heavy steel frame. Faint smell of cordite."
     targetPassage: {fileID: 11400000, guid: b1105001b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
+    targetRoomId: 'hallway_2'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "CHECK UNIT 404"
+    choiceSubtitle: "Mrs. Gable's apartment. Barricaded inside; dog barking."
+    targetPassage: {fileID: 11400000, guid: c1104001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: 'unit_404_door'
     targetRoomId: 'hallway_2'
     timeMinutesCost: 1
     staminaCost: 0

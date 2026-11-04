@@ -1267,111 +1267,111 @@ namespace SundayLastBreath.UI
             // Built-in Default Floor: Ascott Residency 4th Floor
             // ROW 0: North Wing (Unit 406 <-> Hallway 1 <-> Unit 407)
             var u407 = new NodeModel(
-                "unit_407", "UNIT 407", "SAFEHOUSE", "YOUR RESIDENCE (SAFEHOUSE)", "SECURED",
-                "NONE", "LOOTED / SECURE", "TV STATIC HUM",
-                "Your residential apartment. The television flickers with civil defense emergency alert white noise. Heavy reinforced deadbolt held firm during the initial outbreak chaos. Direct exit to North Spine Corridor.",
+                "unit_407", "UNIT 407", "MY PLACE", "YOUR APARTMENT (LOCKED OUT)", "DEADBOLTED",
+                "SAFE (SEALED)", "KEYS LOCKED INSIDE", "MUTED TV STATIC",
+                "Your residential apartment. The heavy deadbolt clicked shut automatically when you stepped out into the hallway. In your panic to pack, your keys were left sitting on the kitchen counter. There's no getting back inside without making enough noise to wake the dead.",
                 isAccessible: true, isDiscovered: true, row: 0, col: 2, iconType: TacticalRoomIconType.Home,
-                undiscoveredSub: "SAFEHOUSE", undiscoveredTitle: "YOUR RESIDENCE (SAFEHOUSE)");
+                undiscoveredSub: "MY PLACE", undiscoveredTitle: "YOUR APARTMENT (LOCKED OUT)");
 
             var h1 = new NodeModel(
-                "hallway_1", "CORR-N1", "NORTH SPINE", "NORTH HALLWAY JUNCTION", "CLEAR",
-                "LOW", "UNSEARCHED", "FAINT DRAFT",
-                "North corridor segment outside Units 407 and 406. Commercial carpet muffled under emergency amber lighting. Scattered luggage suggests residents evacuated in a panic.",
+                "hallway_1", "CORR-N1", "UPPER HALL", "NORTH HALLWAY (406 / 407)", "DIM LIGHTING",
+                "LOW", "SCATTERED SHOES", "FAINT DRAFT",
+                "The north corridor segment outside your door (407) and Professor Harmon's (406). Emergency backup bulbs cast jittery amber shadows over the worn carpet. Scattered slippers and dropped mail show how fast people ran.",
                 isAccessible: true, isDiscovered: false, row: 0, col: 1, iconType: TacticalRoomIconType.Corridor, isHallway: true,
-                undiscoveredSub: "NORTH SPINE", undiscoveredTitle: "NORTH SPINE CORRIDOR");
+                undiscoveredSub: "UPPER HALL", undiscoveredTitle: "NORTH HALLWAY CORRIDOR");
 
             var u406 = new NodeModel(
-                "unit_406", "UNIT 406", "PROFESSOR", "DR. ALISTAIR'S RESIDENCE", "DEADBOLT LOCKED",
-                "UNKNOWN", "HIGH INTEL / LORE", "DEAD SILENCE",
-                "Belongs to Dr. Alistair, retired university historian. Known to keep rare archival notes and emergency radio gear. Heavy brass keypad/deadbolt is engaged from within.",
+                "unit_406", "UNIT 406", "PROF. HARMON", "PROFESSOR HARMON'S PLACE", "KEYPAD LOCKED",
+                "QUIET / NO SOUND", "SURVIVAL NOTES & FOOD", "FAINT KEYPAD HUM",
+                "Professor Harmon's apartment. An eccentric sociology professor who spent years writing about societal collapse. He posted his keypad code (8445) before the cell towers died, telling neighbors to take whatever supplies they need.",
                 isAccessible: false, isDiscovered: false, row: 0, col: 0, iconType: TacticalRoomIconType.Locked, isLocked: true,
-                undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 406");
+                undiscoveredSub: "PROF. HARMON", undiscoveredTitle: "PROFESSOR HARMON'S PLACE");
 
             // ROW 1: Mid-North Wing (Unit 404 <-> Hallway 2 <-> Unit 405)
             var u405 = new NodeModel(
-                "unit_405", "UNIT 405", "HUNTER'S APT", "MARCUS'S APARTMENT", "REINFORCED LOCK",
-                "UNKNOWN", "WEAPONS / AMMO", "METALLIC CLICK",
-                "Residence of Marcus, an experienced outdoorsman and big-game hunter. Faint scent of gun oil and cordite seeps beneath the steel-reinforced door frame. High-priority supply cache.",
+                "unit_405", "UNIT 405", "MARCUS", "MARCUS'S APARTMENT", "DOOR AJAR (TRIPPED?)",
+                "TRIPWIRE HAZARD", "GUNPOWDER & SAFE", "METALLIC CLINK",
+                "Marcus's place. The quiet veteran down the hall who always talked about home defense and bugging out. The door is cracked open an inch and smells sharply of gun oil and cordite—knowing Marcus, he didn't leave without booby-trapping the entrance.",
                 isAccessible: false, isDiscovered: false, row: 1, col: 2, iconType: TacticalRoomIconType.Locked, isLocked: true,
-                undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 405");
+                undiscoveredSub: "MARCUS", undiscoveredTitle: "MARCUS'S RESIDENCE");
 
             var h2 = new NodeModel(
-                "hallway_2", "CORR-N2", "MID-NORTH", "CENTRAL-NORTH CORRIDOR", "SHADOWED",
-                "MEDIUM", "SCATTERED DEBRIS", "WALL SCRATCHING",
-                "Upper-middle hallway corridor. Shattered wall sconces and overturned side tables partially narrow the path. Intermittent rasping echoes from behind the East wing drywall.",
+                "hallway_2", "CORR-N2", "MID-HALL", "MID-HALLWAY (404 / 405)", "FAINT CORDITE",
+                "MEDIUM", "OVERTURNED TABLES", "DOG BARKING & SCRATCHING",
+                "The middle hallway corridor between Mrs. Gable's barricaded unit (404) and Marcus's apartment (405). The carpet is kicked up and smells faintly of spent powder. Buster's frantic whines echo through the walls.",
                 isAccessible: true, isDiscovered: false, row: 1, col: 1, iconType: TacticalRoomIconType.Corridor, isHallway: true,
-                undiscoveredSub: "MID-NORTH", undiscoveredTitle: "CENTRAL-NORTH CORRIDOR");
+                undiscoveredSub: "MID-HALL", undiscoveredTitle: "MID-HALLWAY CORRIDOR");
 
             var u404 = new NodeModel(
-                "unit_404", "UNIT 404", "BARRICADED", "QUARANTINED NEIGHBOR", "BARRICADED",
-                "HIGH", "INACCESSIBLE", "HEAVY THUMPING",
-                "Doorway violently nailed shut from the inside with timber planks and heavy furniture. Deep, frantic gouge marks score the outer mahogany veneer. Do not breach.",
+                "unit_404", "UNIT 404", "MRS. GABLE", "MRS. GABLE & BUSTER", "FURNITURE WEDGED",
+                "PANICKED RESIDENT", "NONE / KEEP OUT", "DOG SCRATCHING & WHINING",
+                "Old Mrs. Gable's place. Sweet old lady who always gave out hard candies in the elevator. She panics at every loud siren—she must have shoved her heavy oak dresser against the door when the screaming started. Her golden retriever Buster is whining and scratching frantically at the wood.",
                 isAccessible: false, isDiscovered: false, row: 1, col: 0, iconType: TacticalRoomIconType.Hazard, isBlocked: true,
-                undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 404");
+                undiscoveredSub: "MRS. GABLE", undiscoveredTitle: "MRS. GABLE'S RESIDENCE");
 
             // ROW 2: Mid-South Wing (Unit 402 <-> Hallway 3 <-> Unit 403)
             var u403 = new NodeModel(
-                "unit_403", "UNIT 403", "BIOHAZARD", "CONTAMINATED RESIDENCE", "BIOHAZARD",
-                "DANGER", "UNKNOWN", "FLIES / SILENCE",
-                "A dark coagulated smear of blood trails down the brass handle onto the threshold. The door frame is warped and jammed shut. Entering without bio-protective gear is lethal.",
+                "unit_403", "UNIT 403", "SARAH (AWAY)", "SARAH'S APARTMENT", "LOCKED / VACANT",
+                "NO SIGN OF LIFE", "NONE / VACANT", "DEAD SILENCE",
+                "Sarah's apartment. She's an ER trauma nurse down at Swedish Medical. Her running sneakers aren't on the welcome mat and the apartment is pitch black. She was on the night shift when the hospitals were overwhelmed—she never made it back home.",
                 isAccessible: false, isDiscovered: false, row: 2, col: 2, iconType: TacticalRoomIconType.Hazard, isBlocked: true,
-                undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 403");
+                undiscoveredSub: "SARAH", undiscoveredTitle: "SARAH'S RESIDENCE");
 
             var h3 = new NodeModel(
-                "hallway_3", "CORR-S1", "MID-SOUTH", "CENTRAL-SOUTH CORRIDOR", "FLICKERING",
-                "MEDIUM", "UNSEARCHED", "DISTANT MUSIC",
-                "Fluorescent ceiling tube strobes erratically, casting harsh staccato shadows. Dark footprints on the runner rug lead southward toward the fire exit stairwell.",
+                "hallway_3", "CORR-S1", "LOWER HALL", "LOWER HALLWAY (402 / 403)", "PITCH BLACK",
+                "MEDIUM", "UNSEARCHED", "DISTANT CHOPIN PIANO",
+                "The ceiling fixtures have completely burned out in this section. The hallway is pitch black except for a thin sliver of warm light beneath the Andersons' chained door, accompanied by haunting piano music.",
                 isAccessible: true, isDiscovered: false, row: 2, col: 1, iconType: TacticalRoomIconType.Corridor, isHallway: true,
-                undiscoveredSub: "MID-SOUTH", undiscoveredTitle: "CENTRAL-SOUTH CORRIDOR");
+                undiscoveredSub: "LOWER HALL", undiscoveredTitle: "LOWER HALLWAY CORRIDOR");
 
             var u402 = new NodeModel(
-                "unit_402", "UNIT 402", "DOOR AJAR", "ANDERSONS' RESIDENCE", "DOOR AJAR",
-                "LOW", "MEDICAL / RATIONS", "RUNNING WATER",
-                "The safety chain is snapped and the door hangs open two inches. Sound of an overflowing sink inside. High probability of salvageable first-aid supplies and canned provisions.",
+                "unit_402", "UNIT 402", "THE ANDERSONS", "THE ANDERSONS' PLACE", "CHAIN LOCKED",
+                "CHILLING SILENCE", "MEDICINE & SUPP.", "CHOPIN ON VINYL",
+                "The Andersons' place. The polite family from down the hall whose daughter Emma plays classical piano. The door is cracked two inches on a brass security chain. The smell of harsh bleach seeps out, while Chopin's Nocturne plays softly on repeat from their living room.",
                 isAccessible: true, isDiscovered: false, row: 2, col: 0, iconType: TacticalRoomIconType.DoorAjar,
-                undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 402");
+                undiscoveredSub: "THE ANDERSONS", undiscoveredTitle: "THE ANDERSONS' RESIDENCE");
 
             // ROW 3: South Wing (Utility Closet <-> Hallway 4 <-> Unit 401)
             var u401 = new NodeModel(
-                "unit_401", "UNIT 401", "CORNER APT", "STUDENT RESIDENCE 401", "UNLOCKED",
-                "LOW", "KEYS / VALUABLES", "WIND THROUGH GLASS",
-                "South-west corner apartment. Unopened mail and flyers are piled on the welcome mat. Latch appears unlocked following the post-party evacuation.",
+                "unit_401", "UNIT 401", "PARTY FLAT", "THE PARTY FLAT (401)", "DOOR WIDE OPEN",
+                "BLARING NOISE", "CAR KEYS & RATIONS", "BLARING POP MUSIC",
+                "The corner apartment rented to college students. They were throwing a massive weekend party when the sirens started. The front door was left hanging wide open during the stampede. Obnoxious pop music is still thumping from their sound system, drowning out the street.",
                 isAccessible: true, isDiscovered: false, row: 3, col: 2, iconType: TacticalRoomIconType.Apartment,
-                undiscoveredSub: "RESIDENTIAL", undiscoveredTitle: "RESIDENTIAL UNIT 401");
+                undiscoveredSub: "STUDENT APT", undiscoveredTitle: "STUDENT RESIDENCE 401");
 
             var h4 = new NodeModel(
-                "hallway_4", "CORR-S2", "SOUTH SPINE", "SOUTH SERVICE JUNCTION", "ELEVATED",
-                "MEDIUM", "UNSEARCHED", "OZONE & SMOKE",
-                "Southern corridor intersection bordering the electrical utility room and stairwell foyer. The air is thick with the acrid smell of blown transformers and damp concrete.",
+                "hallway_4", "CORR-S2", "SOUTH SPINE", "SOUTH SERVICE JUNCTION", "VIBRATING WALLS",
+                "MEDIUM", "DISCARDED CUPS", "OZONE & THUMPING BASS",
+                "Southern corridor intersection bordering the electrical utility room and stairwell foyer. The carpet gives way to scuffed concrete. The vibrating bass from Kyle's stereo shakes the ceiling tiles.",
                 isAccessible: true, isDiscovered: false, row: 3, col: 1, iconType: TacticalRoomIconType.Corridor, isHallway: true,
                 undiscoveredSub: "SOUTH SPINE", undiscoveredTitle: "SOUTH SERVICE JUNCTION");
 
             var util = new NodeModel(
-                "utility", "UTILITY", "MAINTENANCE", "ELECTRICAL & SERVICE CLOSET", "SERVICE ACCESS",
-                "LOW", "TOOLS / FUSES", "TRANSFORMER HUM",
-                "Building maintenance alcove with a heavy steel louver door. Houses the 4th floor master breaker panel, backup fuses, and janitorial hardware lockers.",
+                "utility", "UTILITY", "MAINTENANCE", "CARL'S UTILITY CLOSET", "LOCKED DOOR",
+                "TRANSFORMER HUM", "TOOLS & FUSES", "FLUORESCENT BUZZ",
+                "Carl the building superintendent's maintenance closet. Houses the floor breaker panels, backup fuses, and janitorial supplies behind a heavy magnetic access door.",
                 isAccessible: true, isDiscovered: false, row: 3, col: 0, iconType: TacticalRoomIconType.Utility,
-                undiscoveredSub: "SERVICE ROOM", undiscoveredTitle: "UTILITY SERVICE BAY");
+                undiscoveredSub: "MAINTENANCE", undiscoveredTitle: "UTILITY SERVICE BAY");
 
             // ROW 4: Exit Foyer (Collapsed East Wing <-> Hallway End <-> Stairwell)
             var stairs = new NodeModel(
-                "stairs", "STAIRWELL", "FIRE EXIT", "WEST EMERGENCY STAIRWELL", "ESCAPE ROUTE",
-                "MEDIUM", "PRIMARY EXIT", "ECHOING GROANS",
-                "Reinforced concrete fire stairwell descending to the 2nd Floor and Ground Lobby. Emergency push-bar door is operational. Descending past this point commits to leaving the 4th floor.",
+                "stairs", "STAIRWELL", "FIRE EXIT", "EMERGENCY FIRE EXIT", "ESCAPE ROUTE",
+                "BLOOD ON GLASS", "DESCENT TO LOBBY", "DRAFT FROM BELOW",
+                "The north-west fire stairwell descending toward the lobby and street. Emergency push-bar is operational, but bloody smears on the glass warn of chaos on the lower floors. Once you go down, there is no coming back up.",
                 isAccessible: true, isDiscovered: false, row: 4, col: 2, iconType: TacticalRoomIconType.Stairs, isStairs: true,
                 undiscoveredSub: "FIRE EXIT", undiscoveredTitle: "WEST FIRE STAIRWELL");
 
             var hEnd = new NodeModel(
-                "hallway_end", "FOYER-4S", "SOUTH FOYER", "STAIRWELL ACCESS FOYER", "CLEAR",
-                "MEDIUM", "EXTINGUISHER", "DRAFT FROM BELOW",
-                "Southern terminus of the 4th floor spine corridor. A discharged fire extinguisher lies rolling on the tiles. Direct access West to the Fire Stairwell.",
+                "hallway_end", "FOYER-4S", "STAIR FOYER", "STAIRWELL ACCESS FOYER", "FIRE DOORS",
+                "BLOODY PRINTS", "EXTINGUISHER", "DRAFT FROM BELOW",
+                "Southern terminus of the 4th floor corridor. A discharged fire extinguisher lies rolling on the tiles. Bloody streaks smear the emergency fire doors leading into the stairwell.",
                 isAccessible: true, isDiscovered: false, row: 4, col: 1, iconType: TacticalRoomIconType.Corridor, isHallway: true,
-                undiscoveredSub: "SOUTH FOYER", undiscoveredTitle: "STAIRWELL ACCESS FOYER");
+                undiscoveredSub: "STAIR FOYER", undiscoveredTitle: "STAIRWELL ACCESS FOYER");
 
             var blocked = new NodeModel(
-                "empty_bot", "EAST WING", "EAST WING", "COLLAPSED EAST ALCOVE", "STRUCTURAL FAIL",
+                "empty_bot", "EAST WING", "BLOCKED HALL", "COLLAPSED EAST ALCOVE", "CAVED IN",
                 "IMPASSABLE", "NONE", "SETTLING CONCRETE",
-                "Load-bearing ceiling beams and concrete slabs have caved in, completely sealing the south-east service shaft. Impassable without heavy excavation equipment.",
+                "Plaster and support beams caved in when the blast wave hit the downtown substation. The corridor leading to the east residential wing is completely sealed by rubble.",
                 isAccessible: false, isDiscovered: false, row: 4, col: 0, iconType: TacticalRoomIconType.Collapsed, isBlocked: true,
                 undiscoveredSub: "EAST WING", undiscoveredTitle: "EAST RESIDENTIAL WING");
 
@@ -1823,7 +1823,7 @@ namespace SundayLastBreath.UI
                 }
                 else
                 {
-                    intelDescriptionText.text = "Standard architectural sector listed on building floorplan schematic. No direct visual or acoustic reconnaissance available from your safehouse. Approach sector to acquire recon intel.";
+                    intelDescriptionText.text = "Standard apartment listed on the floor directory. You haven't checked on this neighbor yet. Approach the door to see if anyone is inside.";
                 }
             }
 

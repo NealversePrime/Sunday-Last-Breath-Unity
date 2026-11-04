@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5243d49411170e49a1bac6c9ca10949, type: 3}
+  m_Name: Passage_Unit403_Door
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
+  passageId: unit_403_door
+  passageTitle: UNIT 403 // SARAH'S APARTMENT
+  associatedRoomId: hallway_3
+  backdropSprite: {fileID: 21300000, guid: eb6e8907fc2cb5940b540f3408f62fa0, type: 3}
+  keepPreviousBackdrop: 0
+  animatedBackdropFrames: []
+  animationFPS: 8
+  musicAction: 0
+  backgroundMusicOrAmbience: {fileID: 0}
+  musicVolume: 0.5
+  entranceSFX: {fileID: 0}
+  sfxVolume: 0.8
+  speakerName: ''
+  storyText: "You try the brass handle of Unit 403. It's locked tight, the deadbolt fully engaged from the outside.\n\n<color=#94A3B8><b>*CLICK-RATTLE*</b></color>\n\nThis is Sarah's place. She works as an ER trauma nurse down at Swedish Medical Center in the city center. Her welcome mat has dried rain spots from yesterday morning, but her running sneakers aren't on the rack outside.\n\nShe was on the 7 PM night shift. With the news feeds showing hospitals overwhelmed and the military barricading the downtown bridges, there's no way she made it home before the city was locked down.\n\nThe peephole is pitch black and there isn't a whisper of sound from within. Nobody is home."
+  narrativeBeats: []
+  dialogueLines:
+  - introNarration: "You rattle the brass handle of Unit 403. Deadbolt engaged tight from the outside."
+    speakerName: "YOU"
+    side: 0
+    avatarSprite: {fileID: 0}
+    animatedAvatarFrames: []
+    avatarFPS: 8
+    dialogueText: "Sarah's shoes are gone. She was working the emergency room downtown. With the bridges closed and hospitals swamped, she's trapped in the city center. The apartment is empty."
+    outroNarration: "Total darkness inside the peephole."
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+  initialFloorItems: []
+  choices:
+  - choiceLabel: "▲ Step back and return to Lower Hallway"
+    choiceSubtitle: "Leave Unit 403 and return to Section 3."
+    targetPassage: {fileID: 11400000, guid: a1103003b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'hallway_3'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 1
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3

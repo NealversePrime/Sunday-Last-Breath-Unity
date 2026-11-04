@@ -1107,17 +1107,18 @@ namespace SundayLastBreath.Editor
             menuObj.SetActive(false);
 
             VerticalLayoutGroup mVlg2 = menuObj.AddComponent<VerticalLayoutGroup>();
-            mVlg2.spacing = 6f;
+            mVlg2.spacing = 12f;
             mVlg2.childControlWidth = true;
             mVlg2.childControlHeight = true;
             mVlg2.childForceExpandWidth = true;
             mVlg2.childForceExpandHeight = false;
 
-            // Current Situation & Story Box (Sleek 58px Compact Header)
+            // Current Situation & Story Box (Sleek 64px Initial Header)
             GameObject sitBox = new GameObject("SituationBox", typeof(RectTransform));
             sitBox.transform.SetParent(menuObj.transform, false);
             LayoutElement sitLe = sitBox.AddComponent<LayoutElement>();
-            sitLe.preferredHeight = 58f;
+            sitLe.preferredHeight = 64f;
+            sitLe.minHeight = 64f;
             sitLe.flexibleHeight = 0f;
             sitLe.flexibleWidth = 1f;
 
@@ -1192,8 +1193,8 @@ namespace SundayLastBreath.Editor
             sitBodyTmp.overflowMode = TextOverflowModes.Masking;
             RectTransform sbtRect = sitBodyTmp.rectTransform;
             sbtRect.anchorMin = new Vector2(0f, 0f); sbtRect.anchorMax = new Vector2(1f, 1f);
-            sbtRect.offsetMin = new Vector2(16f, 4f);
-            sbtRect.offsetMax = new Vector2(-16f, -30f);
+            sbtRect.offsetMin = new Vector2(18f, 16f);
+            sbtRect.offsetMax = new Vector2(-18f, -34f);
 
             // Packed Success Banner (Sleek 26px Compact Alert)
             GameObject pBanner = new GameObject("PackedSuccessBanner", typeof(RectTransform));
@@ -1228,7 +1229,8 @@ namespace SundayLastBreath.Editor
             GameObject subHeadObj = new GameObject("ChoiceSubHeader", typeof(RectTransform));
             subHeadObj.transform.SetParent(menuObj.transform, false);
             LayoutElement shLe = subHeadObj.AddComponent<LayoutElement>();
-            shLe.preferredHeight = 18f;
+            shLe.preferredHeight = 22f;
+            shLe.minHeight = 22f;
             shLe.flexibleHeight = 0f;
             shLe.flexibleWidth = 1f;
 
@@ -1237,7 +1239,8 @@ namespace SundayLastBreath.Editor
                 10.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform shtr = cshTmp.rectTransform;
             StretchFull(shtr);
-            shtr.offsetMin = new Vector2(4f, 0f);
+            shtr.offsetMin = new Vector2(6f, 2f);
+            shtr.offsetMax = new Vector2(-6f, -2f);
             SundayTypography.ApplyFont(cshTmp, FontRole.Mono);
 
             // Scrollable Tactical Choice Viewport (Eliminates clipping & handles any number of choices)
@@ -1245,7 +1248,7 @@ namespace SundayLastBreath.Editor
             choiceScrollObj.transform.SetParent(menuObj.transform, false);
             LayoutElement csLe = choiceScrollObj.AddComponent<LayoutElement>();
             csLe.flexibleHeight = 1f;
-            csLe.minHeight = 240f;
+            csLe.minHeight = 80f;
             csLe.flexibleWidth = 1f;
 
             ScrollRect choiceSr = choiceScrollObj.AddComponent<ScrollRect>();
@@ -3296,7 +3299,7 @@ namespace SundayLastBreath.Editor
 
             AudioClip beepClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
             AudioClip staticClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/static.mp3");
-            AudioClip alertClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/tick.mp3");
+            AudioClip alertClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/SFX/terminal_beep.mp3");
             soCtrl.FindProperty("screenWakeClip").objectReferenceValue = beepClip;
             soCtrl.FindProperty("staticBurstClip").objectReferenceValue = staticClip;
             soCtrl.FindProperty("alertBeepClip").objectReferenceValue = alertClip;
@@ -3624,37 +3627,40 @@ namespace SundayLastBreath.Editor
             modTmp.fontSize = 9.5f;
             modTmp.alignment = TextAlignmentOptions.MidlineRight;
             modTmp.color = new Color(0.40f, 0.48f, 0.58f);
-            modTmp.text = "PANASONIC TOUGHBOOK CF-33";
+            modTmp.text = "DESKTOP WORKSTATION // UNIT 407";
             SundayTypography.ApplyFont(modTmp, FontRole.Mono);
 
             // 2. Inner Laptop Screen / Monitor
             GameObject screenObj = new GameObject("LaptopScreen", typeof(RectTransform));
             screenObj.transform.SetParent(hackPanel.transform, false);
             Image sBg = screenObj.AddComponent<Image>();
-            sBg.color = new Color(0.015f, 0.022f, 0.032f, 1f); // Deep matte LCD display
+            sBg.color = new Color(0.012f, 0.018f, 0.026f, 1f); // Deep matte LCD display
 
             Outline sOl = screenObj.AddComponent<Outline>();
             sOl.effectColor = new Color(0.12f, 0.16f, 0.24f, 1f);
 
             VerticalLayoutGroup sVlg = screenObj.AddComponent<VerticalLayoutGroup>();
-            sVlg.padding = new RectOffset(14, 14, 8, 10);
-            sVlg.spacing = 6f;
+            sVlg.padding = new RectOffset(16, 16, 10, 12);
+            sVlg.spacing = 8f;
             sVlg.childControlWidth = true;
+            sVlg.childControlHeight = true;
             sVlg.childForceExpandWidth = true;
+            sVlg.childForceExpandHeight = false;
 
             LayoutElement sLe = screenObj.AddComponent<LayoutElement>();
-            sLe.preferredHeight = 600f;
+            sLe.preferredHeight = 490f;
+            sLe.minHeight = 460f;
             sLe.flexibleHeight = 1f;
 
             // 3. OS Window Header Bar
             GameObject hObj = new GameObject("Header", typeof(RectTransform));
             hObj.transform.SetParent(screenObj.transform, false);
             Image hBg = hObj.AddComponent<Image>();
-            hBg.color = new Color(0.05f, 0.08f, 0.14f, 0.95f);
+            hBg.color = new Color(0.06f, 0.09f, 0.16f, 0.95f);
 
             LayoutElement hLe = hObj.AddComponent<LayoutElement>();
-            hLe.preferredHeight = 24f;
-            hLe.minHeight = 24f;
+            hLe.preferredHeight = 26f;
+            hLe.minHeight = 26f;
 
             GameObject hTitleObj = new GameObject("TitleText", typeof(RectTransform));
             hTitleObj.transform.SetParent(hObj.transform, false);
@@ -3664,78 +3670,72 @@ namespace SundayLastBreath.Editor
             htRt.offsetMax = new Vector2(-8f, 0f);
 
             TextMeshProUGUI hTmp = hTitleObj.AddComponent<TextMeshProUGUI>();
-            hTmp.fontSize = 10.5f;
+            hTmp.fontSize = 11f;
             hTmp.fontStyle = FontStyles.Bold;
             hTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            hTmp.text = "<b><color=#38bdf8>[>]</color> terminal@unit407: ~/recon/defense_grid</b>               <color=#64748b>[ETH0: 1 Gbps]</color>   <color=#10b981>[VPN: ACTIVE]</color>   <color=#94a3b8>[ — ]  [ □ ]  [ ✕ ]</color>";
+            hTmp.text = "<b><color=#38bdf8>[>]</color> terminal@unit407: ~/network/emergency_intercept.log</b>        <color=#64748b>[SUBNET: 192.168.1.1]</color>   <color=#10b981>[LINK: ACTIVE]</color>";
             SundayTypography.ApplyFont(hTmp, FontRole.Mono);
 
             // 4. Terminal Text Body
             GameObject tObj = new GameObject("TerminalText");
             tObj.transform.SetParent(screenObj.transform, false);
             LayoutElement tle = tObj.AddComponent<LayoutElement>();
-            tle.preferredHeight = 360f;
-            tle.minHeight = 320f;
+            tle.preferredHeight = 440f;
+            tle.minHeight = 420f;
             tle.flexibleHeight = 1f;
             terminalText = tObj.AddComponent<TextMeshProUGUI>();
-            terminalText.fontSize = 11.5f;
+            terminalText.fontSize = 12f;
             terminalText.color = new Color(0.20f, 0.90f, 0.45f);
-            terminalText.lineSpacing = 5f;
-            terminalText.text = "<color=#64748b>root@unit407:~# ./extract_defense_grid.sh --target=DISPATCH_SECURE_NODE_04</color>\n" +
-                                "<color=#38bdf8>[*] ESTABLISHING ENCRYPTED TUNNEL VIA SEATTLE FIBER GRID...</color>\n" +
-                                "<color=#10b981>[+] HANDSHAKE ACCEPTED: 154.790 MHz MILNET GATEWAY (IP: 10.14.88.2)</color>\n" +
-                                "<color=#f59e0b>[*] BYPASSING 256-BIT AES DEFENSE PROTOCOL... [100% OK]</color>\n\n" +
-                                "<color=#ef4444><b>================== [ TOP SECRET // CLASSIFIED DOD DIRECTIVE ] ==================</b></color>\n" +
-                                "<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (EXTREME BIOLOGICAL CONTAINMENT)</color>\n" +
+            terminalText.lineSpacing = 6f;
+            terminalText.text = "<color=#64748b>>_ terminal@unit407: scanning building fiber gateway...</color>\n" +
+                                "<color=#38bdf8>[*] SUBNET 192.168.1.1 — INTERCEPTING MUNICIPAL EMERGENCY FEED...</color>\n" +
+                                "<color=#10b981>[+] BYPASSING LOCAL CARRIER ENCRYPTION... [100% OK]</color>\n" +
+                                "<color=#f59e0b>[*] DOWNLOADING ACTIVE FEMA / DoD TRANSMISSION STREAM...</color>\n\n" +
+                                "<color=#ef4444><b>================== [ CLASSIFIED EMERGENCY DIRECTIVE ] ==================</b></color>\n" +
+                                "<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (CONTAINMENT PROTOCOL)</color>\n" +
                                 "<color=#f1f5f9><b>THREAT LEVEL   :</b></color> <color=#ef4444><b>CATEGORY 5 (EXTINCTION EVENT)</b></color>\n" +
                                 "<color=#f1f5f9><b>PATHOGEN       :</b></color> <color=#f59e0b>NEURO-AGGRESSIVE MUTAGEN (PRIMARY VECTOR: HARBORVIEW LAB)</color>\n" +
                                 "<color=#f1f5f9><b>STATUS         :</b></color> <color=#ef4444>QUARANTINE FAILED // INFECTION RATE: 87.4%</color>\n" +
                                 "<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>INITIATE SECTOR 4 PURGE (THERMAL FIREBOMBING) AT 0600 HOURS.</b></color>\n" +
                                 "<color=#f1f5f9><b>EXTRACTION LZ  :</b></color> <color=#10b981>POINT 'ECHO' // HARBORVIEW HELIPAD (47.604° N, 122.324° W)</color>\n" +
-                                "<color=#ef4444><b>================================================================================</b></color>\n\n" +
-                                "<color=#10b981>[+] DOWNLOADING ATTACHMENT: EVAC_PROTOCOLS.DAT (128 KB)... DONE.</color>\n" +
-                                "<color=#ffd700><b>[+] GENERATING TIER-1 MILITARY CLEARANCE PASSKEY... SYNCED TO PHONE!</b></color>\n\n" +
-                                "<color=#ef4444><b>[!] INTRUSION DETECTED BY CENTRAL DEFENSE NODE. KILL SWITCH ENGAGED!</b></color>\n" +
-                                "<color=#94a3b8>[X] CONNECTION TERMINATED BY REMOTE HOST. LOCAL IP BURNED.</color>";
+                                "<color=#ef4444><b>========================================================================</b></color>\n\n" +
+                                "<color=#10b981>[+] EVACUATION COORDINATES & ATTACHMENTS SECURED (EVAC_PROTOCOLS.DAT).</color>\n" +
+                                "<color=#ffd700><b>[+] GENERATING TIER-1 CLEARANCE PASSKEY... TRANSFERRED TO PERSONAL PHONE!</b></color>\n\n" +
+                                "<color=#ef4444><b>[!] REMOTE DISPATCH DETECTED INTRUSION. CENTRAL KILL-SWITCH ENGAGED!</b></color>\n" +
+                                "<color=#94a3b8>[X] CONNECTION TERMINATED BY HOST. INTRANET ADAPTER SEVERED.</color>";
             SundayTypography.ApplyFont(terminalText, FontRole.Mono);
 
-            // 5. Finish Container
+            // 5. Finish Container (Docked on chassis below LaptopScreen so it NEVER overlaps the terminal!)
             finishContainer = new GameObject("FinishContainer");
-            finishContainer.transform.SetParent(screenObj.transform, false);
+            finishContainer.transform.SetParent(hackPanel.transform, false);
+            LayoutElement fLe = finishContainer.AddComponent<LayoutElement>();
+            fLe.preferredHeight = 100f;
+            fLe.minHeight = 90f;
+            fLe.flexibleWidth = 1f;
+
             VerticalLayoutGroup fVlg = finishContainer.AddComponent<VerticalLayoutGroup>();
-            fVlg.spacing = 6f;
+            fVlg.padding = new RectOffset(0, 0, 4, 4);
+            fVlg.spacing = 8f;
             fVlg.childControlWidth = true;
+            fVlg.childControlHeight = true;
             fVlg.childForceExpandWidth = true;
+            fVlg.childForceExpandHeight = false;
 
             GameObject foObj = new GameObject("Outro");
             foObj.transform.SetParent(finishContainer.transform, false);
             TextMeshProUGUI foTmp = foObj.AddComponent<TextMeshProUGUI>();
-            foTmp.fontSize = 11.5f;
-            foTmp.lineSpacing = 5f;
-            foTmp.color = new Color(0.85f, 0.88f, 0.92f);
-            foTmp.text = "<color=#ef4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military is firebombing the city at dawn. You secured a <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your device.";
+            foTmp.fontSize = 12.5f;
+            foTmp.lineSpacing = 4f;
+            foTmp.color = new Color(0.92f, 0.94f, 0.98f);
+            foTmp.text = "<color=#ef4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military isn't trying to contain the outbreak — they are firebombing the city at dawn. A <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> has been pushed to your personal phone.";
             SundayTypography.ApplyFont(foTmp, FontRole.Body);
 
             LayoutElement oLe = foObj.AddComponent<LayoutElement>();
-            oLe.preferredHeight = 38f;
-            oLe.minHeight = 34f;
+            oLe.preferredHeight = 40f;
+            oLe.minHeight = 36f;
 
-            CreateApartmentMenuButton(finishContainer.transform, "Btn_CloseHacking", "<b>SHUT DOWN LAPTOP & RETURN TO LIVING ROOM</b>   <color=#34D399><b>[ESC / SPACE]</b></color>",
+            CreateApartmentMenuButton(finishContainer.transform, "Btn_CloseHacking", "<b>[ 1 ] WIPE DRIVE & CLOSE LAPTOP</b>   <color=#34D399><b>[ESC / SPACE]</b></color>",
                 "", new Color(0.35f, 0.95f, 0.45f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _);
-
-            // 6. Bottom Bezel / Keyboard Deck Strip
-            GameObject deckObj = new GameObject("LaptopDeckStrip", typeof(RectTransform));
-            deckObj.transform.SetParent(hackPanel.transform, false);
-            LayoutElement dLe = deckObj.AddComponent<LayoutElement>();
-            dLe.preferredHeight = 18f;
-            dLe.minHeight = 18f;
-
-            TextMeshProUGUI dTmp = deckObj.AddComponent<TextMeshProUGUI>();
-            dTmp.fontSize = 9.5f;
-            dTmp.alignment = TextAlignmentOptions.Center;
-            dTmp.color = new Color(0.35f, 0.42f, 0.50f);
-            dTmp.text = "— — —  [ EMBEDDED TPM 2.0 CRYPTOGRAPHIC MODULE ACTIVE // MIL-STD-810G ]  — — —";
-            SundayTypography.ApplyFont(dTmp, FontRole.Mono);
 
             return modalObj;
         }

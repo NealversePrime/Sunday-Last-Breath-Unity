@@ -1218,7 +1218,7 @@ namespace SundayLastBreath.UI
             TextMeshProUGUI htmp = htxtObj.AddComponent<TextMeshProUGUI>();
             htmp.fontSize = 9.5f;
             htmp.alignment = TextAlignmentOptions.Center;
-            htmp.text = "<b><color=#F59E0B>KEY ITEMS & TREASURES</color></b>  <color=#64748B>|</color>  <color=#38BDF8>RE4 VALUABLES POUCH (0 SLOTS)</color>";
+            htmp.text = "<b><color=#F59E0B>KEY ITEMS & VALUABLES</color></b>  <color=#64748B>|</color>  <color=#38BDF8>SPECIAL POUCH (0 SLOTS)</color>";
             RectTransform htr = htxtObj.GetComponent<RectTransform>();
             htr.anchorMin = Vector2.zero; htr.anchorMax = Vector2.one;
             htr.offsetMin = Vector2.zero; htr.offsetMax = Vector2.zero;
@@ -1436,7 +1436,7 @@ namespace SundayLastBreath.UI
             {
                 subLine = !string.IsNullOrEmpty(entry.acquiredTime) 
                     ? $"<color=#64748B>Acquired: {entry.acquiredTime}</color>" 
-                    : "<color=#64748B>Dedicated RE4 Key Compartment</color>";
+                    : "<color=#64748B>Dedicated Key & Valuables Pouch</color>";
             }
 
             string desc = string.IsNullOrEmpty(entry.description)

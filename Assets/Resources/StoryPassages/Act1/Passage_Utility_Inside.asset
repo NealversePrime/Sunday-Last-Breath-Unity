@@ -71,33 +71,33 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "<color=#93C5FD><b>SUPERINTENDENT'S WORKSHOP.</b></color>\n\nThe smell of machine oil, WD-40, and rubber fills the room. Tall steel shelving units line both walls, loaded with industrial supplies.\n\nA heavy rubberized waterproof flashlight and rolls of industrial duct tape sit right on the work counter."
+  storyText: "The heavy door gives way. The air is thick and stinging with industrial bleach. A single failing fluorescent tube flickers on bare concrete.\n\nHeavy metal racks line the room, packed with maintenance supplies. In the center, a yellow mop bucket is tipped over, a dark smear leading toward the back corner. A metal desk sits buried under blueprints and a logbook."
   narrativeBeats: []
   dialogueLines:
-  - introNarration: "The magnetic lock buzzes and pops free.\n\n<color=#93C5FD><b>SUPERINTENDENT'S WORKSHOP.</b></color> Tall industrial shelves line the bare concrete."
+  - introNarration: "The heavy steel maintenance door screeches open into harsh bleach air."
     speakerName: "YOU"
     side: 0
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "Jackpot. Heavy flashlight with fresh D-cells, plus reinforced duct tape. This flashlight will illuminate the stairwell all the way down."
-    outroNarration: "A yellow mop bucket is overturned in the corner."
+    dialogueText: "Carl locked himself in here because he was feeling feverish. His joints were burning. He never clocked out."
+    outroNarration: "The fluorescent bulb buzzes erratically overhead."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
-  - choiceLabel: "Take Flashlight & Duct Tape"
-    choiceSubtitle: "Equip heavy flashlight and grab duct tape."
+  - choiceLabel: "Search Tipped Cleaning Cart"
+    choiceSubtitle: "An unopened jug of industrial Bleach and thick Work Gloves."
     targetPassage: {fileID: 11400000, guid: e1100002b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
     targetRoomId: 'utility_room'
-    timeMinutesCost: 1
+    timeMinutesCost: 2
     staminaCost: 0
     healthCost: 0
     requiresStoryFlag: ''
-    requiresNotFlag: ''
-    hideWhenUnavailable: 0
-    setsStoryFlagOnExecute: ''
+    requiresNotFlag: 'looted_utility_bleach'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_utility_bleach'
     clearsStoryFlagOnExecute: ''
     triggerActionId: ''
     requirementMode: 0
@@ -111,10 +111,98 @@ MonoBehaviour:
     givesItem: ''
     givesItemQty: 1
     givesLootList:
-    - itemId: "flashlight"
+    - itemId: "Bleach"
       quantity: 1
-    - itemId: "ducttape"
+    - itemId: "Work Gloves"
       quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Scavenge Metal Shelves"
+    choiceSubtitle: "A roll of heavy-duty Duct Tape and a coil of nylon Rope."
+    targetPassage: {fileID: 11400000, guid: e1100002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'utility_room'
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_utility_tape'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_utility_tape'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Duct Tape"
+      quantity: 1
+    - itemId: "Rope"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Check Drawers of Metal Desk"
+    choiceSubtitle: "A heavy-duty Flashlight and two spare Batteries."
+    targetPassage: {fileID: 11400000, guid: e1100002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'utility_room'
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_utility_desk'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_utility_desk'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Flashlight"
+      quantity: 1
+    - itemId: "Batteries"
+      quantity: 2
     dropLootDirectlyToFloor: 0
     skillCheckType: 0
     skillDC: 10

@@ -71,33 +71,33 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "<color=#93C5FD><b>UNIT 401 - THE COLLEGE PARTY.</b></color>\n\nThe apartment is trashed. Red plastic cups, shattered beer bottles, and discarded coats cover every surface. The blaring sound system vibrates the floorboards.\n\nIn the corner, a massive oak bookshelf has toppled over. Underneath its splintered frame, a brass keychain glints in the strobe light."
+  storyText: "The heavy oak shelf is off him. The <b>Car Keys</b> are safely in your pocket.\n\nThe scratched CD player loops endlessly from the corner:\n\n<i>\"...and we danced all night to the best song ever...\"</i>\n\nThe apartment smells like beer, grief, and stale panic. You are the only living thing left here."
   narrativeBeats: []
   dialogueLines:
-  - introNarration: "You push open the half-ajar door into <b>Unit 401</b>.\n\n<color=#93C5FD><b>THE ABANDONED PARTY.</b></color> Strobe lights flicker against smashed cups."
+  - introNarration: "The blaring pop music echoes off empty red solo cups and smashed glass."
     speakerName: "YOU"
     side: 0
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "They panicked and stampeded for the exits. That toppled shelf is pinning a set of car keys to the floor. Might belong to a vehicle parked outside."
-    outroNarration: "The bass keeps thumping relentlessly through the broken drywall."
+    dialogueText: "He's somebody's kid. I didn't know him. I'm not going to start crying for him now. The car keys are mine."
+    outroNarration: "The bass shakes the floorboards in an empty apartment."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
-  - choiceLabel: "Lever the Toppled Shelf and Grab Keys"
-    choiceSubtitle: "Use your body weight to lift the oak shelf and snatch the car keys and alcohol."
+  - choiceLabel: "Raid the Kitchen"
+    choiceSubtitle: "Two energy bars and a sealed water bottle (Energy Bar x2, Bottled Water x1)."
     targetPassage: {fileID: 11400000, guid: d1101001b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
     targetRoomId: 'unit_401'
     timeMinutesCost: 2
-    staminaCost: 6
+    staminaCost: 0
     healthCost: 0
     requiresStoryFlag: ''
-    requiresNotFlag: ''
-    hideWhenUnavailable: 0
-    setsStoryFlagOnExecute: ''
+    requiresNotFlag: 'looted_401_kitchen'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_401_kitchen'
     clearsStoryFlagOnExecute: ''
     triggerActionId: ''
     requirementMode: 0
@@ -111,9 +111,9 @@ MonoBehaviour:
     givesItem: ''
     givesItemQty: 1
     givesLootList:
-    - itemId: "carkeys"
-      quantity: 1
-    - itemId: "whiskey"
+    - itemId: "Energy Bar"
+      quantity: 2
+    - itemId: "Bottled Water"
       quantity: 1
     dropLootDirectlyToFloor: 0
     skillCheckType: 0
@@ -130,7 +130,95 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "▲ Return to Hallway End"
+  - choiceLabel: "Check Medicine Cabinet"
+    choiceSubtitle: "Painkillers and a bandage roll (Painkillers x2, Bandage x1)."
+    targetPassage: {fileID: 11400000, guid: d1101001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_401'
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_401_bathroom'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_401_bathroom'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Painkillers"
+      quantity: 2
+    - itemId: "Bandage"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Take Alcohol from Counter"
+    choiceSubtitle: "Full bottles of spirits (Bottle of Vodka x1, Whiskey x1)."
+    targetPassage: {fileID: 11400000, guid: d1101001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_401'
+    timeMinutesCost: 2
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_401_alcohol'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_401_alcohol'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Bottle of Vodka"
+      quantity: 1
+    - itemId: "Whiskey"
+      quantity: 1
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "▲ Leave Apartment and Return to Hallway"
     choiceSubtitle: "Step back out into Section 4."
     targetPassage: {fileID: 11400000, guid: a1104004b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''

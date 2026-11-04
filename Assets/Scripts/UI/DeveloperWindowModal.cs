@@ -1144,8 +1144,8 @@ namespace SundayLastBreath.UI
         {
             var content = CreateTabPanelRoot(DevTab.FastTravel, "[WARP] FAST TRAVEL & PASSAGE TELEPORT", "Instantly jump to any room, hallway corridor, or external survival passage.");
 
-            CreateSectionHeader(content.transform, "UNIT 407 (SAFEHOUSE)");
-            CreateWarpRow(content.transform, "Unit 407 Living Room (Safehouse Hub)", () => WarpToHubMode());
+            CreateSectionHeader(content.transform, "UNIT 407 (YOUR APARTMENT)");
+            CreateWarpRow(content.transform, "Unit 407 Living Room (Apartment Hub)", () => WarpToHubMode());
             CreateWarpRow(content.transform, "Passage: Unit 407 Hub", () => WarpToPassage("Act1/Passage_Unit407_Hub"));
 
             CreateSectionHeader(content.transform, "FLOOR 4 RESIDENCY & UNITS");

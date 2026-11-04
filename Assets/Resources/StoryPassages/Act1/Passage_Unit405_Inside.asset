@@ -71,33 +71,33 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "You slip through the cleared doorway into <b>Unit 405</b>.\n\nThe living room looks like a forward operating base. Spent brass shell casings roll across the hardwood floor. Gun cases lie open on the sofa, emptied of rifles.\n\nHowever, a heavy tactical vest and an open box of 9mm ammunition remain on the steel workbench."
+  storyText: "You step into Marcus's apartment. It looks like a staging ground. A heavy wooden reloading bench is dusted with gunpowder and brass shavings. In the corner, a massive steel gun safe sits wide open — completely stripped of rifles.\n\nOn the wall is a topographical map tracing a route avoiding highways to <i>'Oakhaven Cabin'</i>. Underneath is a HAM radio with a notepad on the mic. Near the safe, a small wooden toy car lies forgotten on the rug."
   narrativeBeats: []
   dialogueLines:
-  - introNarration: "You step past the disarmed tripwire into <b>Unit 405</b>.\n\n<color=#93C5FD><b>TACTICAL WORKSHOP.</b></color> Spent brass shell casings roll across the hardwood floor."
+  - introNarration: "You step into Marcus's apartment. It looks like a staging ground dusted with gunpowder."
     speakerName: "YOU"
     side: 0
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "Marcus geared up for a war. He took the heavy ordnance, but there's still plenty of 9mm rounds and a combat knife here. Exactly what I need."
-    outroNarration: "Gun cases lie open on the furniture, cleaned out in a hurry."
+    dialogueText: "Marcus was bitten on the stairwell. He chose to die outside so he wouldn't bring the virus to Diane and the boys at Oakhaven. Rest in peace, brother."
+    outroNarration: "A small wooden toy car lies forgotten near the open safe."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
-  - choiceLabel: "Raid the Gunsmith Workbench"
-    choiceSubtitle: "Loot 9mm ammunition and a tactical combat knife."
+  - choiceLabel: "Sweep the Reloading Bench"
+    choiceSubtitle: "Marcus left loose ammunition and scrap metal on the workbench."
     targetPassage: {fileID: 11400000, guid: b1105002b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
     targetRoomId: 'unit_405'
-    timeMinutesCost: 2
+    timeMinutesCost: 5
     staminaCost: 0
     healthCost: 0
     requiresStoryFlag: ''
-    requiresNotFlag: ''
-    hideWhenUnavailable: 0
-    setsStoryFlagOnExecute: ''
+    requiresNotFlag: 'looted_405_bench'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_405_bench'
     clearsStoryFlagOnExecute: ''
     triggerActionId: ''
     requirementMode: 0
@@ -111,9 +111,51 @@ MonoBehaviour:
     givesItem: ''
     givesItemQty: 1
     givesLootList:
-    - itemId: "ammo_9mm"
-      quantity: 10
-    - itemId: "knife"
+    - itemId: "Pistol Ammo"
+      quantity: 12
+    - itemId: "Scrap Metal"
+      quantity: 3
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Check Bottom of Gun Safe"
+    choiceSubtitle: "Rifles are gone, but tucked in the corner is a high-carbon Hunting Knife."
+    targetPassage: {fileID: 11400000, guid: b1105002b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_405'
+    timeMinutesCost: 3
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_405_safe'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_405_safe'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Hunting Knife"
       quantity: 1
     dropLootDirectlyToFloor: 0
     skillCheckType: 0
@@ -130,8 +172,8 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "▲ Return to Mid-Hallway"
-    choiceSubtitle: "Slip back through the reinforced door."
+  - choiceLabel: "▲ Leave Apartment and Return to Hallway"
+    choiceSubtitle: "Slip back out into Mid-Hallway."
     targetPassage: {fileID: 11400000, guid: a1102002b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
     targetRoomId: 'hallway_2'

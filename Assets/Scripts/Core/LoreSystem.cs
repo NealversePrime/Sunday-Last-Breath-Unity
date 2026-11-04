@@ -11,6 +11,8 @@ namespace SundayLastBreath.Core
         public string content;
         public string timestamp;
 
+        public LoreEntry() { }
+
         public LoreEntry(string title, string content, string timestamp = "")
         {
             this.title = title;
@@ -45,6 +47,25 @@ namespace SundayLastBreath.Core
         public bool HasLore(string title)
         {
             return entries.Exists(e => e.title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void Clear()
+        {
+            entries.Clear();
+        }
+
+        public List<LoreEntry> GetEntriesList()
+        {
+            return new List<LoreEntry>(entries);
+        }
+
+        public void SetEntries(List<LoreEntry> loadedEntries)
+        {
+            entries.Clear();
+            if (loadedEntries != null)
+            {
+                entries.AddRange(loadedEntries);
+            }
         }
     }
 }

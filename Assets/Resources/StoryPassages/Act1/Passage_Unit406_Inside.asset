@@ -71,33 +71,33 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "The electronic lock chirps, and the heavy door unlatches.\n\n<color=#93C5FD><b>HARMON'S STUDY.</b></color> The apartment has been turned upside down. Bookshelves are emptied onto the carpet, blueprints cover the dining table, and the faint stench of burned copper hangs in the air.\n\nHarmon fled in a panic, but his workbench drawers are still half-open."
+  storyText: "The heavy door swings open into darkness. The smell reaches you first: old paper, dust, and peppermint. Drawers are pulled open. His heavy coat and hiking backpack are gone.\n\nFloor-to-ceiling shelves line all four walls. His reading glasses sit folded on an open book — <i>The Fall of Rome</i>, marked with a yellow sticky note:\n\n<i>\"Every empire ends. We're just living in the intermission. Take what you need.\"</i>"
   narrativeBeats: []
   dialogueLines:
-  - introNarration: "The electronic lock chirps, and the door swings open into darkness.\n\n<color=#93C5FD><b>HARMON'S STUDY.</b></color> Books and papers are scattered everywhere."
+  - introNarration: "The heavy door swings open into darkness. The smell of old paper and peppermint fills the room."
     speakerName: "YOU"
     side: 0
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "He definitely knew something was coming. The entire desk is covered in emergency frequency notes. I should grab whatever medical supplies and rations he left behind."
-    outroNarration: "Blueprints for the city's power grid are scattered across the drafting table."
+    dialogueText: "He didn't just see this coming. He packed up and left before the alarms even started."
+    outroNarration: "His reading glasses sit folded on an open book — The Fall of Rome."
     requiresStoryFlag: ''
     requiresNotFlag: ''
   initialFloorItems: []
   choices:
-  - choiceLabel: "Scavenge Harmon's Desk"
-    choiceSubtitle: "Search the drafting table drawers for supplies."
+  - choiceLabel: "Search Abandoned Kitchen"
+    choiceSubtitle: "He packed light, leaving canned food, an energy bar, and bottled water."
     targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
     targetPassageId: ''
     targetRoomId: 'unit_406'
-    timeMinutesCost: 2
+    timeMinutesCost: 5
     staminaCost: 0
     healthCost: 0
     requiresStoryFlag: ''
-    requiresNotFlag: ''
-    hideWhenUnavailable: 0
-    setsStoryFlagOnExecute: ''
+    requiresNotFlag: 'looted_406_kitchen'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_406_kitchen'
     clearsStoryFlagOnExecute: ''
     triggerActionId: ''
     requirementMode: 0
@@ -111,9 +111,55 @@ MonoBehaviour:
     givesItem: ''
     givesItemQty: 1
     givesLootList:
-    - itemId: "bandage"
+    - itemId: "Canned Food"
+      quantity: 1
+    - itemId: "Energy Bar"
+      quantity: 1
+    - itemId: "Bottled Water"
       quantity: 2
-    - itemId: "whiskey"
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "Raid Desk Drawers"
+    choiceSubtitle: "A heavy hardbound Encyclopedia and a fully charged Flashlight."
+    targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
+    targetPassageId: ''
+    targetRoomId: 'unit_406'
+    timeMinutesCost: 5
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: 'looted_406_desk'
+    hideWhenUnavailable: 1
+    setsStoryFlagOnExecute: 'looted_406_desk'
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList:
+    - itemId: "Encyclopedia"
+      quantity: 1
+    - itemId: "Flashlight"
       quantity: 1
     dropLootDirectlyToFloor: 0
     skillCheckType: 0
@@ -130,7 +176,7 @@ MonoBehaviour:
     fadeOutBgmDuringTransition: 1
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
-  - choiceLabel: "▲ Leave Apartment (Return to Hallway)"
+  - choiceLabel: "▲ Leave Study and Return to Hallway"
     choiceSubtitle: "Step back out into Upper Hallway."
     targetPassage: {fileID: 11400000, guid: 3d8ebf1e8e3258543b88026777e8d1d7, type: 2}
     targetPassageId: ''

@@ -145982,7 +145982,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   screenWakeClip: {fileID: 8300000, guid: b770821ec13920940a38424e0d08d7a5, type: 3}
   staticBurstClip: {fileID: 8300000, guid: 5f3cabefe8d360f4dab86093c35bbe72, type: 3}
-  alertBeepClip: {fileID: 8300000, guid: 0185ba255cf65f94ba59010ba8a6eaec, type: 3}
+  alertBeepClip: {fileID: 8300000, guid: b770821ec13920940a38424e0d08d7a5, type: 3}
 --- !u!114 &1445521370
 MonoBehaviour:
   m_ObjectHideFlags: 0

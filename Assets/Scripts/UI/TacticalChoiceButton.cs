@@ -181,7 +181,16 @@ namespace SundayLastBreath.UI
             if (accent.HasValue)
             {
                 baseAccentColor = accent.Value;
+                hoverAccentColor = Color.Lerp(accent.Value, Color.white, 0.45f);
                 if (accentBar != null) accentBar.color = accent.Value;
+                if (background != null) background.color = new Color(Mathf.Clamp01(accent.Value.r * 0.25f), Mathf.Clamp01(accent.Value.g * 0.25f), Mathf.Clamp01(accent.Value.b * 0.25f), 0.75f);
+            }
+            else
+            {
+                baseAccentColor = new Color(0.95f, 0.75f, 0.35f);
+                hoverAccentColor = new Color(1f, 0.85f, 0.40f);
+                if (accentBar != null) accentBar.color = baseAccentColor;
+                if (background != null) background.color = new Color(0.04f, 0.06f, 0.09f, 0.65f);
             }
             gameObject.SetActive(true);
         }
@@ -218,12 +227,14 @@ namespace SundayLastBreath.UI
                 hotkeyTmp.color = normalHotkeyColor;
             }
 
-            if (background != null) background.color = baseBgColor;
+            if (background != null) background.color = new Color(0.04f, 0.06f, 0.09f, 0.65f);
             if (outline != null)
             {
                 outline.effectColor = baseOutlineColor;
                 outline.effectDistance = new Vector2(1f, -1f);
             }
+            baseAccentColor = new Color(0.95f, 0.75f, 0.35f);
+            hoverAccentColor = new Color(1f, 0.85f, 0.40f);
             if (accentBar != null)
             {
                 accentBar.color = baseAccentColor;

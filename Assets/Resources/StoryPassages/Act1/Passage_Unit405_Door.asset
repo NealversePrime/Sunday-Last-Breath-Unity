@@ -51,10 +51,10 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "<color=#93C5FD><b>UNIT 405 - THE HUNTER'S DOOR.</b></color>\n\nA solid steel-plated door with heavy deadbolts. Looking closely at the gap between the door and the frame, you spot a taut monofilament tripwire wired directly to an improvised 12-gauge blank charge.\n\nMarcus doesn't like unexpected visitors."
+  storyText: "<color=#93C5FD><b>UNIT 405 - MARCUS'S APARTMENT.</b></color>\n\nA solid steel-plated door with heavy deadbolts. Looking closely at the gap between the door and the frame, you spot a taut monofilament tripwire wired directly to an improvised 12-gauge blank charge.\n\nMarcus doesn't like unexpected visitors."
   narrativeBeats: []
   dialogueLines:
-  - introNarration: "<color=#93C5FD><b>UNIT 405 - THE HUNTER'S DOOR.</b></color> Heavy steel plates reinforce the frame."
+  - introNarration: "<color=#93C5FD><b>UNIT 405 - MARCUS'S APARTMENT.</b></color> Heavy steel plates reinforce the frame."
     speakerName: "YOU"
     side: 0
     avatarSprite: {fileID: 0}

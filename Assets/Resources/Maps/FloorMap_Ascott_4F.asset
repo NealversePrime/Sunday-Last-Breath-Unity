@@ -15,13 +15,13 @@ MonoBehaviour:
   floorId: ascott_4f
   floorTitle: "ARCHITECTURAL BLUEPRINT // ASCOTT RESIDENCY \u2014 4TH FLOOR WEST WING"
   floorSubtitle: SCHEMATIC SCALE 1:100 // CONTIGUOUS FLOORPLAN
-  gridCoordinate: 'GRID [W-01:R-01] // BIO-RADAR: ACTIVE'
+  gridCoordinate: 'FLOOR 4 // WEST WING CORRIDOR'
   vectorMapSprite: {fileID: 3286163911610860551, guid: e40c3d7df1e25bd4ba85ff0260c31985, type: 3}
   rooms:
   - roomId: unit_407
     roomCode: UNIT 407
-    shortSub: SAFEHOUSE
-    fullTitle: UNIT 407 // SAFEHOUSE
+    shortSub: MY PLACE
+    fullTitle: UNIT 407 // YOUR APARTMENT
     position: {x: 58.3, y: 119.4}
     size: {x: 35.1, y: 35.1}
     iconType: 1
@@ -31,19 +31,19 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 1
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 407 // SAFEHOUSE
-    statusTag: CURRENT SECTOR
-    threatLevel: NONE
-    scavengeStatus: LOOTED / SECURED
-    acousticScan: TV STATIC HUM
-    reconIntel: Your residential apartment. Reinforced deadbolt held through the initial outbreak chaos. Emergency broadcasts flicker over television.
+    undiscoveredSub: MY PLACE
+    undiscoveredTitle: UNIT 407 // YOUR APARTMENT
+    statusTag: DEADBOLTED
+    threatLevel: SAFE (SEALED)
+    scavengeStatus: KEYS LOCKED INSIDE
+    acousticScan: MUTED TV STATIC
+    reconIntel: Your residential apartment. The heavy deadbolt clicked shut automatically when you stepped out into the hallway. In your panic to pack, your keys were left sitting on the kitchen counter. There's no getting back inside without making enough noise to wake the dead.
     connectedRoomIds:
     - hallway_1
   - roomId: hallway_1
     roomCode: HALLWAY 1
-    shortSub: CORRIDOR
-    fullTitle: HALLWAY 1 // CORRIDOR
+    shortSub: UPPER HALL
+    fullTitle: NORTH CORRIDOR // UPPER HALLWAY
     position: {x: 0.0, y: 119.4}
     size: {x: 35.1, y: 35.1}
     iconType: 7
@@ -53,21 +53,21 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: HALLWAY 1 // CORRIDOR
-    statusTag: CLEAR
-    threatLevel: MEDIUM
-    scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    undiscoveredSub: UPPER HALL
+    undiscoveredTitle: NORTH CORRIDOR // UPPER HALLWAY
+    statusTag: DIM LIGHTING
+    threatLevel: LOW
+    scavengeStatus: SCATTERED SHOES
+    acousticScan: FAINT DRAFT
+    reconIntel: The north corridor segment outside your door (407) and Professor Harmon's (406). Emergency backup bulbs cast jittery amber shadows over the worn carpet. Scattered slippers and dropped mail show how fast people ran.
     connectedRoomIds:
     - unit_407
     - unit_406
     - hallway_2
   - roomId: unit_406
     roomCode: UNIT 406
-    shortSub: PROFESSOR'S LAB
-    fullTitle: UNIT 406 // PROFESSOR'S LAB
+    shortSub: PROF. HARMON
+    fullTitle: UNIT 406 // PROFESSOR HARMON'S PLACE
     position: {x: -58.3, y: 119.4}
     size: {x: 35.1, y: 35.1}
     iconType: 2
@@ -77,19 +77,19 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 406 // PROFESSOR'S LAB
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: HIGH INTEL
-    acousticScan: DEAD SILENCE
-    reconIntel: Residence of Dr. Alistair / Prof. Harmon. Features a heavy electronic keypad deadbolt lock. Known repository of archival biological research.
+    undiscoveredSub: PROF. HARMON
+    undiscoveredTitle: UNIT 406 // PROFESSOR HARMON'S PLACE
+    statusTag: KEYPAD LOCKED
+    threatLevel: QUIET / NO SOUND
+    scavengeStatus: SURVIVAL NOTES & FOOD
+    acousticScan: FAINT KEYPAD HUM
+    reconIntel: Professor Harmon's apartment. An eccentric sociology professor who spent years writing about societal collapse. He posted his keypad code (8445) before the cell towers died, telling neighbors to take whatever supplies they need.
     connectedRoomIds:
     - hallway_1
   - roomId: unit_405
     roomCode: UNIT 405
-    shortSub: HUNTER'S APT
-    fullTitle: UNIT 405 // HUNTER'S APT
+    shortSub: MARCUS
+    fullTitle: UNIT 405 // MARCUS'S APARTMENT
     position: {x: 58.3, y: 59.7}
     size: {x: 35.1, y: 35.1}
     iconType: 0
@@ -99,19 +99,19 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 405 // HUNTER'S APT
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: WEAPONS / AMMO
-    acousticScan: METALLIC CLICK
-    reconIntel: Residence of Marcus, an experienced outdoorsman and hunter. Reinforced steel frame door. High-priority cache for firearms and ammunition.
+    undiscoveredSub: MARCUS
+    undiscoveredTitle: UNIT 405 // MARCUS'S APARTMENT
+    statusTag: DOOR AJAR (TRIPPED?)
+    threatLevel: TRIPWIRE HAZARD
+    scavengeStatus: GUNPOWDER & SAFE
+    acousticScan: METALLIC CLINK
+    reconIntel: Marcus's place. The quiet veteran down the hall who always talked about home defense and bugging out. The door is cracked open an inch and smells sharply of gun oil and cordite—knowing Marcus, he didn't leave without booby-trapping the entrance.
     connectedRoomIds:
     - hallway_2
   - roomId: hallway_2
     roomCode: HALLWAY 2
-    shortSub: CORRIDOR
-    fullTitle: HALLWAY 2 // CORRIDOR
+    shortSub: MID-HALL
+    fullTitle: MID-HALLWAY // SECTION 2
     position: {x: 0.0, y: 59.7}
     size: {x: 35.1, y: 35.1}
     iconType: 7
@@ -121,13 +121,13 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: HALLWAY 2 // CORRIDOR
-    statusTag: CLEAR
+    undiscoveredSub: MID-HALL
+    undiscoveredTitle: MID-HALLWAY // SECTION 2
+    statusTag: FAINT CORDITE
     threatLevel: MEDIUM
-    scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    scavengeStatus: OVERTURNED TABLES
+    acousticScan: DOG BARKING & SCRATCHING
+    reconIntel: The middle hallway corridor between Mrs. Gable's barricaded unit (404) and Marcus's apartment (405). The carpet is kicked up and smells faintly of spent powder. Buster's frantic whines echo through the walls.
     connectedRoomIds:
     - hallway_1
     - unit_405
@@ -135,8 +135,8 @@ MonoBehaviour:
     - hallway_3
   - roomId: unit_404
     roomCode: UNIT 404
-    shortSub: BARRICADED
-    fullTitle: UNIT 404 // BARRICADED
+    shortSub: MRS. GABLE
+    fullTitle: UNIT 404 // MRS. GABLE & BUSTER
     position: {x: -58.3, y: 59.7}
     size: {x: 35.1, y: 35.1}
     iconType: 3
@@ -146,19 +146,19 @@ MonoBehaviour:
     isBlocked: 1
     isAccessible: 0
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 404 // BARRICADED
-    statusTag: BLOCKED
-    threatLevel: HIGH
-    scavengeStatus: INACCESSIBLE
-    acousticScan: HEAVY THUMPING
-    reconIntel: Doorway violently nailed shut from the inside with heavy structural timber planks. Frantic gouge marks on door frame. Completely impassable.
+    undiscoveredSub: MRS. GABLE
+    undiscoveredTitle: UNIT 404 // MRS. GABLE & BUSTER
+    statusTag: FURNITURE WEDGED
+    threatLevel: PANICKED RESIDENT
+    scavengeStatus: NONE / KEEP OUT
+    acousticScan: DOG SCRATCHING & WHINING
+    reconIntel: Old Mrs. Gable's place. Sweet old lady who always gave out hard candies in the elevator. She panics at every loud siren—she must have shoved her heavy oak dresser against the door when the screaming started. Her golden retriever Buster is whining and scratching frantically at the wood.
     connectedRoomIds:
     - hallway_2
   - roomId: unit_403
     roomCode: UNIT 403
-    shortSub: BIOHAZARD
-    fullTitle: UNIT 403 // BIOHAZARD
+    shortSub: SARAH (AWAY)
+    fullTitle: UNIT 403 // SARAH'S APARTMENT
     position: {x: 58.3, y: 0.0}
     size: {x: 35.1, y: 35.1}
     iconType: 3
@@ -168,19 +168,19 @@ MonoBehaviour:
     isBlocked: 1
     isAccessible: 0
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 403 // BIOHAZARD
-    statusTag: BLOCKED
-    threatLevel: HIGH
-    scavengeStatus: INACCESSIBLE
-    acousticScan: FLIES / SILENCE
-    reconIntel: Severe biological quarantine hazard. Dark coagulated substance beneath warped door frame. Entry without protective hazmat suit is lethal.
+    undiscoveredSub: SARAH (AWAY)
+    undiscoveredTitle: UNIT 403 // SARAH'S APARTMENT
+    statusTag: LOCKED / VACANT
+    threatLevel: NO SIGN OF LIFE
+    scavengeStatus: NONE / VACANT
+    acousticScan: DEAD SILENCE
+    reconIntel: Sarah's apartment. She's an ER trauma nurse down at Swedish Medical. Her running sneakers aren't on the welcome mat and the apartment is pitch black. She was on the night shift when the hospitals were overwhelmed—she never made it back home.
     connectedRoomIds:
     - hallway_3
   - roomId: hallway_3
     roomCode: HALLWAY 3
-    shortSub: CORRIDOR
-    fullTitle: HALLWAY 3 // CORRIDOR
+    shortSub: LOWER HALL
+    fullTitle: LOWER HALLWAY // SECTION 3
     position: {x: 0.0, y: 0.0}
     size: {x: 35.1, y: 35.1}
     iconType: 7
@@ -190,13 +190,13 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: HALLWAY 3 // CORRIDOR
-    statusTag: CLEAR
+    undiscoveredSub: LOWER HALL
+    undiscoveredTitle: LOWER HALLWAY // SECTION 3
+    statusTag: PITCH BLACK
     threatLevel: MEDIUM
     scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    acousticScan: DISTANT CHOPIN PIANO
+    reconIntel: The ceiling fixtures have completely burned out in this section. The hallway is pitch black except for a thin sliver of warm light beneath the Andersons' chained door, accompanied by haunting piano music.
     connectedRoomIds:
     - hallway_2
     - unit_403
@@ -204,8 +204,8 @@ MonoBehaviour:
     - hallway_4
   - roomId: unit_402
     roomCode: UNIT 402
-    shortSub: ANDERSONS' APT
-    fullTitle: UNIT 402 // ANDERSONS' APT
+    shortSub: THE ANDERSONS
+    fullTitle: UNIT 402 // THE ANDERSONS' PLACE
     position: {x: -58.3, y: 0.0}
     size: {x: 35.1, y: 35.1}
     iconType: 4
@@ -215,19 +215,19 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 402 // ANDERSONS' APT
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: MEDICAL / RATIONS
-    acousticScan: RUNNING WATER
-    reconIntel: The door safety chain is broken and the door stands slightly ajar. Overflowing tap sound inside. Salvageable medical supplies and canned food.
+    undiscoveredSub: THE ANDERSONS
+    undiscoveredTitle: UNIT 402 // THE ANDERSONS' PLACE
+    statusTag: CHAIN LOCKED
+    threatLevel: CHILLING SILENCE
+    scavengeStatus: MEDICINE & SUPP.
+    acousticScan: CHOPIN ON VINYL
+    reconIntel: The Andersons' place. The polite family from down the hall whose daughter Emma plays classical piano. The door is cracked two inches on a brass security chain. The smell of harsh bleach seeps out, while Chopin's Nocturne plays softly on repeat from their living room.
     connectedRoomIds:
     - hallway_3
   - roomId: unit_401
     roomCode: UNIT 401
-    shortSub: CORNER APT
-    fullTitle: UNIT 401 // CORNER APT
+    shortSub: PARTY FLAT
+    fullTitle: UNIT 401 // THE PARTY FLAT
     position: {x: 58.3, y: -59.7}
     size: {x: 35.1, y: 35.1}
     iconType: 0
@@ -237,19 +237,19 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UNIT 401 // CORNER APT
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: KEYS / VALUABLES
-    acousticScan: WIND THROUGH GLASS
-    reconIntel: South-west corner residential unit. Unopened letters scattered by the entrance. Door latch is unlocked following hurried evacuation.
+    undiscoveredSub: PARTY FLAT
+    undiscoveredTitle: UNIT 401 // THE PARTY FLAT
+    statusTag: DOOR WIDE OPEN
+    threatLevel: BLARING NOISE
+    scavengeStatus: CAR KEYS & RATIONS
+    acousticScan: BLARING POP MUSIC
+    reconIntel: The corner apartment rented to college students. They were throwing a massive weekend party when the sirens started. The front door was left hanging wide open during the stampede. Obnoxious pop music is still thumping from their sound system, drowning out the street.
     connectedRoomIds:
     - hallway_4
   - roomId: hallway_4
     roomCode: HALLWAY 4
-    shortSub: CORRIDOR
-    fullTitle: HALLWAY 4 // CORRIDOR
+    shortSub: SOUTH SPINE
+    fullTitle: SOUTH SERVICE JUNCTION // SECTION 4
     position: {x: 0.0, y: -59.7}
     size: {x: 35.1, y: 35.1}
     iconType: 7
@@ -259,13 +259,13 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: HALLWAY 4 // CORRIDOR
-    statusTag: CLEAR
+    undiscoveredSub: SOUTH SPINE
+    undiscoveredTitle: SOUTH SERVICE JUNCTION // SECTION 4
+    statusTag: VIBRATING WALLS
     threatLevel: MEDIUM
-    scavengeStatus: UNSEARCHED
-    acousticScan: OZONE & SMOKE
-    reconIntel: Southern junction bordering the utility electrical closet and stairwell entrance. Acrid scent of electrical discharge in the air.
+    scavengeStatus: DISCARDED CUPS
+    acousticScan: OZONE & THUMPING BASS
+    reconIntel: Southern corridor intersection bordering the electrical utility room and stairwell foyer. The carpet gives way to scuffed concrete. The vibrating bass from Kyle's stereo shakes the ceiling tiles.
     connectedRoomIds:
     - unit_401
     - hallway_3
@@ -274,8 +274,8 @@ MonoBehaviour:
     - blocked_stairs
   - roomId: utility
     roomCode: UTILITY BAY
-    shortSub: SERVICE ROOM
-    fullTitle: UTILITY BAY // SERVICE ROOM
+    shortSub: MAINTENANCE
+    fullTitle: UTILITY BAY // CARL'S CLOSET
     position: {x: -58.3, y: -59.7}
     size: {x: 35.1, y: 35.1}
     iconType: 5
@@ -285,13 +285,13 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: UTILITY BAY // SERVICE ROOM
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: TOOLS / FUSES
-    acousticScan: TRANSFORMER HUM
-    reconIntel: Facility service closet and breaker substation. Houses fuse boxes, spare cables, and building maintenance gear.
+    undiscoveredSub: MAINTENANCE
+    undiscoveredTitle: UTILITY BAY // CARL'S CLOSET
+    statusTag: LOCKED DOOR
+    threatLevel: TRANSFORMER HUM
+    scavengeStatus: TOOLS & FUSES
+    acousticScan: FLUORESCENT BUZZ
+    reconIntel: Carl the building superintendent's maintenance closet. Houses the floor breaker panels, backup fuses, and janitorial supplies behind a heavy magnetic access door.
     connectedRoomIds:
     - hallway_4
   - roomId: stairs
@@ -307,19 +307,19 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
+    undiscoveredSub: FIRE EXIT
     undiscoveredTitle: STAIRWELL // FIRE EXIT
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: ESCAPE ROUTE
-    acousticScan: ECHOING GROANS
+    statusTag: ESCAPE ROUTE
+    threatLevel: BLOOD ON GLASS
+    scavengeStatus: DESCENT TO LOBBY
+    acousticScan: DRAFT FROM BELOW
     reconIntel: Emergency fire exit stairwell. Heavy reinforced fire door with functioning push-bar. Primary route descending to 3rd and Ground floors.
     connectedRoomIds:
     - hallway_4
   - roomId: blocked_stairs
     roomCode: BLOCKED STAIRS
-    shortSub: COLLAPSED
-    fullTitle: BLOCKED STAIRS // COLLAPSED
+    shortSub: BLOCKED HALL
+    fullTitle: EAST WING // COLLAPSED ALCOVE
     position: {x: -58.3, y: -119.4}
     size: {x: 35.1, y: 35.1}
     iconType: 6
@@ -329,13 +329,13 @@ MonoBehaviour:
     isBlocked: 1
     isAccessible: 0
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: BLOCKED STAIRS // COLLAPSED
-    statusTag: COLLAPSED
+    undiscoveredSub: BLOCKED HALL
+    undiscoveredTitle: EAST WING // COLLAPSED ALCOVE
+    statusTag: CAVED IN
     threatLevel: IMPASSABLE
     scavengeStatus: NONE
     acousticScan: SETTLING CONCRETE
-    reconIntel: Load-bearing ceiling collapse has completely crushed the western stairwell shaft under reinforced concrete slabs. Impassable.
+    reconIntel: Plaster and support beams caved in when the blast wave hit the downtown substation. The corridor leading to the east residential wing is completely sealed by rubble.
     connectedRoomIds:
     - hallway_4
   doorways:

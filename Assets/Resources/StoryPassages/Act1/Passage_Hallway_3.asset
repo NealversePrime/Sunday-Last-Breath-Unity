@@ -51,7 +51,7 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "<color=#93C5FD><b>LOWER HALLWAY.</b></color> The lights are completely dead in this section. The metallic, coppery tang of blood mixes with the smell of ozone.\n\nJarringly, soft classical music (Chopin) plays from behind the chained door of <b>Unit 402</b>. Across from it is <b>Unit 403</b>."
+  storyText: "<color=#93C5FD><b>LOWER HALLWAY.</b></color> The lights are completely dead in this section. A faint, stinging scent of bleach drifts down the corridor.\n\nSoft classical piano music plays from behind the chained door of <b>Unit 402 (The Andersons)</b>. Across from it is <b>Unit 403 (Sarah)</b>, pitch black and silent."
   narrativeBeats: []
   dialogueLines:
   - introNarration: "<color=#93C5FD><b>LOWER HALLWAY (SECTION 3).</b></color> The ceiling bulbs have burned out completely."
@@ -60,7 +60,7 @@ MonoBehaviour:
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "Chopin? Who plays a phonograph record in the dark while the city burns outside? The Andersons live here... something isn't right."
+    dialogueText: "Chopin? Emma must be playing their turntable... but why with the lights off? Across from them, Sarah's place is dark—she's probably still down at the ER."
     outroNarration: "The coppery tang of blood is stronger here. The classical piano melody feels chillingly out of place."
     requiresStoryFlag: ''
     requiresNotFlag: ''
@@ -70,6 +70,46 @@ MonoBehaviour:
     choiceSubtitle: "The Andersons' door. Chained from the inside. Classical music playing."
     targetPassage: {fileID: 11400000, guid: c1102001b5696ff4eada863cecea8452, type: 2}
     targetPassageId: ''
+    targetRoomId: 'hallway_3'
+    timeMinutesCost: 1
+    staminaCost: 0
+    healthCost: 0
+    requiresStoryFlag: ''
+    requiresNotFlag: ''
+    hideWhenUnavailable: 0
+    setsStoryFlagOnExecute: ''
+    clearsStoryFlagOnExecute: ''
+    triggerActionId: ''
+    requirementMode: 0
+    requiredStat: ''
+    requiredStatValue: 0
+    requiredSkill: ''
+    requiredSkillLevel: 0
+    requiredTrait: ''
+    requiredItem: ''
+    consumesItem: ''
+    givesItem: ''
+    givesItemQty: 1
+    givesLootList: []
+    dropLootDirectlyToFloor: 0
+    skillCheckType: 0
+    skillDC: 10
+    successPassage: {fileID: 0}
+    failurePassage: {fileID: 0}
+    choiceSFX: {fileID: 0}
+    isBackButton: 0
+    transitionVideo: {fileID: 0}
+    transitionVideoPath: ''
+    transitionStartSFX: {fileID: 0}
+    transitionStepSFX: {fileID: 0}
+    transitionEndSFX: {fileID: 0}
+    fadeOutBgmDuringTransition: 1
+    videoFadeInDuration: 0.35
+    postVideoPause: 0.3
+  - choiceLabel: "CHECK UNIT 403"
+    choiceSubtitle: "Sarah's apartment. ER nurse; shoes missing; dark inside."
+    targetPassage: {fileID: 11400000, guid: c1103001b5696ff4eada863cecea8452, type: 2}
+    targetPassageId: 'unit_403_door'
     targetRoomId: 'hallway_3'
     timeMinutesCost: 1
     staminaCost: 0

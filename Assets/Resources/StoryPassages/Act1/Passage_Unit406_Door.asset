@@ -71,7 +71,7 @@ MonoBehaviour:
   entranceSFX: {fileID: 0}
   sfxVolume: 0.8
   speakerName: ''
-  storyText: "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a modern electronic keypad lock. The blue backlight on the keypad pulses weakly.\n\nA handwritten note taped beside the keypad in spidery ink reads: <i>'If you're reading this, don't look outside. Get to the basement.'</i>"
+  storyText: "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a modern electronic keypad lock. The blue backlight on the keypad pulses weakly.\n\nA handwritten note taped beside the keypad reads: <i>'If you're reading this, the network is down. If you're a neighbor from this floor, I posted the entry code on the community board before fleeing. Take whatever supplies or notes you need. Stay off the streets.'</i>"
   narrativeBeats: []
   dialogueLines:
   - introNarration: "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door."
@@ -80,8 +80,8 @@ MonoBehaviour:
     avatarSprite: {fileID: 0}
     animatedAvatarFrames: []
     avatarFPS: 8
-    dialogueText: "Harmon texted me the emergency passcode earlier: 8-4-6-5. Let's see if the keypad's backup battery is still alive."
-    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+    dialogueText: "Harmon posted his emergency passcode on social media before the network cut out: 8-4-4-5. Let's see if the keypad's backup battery is still alive."
+    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, the network is down. If you're a neighbor from this floor, I posted the entry code on the community board before fleeing. Take whatever supplies or notes you need.'"
     requiresStoryFlag: 'checked_phone_harmon'
     requiresNotFlag: ''
   - introNarration: "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door."
@@ -91,12 +91,12 @@ MonoBehaviour:
     animatedAvatarFrames: []
     avatarFPS: 8
     dialogueText: "A heavy electronic deadbolt seals Harmon's door. Total silence inside... I don't know his code, but maybe I can deduce it from the worn keys, bypass the latch, or force it open."
-    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'"
+    outroNarration: "A handwritten note taped beside the keypad reads: 'If you're reading this, the network is down. If you're a neighbor from this floor, I posted the entry code on the community board before fleeing. Take whatever supplies or notes you need.'"
     requiresStoryFlag: ''
     requiresNotFlag: 'checked_phone_harmon'
   initialFloorItems: []
   choices:
-  - choiceLabel: "Enter passcode from phone (8465)"
+  - choiceLabel: "Enter passcode from phone (8445)"
     choiceSubtitle: "Type Harmon's emergency passcode into the pulsing electronic keypad."
     targetPassage: {fileID: 11400000, guid: 18f5aa56867a7e446a64c8b657e81029, type: 2}
     targetPassageId: ''
@@ -145,8 +145,8 @@ MonoBehaviour:
     staminaCost: 0
     healthCost: 0
     requiresStoryFlag: ''
-    requiresNotFlag: 'room406_locked_out'
-    hideWhenUnavailable: 0
+    requiresNotFlag: 'checked_phone_harmon'
+    hideWhenUnavailable: 1
     setsStoryFlagOnExecute: ''
     clearsStoryFlagOnExecute: ''
     triggerActionId: 'OPEN_KEYPAD_MODAL'

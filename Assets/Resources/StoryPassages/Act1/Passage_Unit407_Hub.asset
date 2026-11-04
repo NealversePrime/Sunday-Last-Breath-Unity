@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Passage_Unit407_Hub
   m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.StoryPassageData
   passageId: unit_407_hub
-  passageTitle: UNIT 407 // SAFEHOUSE
+  passageTitle: UNIT 407 // YOUR APARTMENT
   associatedRoomId: unit_407
   backdropSprite: {fileID: 0}
   keepPreviousBackdrop: 0
@@ -201,7 +201,7 @@ MonoBehaviour:
     videoFadeInDuration: 0.35
     postVideoPause: 0.3
   - choiceLabel: "Inspect Government Network Traffic [HACK]"
-    choiceSubtitle: "Exploit building network vulnerabilities to bypass defense protocols. (Tech 2, Tactics 6, or Gamer)"
+    choiceSubtitle: "Exploit building network vulnerabilities to bypass defense protocols. (Tech 3, Tactics 6, or Gamer)"
     targetPassage: {fileID: 0}
     targetPassageId: ''
     targetRoomId: ''
@@ -218,7 +218,7 @@ MonoBehaviour:
     requiredStat: 'Tactics'
     requiredStatValue: 6
     requiredSkill: 'tech'
-    requiredSkillLevel: 2
+    requiredSkillLevel: 3
     requiredTrait: 'GAMER'
     requiredItem: ''
     consumesItem: ''
