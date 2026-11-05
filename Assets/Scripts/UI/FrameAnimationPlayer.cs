@@ -32,14 +32,7 @@ namespace SundayLastBreath.UI
 
         private void Awake()
         {
-            if (targetImage == null)
-            {
-                targetImage = GetComponent<Image>();
-            }
-            if (targetRawImage == null)
-            {
-                targetRawImage = GetComponent<RawImage>();
-            }
+            EnsureTarget();
 
             if (playOnAwake && frames.Count > 0)
             {
@@ -47,8 +40,15 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private void EnsureTarget()
+        {
+            if (targetImage == null) targetImage = GetComponent<Image>();
+            if (targetRawImage == null) targetRawImage = GetComponent<RawImage>();
+        }
+
         public void SetFrames(List<Sprite> newFrames, float fps = 12f, bool shouldLoop = true)
         {
+            EnsureTarget();
             frames = newFrames ?? new List<Sprite>();
             framesPerSecond = fps;
             loop = shouldLoop;
@@ -59,6 +59,7 @@ namespace SundayLastBreath.UI
 
         public void Play()
         {
+            EnsureTarget();
             if (frames == null || frames.Count == 0) return;
             isPlaying = true;
             currentFrameIndex = 0;
@@ -114,6 +115,8 @@ namespace SundayLastBreath.UI
         {
             if (frames == null || frames.Count == 0 || currentFrameIndex < 0 || currentFrameIndex >= frames.Count)
                 return;
+
+            EnsureTarget();
 
             Sprite currentSprite = frames[currentFrameIndex];
             if (currentSprite != null)

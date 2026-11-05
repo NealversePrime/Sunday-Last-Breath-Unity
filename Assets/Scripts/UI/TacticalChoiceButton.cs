@@ -163,6 +163,16 @@ namespace SundayLastBreath.UI
             }
         }
 
+        public void SetDisabledChoiceTag()
+        {
+            if (hotkeyTmp != null)
+            {
+                hotkeyTmp.text = "[ — ]";
+                hotkeyTmp.color = new Color(0.35f, 0.4f, 0.45f, 0.45f);
+                SundayTypography.ApplyFont(hotkeyTmp, FontRole.Mono);
+            }
+        }
+
         public void SetChoice(string mainText, System.Action onClickAction, bool interactable = true, Color? accent = null)
         {
             if (mainLabelTmp != null)
@@ -178,7 +188,20 @@ namespace SundayLastBreath.UI
                     button.onClick.AddListener(() => onClickAction());
                 }
             }
-            if (accent.HasValue)
+            if (!interactable)
+            {
+                baseAccentColor = new Color(0.25f, 0.28f, 0.32f, 0.35f);
+                hoverAccentColor = baseAccentColor;
+                baseBgColor = new Color(0.02f, 0.03f, 0.05f, 0.4f);
+                baseOutlineColor = new Color(0.12f, 0.15f, 0.18f, 0.25f);
+                normalHotkeyColor = new Color(0.35f, 0.4f, 0.45f, 0.45f);
+
+                if (accentBar != null) accentBar.color = baseAccentColor;
+                if (background != null) background.color = baseBgColor;
+                if (outline != null) outline.effectColor = baseOutlineColor;
+                if (hotkeyTmp != null) hotkeyTmp.color = normalHotkeyColor;
+            }
+            else if (accent.HasValue)
             {
                 baseAccentColor = accent.Value;
                 hoverAccentColor = Color.Lerp(accent.Value, Color.white, 0.45f);

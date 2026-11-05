@@ -2277,9 +2277,12 @@ namespace SundayLastBreath.UI
             for (int i = hobbyCardsContainer.childCount - 1; i >= 0; i--)
             {
                 Transform child = hobbyCardsContainer.GetChild(i);
+                if (child == null) continue;
                 child.gameObject.SetActive(false);
-                child.SetParent(null);
-                Destroy(child.gameObject);
+                if (Application.isPlaying)
+                    Destroy(child.gameObject);
+                else
+                    DestroyImmediate(child.gameObject);
             }
 
             int spawnedCount = 0;

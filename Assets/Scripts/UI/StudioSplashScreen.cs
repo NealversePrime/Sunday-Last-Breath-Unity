@@ -97,6 +97,16 @@ namespace SundayLastBreath.UI
             ProceedToNext();
         }
 
+        protected override void OnScreenClosed()
+        {
+            base.OnScreenClosed();
+            if (timerCoroutine != null)
+            {
+                StopCoroutine(timerCoroutine);
+                timerCoroutine = null;
+            }
+        }
+
         private void ProceedToNext()
         {
             Hide(0.6f, () =>

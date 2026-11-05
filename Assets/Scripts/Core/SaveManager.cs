@@ -190,7 +190,14 @@ namespace SundayLastBreath.Core
             }
             else if (triggerLoad)
             {
-                QuickLoad();
+                if (SundayLastBreath.UI.LoadingScreen.Instance != null)
+                {
+                    SundayLastBreath.UI.LoadingScreen.Instance.QuickLoadWithScreen();
+                }
+                else
+                {
+                    QuickLoad();
+                }
             }
         }
 
@@ -464,6 +471,7 @@ namespace SundayLastBreath.Core
                 {
                     hub.SetGameClockTime(loadedDay, loadedHour, loadedMinute, loadedDate, loadedMonth, loadedYear, loadedDayName);
                     hub.SetLocation(loadedRoomId);
+                    hub.RefreshLocationBGM();
                 }
 
                 // 6. Rich Console Telemetry Output

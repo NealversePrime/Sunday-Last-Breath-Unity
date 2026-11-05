@@ -31,7 +31,7 @@ namespace SundayLastBreath.UI
         private Action onCancelledCallback;
 
         [Header("Valid Passcodes")]
-        private readonly string[] validCodes = new string[] { "8465", "8445", "4181", "1481" };
+        private readonly string[] validCodes = new string[] { "8445", "8465", "4181", "1481" };
 
         [Header("UI References")]
         private GameObject modalContainer;
@@ -40,6 +40,14 @@ namespace SundayLastBreath.UI
         private TextMeshProUGUI attemptsText;
         private TextMeshProUGUI observationClueText;
         private List<Button> keypadButtons = new List<Button>();
+        private struct KeypadButtonInfo
+        {
+            public string label;
+            public Image image;
+            public Outline outline;
+            public TextMeshProUGUI text;
+        }
+        private List<KeypadButtonInfo> buttonInfos = new List<KeypadButtonInfo>();
         private AudioSource audioSource;
 
         private void Awake()
@@ -61,7 +69,7 @@ namespace SundayLastBreath.UI
             }
         }
 
-        public void OpenKeypad(Action onUnlocked, Action onLockedOut = null, Action onCancelled = null)
+        public void OpenKeypad(Action onUnlocked, Action onLockedOut = null, Action onCancelled = null, bool hasObservationClue = false)
         {
             EnsureAudioSource();
             onUnlockedCallback = onUnlocked;
@@ -75,6 +83,7 @@ namespace SundayLastBreath.UI
             isProcessing = false;
 
             BuildOrRefreshUI();
+            ApplyObservationStyling(hasObservationClue);
             gameObject.SetActive(true);
             UpdateDisplay();
             PlayBeepSound(1200f, 0.05f);
@@ -430,12 +439,11 @@ namespace SundayLastBreath.UI
                 "CLR", "0", "ENT"
             };
 
-            // Buttons 4, 5, 6, 8 (and 1) are worn as shown in the reference photo!
+            buttonInfos.Clear();
             for (int i = 0; i < labels.Length; i++)
             {
                 string lbl = labels[i];
-                bool isWornKey = (lbl == "4" || lbl == "5" || lbl == "6" || lbl == "8" || lbl == "1");
-                CreateKeypadButton(gridObj.transform, lbl, isWornKey);
+                CreateKeypadButton(gridObj.transform, lbl);
             }
 
             // Clue note box under keypad
@@ -449,7 +457,7 @@ namespace SundayLastBreath.UI
             clRect.anchoredPosition = new Vector2(0f, 70f);
 
             observationClueText = clueObj.GetComponent<TextMeshProUGUI>();
-            observationClueText.text = "<color=#FBBF24><b>[OBSERVATION]</b></color> <color=#94A3B8>Buttons <b>4</b>, <b>5</b>, <b>6</b>, and <b>8</b> show noticeable enamel wear and dark skin-oil smudges from frequent entry.</color>";
+            observationClueText.text = "<color=#64748B>[SECURITY KEYPAD] Enter 4-digit authorization code.</color>";
             observationClueText.fontSize = 10.5f;
             observationClueText.alignment = TextAlignmentOptions.Center;
 
@@ -485,25 +493,16 @@ namespace SundayLastBreath.UI
             ctTmp.color = new Color(0.7f, 0.75f, 0.85f, 1f);
         }
 
-        private void CreateKeypadButton(Transform parent, string label, bool isWornKey)
+        private void CreateKeypadButton(Transform parent, string label)
         {
             GameObject btnObj = new GameObject($"Key_{label}", typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
             btnObj.transform.SetParent(parent, false);
 
             Image img = btnObj.GetComponent<Image>();
-            Outline ol = btnObj.GetComponent<Outline>();
+            img.color = new Color(0.12f, 0.14f, 0.17f, 1f);
 
-            // Distinct visual wear styling for buttons 1, 4, 8
-            if (isWornKey)
-            {
-                img.color = new Color(0.18f, 0.16f, 0.12f, 1f); // Weathered brass/enamel tint
-                ol.effectColor = new Color(0.75f, 0.55f, 0.25f, 0.85f);
-            }
-            else
-            {
-                img.color = new Color(0.12f, 0.14f, 0.17f, 1f);
-                ol.effectColor = new Color(0.25f, 0.3f, 0.38f, 0.7f);
-            }
+            Outline ol = btnObj.GetComponent<Outline>();
+            ol.effectColor = new Color(0.25f, 0.3f, 0.38f, 0.7f);
             ol.effectDistance = new Vector2(1f, -1f);
 
             Button btn = btnObj.GetComponent<Button>();
@@ -517,11 +516,7 @@ namespace SundayLastBreath.UI
             tr.sizeDelta = Vector2.zero;
 
             TextMeshProUGUI tmp = txtObj.GetComponent<TextMeshProUGUI>();
-            if (isWornKey)
-            {
-                tmp.text = $"<color=#FDE047><b>{label}</b></color> <size=60%><color=#CA8A04>•</color></size>";
-            }
-            else if (label == "ENT")
+            if (label == "ENT")
             {
                 tmp.text = "<color=#10B981><b>ENT</b></color>";
             }
@@ -550,6 +545,56 @@ namespace SundayLastBreath.UI
             {
                 string digit = label;
                 btn.onClick.AddListener(() => OnDigitClicked(digit));
+            }
+
+            buttonInfos.Add(new KeypadButtonInfo
+            {
+                label = label,
+                image = img,
+                outline = ol,
+                text = tmp
+            });
+        }
+
+        private void ApplyObservationStyling(bool showObservation)
+        {
+            foreach (var b in buttonInfos)
+            {
+                if (b.label == "ENT" || b.label == "CLR") continue;
+
+                bool isWorn = showObservation && (b.label == "4" || b.label == "5" || b.label == "8");
+                if (isWorn)
+                {
+                    if (b.image != null) b.image.color = new Color(0.18f, 0.16f, 0.12f, 1f);
+                    if (b.outline != null)
+                    {
+                        b.outline.effectColor = new Color(0.75f, 0.55f, 0.25f, 0.85f);
+                        b.outline.effectDistance = new Vector2(1f, -1f);
+                    }
+                    if (b.text != null) b.text.text = $"<color=#FDE047><b>{b.label}</b></color> <size=60%><color=#CA8A04>•</color></size>";
+                }
+                else
+                {
+                    if (b.image != null) b.image.color = new Color(0.12f, 0.14f, 0.17f, 1f);
+                    if (b.outline != null)
+                    {
+                        b.outline.effectColor = new Color(0.25f, 0.3f, 0.38f, 0.7f);
+                        b.outline.effectDistance = new Vector2(1f, -1f);
+                    }
+                    if (b.text != null) b.text.text = $"<color=#E2E8F0><b>{b.label}</b></color>";
+                }
+            }
+
+            if (observationClueText != null)
+            {
+                if (showObservation)
+                {
+                    observationClueText.text = "<color=#FBBF24><b>[OBSERVATION]</b></color> <color=#94A3B8>Buttons <b>4</b>, <b>5</b>, and <b>8</b> show noticeable enamel wear and dark skin-oil smudges from frequent entry.</color>";
+                }
+                else
+                {
+                    observationClueText.text = "<color=#64748B>[SECURITY KEYPAD] Enter 4-digit authorization code.</color>";
+                }
             }
         }
 

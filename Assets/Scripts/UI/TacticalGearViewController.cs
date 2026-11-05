@@ -388,13 +388,20 @@ namespace SundayLastBreath.UI
             public bool matches;
         }
 
+        private void SafeDestroy(GameObject go)
+        {
+            if (go == null) return;
+            if (Application.isPlaying) Destroy(go);
+            else DestroyImmediate(go);
+        }
+
         private void RefreshBackpackGrid()
         {
             if (backpackGridRoot == null) return;
 
             for (int i = backpackGridRoot.childCount - 1; i >= 0; i--)
             {
-                Destroy(backpackGridRoot.GetChild(i).gameObject);
+                SafeDestroy(backpackGridRoot.GetChild(i).gameObject);
             }
 
             // Auto-migrate any stray key items out of backpack inventory into dedicated key items pocket
@@ -783,7 +790,7 @@ namespace SundayLastBreath.UI
 
             for (int i = floorGridRoot.childCount - 1; i >= 0; i--)
             {
-                Destroy(floorGridRoot.GetChild(i).gameObject);
+                SafeDestroy(floorGridRoot.GetChild(i).gameObject);
             }
 
             int count = _floorItems != null ? _floorItems.Count : 0;
@@ -1291,7 +1298,7 @@ namespace SundayLastBreath.UI
 
             for (int i = _keyItemsContent.childCount - 1; i >= 0; i--)
             {
-                Destroy(_keyItemsContent.GetChild(i).gameObject);
+                SafeDestroy(_keyItemsContent.GetChild(i).gameObject);
             }
 
             var list = _player != null && _player.keyItems != null ? _player.keyItems : new List<KeyItemEntry>();

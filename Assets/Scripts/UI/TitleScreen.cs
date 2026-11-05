@@ -262,7 +262,7 @@ namespace SundayLastBreath.UI
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayButtonClick();
-                AudioManager.Instance.StopBGM(0.8f);
+                AudioManager.Instance.StopBGM(0.5f);
             }
 
             if (loadGameModal != null)
@@ -270,24 +270,31 @@ namespace SundayLastBreath.UI
                 loadGameModal.SetActive(false);
             }
 
-            bool loadSuccess = SaveManager.Instance != null && SaveManager.Instance.LoadFromSlot(slotIndex);
-
-            if (loadSuccess)
+            Hide(0.2f, () =>
             {
-                Hide(0.6f, () =>
+                if (LoadingScreen.Instance != null)
                 {
-                    if (GameManager.Instance != null)
+                    LoadingScreen.Instance.LoadSlotWithScreen(slotIndex, () =>
+                    {
+                        if (GameManager.Instance != null)
+                        {
+                            var player = GameManager.Instance.CurrentPlayer;
+                            string loc = player != null ? player.currentLocationId : "unit_407";
+                            GameManager.Instance.ResumeFromSave(player, loc);
+                        }
+                    });
+                }
+                else
+                {
+                    bool loadSuccess = SaveManager.Instance != null && SaveManager.Instance.LoadFromSlot(slotIndex);
+                    if (loadSuccess && GameManager.Instance != null)
                     {
                         var player = GameManager.Instance.CurrentPlayer;
                         string loc = player != null ? player.currentLocationId : "unit_407";
                         GameManager.Instance.ResumeFromSave(player, loc);
                     }
-                });
-            }
-            else
-            {
-                Debug.LogWarning($"[TitleScreen] Failed to load save slot {slotIndex}.");
-            }
+                }
+            });
         }
 
         private void OnDeleteSlotClicked(int slotIndex)

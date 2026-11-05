@@ -21,7 +21,16 @@ namespace SundayLastBreath.Core
     /// </summary>
     public class GameManager : MonoBehaviour
     {
-        public static GameManager Instance { get; private set; }
+        private static GameManager _instance;
+        public static GameManager Instance
+        {
+            get
+            {
+                if (_instance == null) _instance = FindAnyObjectByType<GameManager>(FindObjectsInactive.Include);
+                return _instance;
+            }
+            private set => _instance = value;
+        }
 
         [Header("State")]
         [SerializeField] private GameState currentState = GameState.StudioSplash;
