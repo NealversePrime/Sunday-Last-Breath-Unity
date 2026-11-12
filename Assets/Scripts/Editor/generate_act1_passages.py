@@ -445,29 +445,29 @@ u406_door_def = {
     "musicAction": 0,
     "frames": frames_u406_door,
     "fps": 8,
-    "storyText": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a modern electronic keypad lock. The blue backlight on the keypad pulses weakly.\n\nA handwritten note taped beside the keypad in spidery ink reads: <i>'If you're reading this, don't look outside. Get to the basement.'</i>",
+    "storyText": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color>\n\nA sturdy wooden door fitted with a commercial electronic keypad lock. The blue backlight on the keypad glows faintly.\n\nA handwritten note taped beside the keypad in neat ink reads: <i>'If you're still on this floor, I posted my door code on the building feed before leaving. Grab the notes and get out before morning.'</i>",
     "dialogueLines": [
         {
-            "introNarration": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
+            "introNarration": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Dead quiet on the other side of the door.",
             "speakerName": "YOU",
             "side": 0,
-            "dialogueText": "Harmon texted me the emergency passcode earlier: 8-4-6-5. Let's see if the keypad's backup battery is still alive.",
-            "outroNarration": "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'",
+            "dialogueText": "Harmon posted his door code earlier: 8-4-4-5. Let's see if the keypad battery is still alive.",
+            "outroNarration": "A handwritten note taped beside the keypad reads: 'If you're still on this floor, I posted my door code on the building feed before leaving. Grab the notes and get out before morning.'",
             "requiresStoryFlag": "checked_phone_harmon"
         },
         {
-            "introNarration": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Total silence emanates from behind the heavy door.",
+            "introNarration": "<color=#93C5FD><b>UNIT 406 - PROFESSOR HARMON'S DOOR.</b></color> Dead quiet on the other side of the door.",
             "speakerName": "YOU",
             "side": 0,
-            "dialogueText": "A heavy electronic deadbolt seals Harmon's door. Total silence inside... I don't know his code, but maybe I can deduce it from the worn keys, bypass the latch, or force it open.",
-            "outroNarration": "A handwritten note taped beside the keypad reads: 'If you're reading this, don't look outside. Get to the basement.'",
+            "dialogueText": "A heavy electronic deadbolt seals Harmon's door. Dead quiet inside... I don't know his code, but maybe I can guess it from the worn keys, bypass the latch, or force it.",
+            "outroNarration": "A handwritten note taped beside the keypad reads: 'If you're still on this floor, I posted my door code on the building feed before leaving. Grab the notes and get out before morning.'",
             "requiresNotFlag": "checked_phone_harmon"
         }
     ],
     "choices": [
         {
-            "choiceLabel": "Enter passcode from phone (8465)",
-            "choiceSubtitle": "Type Harmon's emergency passcode into the pulsing electronic keypad.",
+            "choiceLabel": "Enter passcode from phone (8445)",
+            "choiceSubtitle": "Type Harmon's door code into the lit electronic keypad.",
             "requiresStoryFlag": "checked_phone_harmon",
             "hideWhenUnavailable": True,
             "setsStoryFlagOnExecute": "room406_opened",
@@ -940,15 +940,15 @@ u407_hub_def = {
     "musicAction": 1,
     "bgm_guid": GUID_TENSION_BGM,
     "musicVolume": 0.4,
-    "storyText": "The robotic emergency broadcast cuts out. Cold static returns to the television screen.\n\n<color=#93C5FD><b>UNIT 407 - YOUR APARTMENT.</b></color> Through the thin plaster of the walls, you can hear it: the distant, overlapping chorus of emergency sirens echoing across the city.\n\nThe deadbolt on your front door is still thrown, but you can't stay here forever.",
+    "storyText": "The emergency broadcast cuts out. Static fills the television screen again.\n\n<color=#93C5FD><b>UNIT 407 - YOUR APARTMENT.</b></color> Through the thin drywall, you hear distant sirens rising and falling across the neighborhood.\n\nThe deadbolt on your front door is still thrown, but staying put won't get you answers.",
     "narrativeBeats": [],
     "dialogueLines": [
         {
-            "introNarration": "The robotic emergency voice cuts out. Cold static returns to the TV.\n\nThrough the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens.",
+            "introNarration": "The automated emergency voice cuts out. Static returns to the TV.\n\nThrough the thin plaster walls, you can hear distant sirens overlapping across the blocks.",
             "speakerName": "YOU",
             "side": 0,
-            "dialogueText": "Lethal force authorized... The Guard doesn't deploy for a standard riot. If they establish a quarantine cordon around this block, I'll be trapped here.",
-            "outroNarration": "The emergency broadcasts have fallen completely silent. The apartment is cold."
+            "dialogueText": "Stay indoors until daylight... Whatever is happening down on the avenues, sirens don't run like that for a normal night. If they lock down this block, I'm stuck.",
+            "outroNarration": "The broadcast signal goes dead. The room feels cold."
         }
     ],
     "choices": [

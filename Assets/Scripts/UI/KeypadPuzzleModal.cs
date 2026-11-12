@@ -31,7 +31,7 @@ namespace SundayLastBreath.UI
         private Action onCancelledCallback;
 
         [Header("Valid Passcodes")]
-        private readonly string[] validCodes = new string[] { "8445", "8465", "4181", "1481" };
+        private readonly string[] validCodes = new string[] { "8445" };
 
         [Header("UI References")]
         private GameObject modalContainer;

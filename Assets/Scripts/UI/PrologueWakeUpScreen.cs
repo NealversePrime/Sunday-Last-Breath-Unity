@@ -87,22 +87,22 @@ namespace SundayLastBreath.UI
         private static readonly string[] NarrativeSteps = new string[]
         {
             // Step 1: Peace before the collapse
-            "It was supposed to be a quiet Saturday night. You remember the warmth of the couch, the low hum of the apartment heater, and drifting off to the dull murmur of a late-night talk show.",
+            "It started like any other Saturday night. Warm apartment, heater humming in the corner, a late-night talk show murmuring in the background until you fell asleep on the couch.",
 
             // Step 2: The broadcast dies (Static Jumpscare)
-            "Then, the broadcast dies. A harsh, jagged tearing sound shreds through the tail end of your sleep—relentless, cold white noise.",
+            "Then the channel cuts out. A sharp burst of white noise tears straight through your sleep.",
 
             // Step 3: Waking in disorientation
-            "Your eyes snap open as you jolt upright. The living room is drowning in the chaotic strobe of an untuned television. Beside it, the modem flashes its LEDs in a frantic pulse, searching for a dead connection.",
+            "You jolt upright. The living room is flashing gray from a dead TV screen. Beside it, the modem's red light blinks over and over, trying to find a signal that isn't there.",
 
             // Step 4: Sirens fade in
-            "You hold your breath. Beyond the thin glass of the balcony door, a sound bleeds through from the city streets below—a rising, mournful chorus of distant emergency sirens echoing across the night.",
+            "You hold your breath. Through the balcony glass, sirens are rising from a few blocks over—more than one, overlapping in the rain.",
 
             // Step 5: The scream cut short
-            "And buried deep beneath the mechanical wail of the sirens... a raw, terrifying scream that is abruptly cut short in the dark.",
+            "Beneath the sirens, someone outside screams. Then it stops mid-breath.",
 
             // Step 6: Reflection at the window
-            "Barefoot and disoriented, you stumble toward the glass balcony door. As you reach out to pull the curtain, your own pale, blurred reflection stares back at you from the darkened window pane."
+            "Barefoot, you cross the floor and pull the curtain back. The street below is dark, and your own pale face looks back at you in the cold glass."
         };
 
         protected override void Awake()

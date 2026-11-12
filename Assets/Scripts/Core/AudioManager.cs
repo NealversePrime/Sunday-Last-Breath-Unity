@@ -24,7 +24,12 @@ namespace SundayLastBreath.Core
         [Range(0f, 1f)] [SerializeField] private float bgmVolume = 1f;
         [Range(0f, 1f)] [SerializeField] private float sfxVolume = 1f;
 
+        private const string PrefMasterVol = "SLB_MasterVolume";
+        private const string PrefBgmVol = "SLB_BgmVolume";
+        private const string PrefSfxVol = "SLB_SfxVolume";
+
         private Coroutine bgmFadeCoroutine;
+        private float currentBgmScale = 1f;
 
         public float MasterVolume => masterVolume;
         public float BgmVolume => bgmVolume;
@@ -40,6 +45,11 @@ namespace SundayLastBreath.Core
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            if (PlayerPrefs.HasKey(PrefMasterVol)) masterVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(PrefMasterVol, 1f));
+            if (PlayerPrefs.HasKey(PrefBgmVol)) bgmVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(PrefBgmVol, 1f));
+            if (PlayerPrefs.HasKey(PrefSfxVol)) sfxVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(PrefSfxVol, 1f));
+            AudioListener.volume = masterVolume;
 
             InitializeAudioSources();
             EnsureAudioListener();
@@ -101,10 +111,15 @@ namespace SundayLastBreath.Core
         public void PlayBGM(AudioClip clip, float fadeDuration = 1f, float volumeScale = 1f)
         {
             if (clip == null) return;
-            if (bgmSource.isPlaying && bgmSource.clip == clip) return;
+            currentBgmScale = Mathf.Clamp01(volumeScale);
+            if (bgmSource.isPlaying && bgmSource.clip == clip)
+            {
+                UpdateVolumes();
+                return;
+            }
 
             if (bgmFadeCoroutine != null) StopCoroutine(bgmFadeCoroutine);
-            bgmFadeCoroutine = StartCoroutine(FadeBGM(clip, fadeDuration, volumeScale));
+            bgmFadeCoroutine = StartCoroutine(FadeBGM(clip, fadeDuration, currentBgmScale));
         }
 
         public void StopBGM(float fadeDuration = 1f)
@@ -184,18 +199,25 @@ namespace SundayLastBreath.Core
         public void SetMasterVolume(float volume)
         {
             masterVolume = Mathf.Clamp01(volume);
+            AudioListener.volume = masterVolume;
+            PlayerPrefs.SetFloat(PrefMasterVol, masterVolume);
+            PlayerPrefs.Save();
             UpdateVolumes();
         }
 
         public void SetBGMVolume(float volume)
         {
             bgmVolume = Mathf.Clamp01(volume);
+            PlayerPrefs.SetFloat(PrefBgmVol, bgmVolume);
+            PlayerPrefs.Save();
             UpdateVolumes();
         }
 
         public void SetSFXVolume(float volume)
         {
             sfxVolume = Mathf.Clamp01(volume);
+            PlayerPrefs.SetFloat(PrefSfxVol, sfxVolume);
+            PlayerPrefs.Save();
             UpdateVolumes();
         }
 
@@ -203,7 +225,7 @@ namespace SundayLastBreath.Core
         {
             if (bgmSource != null && bgmSource.isPlaying)
             {
-                bgmSource.volume = masterVolume * bgmVolume;
+                bgmSource.volume = masterVolume * bgmVolume * currentBgmScale;
             }
         }
     }

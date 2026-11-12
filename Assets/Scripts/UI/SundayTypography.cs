@@ -91,20 +91,30 @@ namespace SundayLastBreath.UI
             }
         }
 
+        public static string SanitizeText(string t)
+        {
+            if (string.IsNullOrEmpty(t)) return t;
+            return t.Replace("\u2611", "[v]")
+                    .Replace("\U0001F4AC", "RE:")
+                    .Replace("\u21BA", "RT:")
+                    .Replace("\u26A0", "[!]")
+                    .Replace("■", "//")
+                    .Replace("□", "[ ]")
+                    .Replace("▲", "[UP]")
+                    .Replace("▼", "[DN]")
+                    .Replace("►", ">")
+                    .Replace("✓", "[OK]")
+                    .Replace("●", "*")
+                    .Replace("○", "-");
+        }
+
         public static void ApplyFont(TextMeshProUGUI tmp, FontRole role)
         {
             if (tmp == null) return;
 
             if (!string.IsNullOrEmpty(tmp.text))
             {
-                string t = tmp.text;
-                if (t.Contains("\u2611") || t.Contains("\U0001F4AC") || t.Contains("\u21BA") || t.Contains("\u26A0"))
-                {
-                    tmp.text = t.Replace("\u2611", "[v]")
-                                .Replace("\U0001F4AC", "RE:")
-                                .Replace("\u21BA", "RT:")
-                                .Replace("\u26A0", "[!]");
-                }
+                tmp.text = SanitizeText(tmp.text);
             }
 
             TMP_FontAsset fontAsset = GetFont(role);

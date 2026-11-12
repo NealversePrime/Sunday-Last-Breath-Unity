@@ -66,8 +66,37 @@ namespace SundayLastBreath.UI
             }
 
             EnsureHarmonCardConfigured();
+            ConfigureDayZeroFeedPosts();
             SanitizeAllPhoneGlyphs();
             EnhanceFeedReadability();
+        }
+
+        private void ConfigureDayZeroFeedPosts()
+        {
+            if (feedContent == null) return;
+
+            SetCardBody("PostCard_C",
+                "Anyone near 5th St Hospital know what's going on? Police in gas masks blocking the whole street. They turned two ambulances around.");
+
+            SetCardBody("PostCard_N",
+                "BREAKING: City health officials are checking reports of an aggressive flu-like illness behind tonight's assaults. Residents are urged to lock doors and ignore unverified rumors.");
+
+            SetCardBody("PostCard_U",
+                "Look at the video before they pull it! That wasn't a normal fight, the cop shot him three times in the chest and he didn't even slow down! Wait he's coming toward— <i>[VIDEO ENDS]</i>");
+        }
+
+        private void SetCardBody(string cardName, string bodyText)
+        {
+            Transform card = feedContent.Find(cardName);
+            if (card == null) return;
+            foreach (var t in card.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                if (t != null && (t.name == "PostBody" || t.name == "Body"))
+                {
+                    t.text = bodyText;
+                    break;
+                }
+            }
         }
 
         private void EnsureHarmonCardConfigured()
@@ -138,7 +167,7 @@ namespace SundayLastBreath.UI
                 }
                 else if (t.name == "PostBody" || t.name == "Body")
                 {
-                    t.text = "To my neighbors at Ascott (especially 4th floor): It's not a riot. Systemic contagion collapse is underway. I've left for the rural counties. If you need supplies, medicine, or my research notes, my door code for Unit 406 is <color=#F59E0B><b>8445</b></color>. Take whatever you need and don't stay in the open.";
+                    t.text = "4th floor neighbors: turn off your TV and pack a bag. Something bad is spreading downtown and the bridges are locking down. I already headed out east. My door code for Unit 406 is <color=#F59E0B><b>8445</b></color>. Take whatever food or medicine you need.";
                     t.fontSize = 13.5f;
                     t.lineSpacing = 3.5f;
                     t.color = new Color(0.92f, 0.95f, 0.98f);
@@ -292,6 +321,7 @@ namespace SundayLastBreath.UI
         private void OnEnable()
         {
             EnsureHarmonCardConfigured();
+            ConfigureDayZeroFeedPosts();
             SanitizeAllPhoneGlyphs();
             EnhanceFeedReadability();
             isNetworkDead = false;
@@ -464,7 +494,7 @@ namespace SundayLastBreath.UI
 
                 if (dossierOutroText != null)
                 {
-                    dossierOutroText.text = "A post from your next-door neighbor, <color=#F59E0B><b>Professor Harmon (Unit 406)</b></color>, flashes onto the timeline: he predicted the collapse and posted his door keypad code (<color=#F59E0B><b>8445</b></color>) before cell service dies!\n\n<color=#94A3B8><i>[ Incoming live video stream... ]</i></color>";
+                    dossierOutroText.text = "A post from your neighbor across the hall, <color=#F59E0B><b>Prof. Harmon (Unit 406)</b></color>, pops up before the feed slows down. He already left the building and posted his door code (<color=#F59E0B><b>8445</b></color>).\n\n<color=#94A3B8><i>[ Loading attached clip... ]</i></color>";
                 }
 
                 yield return new WaitForSecondsRealtime(4.50f);
@@ -489,7 +519,7 @@ namespace SundayLastBreath.UI
             // Update left dossier with live observation while video buffers
             if (dossierOutroText != null)
             {
-                dossierOutroText.text = "The comments are a storm of denial, prayers, and wild conspiracies. Professor Harmon's emergency alert and door code (<color=#F59E0B><b>8445</b></color>) stick firmly in your mind.\n\n<color=#94A3B8><i>[ Buffering attached video stream... ]</i></color>";
+                dossierOutroText.text = "People in the replies are arguing—half think it's fake, half are panicking. Harmon's door code (<color=#F59E0B><b>8445</b></color>) is the one concrete thing you have.\n\n<color=#94A3B8><i>[ Buffering attached video... ]</i></color>";
             }
 
             // Give player ample time (~5.5s) to read Post 3 and watch video buffer & live ticker
@@ -528,7 +558,7 @@ namespace SundayLastBreath.UI
             // Complete Dossier Outro Prose
             if (dossierOutroText != null)
             {
-                dossierOutroText.text = "The comments are a storm of denial, prayers, and wild conspiracies. Professor Harmon's emergency alert and door code (<color=#F59E0B><b>8445</b></color>) remain etched into your memory.\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. <color=#EF4444>The internet is gone.</color>";
+                dossierOutroText.text = "People in the replies are arguing—half think it's fake, half are panicking. You lock Harmon's door code (<color=#F59E0B><b>8445</b></color>) in your head.\n\nBefore you can scroll any further, the spinner freezes. Signal drops to zero. <color=#EF4444>No service.</color>";
             }
 
             // Subtle chassis glitch jolt
@@ -687,7 +717,7 @@ namespace SundayLastBreath.UI
 
             if (dossierOutroText != null)
             {
-                dossierOutroText.text = "The comments are a storm of denial, prayers, and wild conspiracies. Professor Harmon's emergency alert and door code (<color=#F59E0B><b>8445</b></color>) remain etched into your memory.\n\nBefore you can scroll further, the little loading icon freezes. The signal drops completely. <color=#EF4444>The internet is gone.</color>";
+                dossierOutroText.text = "People in the replies are arguing—half think it's fake, half are panicking. You lock Harmon's door code (<color=#F59E0B><b>8445</b></color>) in your head.\n\nBefore you can scroll any further, the spinner freezes. Signal drops to zero. <color=#EF4444>No service.</color>";
             }
 
             if (feedScrollRect != null)

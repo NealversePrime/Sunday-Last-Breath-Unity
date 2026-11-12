@@ -150,8 +150,8 @@ namespace SundayLastBreath.UI
             if (modalTitleText != null)
             {
                 modalTitleText.text = anySave
-                    ? "■ SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER"
-                    : "■ SURVIVOR ARCHIVE // ALL SLOTS EMPTY";
+                    ? "SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER"
+                    : "SURVIVOR ARCHIVE // ALL SLOTS EMPTY";
             }
 
             for (int i = 0; i < SaveManager.TotalSlotCount; i++)
@@ -170,7 +170,7 @@ namespace SundayLastBreath.UI
                     {
                         string titleHex = slotIdx == 0 ? "#38BDF8" : "#F59E0B";
                         slotTitleTexts[slotIdx].text =
-                            $"<color={titleHex}><b>■ {slotTitle}</b></color>   <color=#F8FAFC><b>{s.characterName.ToUpper()}</b></color> <color=#94A3B8>({s.job})</color>   {savedTimeBadge}";
+                            $"<color={titleHex}><b>[{slotTitle}]</b></color>   <color=#F8FAFC><b>{s.characterName.ToUpper()}</b></color> <color=#94A3B8>({s.job})</color>   {savedTimeBadge}";
                     }
 
                     if (slotDetailTexts[slotIdx] != null)
@@ -191,7 +191,7 @@ namespace SundayLastBreath.UI
 
                     if (slotLoadBtnLabels[slotIdx] != null)
                     {
-                        slotLoadBtnLabels[slotIdx].text = "<b>► LOAD SLOT</b>";
+                        slotLoadBtnLabels[slotIdx].text = "<b>> LOAD SLOT</b>";
                         slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.98f, 0.65f);
                     }
 
@@ -215,7 +215,7 @@ namespace SundayLastBreath.UI
                 {
                     if (slotTitleTexts[slotIdx] != null)
                     {
-                        slotTitleTexts[slotIdx].text = $"<color=#64748B><b>□ {slotTitle}</b>   —   [ EMPTY ARCHIVE SLOT ]</color>";
+                        slotTitleTexts[slotIdx].text = $"<color=#64748B><b>[{slotTitle}]</b>   -   [ EMPTY ARCHIVE SLOT ]</color>";
                     }
 
                     if (slotDetailTexts[slotIdx] != null)
@@ -366,7 +366,7 @@ namespace SundayLastBreath.UI
             ttRect.offsetMax = new Vector2(-20f, 0f);
 
             modalTitleText = titleTextObj.AddComponent<TextMeshProUGUI>();
-            modalTitleText.text = "■ SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER";
+            modalTitleText.text = "SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER";
             modalTitleText.fontSize = 16.5f;
             modalTitleText.fontStyle = FontStyles.Bold;
             modalTitleText.color = new Color(1f, 0.75f, 0.35f, 1f);
@@ -466,7 +466,7 @@ namespace SundayLastBreath.UI
                 lbtRect.offsetMax = Vector2.zero;
 
                 slotLoadBtnLabels[slotIdx] = lbTxtObj.AddComponent<TextMeshProUGUI>();
-                slotLoadBtnLabels[slotIdx].text = "<b>► LOAD SLOT</b>";
+                slotLoadBtnLabels[slotIdx].text = "<b>> LOAD SLOT</b>";
                 slotLoadBtnLabels[slotIdx].fontSize = 12.5f;
                 slotLoadBtnLabels[slotIdx].alignment = TextAlignmentOptions.Center;
                 slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.98f, 0.65f);
@@ -550,8 +550,33 @@ namespace SundayLastBreath.UI
 
         private void OnSettingsClicked()
         {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayButtonClick();
+            }
+
+            if (settingsModal == null)
+            {
+                Transform found = transform.Find("SettingsModal");
+                if (found != null)
+                {
+                    settingsModal = found.gameObject;
+                }
+                else
+                {
+                    settingsModal = new GameObject("SettingsModal", typeof(RectTransform), typeof(Image), typeof(SettingsModal));
+                    settingsModal.transform.SetParent(transform, false);
+                    RectTransform rt = settingsModal.GetComponent<RectTransform>();
+                    rt.anchorMin = Vector2.zero;
+                    rt.anchorMax = Vector2.one;
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
+                }
+            }
+
             if (settingsModal != null)
             {
+                settingsModal.transform.SetAsLastSibling();
                 settingsModal.SetActive(true);
             }
         }

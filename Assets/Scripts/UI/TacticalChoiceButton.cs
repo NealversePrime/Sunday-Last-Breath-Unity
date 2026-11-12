@@ -43,14 +43,23 @@ namespace SundayLastBreath.UI
         public MMF_Player ClickFeedback { get => clickFeedback; set => clickFeedback = value; }
 
         [Header("Colors & Styling")]
-        [SerializeField] private Color baseBgColor = new Color(0.04f, 0.06f, 0.09f, 0.65f);
-        [SerializeField] private Color hoverBgColor = new Color(0.95f, 0.65f, 0.15f, 0.14f);
+        [SerializeField] private Color baseBgColor = new Color(0.003f, 0.005f, 0.009f, 0.82f);
+        [SerializeField] private Color hoverBgColor = new Color(0.85f, 0.50f, 0.06f, 0.96f);
         [SerializeField] private Color baseOutlineColor = new Color(0.18f, 0.22f, 0.28f, 0.40f);
         [SerializeField] private Color hoverOutlineColor = new Color(0.95f, 0.70f, 0.25f, 0.85f);
         [SerializeField] private Color baseAccentColor = new Color(0.95f, 0.75f, 0.35f);
         [SerializeField] private Color hoverAccentColor = new Color(1f, 0.85f, 0.40f);
         [SerializeField] private Color normalHotkeyColor = new Color(0.85f, 0.65f, 0.30f, 0.95f);
-        [SerializeField] private Color hoverHotkeyColor = Color.white;
+        [SerializeField] private Color hoverHotkeyColor = Color.black;
+
+        private static readonly Color DefaultBaseBgColor = new Color(0.003f, 0.005f, 0.009f, 0.82f);
+        private static readonly Color DisabledBaseBgColor = new Color(0.002f, 0.003f, 0.005f, 0.50f);
+        private static readonly Color DefaultHoverBgColor = new Color(0.85f, 0.50f, 0.06f, 0.96f);
+        private static readonly Color DefaultBaseOutlineColor = new Color(0.18f, 0.22f, 0.28f, 0.40f);
+        private static readonly Color DefaultBaseAccentColor = new Color(0.95f, 0.75f, 0.35f);
+        private static readonly Color DefaultHoverAccentColor = new Color(1f, 0.85f, 0.40f);
+        private static readonly Color DefaultNormalHotkeyColor = new Color(0.85f, 0.65f, 0.30f, 0.95f);
+        private static readonly Color HoverDarkTextColor = new Color(0f, 0f, 0f, 1f);
 
         [Header("Animation Settings")]
         [SerializeField] private float slideDistance = 6f;
@@ -61,8 +70,38 @@ namespace SundayLastBreath.UI
         private float currentChevronOffset = -4f;
         private bool isHovered = false;
         private Coroutine shineCoroutine;
+        private bool hasManagedChoiceText = false;
+        private string rawMainText;
+        private string untaggedFallbackText;
 
         public Button ButtonComponent => button;
+
+        private void ClearSelectableTint()
+        {
+            if (button != null)
+            {
+                if (button.transition != Selectable.Transition.None)
+                {
+                    button.transition = Selectable.Transition.None;
+                }
+                if (button.targetGraphic != null)
+                {
+                    button.targetGraphic.CrossFadeColor(Color.white, 0f, true, true);
+                    if (button.targetGraphic.canvasRenderer != null)
+                    {
+                        button.targetGraphic.canvasRenderer.SetColor(Color.white);
+                    }
+                }
+            }
+            if (background != null)
+            {
+                background.CrossFadeColor(Color.white, 0f, true, true);
+                if (background.canvasRenderer != null)
+                {
+                    background.canvasRenderer.SetColor(Color.white);
+                }
+            }
+        }
 
         public void Initialize(Button btn, RectTransform txtContainer, Image bg, Image bar, Outline ol, RectTransform shine, Color accent,
             TextMeshProUGUI chevron = null, TextMeshProUGUI hotkey = null, TextMeshProUGUI mainLbl = null, TextMeshProUGUI subLbl = null)
@@ -87,7 +126,10 @@ namespace SundayLastBreath.UI
                 0.95f
             );
 
-            if (background != null) baseBgColor = background.color;
+            ClearSelectableTint();
+            baseBgColor = DefaultBaseBgColor;
+            hoverBgColor = DefaultHoverBgColor;
+            if (background != null) background.color = baseBgColor;
             if (outline != null) baseOutlineColor = outline.effectColor;
             if (accentBar != null) baseAccentColor = accentBar.color;
         }
@@ -97,6 +139,8 @@ namespace SundayLastBreath.UI
             if (button == null) button = GetComponent<Button>();
             if (background == null) background = GetComponent<Image>();
             if (outline == null) outline = GetComponent<Outline>();
+
+            ClearSelectableTint();
 
             // Auto-locate components if not linked
             if (hoverChevronTmp == null)
@@ -167,20 +211,121 @@ namespace SundayLastBreath.UI
         {
             if (hotkeyTmp != null)
             {
-                hotkeyTmp.text = "[ — ]";
+                hotkeyTmp.text = "[ - ]";
                 hotkeyTmp.color = new Color(0.35f, 0.4f, 0.45f, 0.45f);
                 SundayTypography.ApplyFont(hotkeyTmp, FontRole.Mono);
             }
         }
 
+        private static string StripColorTags(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            return System.Text.RegularExpressions.Regex.Replace(text, @"</?color(?:=[^>]*)?>", string.Empty, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        public void SyncContentAndState(string mainText)
+        {
+            hasManagedChoiceText = true;
+            rawMainText = mainText;
+            untaggedFallbackText = null;
+            ClearSelectableTint();
+
+            bool interactable = button == null || button.interactable;
+            hoverBgColor = DefaultHoverBgColor;
+            hoverHotkeyColor = HoverDarkTextColor;
+
+            if (!interactable)
+            {
+                isHovered = false;
+                baseAccentColor = new Color(0.25f, 0.28f, 0.32f, 0.35f);
+                hoverAccentColor = baseAccentColor;
+                baseBgColor = DisabledBaseBgColor;
+                baseOutlineColor = new Color(0.12f, 0.15f, 0.18f, 0.25f);
+                normalHotkeyColor = new Color(0.35f, 0.4f, 0.45f, 0.45f);
+
+                if (hoverChevronTmp != null) hoverChevronTmp.gameObject.SetActive(false);
+                if (accentBar != null)
+                {
+                    accentBar.color = baseAccentColor;
+                    accentBar.gameObject.SetActive(false);
+                }
+                if (background != null) background.color = baseBgColor;
+                if (outline != null)
+                {
+                    outline.effectColor = baseOutlineColor;
+                    outline.effectDistance = new Vector2(1f, -1f);
+                }
+                if (hotkeyTmp != null) hotkeyTmp.color = normalHotkeyColor;
+                RestoreNormalLabelVisuals();
+            }
+            else
+            {
+                baseAccentColor = DefaultBaseAccentColor;
+                hoverAccentColor = DefaultHoverAccentColor;
+                baseBgColor = DefaultBaseBgColor;
+                baseOutlineColor = DefaultBaseOutlineColor;
+                normalHotkeyColor = DefaultNormalHotkeyColor;
+
+                if (isHovered)
+                {
+                    if (hoverChevronTmp != null)
+                    {
+                        hoverChevronTmp.color = HoverDarkTextColor;
+                        hoverChevronTmp.gameObject.SetActive(true);
+                    }
+                    if (hotkeyTmp != null) hotkeyTmp.color = HoverDarkTextColor;
+                    if (mainLabelTmp != null)
+                    {
+                        mainLabelTmp.color = HoverDarkTextColor;
+                        mainLabelTmp.text = StripColorTags(mainText);
+                    }
+                    if (background != null) background.color = hoverBgColor;
+                    if (accentBar != null)
+                    {
+                        accentBar.color = hoverAccentColor;
+                        accentBar.gameObject.SetActive(true);
+                    }
+                    if (outline != null) outline.effectColor = hoverOutlineColor;
+                }
+                else
+                {
+                    if (hoverChevronTmp != null) hoverChevronTmp.gameObject.SetActive(false);
+                    if (accentBar != null)
+                    {
+                        accentBar.color = baseAccentColor;
+                        accentBar.gameObject.SetActive(false);
+                    }
+                    if (background != null) background.color = baseBgColor;
+                    if (outline != null) outline.effectColor = baseOutlineColor;
+                    if (hotkeyTmp != null) hotkeyTmp.color = normalHotkeyColor;
+                    RestoreNormalLabelVisuals();
+                }
+            }
+        }
+
         public void SetChoice(string mainText, System.Action onClickAction, bool interactable = true, Color? accent = null)
         {
+            hasManagedChoiceText = true;
+            rawMainText = mainText;
+            untaggedFallbackText = null;
+            isHovered = false;
+            hoverBgColor = DefaultHoverBgColor;
+            hoverHotkeyColor = HoverDarkTextColor;
+
+            ClearSelectableTint();
+
+            if (hoverChevronTmp != null)
+            {
+                hoverChevronTmp.gameObject.SetActive(false);
+            }
             if (mainLabelTmp != null)
             {
+                mainLabelTmp.color = Color.white;
                 mainLabelTmp.text = mainText;
             }
             if (button != null)
             {
+                button.transition = Selectable.Transition.None;
                 button.interactable = interactable;
                 button.onClick.RemoveAllListeners();
                 if (onClickAction != null)
@@ -192,11 +337,15 @@ namespace SundayLastBreath.UI
             {
                 baseAccentColor = new Color(0.25f, 0.28f, 0.32f, 0.35f);
                 hoverAccentColor = baseAccentColor;
-                baseBgColor = new Color(0.02f, 0.03f, 0.05f, 0.4f);
+                baseBgColor = DisabledBaseBgColor;
                 baseOutlineColor = new Color(0.12f, 0.15f, 0.18f, 0.25f);
                 normalHotkeyColor = new Color(0.35f, 0.4f, 0.45f, 0.45f);
 
-                if (accentBar != null) accentBar.color = baseAccentColor;
+                if (accentBar != null)
+                {
+                    accentBar.color = baseAccentColor;
+                    accentBar.gameObject.SetActive(false);
+                }
                 if (background != null) background.color = baseBgColor;
                 if (outline != null) outline.effectColor = baseOutlineColor;
                 if (hotkeyTmp != null) hotkeyTmp.color = normalHotkeyColor;
@@ -205,15 +354,35 @@ namespace SundayLastBreath.UI
             {
                 baseAccentColor = accent.Value;
                 hoverAccentColor = Color.Lerp(accent.Value, Color.white, 0.45f);
-                if (accentBar != null) accentBar.color = accent.Value;
-                if (background != null) background.color = new Color(Mathf.Clamp01(accent.Value.r * 0.25f), Mathf.Clamp01(accent.Value.g * 0.25f), Mathf.Clamp01(accent.Value.b * 0.25f), 0.75f);
+                baseBgColor = new Color(Mathf.Clamp01(accent.Value.r * 0.04f), Mathf.Clamp01(accent.Value.g * 0.04f), Mathf.Clamp01(accent.Value.b * 0.04f), 0.85f);
+                baseOutlineColor = DefaultBaseOutlineColor;
+                normalHotkeyColor = DefaultNormalHotkeyColor;
+
+                if (accentBar != null)
+                {
+                    accentBar.color = baseAccentColor;
+                    accentBar.gameObject.SetActive(false);
+                }
+                if (background != null) background.color = baseBgColor;
+                if (outline != null) outline.effectColor = baseOutlineColor;
+                if (hotkeyTmp != null) hotkeyTmp.color = normalHotkeyColor;
             }
             else
             {
-                baseAccentColor = new Color(0.95f, 0.75f, 0.35f);
-                hoverAccentColor = new Color(1f, 0.85f, 0.40f);
-                if (accentBar != null) accentBar.color = baseAccentColor;
-                if (background != null) background.color = new Color(0.04f, 0.06f, 0.09f, 0.65f);
+                baseAccentColor = DefaultBaseAccentColor;
+                hoverAccentColor = DefaultHoverAccentColor;
+                baseBgColor = DefaultBaseBgColor;
+                baseOutlineColor = DefaultBaseOutlineColor;
+                normalHotkeyColor = DefaultNormalHotkeyColor;
+
+                if (accentBar != null)
+                {
+                    accentBar.color = baseAccentColor;
+                    accentBar.gameObject.SetActive(false);
+                }
+                if (background != null) background.color = baseBgColor;
+                if (outline != null) outline.effectColor = baseOutlineColor;
+                if (hotkeyTmp != null) hotkeyTmp.color = normalHotkeyColor;
             }
             gameObject.SetActive(true);
         }
@@ -232,11 +401,38 @@ namespace SundayLastBreath.UI
             button.onClick.Invoke();
         }
 
+        private void RestoreNormalLabelVisuals()
+        {
+            if (mainLabelTmp != null)
+            {
+                mainLabelTmp.color = Color.white;
+                if (hasManagedChoiceText && rawMainText != null)
+                {
+                    mainLabelTmp.text = rawMainText;
+                }
+                else if (untaggedFallbackText != null)
+                {
+                    mainLabelTmp.text = untaggedFallbackText;
+                }
+            }
+            untaggedFallbackText = null;
+        }
+
         public void ResetVisuals()
         {
             isHovered = false;
             currentChevronOffset = defaultChevronOffset;
             targetChevronOffset = defaultChevronOffset;
+
+            baseBgColor = DefaultBaseBgColor;
+            hoverBgColor = DefaultHoverBgColor;
+            baseOutlineColor = DefaultBaseOutlineColor;
+            baseAccentColor = DefaultBaseAccentColor;
+            hoverAccentColor = DefaultHoverAccentColor;
+            normalHotkeyColor = DefaultNormalHotkeyColor;
+            hoverHotkeyColor = HoverDarkTextColor;
+
+            ClearSelectableTint();
 
             if (hoverChevronTmp != null)
             {
@@ -249,15 +445,14 @@ namespace SundayLastBreath.UI
             {
                 hotkeyTmp.color = normalHotkeyColor;
             }
+            RestoreNormalLabelVisuals();
 
-            if (background != null) background.color = new Color(0.04f, 0.06f, 0.09f, 0.65f);
+            if (background != null) background.color = baseBgColor;
             if (outline != null)
             {
                 outline.effectColor = baseOutlineColor;
                 outline.effectDistance = new Vector2(1f, -1f);
             }
-            baseAccentColor = new Color(0.95f, 0.75f, 0.35f);
-            hoverAccentColor = new Color(1f, 0.85f, 0.40f);
             if (accentBar != null)
             {
                 accentBar.color = baseAccentColor;
@@ -269,6 +464,11 @@ namespace SundayLastBreath.UI
 
         private void Update()
         {
+            if (background != null && background.canvasRenderer != null && background.canvasRenderer.GetColor() != Color.white)
+            {
+                background.canvasRenderer.SetColor(Color.white);
+            }
+
             // Smooth Chevron Slide
             if (hoverChevronTmp != null && hoverChevronTmp.gameObject.activeSelf)
             {
@@ -303,23 +503,44 @@ namespace SundayLastBreath.UI
         {
             if (button != null && !button.interactable) return;
 
+            ClearSelectableTint();
+
             isHovered = true;
+            hoverBgColor = DefaultHoverBgColor;
+            hoverHotkeyColor = HoverDarkTextColor;
             targetChevronOffset = defaultChevronOffset + slideDistance;
 
+            if (background != null)
+            {
+                background.color = hoverBgColor;
+            }
             if (hoverChevronTmp != null)
             {
+                hoverChevronTmp.color = HoverDarkTextColor;
                 hoverChevronTmp.gameObject.SetActive(true);
             }
             if (hotkeyTmp != null)
             {
-                hotkeyTmp.color = hoverHotkeyColor;
+                hotkeyTmp.color = HoverDarkTextColor;
+            }
+            if (mainLabelTmp != null)
+            {
+                string source = hasManagedChoiceText ? (rawMainText ?? mainLabelTmp.text) : mainLabelTmp.text;
+                if (!hasManagedChoiceText && untaggedFallbackText == null)
+                {
+                    untaggedFallbackText = source;
+                }
+                mainLabelTmp.color = HoverDarkTextColor;
+                mainLabelTmp.text = StripColorTags(source);
             }
             if (accentBar != null)
             {
+                accentBar.color = hoverAccentColor;
                 accentBar.gameObject.SetActive(true);
             }
             if (outline != null)
             {
+                outline.effectColor = hoverOutlineColor;
                 outline.effectDistance = new Vector2(2f, -1f);
             }
 
@@ -342,9 +563,15 @@ namespace SundayLastBreath.UI
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            ClearSelectableTint();
+
             isHovered = false;
             targetChevronOffset = defaultChevronOffset;
 
+            if (background != null)
+            {
+                background.color = baseBgColor;
+            }
             if (hoverChevronTmp != null)
             {
                 hoverChevronTmp.gameObject.SetActive(false);
@@ -353,6 +580,7 @@ namespace SundayLastBreath.UI
             {
                 hotkeyTmp.color = normalHotkeyColor;
             }
+            RestoreNormalLabelVisuals();
             if (accentBar != null)
             {
                 accentBar.gameObject.SetActive(false);

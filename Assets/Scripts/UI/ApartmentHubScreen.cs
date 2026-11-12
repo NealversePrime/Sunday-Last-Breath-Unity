@@ -936,6 +936,18 @@ namespace SundayLastBreath.UI
 
         private bool barricade_pushed = false;
 
+        private bool barricade_inspected = false;
+
+        private bool stair_3f_door_checked = false;
+
+        private bool stair_listened_2f_door = false;
+
+        private bool stair_noise_made = false;
+
+        private bool stair_hum_deducted = false;
+
+        private bool stair_entered_sfx_played = false;
+
 
 
         private readonly List<TacticalChoiceButton> hallwayChoiceButtons = new List<TacticalChoiceButton>();
@@ -1430,13 +1442,19 @@ namespace SundayLastBreath.UI
             }
 
             if (pdaTabLoreBtn != null)
-
             {
-
+                var loreTabLabel = pdaTabLoreBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (loreTabLabel != null) loreTabLabel.text = "NOTES";
                 pdaTabLoreBtn.onClick.RemoveAllListeners();
-
                 pdaTabLoreBtn.onClick.AddListener(() => SwitchPDATab("LORE"));
-
+            }
+            if (pdaPanelLore != null)
+            {
+                Transform notesBadgeText = pdaPanelLore.transform.Find("SectionBadge/Text");
+                if (notesBadgeText != null && notesBadgeText.TryGetComponent<TextMeshProUGUI>(out var notesBadgeTmp))
+                {
+                    notesBadgeTmp.text = "NOTES & CLUES";
+                }
             }
 
 
@@ -2725,7 +2743,7 @@ namespace SundayLastBreath.UI
 
                         {
 
-                            radioFreqHeaderText.text = "FREQ: 154.790 MHz                                    <color=#ef4444>● REC</color>";
+                            radioFreqHeaderText.text = "FREQ: 154.790 MHz                                    <color=#ef4444>[REC]</color>";
 
                             SundayTypography.ApplyFont(radioFreqHeaderText, FontRole.Mono);
 
@@ -3033,7 +3051,7 @@ namespace SundayLastBreath.UI
 
                         hackingLedText.alignment = TextAlignmentOptions.MidlineLeft;
 
-                        hackingLedText.text = "<color=#10b981>● PWR</color>   <color=#f59e0b>● HDD</color>   <color=#38bdf8>● NET</color>";
+                        hackingLedText.text = "<color=#10b981>[PWR]</color>   <color=#f59e0b>[HDD]</color>   <color=#38bdf8>[NET]</color>";
 
                         SundayTypography.ApplyFont(hackingLedText, FontRole.Mono);
 
@@ -3351,7 +3369,7 @@ namespace SundayLastBreath.UI
 
                                 foTmp.color = new Color(0.92f, 0.94f, 0.98f);
 
-                                foTmp.text = "<color=#ef4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military isn't trying to contain the outbreak — they are firebombing the city at dawn. A <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> has been pushed to your personal phone.";
+                                foTmp.text = "<color=#ef4444><b>'BRIDGES & FREEWAY ON-RAMPS CLOSING BY 0100.'</b></color> If the main roads lock down at 1 AM, waiting for morning means getting boxed in. You save the cached <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your phone before the router goes dead.";
 
                                 SundayTypography.ApplyFont(foTmp, FontRole.Body);
 
@@ -3596,6 +3614,16 @@ namespace SundayLastBreath.UI
                 if (stmp != null) stmp.text = "";
 
                 sl.gameObject.SetActive(false);
+
+            }
+
+            TacticalChoiceButton tcb = btn.GetComponent<TacticalChoiceButton>();
+
+            if (tcb != null)
+
+            {
+
+                tcb.SyncContentAndState(singleFullText);
 
             }
 
@@ -4125,11 +4153,11 @@ namespace SundayLastBreath.UI
 
             {
 
-                return "Sirens wail through the rain-streaked glass, casting flickering blue light across your dark living room. The brass apartment key is in your pocket, and the front door deadbolt is ready to unlock.";
+                return "Blue and red lights sweep across your living room curtains from the street below. Your apartment key is in your pocket, and the front door is ready to unlock.";
 
             }
 
-            return "Sirens wail through the rain-streaked glass, casting flickering blue light across your dark living room. The heavy deadbolt on the front door is locked from the inside. Your apartment keys, wallet, and everyday items are still on the coffee table.";
+            return "Blue and red lights sweep across your living room curtains from the street below. The front deadbolt is still locked. Your keys, wallet, and everyday gear are sitting on the coffee table.";
 
         }
 
@@ -4253,6 +4281,11 @@ namespace SundayLastBreath.UI
 
             _storyLogs.Clear();
 
+            _visitedLocationAnchors.Clear();
+            _returnVariantIndices.Clear();
+
+            lastAutoLoggedSituationText = "";
+
             InitializeStoryLogs();
 
             RefreshStoryLogUI();
@@ -4357,9 +4390,21 @@ namespace SundayLastBreath.UI
 
             barricade_pushed = false;
 
+            barricade_inspected = false;
+
+            stair_3f_door_checked = false;
+
+            stair_listened_2f_door = false;
+
+            stair_noise_made = false;
+
+            stair_hum_deducted = false;
+
+            stair_entered_sfx_played = false;
 
 
-            SetSituationNarration(GetUnit407Anchor());
+
+            SetSituationNarration(GetUnit407Anchor(), recordInLog: false);
 
 
 
@@ -5267,7 +5312,10 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    PlayHubBGM("Audio/BGM/hallway_drone", 0.5f, true);
+                    if (stair_phase < 4)
+                        PlayHubBGM("Audio/SFX/generator_hum", 0.45f, true);
+                    else
+                        StopHubBGM();
 
                 }
 
@@ -5385,7 +5433,9 @@ namespace SundayLastBreath.UI
 
                                  Keyboard.current.enterKey.wasPressedThisFrame ||
 
-                                 Keyboard.current.numpadEnterKey.wasPressedThisFrame;
+                                 Keyboard.current.numpadEnterKey.wasPressedThisFrame ||
+
+                                 Keyboard.current.lKey.wasPressedThisFrame;
 
                 }
 
@@ -5403,7 +5453,9 @@ namespace SundayLastBreath.UI
 
                                      Input.GetKeyDown(KeyCode.Return) ||
 
-                                     Input.GetKeyDown(KeyCode.KeypadEnter);
+                                     Input.GetKeyDown(KeyCode.KeypadEnter) ||
+
+                                     Input.GetKeyDown(KeyCode.L);
 
                     }
 
@@ -5679,6 +5731,16 @@ namespace SundayLastBreath.UI
 
                 }
 
+                else if (Keyboard.current.lKey.wasPressedThisFrame && currentConsoleMode == ConsoleMode.Narrative)
+
+                {
+
+                    OnOpenStoryLogClicked();
+
+                    return;
+
+                }
+
                 else if ((Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.f1Key.wasPressedThisFrame) && currentConsoleMode != ConsoleMode.Narrative)
 
                 {
@@ -5718,6 +5780,16 @@ namespace SundayLastBreath.UI
                     {
 
                         SwitchConsoleMode(currentConsoleMode == ConsoleMode.Gear ? ConsoleMode.Narrative : ConsoleMode.Gear);
+
+                    }
+
+                    else if (Input.GetKeyDown(KeyCode.L) && currentConsoleMode == ConsoleMode.Narrative)
+
+                    {
+
+                        OnOpenStoryLogClicked();
+
+                        return;
 
                     }
 
@@ -6297,9 +6369,9 @@ namespace SundayLastBreath.UI
 
             int clamped = Mathf.Clamp(val, 0, max);
 
-            string filled = new string('■', clamped);
+            string filled = new string('|', clamped);
 
-            string empty = new string('■', Mathf.Max(0, max - clamped));
+            string empty = new string('|', Mathf.Max(0, max - clamped));
 
             return $"<b>{label.PadRight(9)}</b> <color={hexColor}>{filled}</color><color=#22262c>{empty}</color>  <color=#ffffff>[ {val} ]</color>";
 
@@ -6528,13 +6600,9 @@ namespace SundayLastBreath.UI
 
 
             if (loreSystem == null || loreSystem.Entries.Count == 0)
-
             {
-
-                pdaLoreText.text = "<color=#6c7a89><i>No intelligence logs recorded yet.\n\nUse your Phone, Emergency Radio, or Laptop in the apartment to gather outbreak intel.</i></color>";
-
+                pdaLoreText.text = "<color=#6c7a89><i>No notes recorded yet.\n\nKey clues, door codes, journals, and broadcasts you discover will be saved here for quick reference.</i></color>";
                 return;
-
             }
 
 
@@ -6545,7 +6613,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                sb.AppendLine($"<color=#f39c12><b>■ {entry.title.ToUpperInvariant()}</b></color> <color=#6c7a89>[{entry.timestamp}]</color>");
+                sb.AppendLine($"<color=#f39c12><b>// {entry.title.ToUpperInvariant()}</b></color> <color=#6c7a89>[{entry.timestamp}]</color>");
 
                 sb.AppendLine($"<color=#d0d6dc>{entry.content}</color>\n");
 
@@ -7489,7 +7557,7 @@ namespace SundayLastBreath.UI
 
                     if (dockHeaderChannel != null) dockHeaderChannel.text = "<color=#EF4444>CHANNEL: EMERGENCY BROADCAST SYSTEM</color>";
 
-                    if (beat1IntroText != null) beat1IntroText.text = "The apartment jolts into blinding static. The harsh electronic scream of the Emergency Alert System screeches from the television speakers, tearing through the dark.";
+                    if (beat1IntroText != null) beat1IntroText.text = "The TV snaps out of static into a loud, jarring Emergency Alert tone that fills the dark room.";
 
                 }
 
@@ -7507,9 +7575,9 @@ namespace SundayLastBreath.UI
 
                     if (monologueSpeechText != null) monologueSpeechText.text = GetPlayerMonologueText();
 
-                    if (beat2IntroText != null) beat2IntroText.text = "The automated warning cuts out. Cold static returns to the TV screen.";
+                    if (beat2IntroText != null) beat2IntroText.text = "The automated voice cuts off, leaving nothing but TV static.";
 
-                    if (beat2FootnoteText != null) beat2FootnoteText.text = "Through the thin plaster of your wall, frantic footsteps pound down the corridor. A neighbor shouts, cut short by the heavy slam of a fire door.";
+                    if (beat2FootnoteText != null) beat2FootnoteText.text = "Through the wall, heavy footsteps run past in the hallway. Someone yells, then a fire door slams shut down the hall.";
 
                 }
 
@@ -7523,7 +7591,7 @@ namespace SundayLastBreath.UI
 
                     if (tableStashDisplay != null) { tableStashDisplay.SetActive(true); PopulateTableStashUI(); }
 
-                    if (beat3NarrativeText != null) beat3NarrativeText.text = "Midnight is minutes away. Once the power grid collapses completely, the building locks will be unpredictable.\n\nYour apartment keys, wallet, and gear are sitting on the coffee table. You cannot step into the dark corridor without your keys.\n\nGrab your essentials from the table, and check what you can scavenge from the kitchen, bathroom, or closet before unlocking the deadbolt.";
+                    if (beat3NarrativeText != null) beat3NarrativeText.text = "It's almost midnight. If the power goes out completely, you won't be able to see a thing out there.\n\nYour keys, wallet, and gear are on the coffee table. Grab what you can carry—check the kitchen, bathroom, or closet too—before you unlock the door.";
 
                 }
 
@@ -7571,7 +7639,7 @@ namespace SundayLastBreath.UI
 
                         beat1IntroText,
 
-                        "The apartment jolts into blinding static. The harsh electronic scream of the Emergency Alert System screeches from the television speakers, tearing through the dark."
+                        "The TV snaps out of static into a loud, jarring Emergency Alert tone that fills the dark room."
 
                     );
 
@@ -7657,7 +7725,7 @@ namespace SundayLastBreath.UI
 
                     {
 
-                        beat2IntroText.text = "The automated warning cuts out. Cold static returns to the TV screen.";
+                        beat2IntroText.text = "The automated voice cuts off, leaving nothing but TV static.";
 
                     }
 
@@ -7667,7 +7735,7 @@ namespace SundayLastBreath.UI
 
                         beat2FootnoteText,
 
-                        "Through the thin plaster of your wall, frantic footsteps pound down the corridor. A neighbor shouts, cut short by the heavy slam of a fire door."
+                        "Through the wall, heavy footsteps run past in the hallway. Someone yells, then a fire door slams shut down the hall."
 
                     );
 
@@ -7707,11 +7775,11 @@ namespace SundayLastBreath.UI
 
                         beat3NarrativeText,
 
-                        "Midnight is minutes away. Once the power grid collapses completely, the building locks will be unpredictable.\n\n" +
+                        "It's almost midnight. If the power goes out completely, you won't be able to see a thing out there.\n\n" +
 
-                        "Your apartment keys, wallet, and gear are sitting on the coffee table. You cannot step into the dark corridor without your keys.\n\n" +
+                        "Your keys, wallet, and gear are on the coffee table.\n\n" +
 
-                        "Grab your essentials from the table, and check what you can scavenge from the kitchen, bathroom, or closet before unlocking the deadbolt."
+                        "Grab what you can carry—and check the kitchen, bathroom, or closet—before you unlock the front door."
 
                     );
 
@@ -7727,7 +7795,7 @@ namespace SundayLastBreath.UI
 
         {
 
-            if (currentPlayer == null) return "Lethal force authorized. They don't lock down the entire city for mass hysteria. This apartment door won't hold if panic reaches the hallway.";
+            if (currentPlayer == null) return "Lethal force authorized. They don't lock down the whole city over a normal riot. If panic hits this building, a hollow apartment door won't stop anyone.";
 
 
 
@@ -7735,7 +7803,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                return "Shelter in place? Wait inside a fourth-floor room with a single wooden door while police shoot into crowds? That's not a shelter. That's a trap.";
+                return "Shelter in place? Wait inside a fourth-floor apartment with one door while shots are going off outside? No thanks. That's a trap.";
 
             }
 
@@ -7743,7 +7811,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                return "Lethal force authorized on civilians. Rules of engagement don't collapse like this for a riot. If the military cordons this block, no one is getting out.";
+                return "Lethal force authorized on city streets. Dispatch doesn't drop rules of engagement like that for a normal crowd. If they cordon off this block, nobody's getting out.";
 
             }
 
@@ -7751,13 +7819,13 @@ namespace SundayLastBreath.UI
 
             {
 
-                return "Neuro-aggressive pathogen. Extreme tissue trauma ignored. In a high-rise with shared ventilation... staying in this apartment is suicide.";
+                return "Fluid-borne and causing violent behavior... Whatever's going around downtown, sitting inside a building with shared vents isn't safe.";
 
             }
 
 
 
-            return "Lethal force authorized. They don't lock down the entire city for mass hysteria. This apartment door won't hold if panic reaches the hallway.";
+            return "Lethal force authorized. They don't lock down the whole city over a normal riot. If panic hits this building, a hollow apartment door won't stop anyone.";
 
         }
 
@@ -7921,7 +7989,7 @@ namespace SundayLastBreath.UI
 
         #region Hub Menu Mode
 
-        private void ShowHubMenu()
+        private void ShowHubMenu(bool updateSituation = true)
 
         {
 
@@ -7933,10 +8001,7 @@ namespace SundayLastBreath.UI
 
             if (awakeningContainer != null) awakeningContainer.SetActive(false);
 
-            if (awakeningContainer != null) awakeningContainer.SetActive(false);
             if (hubMenuContainer != null) hubMenuContainer.SetActive(true);
-            if (continuePrompt != null) continuePrompt.SetActive(false);
-
             if (continuePrompt != null) continuePrompt.SetActive(false);
 
 
@@ -7946,7 +8011,10 @@ namespace SundayLastBreath.UI
             if (dockHeaderChannel != null) dockHeaderChannel.text = hasPacked ? "<color=#10B981>DOOR READY TO UNLOCK</color>" : "<color=#EF4444>FRONT DOOR LOCKED (NEED KEYS)</color>";
 
             UpdateSituationBoxHeader("LIVING ROOM");
-            SetSituationNarration(GetUnit407Anchor());
+            if (updateSituation)
+            {
+                SetSituationNarration(GetUnit407Anchor(), recordInLog: false);
+            }
 
 
 
@@ -8660,13 +8728,7 @@ namespace SundayLastBreath.UI
 
             // Note: Keep room floorItems intact so player doesn't lose anything!
 
-
-
-            AppendStoryLog(gameClock.GetTimeString(), "APARTMENT 407 // GATHERED ESSENTIALS",
-
-                $"Picked up apartment keys, wallet, phone, and everyday essentials off the table. Ready to unlock the front deadbolt.");
-
-            SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#10B981>[ESSENTIALS SECURED]</color> You approach the coffee table and scoop up your keys, wallet, and everyday gear. An unsent message sits frozen on your phone: <color=#94A3B8>\"Traffic stopped on Pike. Heading home soon.\"</color> You pocket the heavy brass apartment key, tighten your pack straps, and stand ready by the door.");
+            SetSituationNarration("<color=#10B981>[ESSENTIALS SECURED]</color> You approach the coffee table and scoop up your keys, wallet, and everyday gear. An unsent message sits frozen on your phone: <color=#94A3B8>\"Traffic stopped on Pike. Heading home soon.\"</color> You pocket the heavy brass apartment key, tighten your pack straps, and stand ready by the door.");
 
 
 
@@ -8682,7 +8744,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                packedSuccessText.text = $"<color=#10B981>✓ Apartment keys and essentials packed ({gatheredCount} items).\n<color=#38BDF8>Front door deadbolt can now be unlocked. Scavenge the kitchen, bathroom, or closet before stepping out.</color></color>";
+                packedSuccessText.text = $"<color=#10B981>[OK] Apartment keys and essentials packed ({gatheredCount} items).\n<color=#38BDF8>Front door deadbolt can now be unlocked. Scavenge the kitchen, bathroom, or closet before stepping out.</color></color>";
 
             }
 
@@ -8696,7 +8758,7 @@ namespace SundayLastBreath.UI
 
 
 
-            ShowHubMenu();
+            ShowHubMenu(updateSituation: false);
 
             PopulateTableStashUI();
 
@@ -8736,15 +8798,7 @@ namespace SundayLastBreath.UI
 
             AddFloorItem("Stale Coffee", 1);
 
-
-
-            AppendStoryLog(gameClock.GetTimeString(), "KITCHEN // SUPPLIES FOUND",
-
-                "Opened the cabinets and fridge in the dark. Secured two bottles of water, canned tuna, and a can opener. Brown silt sputtered from the faucet.");
-
-
-
-            SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#F59E0B>[KITCHEN SEARCHED]</color> You step into the kitchen. The refrigerator is already warming up in the blackout. You pull two bottles of water, canned tuna, and a manual can opener from the cupboards, set them on the counter, and walk back into the living room.");
+            SetSituationNarration("<color=#F59E0B>[KITCHEN SEARCHED]</color> You step into the kitchen. The refrigerator is already warming up in the blackout. You pull two bottles of water, canned tuna, and a manual can opener from the cupboards, set them on the counter, and walk back into the living room.");
 
 
 
@@ -8784,15 +8838,7 @@ namespace SundayLastBreath.UI
 
             AddFloorItem("Rubbing Alcohol", 1);
 
-
-
-            AppendStoryLog(gameClock.GetTimeString(), "BATHROOM // MEDICINE CABINET",
-
-                "Swept the medicine cabinet in the dark. Secured painkillers, bandages, and rubbing alcohol.");
-
-
-
-            SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#10B981>[MEDICINE CABINET CLEARED]</color> You flick on your light and step into the bathroom. You sweep ibuprofen, rolls of gauze, and rubbing alcohol from the vanity mirror cabinet, place them ready on the hall bench, and return to the living room.");
+            SetSituationNarration("<color=#10B981>[MEDICINE CABINET CLEARED]</color> You flick on your light and step into the bathroom. You sweep ibuprofen, rolls of gauze, and rubbing alcohol from the vanity mirror cabinet, place them ready on the hall bench, and return to the living room.");
 
 
 
@@ -8832,15 +8878,7 @@ namespace SundayLastBreath.UI
 
             AddFloorItem("Matches", 1);
 
-
-
-            AppendStoryLog(gameClock.GetTimeString(), "FRONT CLOSET // COAT & SUPPLIES",
-
-                "Pulled down heavy rain poncho, duct tape, and matches from the hall closet.");
-
-
-
-            SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#38BDF8>[FRONT CLOSET SEARCHED]</color> You cross over to the hallway coat closet. You pull down your heavy rain poncho from its hanger, grab a roll of duct tape and wooden matches off the top shelf, and step back into the dark room.");
+            SetSituationNarration("<color=#38BDF8>[FRONT CLOSET SEARCHED]</color> You cross over to the hallway coat closet. You pull down your heavy rain poncho from its hanger, grab a roll of duct tape and wooden matches off the top shelf, and step back into the dark room.");
 
 
 
@@ -9050,9 +9088,9 @@ namespace SundayLastBreath.UI
 
             loreSystem.AddLore(
 
-                "X-Feed Timeline (Day 0)",
+                "Phone Feed (Midnight)",
 
-                "CDC reported an unprecedented neuro-aggressive pathogen causing extreme psychosis. Violence escalating. Videos show infected individuals ignoring fatal chest wounds. The military barricaded the bridges before the cellular network collapsed.",
+                "People near 5th St Hospital posted photos of police in gas masks blocking ambulances. News alerts mention an aggressive flu-like illness behind tonight's assaults, while viral clips show someone taking multiple chest shots and keeping going before cell service cut out.",
 
                 gameClock.GetTimeString()
 
@@ -9064,17 +9102,11 @@ namespace SundayLastBreath.UI
 
                 "Professor Harmon's Door Code",
 
-                "Professor Harmon posted his keypad code (8445) for Unit 406 on social media before the network died. He warned that social collapse was already irreversible and told neighbors to take his supplies.",
+                "Harmon from Unit 406 posted on the neighborhood feed before leaving the city. He left his door code (8445) so neighbors could grab supplies.",
 
                 gameClock.GetTimeString()
 
             );
-
-
-
-            AppendStoryLog(gameClock.GetTimeString(), "NEWS // SOCIAL MEDIA TIMELINE",
-
-                "City news feeds report police in riot gear sealing 5th St Hospital and contagion violence escalating. Professor Harmon posted warning neighbors to evacuate and provided his door code (8445) for Unit 406. Cellular service is now completely dead.");
 
 
 
@@ -9088,7 +9120,7 @@ namespace SundayLastBreath.UI
 
 
 
-            SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#38BDF8>[PHONE INTEL]</color> You tap your phone screen, watching citizen feeds of chaos on 4th & Pike before the network drops completely. Harmon's text stands out: his door code for Unit 406 is <color=#F59E0B>8445</color>. You lower the dark phone, staring at the locked door.");
+            SetSituationNarration("<color=#38BDF8>[PHONE INTEL]</color> You scroll through panicked local posts and a shaky video from downtown before the signal drops to zero. One post from your neighbor across the hall stands out: Harmon left the building and posted his Unit 406 door code (<color=#F59E0B>8445</color>).");
 
             EvaluateHubButtonStates();
 
@@ -9332,7 +9364,7 @@ namespace SundayLastBreath.UI
 
                         sysSlotTitles[slotIdx].text =
 
-                            $"<color={titleHex}><b>■ {slotTitle}</b></color>   <color=#F8FAFC><b>{s.characterName}</b></color> <color=#94A3B8>({s.job})</color>  {savedBadge}";
+                            $"<color={titleHex}><b>[{slotTitle}]</b></color>   <color=#F8FAFC><b>{s.characterName}</b></color> <color=#94A3B8>({s.job})</color>  {savedBadge}";
 
                     }
 
@@ -9344,7 +9376,7 @@ namespace SundayLastBreath.UI
 
                         sysSlotDetails[slotIdx].text =
 
-                            $"<color=#FBBF24>{s.roomDisplayName}</color>  •  <color=#E2E8F0>{s.clockDisplay}</color>  •  " +
+                            $"<color=#FBBF24>{s.roomDisplayName}</color>  |  <color=#E2E8F0>{s.clockDisplay}</color>  |  " +
 
                             $"HP <color=#EF4444>{s.hp}/{s.hpMax}</color>  STM <color=#10B981>{s.stamina}/{s.staminaMax}</color>  HUM <color=#A78BFA>{s.humanity}%</color>";
 
@@ -9380,7 +9412,7 @@ namespace SundayLastBreath.UI
 
                     {
 
-                        sysSlotActionLabels[slotIdx].text = isSlotPickerSaveMode ? "<b>OVERWRITE</b>" : "<b>► LOAD</b>";
+                        sysSlotActionLabels[slotIdx].text = isSlotPickerSaveMode ? "<b>OVERWRITE</b>" : "<b>> LOAD</b>";
 
                         sysSlotActionLabels[slotIdx].color = isSlotPickerSaveMode
 
@@ -9432,7 +9464,7 @@ namespace SundayLastBreath.UI
 
                     {
 
-                        sysSlotTitles[slotIdx].text = $"<color=#64748B><b>□ {slotTitle}</b>   —   [ EMPTY ARCHIVE SLOT ]</color>";
+                        sysSlotTitles[slotIdx].text = $"<color=#64748B><b>[{slotTitle}]</b>   -   [ EMPTY ARCHIVE SLOT ]</color>";
 
                     }
 
@@ -9614,7 +9646,7 @@ namespace SundayLastBreath.UI
 
                     RefreshSystemMenuTelemetry(
 
-                        $"<color=#10B981><b>✓ SAVED TO {slotTitle}!</b></color>  [{s.saveTimestamp}]  —  {s.characterName} | {s.roomDisplayName}");
+                        $"<color=#10B981><b>[SAVED] {slotTitle}!</b></color>  [{s.saveTimestamp}]  -  {s.characterName} | {s.roomDisplayName}");
 
                 }
 
@@ -11190,9 +11222,9 @@ namespace SundayLastBreath.UI
 
                     string recDot = (tick % 2 == 0)
 
-                        ? "<color=#ef4444>● LIVE RX</color>"
+                        ? "<color=#ef4444>[LIVE RX]</color>"
 
-                        : "<color=#7f1d1d>● LIVE RX</color>";
+                        : "<color=#7f1d1d>[LIVE RX]</color>";
 
                     radioFreqHeaderText.text = $"FREQ: 154.790 MHz // SEATTLE PD DISPATCH [CH-1]          {recDot}";
 
@@ -11244,11 +11276,151 @@ namespace SundayLastBreath.UI
 
 
 
+        private float GetRadioSyncTime(float startRealtime, float maxObservedTime)
+
+        {
+
+            if (radioSource != null && radioSource.isPlaying && radioSource.time > 0.001f)
+
+            {
+
+                return Mathf.Max(maxObservedTime, radioSource.time);
+
+            }
+
+            return Mathf.Max(maxObservedTime, Time.realtimeSinceStartup - startRealtime);
+
+        }
+
+
+
+        private IEnumerator WaitUntilRadioTime(float targetTime, float startRealtime, System.Action<float> onUpdateTime, System.Func<float> getMaxTime)
+
+        {
+
+            while (isRadioTransmitting)
+
+            {
+
+                float t = GetRadioSyncTime(startRealtime, getMaxTime());
+
+                onUpdateTime(t);
+
+                if (t >= targetTime) yield break;
+
+                yield return null;
+
+            }
+
+        }
+
+
+
+        private IEnumerator TypeRichTextSegmentSynced(
+
+            System.Text.StringBuilder sb,
+
+            string segment,
+
+            float startSec,
+
+            float endSec,
+
+            float startRealtime,
+
+            System.Action<float> onUpdateTime,
+
+            System.Func<float> getMaxTime)
+
+        {
+
+            yield return WaitUntilRadioTime(startSec, startRealtime, onUpdateTime, getMaxTime);
+
+            if (!isRadioTransmitting) yield break;
+
+
+
+            string prefix = sb.ToString();
+
+            var visibleEnds = new System.Collections.Generic.List<int>(segment.Length);
+
+            for (int i = 0; i < segment.Length; i++)
+
+            {
+
+                if (segment[i] == '<')
+
+                {
+
+                    int closeIdx = segment.IndexOf('>', i);
+
+                    if (closeIdx >= 0)
+
+                    {
+
+                        i = closeIdx;
+
+                        continue;
+
+                    }
+
+                }
+
+                visibleEnds.Add(i + 1);
+
+            }
+
+
+
+            float duration = Mathf.Max(0.05f, endSec - startSec);
+
+            while (isRadioTransmitting)
+
+            {
+
+                float t = GetRadioSyncTime(startRealtime, getMaxTime());
+
+                onUpdateTime(t);
+
+                float progress = Mathf.Clamp01((t - startSec) / duration);
+
+                int count = Mathf.CeilToInt(progress * visibleEnds.Count);
+
+                if (radioTranscriptText != null)
+
+                {
+
+                    string typed = count <= 0 ? "" : segment.Substring(0, visibleEnds[count - 1]);
+
+                    radioTranscriptText.text = prefix + typed;
+
+                }
+
+                if (progress >= 1f) break;
+
+                yield return null;
+
+            }
+
+
+
+            sb.Append(segment);
+
+            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+
+        }
+
+
+
         private IEnumerator RadioTransmissionRoutine()
 
         {
 
             isRadioTransmitting = true;
+
+            float startRealtime = Time.realtimeSinceStartup;
+
+            float maxObservedTime = 0f;
 
 
 
@@ -11257,16 +11429,6 @@ namespace SundayLastBreath.UI
             {
 
                 radioOutroObj.SetActive(false);
-
-            }
-
-
-
-            if (radioTranscriptText != null)
-
-            {
-
-                radioTranscriptText.text = "<color=#94A3B8>[STATIC HISS]</color>";
 
             }
 
@@ -11284,53 +11446,31 @@ namespace SundayLastBreath.UI
 
 
 
-            // 0.0s to 1.6s: Static hiss / frequency lock
+            // Audio cues in police_radio.mp3 (36.13s):
 
-            yield return new WaitForSecondsRealtime(1.6f);
-
-            if (!isRadioTransmitting) yield break;
-
-
-
-            // 1.6s to 11.4s: UNIT 4-CHARLIE First Transmission (Barricade lost)
+            // 1.55s–9.05s: Unit 4-Charlie first burst
 
             sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
 
-            string line1 = "<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing! They just keep coming!\"</i>\n";
+            yield return TypeRichTextSegmentSynced(
 
-            string prefix1 = sb.ToString();
+                sb,
 
+                "<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing!\"</i>\n\n",
 
+                1.55f, 9.05f, startRealtime, t => maxObservedTime = t, () => maxObservedTime
 
-            float line1Duration = 9.8f;
-
-            float charDelay1 = line1Duration / line1.Length;
-
-            for (int i = 1; i <= line1.Length; i += 2)
-
-            {
-
-                if (!isRadioTransmitting) yield break;
-
-                int len = Mathf.Min(i, line1.Length);
-
-                if (radioTranscriptText != null) radioTranscriptText.text = prefix1 + line1.Substring(0, len);
-
-                yield return new WaitForSecondsRealtime(charDelay1 * 2);
-
-            }
-
-            sb.AppendLine(line1);
-
-            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
-
-
-
-            // 11.5s to 13.3s: Heavy Struggle & Screen Shake
+            );
 
             if (!isRadioTransmitting) yield break;
 
-            yield return new WaitForSecondsRealtime(0.2f);
+
+
+            // 9.85s: Heavy slam against cruiser + shout
+
+            yield return WaitUntilRadioTime(9.85f, startRealtime, t => maxObservedTime = t, () => maxObservedTime);
+
+            if (!isRadioTransmitting) yield break;
 
             PlayScreenShake();
 
@@ -11340,49 +11480,41 @@ namespace SundayLastBreath.UI
 
 
 
-            yield return new WaitForSecondsRealtime(1.7f);
+            // 10.05s–11.65s: "Get off the damn car!" -> 13.25s–18.10s: "Dispatch, standard protocol is useless!..."
+
+            sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
+
+            yield return TypeRichTextSegmentSynced(
+
+                sb,
+
+                "<i>\"Get off the damn car! ",
+
+                10.05f, 11.65f, startRealtime, t => maxObservedTime = t, () => maxObservedTime
+
+            );
 
             if (!isRadioTransmitting) yield break;
 
 
 
-            // 13.4s to 21.4s: UNIT 4-CHARLIE Second Transmission (Get off the car, unrestricted lethal force)
+            yield return TypeRichTextSegmentSynced(
 
-            sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
+                sb,
 
-            string line2 = "<i>\"God damn it, get off the damn car! Dispatch, standard protocol is useless! Requesting authorization for unrestricted lethal force!\"</i>\n";
+                "Dispatch, standard protocol is useless! Requesting authorization for unrestricted lethal force!\"</i>\n\n",
 
-            string prefix2 = sb.ToString();
+                13.25f, 18.10f, startRealtime, t => maxObservedTime = t, () => maxObservedTime
 
+            );
 
-
-            float line2Duration = 7.8f;
-
-            float charDelay2 = line2Duration / line2.Length;
-
-            for (int i = 1; i <= line2.Length; i += 2)
-
-            {
-
-                if (!isRadioTransmitting) yield break;
-
-                int len = Mathf.Min(i, line2.Length);
-
-                if (radioTranscriptText != null) radioTranscriptText.text = prefix2 + line2.Substring(0, len);
-
-                yield return new WaitForSecondsRealtime(charDelay2 * 2);
-
-            }
-
-            sb.AppendLine(line2);
-
-            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
+            if (!isRadioTransmitting) yield break;
 
 
 
-            // 21.5s to 22.1s: Radio Squelch
+            // 18.95s: Radio Squelch bursts
 
-            yield return new WaitForSecondsRealtime(0.7f);
+            yield return WaitUntilRadioTime(18.95f, startRealtime, t => maxObservedTime = t, () => maxObservedTime);
 
             if (!isRadioTransmitting) yield break;
 
@@ -11392,49 +11524,29 @@ namespace SundayLastBreath.UI
 
 
 
-            yield return new WaitForSecondsRealtime(0.6f);
+            // 22.15s–35.55s: Dispatch authorization
+
+            sb.AppendLine("<b><color=#F59E0B>DISPATCH:</color></b>");
+
+            yield return TypeRichTextSegmentSynced(
+
+                sb,
+
+                "<i>\"4-Charlie, unrestricted lethal force is authorized. All units, listen carefully. Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#EF4444>Aim for the head.</color> I repeat... <color=#EF4444>aim for the head.</color> Avoid all physical contact.\"</i>\n\n",
+
+                22.15f, 35.55f, startRealtime, t => maxObservedTime = t, () => maxObservedTime
+
+            );
 
             if (!isRadioTransmitting) yield break;
 
 
 
-            // 22.2s to 35.4s: DISPATCH (CALM)
+            // 35.75s: Signal Cuts Out
 
-            sb.AppendLine("<b><color=#F59E0B>DISPATCH (CALM):</color></b>");
+            yield return WaitUntilRadioTime(35.75f, startRealtime, t => maxObservedTime = t, () => maxObservedTime);
 
-            string line3 = "<i>\"4-Charlie, unrestricted lethal force is authorized. All units, listen carefully. Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#EF4444>Aim for the head.</color> I repeat... <color=#EF4444>aim for the head.</color> Avoid all physical contact.\"</i>\n";
-
-            string prefix3 = sb.ToString();
-
-
-
-            float line3Duration = 13.0f;
-
-            float charDelay3 = line3Duration / line3.Length;
-
-            for (int i = 1; i <= line3.Length; i += 2)
-
-            {
-
-                if (!isRadioTransmitting) yield break;
-
-                int len = Mathf.Min(i, line3.Length);
-
-                if (radioTranscriptText != null) radioTranscriptText.text = prefix3 + line3.Substring(0, len);
-
-                yield return new WaitForSecondsRealtime(charDelay3 * 2);
-
-            }
-
-            sb.AppendLine(line3);
-
-            if (radioTranscriptText != null) radioTranscriptText.text = sb.ToString();
-
-
-
-            // 35.5s: Signal Cuts Out
-
-            yield return new WaitForSecondsRealtime(0.5f);
+            if (!isRadioTransmitting) yield break;
 
             isRadioTransmitting = false;
 
@@ -11484,17 +11596,17 @@ namespace SundayLastBreath.UI
 
             sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
 
-            sb.AppendLine("<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing! They just keep coming!\"</i>\n");
+            sb.AppendLine("<i>\"Dispatch, 4-Charlie! We've lost the 5th Street barricade! They are not stopping! I repeat, shooting them in the chest does nothing!\"</i>\n");
 
             sb.AppendLine("<color=#EF4444><b>[HEAVY STRUGGLE / THUD]</b></color>\n");
 
             sb.AppendLine("<b><color=#38BDF8>UNIT 4-CHARLIE:</color></b>");
 
-            sb.AppendLine("<i>\"God damn it, get off the damn car! Dispatch, standard protocol is useless! Requesting authorization for unrestricted lethal force!\"</i>\n");
+            sb.AppendLine("<i>\"Get off the damn car! Dispatch, standard protocol is useless! Requesting authorization for unrestricted lethal force!\"</i>\n");
 
             sb.AppendLine("<color=#F59E0B><b>[RADIO SQUELCH]</b></color>\n");
 
-            sb.AppendLine("<b><color=#F59E0B>DISPATCH (CALM):</color></b>");
+            sb.AppendLine("<b><color=#F59E0B>DISPATCH:</color></b>");
 
             sb.AppendLine("<i>\"4-Charlie, unrestricted lethal force is authorized. All units, listen carefully. Standard rules of engagement are suspended. Body shots will not stop them. You must destroy the brain. <color=#EF4444>Aim for the head.</color> I repeat... <color=#EF4444>aim for the head.</color> Avoid all physical contact.\"</i>\n");
 
@@ -11542,19 +11654,13 @@ namespace SundayLastBreath.UI
 
             loreSystem.AddLore(
 
-                "Radio Intercept (Day 0)",
+                "Police Radio Intercept (Midnight)",
 
-                "Police dispatch authorized unrestricted lethal force. Standard body shots are ineffective against the infected. Neutralization requires destroying the brain. All physical contact must be avoided.",
+                "Police units at 5th Street lost their barricade and reported suspects ignoring chest shots. Dispatch suspended standard rules of engagement, ordered officers to aim for the head, and warned them to avoid all physical contact.",
 
                 gameClock.GetTimeString()
 
             );
-
-
-
-            AppendStoryLog(gameClock.GetTimeString(), "RADIO // EMERGENCY POLICE DISPATCH",
-
-                "Emergency dispatch authorized unrestricted lethal force. Standard body shots are ineffective; neutralization requires destroying the brain. The Harborview medical perimeter has collapsed.");
 
 
 
@@ -11568,7 +11674,7 @@ namespace SundayLastBreath.UI
 
 
 
-            SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#EF4444>[POLICE FREQUENCY LOGGED]</color> You tune the analog dial on your scanner. Through crackling static, central dispatch authorizes unrestricted lethal force, ordering officers to shoot for the head. You switch the receiver off and stand in the heavy silence.");
+            SetSituationNarration("<color=#EF4444>[POLICE FREQUENCY LOGGED]</color> Over the scanner, an officer on 5th Street yells that chest shots aren't stopping whoever's rushing the barricade. Dispatch tells all units to aim for the head before the channel drops to dead air.");
 
             EvaluateHubButtonStates();
 
@@ -11652,7 +11758,7 @@ namespace SundayLastBreath.UI
 
                     string netColor = (tick % 3 == 0) ? "#38bdf8" : "#0284c7";
 
-                    hackingLedText.text = $"<color=#10b981>● PWR</color>   <color={hddColor}>● HDD</color>   <color={netColor}>● NET</color>";
+                    hackingLedText.text = $"<color=#10b981>[PWR]</color>   <color={hddColor}>[HDD]</color>   <color={netColor}>[NET]</color>";
 
                 }
 
@@ -11668,7 +11774,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                hackingLedText.text = "<color=#10b981>● PWR</color>   <color=#78350f>● HDD</color>   <color=#ef4444>● NET [SEVERED]</color>";
+                hackingLedText.text = "<color=#10b981>[PWR]</color>   <color=#78350f>[HDD]</color>   <color=#ef4444>[NET SEVERED]</color>";
 
             }
 
@@ -11698,43 +11804,43 @@ namespace SundayLastBreath.UI
 
             {
 
-                "<color=#64748b>>_ terminal@unit407: scanning building fiber gateway...</color>",
+                "<color=#64748b>>_ terminal@unit407: scanning local building gateway...</color>",
 
-                "<color=#38bdf8>[*] SUBNET 192.168.1.1 — INTERCEPTING MUNICIPAL EMERGENCY FEED...</color>",
+                "<color=#38bdf8>[*] SUBNET 192.168.1.1 — SNIFFING CITY EMERGENCY RELAY...</color>",
 
-                "<color=#10b981>[+] BYPASSING LOCAL CARRIER ENCRYPTION... [100% OK]</color>",
+                "<color=#10b981>[+] LOCAL ROUTER CACHE DUMPED... [OK]</color>",
 
-                "<color=#f59e0b>[*] DOWNLOADING ACTIVE FEMA / DoD TRANSMISSION STREAM...</color>",
-
-                "",
-
-                "<color=#ef4444><b>================== [ CLASSIFIED EMERGENCY DIRECTIVE ] ==================</b></color>",
-
-                "<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (CONTAINMENT PROTOCOL)</color>",
-
-                "<color=#f1f5f9><b>THREAT LEVEL   :</b></color> <color=#ef4444><b>CATEGORY 5 (EXTINCTION EVENT)</b></color>",
-
-                "<color=#f1f5f9><b>PATHOGEN       :</b></color> <color=#f59e0b>NEURO-AGGRESSIVE MUTAGEN (PRIMARY VECTOR: HARBORVIEW LAB)</color>",
-
-                "<color=#f1f5f9><b>STATUS         :</b></color> <color=#ef4444>QUARANTINE FAILED // INFECTION RATE: 87.4%</color>",
-
-                "<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>INITIATE SECTOR 4 PURGE (THERMAL FIREBOMBING) AT 0600 HOURS.</b></color>",
-
-                "<color=#f1f5f9><b>EXTRACTION LZ  :</b></color> <color=#10b981>POINT 'ECHO' // HARBORVIEW HELIPAD (47.604° N, 122.324° W)</color>",
-
-                "<color=#ef4444><b>========================================================================</b></color>",
+                "<color=#f59e0b>[*] READING LAST CACHED MUNICIPAL DISPATCH PACKETS...</color>",
 
                 "",
 
-                "<color=#10b981>[+] EVACUATION COORDINATES & ATTACHMENTS SECURED (EVAC_PROTOCOLS.DAT).</color>",
+                "<color=#ef4444><b>================== [ CACHED CITY EMERGENCY MEMO ] ==================</b></color>",
 
-                "<color=#ffd700><b>[+] GENERATING TIER-1 CLEARANCE PASSKEY... TRANSFERRED TO PERSONAL PHONE!</b></color>",
+                "<color=#f1f5f9><b>INCIDENT CODE  :</b></color> <color=#38bdf8>AMBER-9 (UNCONTROLLED MASS VIOLENCE)</color>",
+
+                "<color=#f1f5f9><b>AFFECTED ZONES :</b></color> <color=#f59e0b>5TH ST HOSPITAL // DOWNTOWN CORRIDOR // I-5 RAMPS</color>",
+
+                "<color=#f1f5f9><b>MEDICAL NOTE   :</b></color> <color=#f59e0b>SUSPECTED ACUTE CONTAGION — BITING / EXTREME AGITATION</color>",
+
+                "<color=#f1f5f9><b>TRAFFIC STATUS :</b></color> <color=#ef4444>BRIDGES & FREEWAY ON-RAMPS CLOSING BY 0100</color>",
+
+                "<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>HOLD IN PLACE UNTIL FURTHER COUNTY ORDERS.</b></color>",
+
+                "<color=#f1f5f9><b>COUNTY STAGING :</b></color> <color=#10b981>EASTBOUND ROUTES / TIMBERLINE CORRIDOR (UNCONFIRMED)</color>",
+
+                "<color=#ef4444><b>====================================================================</b></color>",
 
                 "",
 
-                "<color=#ef4444><b>[!] REMOTE DISPATCH DETECTED INTRUSION. CENTRAL KILL-SWITCH ENGAGED!</b></color>",
+                "<color=#10b981>[+] CACHED ROAD CLOSURE LIST SAVED (ROAD_STATUS.DAT).</color>",
 
-                "<color=#94a3b8>[X] CONNECTION TERMINATED BY HOST. INTRANET ADAPTER SEVERED.</color>"
+                "<color=#ffd700><b>[+] FOUND UNREVOKED MUNICIPAL GATE PASSKEY... SAVED TO PHONE!</b></color>",
+
+                "",
+
+                "<color=#ef4444><b>[!] UPSTREAM GATEWAY TIMED OUT. NO CARRIER ON WAN PORT.</b></color>",
+
+                "<color=#94a3b8>[X] CONNECTION DROPPED. FIBER LINE DEAD.</color>"
 
             };
 
@@ -11816,7 +11922,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                hackingLedText.text = "<color=#10b981>● PWR</color>   <color=#78350f>● HDD</color>   <color=#ef4444>● NET [SEVERED]</color>";
+                hackingLedText.text = "<color=#10b981>[PWR]</color>   <color=#78350f>[HDD]</color>   <color=#ef4444>[NET SEVERED]</color>";
 
             }
 
@@ -11824,43 +11930,43 @@ namespace SundayLastBreath.UI
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
-            sb.AppendLine("<color=#64748b>>_ terminal@unit407: scanning building fiber gateway...</color>");
+            sb.AppendLine("<color=#64748b>>_ terminal@unit407: scanning local building gateway...</color>");
 
-            sb.AppendLine("<color=#38bdf8>[*] SUBNET 192.168.1.1 — INTERCEPTING MUNICIPAL EMERGENCY FEED...</color>");
+            sb.AppendLine("<color=#38bdf8>[*] SUBNET 192.168.1.1 — SNIFFING CITY EMERGENCY RELAY...</color>");
 
-            sb.AppendLine("<color=#10b981>[+] BYPASSING LOCAL CARRIER ENCRYPTION... [100% OK]</color>");
+            sb.AppendLine("<color=#10b981>[+] LOCAL ROUTER CACHE DUMPED... [OK]</color>");
 
-            sb.AppendLine("<color=#f59e0b>[*] DOWNLOADING ACTIVE FEMA / DoD TRANSMISSION STREAM...</color>");
-
-            sb.AppendLine("");
-
-            sb.AppendLine("<color=#ef4444><b>================== [ CLASSIFIED EMERGENCY DIRECTIVE ] ==================</b></color>");
-
-            sb.AppendLine("<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (CONTAINMENT PROTOCOL)</color>");
-
-            sb.AppendLine("<color=#f1f5f9><b>THREAT LEVEL   :</b></color> <color=#ef4444><b>CATEGORY 5 (EXTINCTION EVENT)</b></color>");
-
-            sb.AppendLine("<color=#f1f5f9><b>PATHOGEN       :</b></color> <color=#f59e0b>NEURO-AGGRESSIVE MUTAGEN (PRIMARY VECTOR: HARBORVIEW LAB)</color>");
-
-            sb.AppendLine("<color=#f1f5f9><b>STATUS         :</b></color> <color=#ef4444>QUARANTINE FAILED // INFECTION RATE: 87.4%</color>");
-
-            sb.AppendLine("<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>INITIATE SECTOR 4 PURGE (THERMAL FIREBOMBING) AT 0600 HOURS.</b></color>");
-
-            sb.AppendLine("<color=#f1f5f9><b>EXTRACTION LZ  :</b></color> <color=#10b981>POINT 'ECHO' // HARBORVIEW HELIPAD (47.604° N, 122.324° W)</color>");
-
-            sb.AppendLine("<color=#ef4444><b>========================================================================</b></color>");
+            sb.AppendLine("<color=#f59e0b>[*] READING LAST CACHED MUNICIPAL DISPATCH PACKETS...</color>");
 
             sb.AppendLine("");
 
-            sb.AppendLine("<color=#10b981>[+] EVACUATION COORDINATES & ATTACHMENTS SECURED (EVAC_PROTOCOLS.DAT).</color>");
+            sb.AppendLine("<color=#ef4444><b>================== [ CACHED CITY EMERGENCY MEMO ] ==================</b></color>");
 
-            sb.AppendLine("<color=#ffd700><b>[+] GENERATING TIER-1 CLEARANCE PASSKEY... TRANSFERRED TO PERSONAL PHONE!</b></color>");
+            sb.AppendLine("<color=#f1f5f9><b>INCIDENT CODE  :</b></color> <color=#38bdf8>AMBER-9 (UNCONTROLLED MASS VIOLENCE)</color>");
+
+            sb.AppendLine("<color=#f1f5f9><b>AFFECTED ZONES :</b></color> <color=#f59e0b>5TH ST HOSPITAL // DOWNTOWN CORRIDOR // I-5 RAMPS</color>");
+
+            sb.AppendLine("<color=#f1f5f9><b>MEDICAL NOTE   :</b></color> <color=#f59e0b>SUSPECTED ACUTE CONTAGION — BITING / EXTREME AGITATION</color>");
+
+            sb.AppendLine("<color=#f1f5f9><b>TRAFFIC STATUS :</b></color> <color=#ef4444>BRIDGES & FREEWAY ON-RAMPS CLOSING BY 0100</color>");
+
+            sb.AppendLine("<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>HOLD IN PLACE UNTIL FURTHER COUNTY ORDERS.</b></color>");
+
+            sb.AppendLine("<color=#f1f5f9><b>COUNTY STAGING :</b></color> <color=#10b981>EASTBOUND ROUTES / TIMBERLINE CORRIDOR (UNCONFIRMED)</color>");
+
+            sb.AppendLine("<color=#ef4444><b>====================================================================</b></color>");
 
             sb.AppendLine("");
 
-            sb.AppendLine("<color=#ef4444><b>[!] REMOTE DISPATCH DETECTED INTRUSION. CENTRAL KILL-SWITCH ENGAGED!</b></color>");
+            sb.AppendLine("<color=#10b981>[+] CACHED ROAD CLOSURE LIST SAVED (ROAD_STATUS.DAT).</color>");
 
-            sb.AppendLine("<color=#94a3b8>[X] CONNECTION TERMINATED BY HOST. INTRANET ADAPTER SEVERED.</color>");
+            sb.AppendLine("<color=#ffd700><b>[+] FOUND UNREVOKED MUNICIPAL GATE PASSKEY... SAVED TO PHONE!</b></color>");
+
+            sb.AppendLine("");
+
+            sb.AppendLine("<color=#ef4444><b>[!] UPSTREAM GATEWAY TIMED OUT. NO CARRIER ON WAN PORT.</b></color>");
+
+            sb.AppendLine("<color=#94a3b8>[X] CONNECTION DROPPED. FIBER LINE DEAD.</color>");
 
 
 
@@ -11920,19 +12026,13 @@ namespace SundayLastBreath.UI
 
             loreSystem.AddLore(
 
-                "DoD Intercept: Operation WILDFIRE",
+                "Cached City Traffic (Midnight)",
 
-                "The outbreak is uncontained. The military considers the city a lost cause and has ordered a 'Sector Purge' (firebombing) at 0600 hours. I managed to download a Tier-1 Military Clearance Passkey before severing the connection.",
+                "Pulled cached municipal memos before the fiber line died. Downtown and 5th St Hospital are locked down under 'Code Amber-9', and freeway ramps and bridges are closing by 01:00. Saved a valid checkpoint passkey to my phone.",
 
                 gameClock.GetTimeString()
 
             );
-
-
-
-            AppendStoryLog(gameClock.GetTimeString(), "TERMINAL // CLASSIFIED PASSKEY",
-
-                "Extracted emergency containment directives. Saved Tier-1 Emergency Access Clearance Passkey directly to my phone storage.");
 
 
 
@@ -11946,7 +12046,7 @@ namespace SundayLastBreath.UI
 
 
 
-            SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#EF4444>[OPERATION WILDFIRE CONFIRMED]</color> You sit at the workstation terminal, extracting classified military directives before the killswitch engages. Operation WILDFIRE is set for 06:00—a thermal firebombing purge of Seattle. You snap the laptop closed. You have six hours to get out.");
+            SetSituationNarration("<color=#EF4444>[CACHED DISPATCH PULLED]</color> You pull a few cached city memos before the connection dies completely. Downtown and 5th Street are locked down, and bridges are closing by 01:00. You grab the attached municipal passkey and shut the laptop—if you're leaving this neighborhood, it has to be now.");
 
             EvaluateHubButtonStates();
 
@@ -11976,7 +12076,7 @@ namespace SundayLastBreath.UI
 
                 PlayBeepSFX();
 
-                SetSituationNarration($"{GetUnit407Anchor()}\n\n<color=#EF4444>[DEADBOLT ENGAGED]</color> You try the front latch, but the deadbolt is locked tight from the inside. Your apartment keys and gear are still on the coffee table. Stepping into the hallway without them guarantees locking yourself out in the dark.");
+                SetSituationNarration("<color=#EF4444>[DEADBOLT ENGAGED]</color> You try the front latch, but the deadbolt is locked tight from the inside. Your apartment keys and gear are still on the coffee table. Stepping into the hallway without them guarantees locking yourself out in the dark.");
 
                 return;
 
@@ -13576,6 +13676,16 @@ namespace SundayLastBreath.UI
 
             ES3.Save<bool>("hub_barricade_pushed", barricade_pushed, file);
 
+            ES3.Save<bool>("hub_barricade_inspected", barricade_inspected, file);
+
+            ES3.Save<bool>("hub_stair_3f_door_checked", stair_3f_door_checked, file);
+
+            ES3.Save<bool>("hub_stair_listened_2f_door", stair_listened_2f_door, file);
+
+            ES3.Save<bool>("hub_stair_noise_made", stair_noise_made, file);
+
+            ES3.Save<bool>("hub_stair_hum_deducted", stair_hum_deducted, file);
+
 
 
             // Apartment Hub Visit Flags
@@ -13599,6 +13709,7 @@ namespace SundayLastBreath.UI
             }
 
             ES3.Save<List<string>>("hub_story_logs", new List<string>(_storyLogs), file);
+            ES3.Save<List<string>>("hub_visited_anchors", new List<string>(_visitedLocationAnchors), file);
 
         }
 
@@ -13712,6 +13823,16 @@ namespace SundayLastBreath.UI
 
             if (ES3.KeyExists("hub_barricade_pushed", file)) barricade_pushed = ES3.Load<bool>("hub_barricade_pushed", file);
 
+            if (ES3.KeyExists("hub_barricade_inspected", file)) barricade_inspected = ES3.Load<bool>("hub_barricade_inspected", file);
+
+            if (ES3.KeyExists("hub_stair_3f_door_checked", file)) stair_3f_door_checked = ES3.Load<bool>("hub_stair_3f_door_checked", file);
+
+            if (ES3.KeyExists("hub_stair_listened_2f_door", file)) stair_listened_2f_door = ES3.Load<bool>("hub_stair_listened_2f_door", file);
+
+            if (ES3.KeyExists("hub_stair_noise_made", file)) stair_noise_made = ES3.Load<bool>("hub_stair_noise_made", file);
+
+            if (ES3.KeyExists("hub_stair_hum_deducted", file)) stair_hum_deducted = ES3.Load<bool>("hub_stair_hum_deducted", file);
+
 
 
             phoneVisited = ES3.KeyExists("hub_phone_visited", file) ? ES3.Load<bool>("hub_phone_visited", file) : false;
@@ -13793,6 +13914,22 @@ namespace SundayLastBreath.UI
             }
 
             RefreshStoryLogUI();
+
+            SyncLastAutoLoggedSituationFromLogs();
+
+            _visitedLocationAnchors.Clear();
+            _returnVariantIndices.Clear();
+            if (ES3.KeyExists("hub_visited_anchors", file))
+            {
+                var loadedAnchors = ES3.Load<List<string>>("hub_visited_anchors", file);
+                if (loadedAnchors != null)
+                {
+                    foreach (string a in loadedAnchors)
+                    {
+                        if (!string.IsNullOrEmpty(a)) _visitedLocationAnchors.Add(a);
+                    }
+                }
+            }
 
         }
 
@@ -14330,7 +14467,13 @@ namespace SundayLastBreath.UI
 
 
 
-                    SetSituationNarration("The door to your apartment clicks shut behind you, sealing away the only safe place you have left.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> The emergency lights above are failing, casting long, twitching shadows across the cheap carpet. It's too quiet here, making every distant scream outside echo through the vents. To your right is your unit (407). Directly opposite is <b>Unit 406 (Professor Harmon)</b>.");
+                    ShowLocationAnchor(
+                        "hallway_1",
+                        "The door clicks shut behind you, locking you out of the only place you felt safe.\n\n<color=#93C5FD><b>UPPER HALLWAY.</b></color> One of the emergency bulbs overhead is buzzing and blinking on and off. The air feels still, so every siren outside comes through the hallway vents. Your unit (407) is to your right. Across the carpet is <b>Unit 406 (Professor Harmon)</b>.",
+                        "<color=#93C5FD><b>UPPER HALLWAY.</b></color> Back at the north end of the 4th floor. The ceiling bulb still buzzes weakly over the carpet between your locked door (407) and Unit 406.",
+                        $"<color=#93C5FD><b>UPPER HALLWAY.</b></color> Your front door (407) stays latched tight. Across the hall, Harmon's apartment (406) {(room406_opened ? "stands unlocked in the dark." : "still glows faintly at its blue keypad.")}",
+                        "<color=#93C5FD><b>UPPER HALLWAY.</b></color> Dust hangs still under the blinking bulb while distant street sirens echo softly down through the hallway vents."
+                    );
 
 
 
@@ -14346,7 +14489,7 @@ namespace SundayLastBreath.UI
 
                     SetHallwayChoice(choiceIdx++, "EXAMINE UNIT 407 (YOUR DOOR) <color=#9CA3AF>— Your apartment door. Locked tight behind you.</color>", () => InspectUnit407Exterior());
 
-                    SetHallwayChoice(choiceIdx++, "▼ ADVANCE DOWN THE HALL <color=#9CA3AF>— Walk south toward Units 404 & 405.</color>", () => AdvanceDownHall());
+                    SetHallwayChoice(choiceIdx++, "[ADVANCE] ADVANCE DOWN THE HALL <color=#9CA3AF>— Walk south toward Units 404 & 405.</color>", () => AdvanceDownHall());
 
                     break;
 
@@ -14364,13 +14507,19 @@ namespace SundayLastBreath.UI
 
                     string midHallAudio = spoke_to_mrs_gable
 
-                        ? "Across the hall, behind Mrs. Gable's door (404), Buster gives a quiet, reassured whine. Across from her, the reinforced door of <b>Unit 405 (Marcus)</b> stands silent."
+                        ? "Behind Mrs. Gable's door (404), Buster lets out a soft, calmer whine. Across from her, the reinforced door of <b>Unit 405 (Marcus)</b> isn't moving."
 
-                        : "You can hear Buster barking frantically from behind Mrs. Gable's door (404), his claws scratching against the wood. Across the hall, the reinforced door of <b>Unit 405 (Marcus)</b> stands silent.";
+                        : "Behind Mrs. Gable's door (404), Buster is barking nonstop and scratching at the bottom wood. Across from her, the reinforced door of <b>Unit 405 (Marcus)</b> sits slightly open.";
 
 
 
-                    SetSituationNarration($"<color=#93C5FD><b>MID-HALLWAY.</b></color> Dust motes dance in the flickering light. {midHallAudio} The air here smells faintly of gunpowder.");
+                    ShowLocationAnchor(
+                        "hallway_2",
+                        $"<color=#93C5FD><b>MID-HALLWAY.</b></color> The hallway light here barely holds steady. {midHallAudio} There's a faint smell of gun oil and burnt powder in the air.",
+                        $"<color=#93C5FD><b>MID-HALLWAY.</b></color> You step back into the middle stretch of the hall. {(spoke_to_mrs_gable ? "Mrs. Gable's apartment (404) stays quiet apart from Buster breathing behind the door." : "Buster is still barking and scratching behind Unit 404.")}",
+                        $"<color=#93C5FD><b>MID-HALLWAY.</b></color> Under the uneven hallway light, {(room405_opened ? "Marcus's reinforced door (405) sits unlocked." : "Marcus's heavy steel door (405) remains cracked a fraction of an inch.")} The sharp scent of gun oil still hangs here.",
+                        "<color=#93C5FD><b>MID-HALLWAY.</b></color> Nothing moved in this stretch of the corridor while you were gone—just buzzing wiring and faint sirens through the vents."
+                    );
 
 
 
@@ -14404,9 +14553,9 @@ namespace SundayLastBreath.UI
 
                     SetHallwayChoice(choiceIdx++, unit404Label, () => InspectUnit404());
 
-                    SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Upper Hallway & Unit 407.</color>", () => RetreatUpHall());
+                    SetHallwayChoice(choiceIdx++, "[RETREAT] RETREAT UP THE HALL <color=#9CA3AF>— Back toward Upper Hallway & Unit 407.</color>", () => RetreatUpHall());
 
-                    SetHallwayChoice(choiceIdx++, "▼ ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Lower Hallway.</color>", () => AdvanceDownHall());
+                    SetHallwayChoice(choiceIdx++, "[ADVANCE] ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Lower Hallway.</color>", () => AdvanceDownHall());
 
                     break;
 
@@ -14426,7 +14575,13 @@ namespace SundayLastBreath.UI
 
 
 
-                    SetSituationNarration($"<color=#93C5FD><b>LOWER HALLWAY.</b></color> The lights are completely dead in this section. The faint smell of bleach drifts through the darkness. Soft classical music plays from behind the chained door of <b>Unit 402 (The Andersons)</b>. Across from it is <b>Unit 403 (Sarah)</b>, pitch black and silent.{lowerHallAudioWarning}");
+                    ShowLocationAnchor(
+                        "hallway_3",
+                        $"<color=#93C5FD><b>LOWER HALLWAY.</b></color> The ceiling lights here are completely dead. A sharp smell of bleach drifts out from under one of the doors. Soft classical piano is playing behind the chained door of <b>Unit 402 (The Andersons)</b>. Across the hall, <b>Unit 403 (Sarah)</b> is dark and quiet.{lowerHallAudioWarning}",
+                        $"<color=#93C5FD><b>LOWER HALLWAY.</b></color> Back in the dark stretch between Units 402 and 403. Slow piano notes still drift softly under the Andersons' doorframe.{lowerHallAudioWarning}",
+                        $"<color=#93C5FD><b>LOWER HALLWAY.</b></color> A chemical bleach smell still bites the back of your throat. {(room402_opened ? "Unit 402's door sits unchained." : "Unit 402 remains held on its chain, while Sarah's door (403) stays dark.")}",
+                        "<color=#93C5FD><b>LOWER HALLWAY.</b></color> Dead overhead fixtures leave this corner in near darkness. Only the piano record in 402 breaks the stillness."
+                    );
 
 
 
@@ -14450,9 +14605,9 @@ namespace SundayLastBreath.UI
 
                     SetHallwayChoice(choiceIdx++, "CHECK UNIT 403 <color=#9CA3AF>— Sarah's apartment. Deadbolted from the outside; dark inside.</color>", () => InspectUnit403());
 
-                    SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Mid-Hallway.</color>", () => RetreatUpHall());
+                    SetHallwayChoice(choiceIdx++, "[RETREAT] RETREAT UP THE HALL <color=#9CA3AF>— Back toward Mid-Hallway.</color>", () => RetreatUpHall());
 
-                    SetHallwayChoice(choiceIdx++, "▼ ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Hallway End.</color>", () => AdvanceDownHall());
+                    SetHallwayChoice(choiceIdx++, "[ADVANCE] ADVANCE DOWN THE HALL <color=#9CA3AF>— Proceed south toward Hallway End.</color>", () => AdvanceDownHall());
 
                     break;
 
@@ -14470,13 +14625,19 @@ namespace SundayLastBreath.UI
 
                     string hall4NoiseText = turned_off_music
 
-                        ? "<b>Unit 401 (The College Students)</b> is dark and completely silent now that the stereo is shut down. A heavy, oppressive stillness hangs over the corridor."
+                        ? "<b>Unit 401 (The College Students)</b> is finally quiet with the stereo shut off, leaving the end of the hall dead silent."
 
-                        : "From <b>Unit 401 (The College Students)</b>, loud pop music thumps through the wood, completely masking the sounds of the street below.";
+                        : "From <b>Unit 401 (The College Students)</b>, loud pop music thumps right through the wood, drowning out everything else.";
 
 
 
-                    SetSituationNarration($"<color=#93C5FD><b>HALLWAY END.</b></color> The corridor terminates at the heavy fire doors leading to the stairwell. Bloody handprints smear the glass viewing pane. {hall4NoiseText} To your left is Carl's <b>Utility Closet</b>.");
+                    ShowLocationAnchor(
+                        "hallway_4",
+                        $"<color=#93C5FD><b>HALLWAY END.</b></color> The hall ends at the heavy red fire doors to the stairwell. Dried bloody handprints smear the small glass window on the door. {hall4NoiseText} To your left is Carl's <b>Utility Closet</b>.",
+                        $"<color=#93C5FD><b>HALLWAY END.</b></color> You step back up by the red stairwell doors. {(turned_off_music ? "With Unit 401's stereo shut off, the end of the floor is dead silent." : "Loud pop music is still thumping through Unit 401's open doorway.")}",
+                        $"<color=#93C5FD><b>HALLWAY END.</b></color> Smeared handprints still mark the stairwell window glass. {(utility_opened ? "Carl's maintenance door stands unlatched on your left." : "To your left, the maintenance mag-lock hums steadily.")}",
+                        "<color=#93C5FD><b>HALLWAY END.</b></color> Worn hall carpet meets bare concrete in front of the stairwell frame and service closet."
+                    );
 
 
 
@@ -14574,7 +14735,7 @@ namespace SundayLastBreath.UI
 
                     }, true, new Color(0.95f, 0.25f, 0.25f));
 
-                    SetHallwayChoice(choiceIdx++, "▲ RETREAT UP THE HALL <color=#9CA3AF>— Back toward Lower Hallway.</color>", () => RetreatUpHall());
+                    SetHallwayChoice(choiceIdx++, "[RETREAT] RETREAT UP THE HALL <color=#9CA3AF>— Back toward Lower Hallway.</color>", () => RetreatUpHall());
 
                     break;
 
@@ -14654,7 +14815,12 @@ namespace SundayLastBreath.UI
 
 
 
-            SetSituationNarration("You grip the brass handle of Unit 407 and give it a firm twist. It doesn't budge.\n\n<color=#EF4444><b>*RATTLE-CLACK*</b></color>\n\nThe heavy deadbolt engaged automatically when the door clicked shut behind you. You left your keys on the counter inside during the rush to pack. There is no going back inside without kicking the frame down or making a racket that would alert every infected on this floor.\n\nYour apartment is sealed. Your only way is forward.");
+            ShowLocationAnchor(
+                "ext_407",
+                "You grab the brass knob of Unit 407 and twist. It doesn't budge.\n\n<color=#EF4444><b>*CLACK*</b></color>\n\nThe deadbolt snapped back into place when the door shut behind you, and your key only works that latch from the inside—trying to kick your own door in now would bring whatever's downstairs straight up here.\n\nNo going back inside. The only way is down the hall.",
+                "You test the brass knob of Unit 407 again. Locked deadbolt-tight—your apartment key only turns that latch from the inside.",
+                "Still shut solid. No getting back into 407 without tearing the frame apart."
+            );
 
 
 
@@ -14728,11 +14894,16 @@ namespace SundayLastBreath.UI
 
 
 
-                string noteProse = "Taped above the scanner is a yellow index card in his spidery, precise handwriting: <i>\"If you're still on this floor, I posted my door PIN on the community feed before leaving. Take the research notes and get out before dawn.\"</i>";
+                string noteProse = "Taped above the keypad is a yellow index card in his neat, cramped handwriting: <i>\"If you're still on this floor, I posted my door code on the building feed before heading out. Grab what you need from the desk and get out before morning.\"</i>";
 
 
 
-                SetSituationNarration($"Professor Harmon taught behavioral sociology at the university. He spent years analyzing how quickly civil infrastructure crumbles during systemic shocks.\n\nHis door is sealed with a commercial electronic keypad, its blue LED digits glowing faintly in the dim corridor. Four blank digits. Waiting.\n\n{noteProse}{lockoutMsg}");
+                ShowLocationAnchor(
+                    "ext_406",
+                    $"Professor Harmon taught sociology at the university—mostly on how cities hold together when things fall apart. His door is locked with a commercial keypad, the blue digits glowing faintly in the dark hall. Four blank digits. Waiting.\n\n{noteProse}{lockoutMsg}",
+                    $"You step back up to Harmon's door. Blue keypad numbers glow quietly in the dark hall.{lockoutMsg}",
+                    $"Unit 406's yellow index card still hangs taped above the keypad. Four blank digits wait for a code.{lockoutMsg}"
+                );
 
 
 
@@ -14753,7 +14924,7 @@ namespace SundayLastBreath.UI
 
                 bool hasLocksmith = currentPlayer != null && currentPlayer.HasTrait("LOCKSMITH");
 
-                bool hasTech3 = currentPlayer != null && currentPlayer.tech >= 3;
+                bool hasTech2 = currentPlayer != null && currentPlayer.tech >= 2;
 
                 bool hasMultiTool = currentPlayer != null && currentPlayer.HasItem("Multi-Tool");
 
@@ -14833,15 +15004,15 @@ namespace SundayLastBreath.UI
 
 
 
-                // 2. Tech 3 Knowledge
+                // 2. Tech 2 Knowledge
 
                 AddModularChoice(
 
                     ref choiceIdx,
 
-                    hasTech3,
+                    hasTech2,
 
-                    "[TECH 3]",
+                    "[TECH 2]",
 
                     "Bypass keypad circuit board",
 
@@ -14849,7 +15020,7 @@ namespace SundayLastBreath.UI
 
                     () => OpenUnit406Door(),
 
-                    $"Requires Tech 3 (You have {currentPlayer?.tech ?? 0}) — You lack knowledge of circuit bypasses"
+                    $"Requires Tech 2 (You have {currentPlayer?.tech ?? 0}) — You lack knowledge of circuit bypasses"
 
                 );
 
@@ -14971,16 +15142,18 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetSituationNarration($"{roomAnchor}\n\n{actionNarration}{completionNotice}");
+                    SetSituationNarration($"{actionNarration}{completionNotice}");
 
                 }
 
                 else
-
                 {
-
-                    SetSituationNarration($"The heavy door swings open into darkness. The smell reaches you first: old paper, dust, and peppermint. Drawers are pulled open; his heavy coat and hiking backpack are gone.\n\n{roomAnchor}{completionNotice}");
-
+                    ShowLocationAnchor(
+                        "int_406",
+                        $"The door swings open into darkness. The smell hits first: old paper, dust, and peppermint. Desk drawers hang open, and his heavy coat and hiking pack are gone.\n\n{roomAnchor}{completionNotice}",
+                        $"You step back into Harmon's dark study. Tall bookshelves still smell faintly of dust and peppermint.{completionNotice}",
+                        $"Back inside Unit 406. His reading glasses still sit on <i>The Fall of Rome</i> across the desk.{completionNotice}"
+                    );
                 }
 
 
@@ -14989,13 +15162,13 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, "[STUDY] Skim 'Advanced Mechanics' notes <color=#10B981>[TECH +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[STUDY] Skim 'Advanced Mechanics' notes <color=#10B981>[TECH +1]</color> <color=#9CA3AF>(~10 min)</color>", () =>
 
                     {
 
                         studied_406_mechanics = true;
 
-                        gameClock?.AddTime(20);
+                        gameClock?.AddTime(10);
 
                         if (currentPlayer != null) currentPlayer.tech += 1;
 
@@ -15003,7 +15176,7 @@ namespace SundayLastBreath.UI
 
                         RefreshAllPDAPanels();
 
-                        InspectUnit406("<color=#10B981>[TECH +1]</color> You pull an engineering manual off the shelf and skim the bookmarked pages. Harmon left detailed handwritten diagrams on hotwiring starter relays and bypassing electronic latches. You memorize the core principles, slide the book back into its slot, and walk back to the middle of the room.");
+                        InspectUnit406("<color=#10B981>[TECH +1]</color> You pull a worn repair manual off the shelf and flip to the bookmarked pages. Harmon sketched clear wiring notes in the margins—starter relays, basic door latches, and how to jump them without frying the board. You memorize the basics, slide the book back into place, and step back into the room.");
 
                     });
 
@@ -15015,13 +15188,13 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, "[STUDY] Skim 'Gray's Anatomy' notes <color=#10B981>[MEDICINE +1]</color> <color=#9CA3AF>(~20 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[STUDY] Skim 'Gray's Anatomy' notes <color=#10B981>[MEDICINE +1]</color> <color=#9CA3AF>(~10 min)</color>", () =>
 
                     {
 
                         studied_406_anatomy = true;
 
-                        gameClock?.AddTime(20);
+                        gameClock?.AddTime(10);
 
                         if (currentPlayer != null) currentPlayer.medicine += 1;
 
@@ -15029,7 +15202,7 @@ namespace SundayLastBreath.UI
 
                         RefreshAllPDAPanels();
 
-                        InspectUnit406("<color=#10B981>[MEDICINE +1]</color> You approach the medical shelf and pull down a dog-eared anatomy volume. Harmon underlined in red: <color=#94A3B8>\"Pathogen bypasses pain receptors. Severe trauma to limbs impairs mobility, but only direct brainstem destruction terminates motor function.\"</color> You commit the target zones to memory, slip the book back onto the shelf, and return to the center of the study.");
+                        InspectUnit406("<color=#10B981>[MEDICINE +1]</color> You pull a dog-eared anatomy textbook off the shelf. Under a bookmarked page, Harmon underlined one note twice in red pen: <color=#94A3B8>\"People coming into the ER weren't slowing down from broken ribs or blood loss. Only hard trauma to the upper neck or skull put them down.\"</color> You lock the note into memory, put the book back, and step back to the middle of the room.");
 
                     });
 
@@ -15041,7 +15214,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, "[LORE] Read personal journal <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~10 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[NOTE] Read personal journal <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~10 min)</color>", () =>
 
                     {
 
@@ -15051,15 +15224,13 @@ namespace SundayLastBreath.UI
 
                         if (currentPlayer != null) currentPlayer.per += 1;
 
-                        loreSystem?.AddLore("Professor Harmon's Journal", "His handwriting degrades into a frantic scrawl toward the end. He documented unmarked FEMA transports operating at night and the CDC's total blackout protocols: 'The state lies because panic moves faster than infection. But cognitive dissonance is the real plague.'", gameClock?.GetTimeString() ?? "00:15");
-
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:15", "UNIT 406 // HARMON'S JOURNAL", "Read Professor Harmon's field notes on the collapse. Gained +1 Perception.");
+                        loreSystem?.AddLore("Professor Harmon's Journal", "His handwriting gets messier near the back. By 22:30 he was jotting down police scanner chatter and rumors from his doctor friends: 'Half the downtown ERs stopped answering calls at nine. City hall keeps telling reporters it's a bad flu strain and bad shellfish, while patrol cars are shutting down the on-ramps. Nobody at the top is telling the same story.'", gameClock?.GetTimeString() ?? "00:15");
 
                         PlayClickSFX();
 
                         RefreshAllPDAPanels();
 
-                        InspectUnit406("<color=#10B981>[PERCEPTION +1]</color> You step over to the mahogany desk and open his leather journal. The final entry from 22:30 is a frantic scrawl: <color=#94A3B8>\"The city isn't under quarantine—it's under containment. Transports left at dusk empty. They're going to purge this sector. If you can read this, do not wait for morning.\"</color> You close the cover and step back to the middle of the room.");
+                        InspectUnit406("<color=#10B981>[PERCEPTION +1]</color> You walk over to the mahogany desk and open his leather notebook. The last entry, timed at 22:30, is scribbled fast across the lined paper:\n\n<color=#94A3B8>\"Two nurses I know downtown stopped answering at nine. Evening news called it a bad flu and contaminated water, while the police scanner is calling for roadblocks on I-5. Whatever started tonight, nobody's getting the same story twice. Don't wait until morning to get out.\"</color>\n\nYou close the cover and step back into the middle of the room.");
 
                     });
 
@@ -15209,7 +15380,12 @@ namespace SundayLastBreath.UI
 
 
 
-                SetSituationNarration($"This is Marcus's apartment. The quiet veteran down the hall spent every weekend tuning hunting gear and reinforcing his doorframes. His heavy steel door sits unlocked, cracked open by a fraction of an inch. The sharp scent of gun oil and cordite leaks into the corridor.\n\nYou push the door gently with one knuckle. It catches after half an inch with a dry metallic clink. Angling your flashlight through the seam reveals a thin monofilament line tied from the interior handle to the safety pin of an ordnance canister and a shotgun blank clamped to a pipe. Forcing this open will detonate both at point-blank range and alert everything on this floor.{trapStatus}");
+                ShowLocationAnchor(
+                    "ext_405",
+                    $"This is Marcus's apartment. The quiet veteran down the hall spent his weekends cleaning hunting gear and reinforcing his doorframes. His heavy steel door isn't latched—it sits cracked open by a fraction of an inch, leaking the sharp smell of gun oil and burnt powder into the hall.\n\nYou nudge the door gently with one knuckle. It catches after half an inch with a small metallic click. Angling your flashlight through the gap shows a thin fishing line tied from the inside handle to a pull-pin canister and a shotgun blank clamped to a pipe. Shoving this open will set both off in your face and draw everything on this floor.{trapStatus}",
+                    $"Marcus's reinforced steel door still sits open a fraction of an inch. Gun oil and burnt powder hang sharp in the hall.{trapStatus}",
+                    $"Back at Unit 405's threshold. Through the narrow crack, the taut fishing line still waits behind the handle.{trapStatus}"
+                );
 
 
 
@@ -15377,13 +15553,13 @@ namespace SundayLastBreath.UI
 
                 string completionNotice = all405Done
 
-                    ? "\n\n<color=#EF4444>You have taken what Marcus left behind. By the corner of the open vault, a small wooden toy car sits forgotten in the carpet. His family is waiting at Oakhaven for someone who will never come home.</color>"
+                    ? "\n\n<color=#EF4444>You've taken everything useful Marcus left behind. Near the corner of the open safe, a small wooden toy car sits on the carpet. His family is waiting at Oakhaven for someone who isn't coming back.</color>"
 
                     : "";
 
 
 
-                string roomAnchor = "A makeshift bunker in the middle of a residential complex. A heavy timber reloading bench sits against the far wall, its surface dusted with fine gunpowder and spent brass casings. In the corner, an industrial gun safe stands with its vault door swung wide, rifle racks stripped bare. On the wall beside a silent ham radio, a county map marks backcountry trails toward Oakhaven Cabin.";
+                string roomAnchor = "The apartment looks half-turned into a bunker. A heavy timber reloading bench sits against the far wall, dusted with loose powder and spent brass. In the corner, a big gun safe stands wide open with the rifle racks empty. On the wall beside a dead ham radio, a county map has backcountry trails circled toward Oakhaven Cabin.";
 
 
 
@@ -15391,24 +15567,22 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetSituationNarration($"{roomAnchor}\n\n{actionNarration}{completionNotice}");
+                    SetSituationNarration($"{actionNarration}{completionNotice}");
 
                 }
 
                 else
-
                 {
-
                     string entranceText = room405_trap_triggered
+                        ? "You stumble through the scorched doorway, blinking through the ringing in your ears. The air inside tastes like burnt sulfur, oil, and smoke."
+                        : "You slip past the disarmed door and ease the heavy steel shut behind you. The air inside smells strongly of machine oil, graphite, and gunpowder.";
 
-                        ? "You stumble through the scorched doorway, blinking away the flashbang afterglow. The air inside smells of burnt sulfur, machine oil, and cordite."
-
-                        : "You slip through the cleared doorway and ease the heavy steel door behind you. The air inside smells intensely of machine oil, graphite, and gunpowder.";
-
-
-
-                    SetSituationNarration($"{entranceText}\n\n{roomAnchor}{completionNotice}");
-
+                    ShowLocationAnchor(
+                        "int_405",
+                        $"{entranceText}\n\n{roomAnchor}{completionNotice}",
+                        $"You step back into Marcus's apartment. {(room405_trap_triggered ? "Smoke haze and spent brass still hang bitter in the dark." : "The open gun safe and reloading bench wait along the far wall.")}{completionNotice}",
+                        $"Back inside Unit 405. Beside the dead ham radio, the county map with trails toward Oakhaven still hangs pinned to the wall.{completionNotice}"
+                    );
                 }
 
 
@@ -15417,7 +15591,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, "[LORE] Read notepad by the radio <color=#EF4444>[LORE]</color> <color=#9CA3AF>(~5 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[NOTE] Read notepad by the radio <color=#F59E0B>[CLUE]</color> <color=#9CA3AF>(~5 min)</color>", () =>
 
                     {
 
@@ -15427,13 +15601,11 @@ namespace SundayLastBreath.UI
 
                         loreSystem?.AddLore("Marcus's Final Log", "Marcus emptied his safe and rigged the door to stop looters. However, he was bitten on the stairwell before he could leave. Refusing to bring the infection to his family at Oakhaven Cabin, he chose to wander into the city to die alone.", gameClock?.GetTimeString() ?? "00:20");
 
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:20", "UNIT 405 // MARCUS'S LOG", "Read Marcus's tragic goodbye letter. He was bitten on the stairwell and chose to die alone outside to protect his family at Oakhaven Cabin.");
-
                         PlayClickSFX();
 
                         RefreshAllPDAPanels();
 
-                        InspectUnit405("<color=#EF4444>[LORE RECORDED]</color> You walk over to the communications desk. A grease pencil note is pinned beneath the dead ham radio microphone. The scrawled handwriting shakes near the bottom:\n\n<color=#94A3B8>\"Diane... Emptied the safe and rigged the door. But on the stairs, one bit my forearm. It burns like battery acid. I will not bring this to Oakhaven. I will not bring this to you and the boys. I am going outside to pull them away from the entrance. I love you.\"</color>\n\nYou set the microphone down, stare at the route coordinates for a quiet moment, and walk back to the middle of the room.");
+                        InspectUnit405("<color=#F59E0B>[NOTE RECORDED]</color> You walk over to the radio desk. A grease-pencil note is pinned under the dead microphone, the handwriting shaking near the bottom:\n\n<color=#94A3B8>\"Diane... Emptied the safe and rigged the door. But on the stairs, one bit my forearm. Feels like battery acid in my veins. I won't bring this to Oakhaven. I won't bring it near you and the boys. Going outside to pull them away from the front doors. I love you.\"</color>\n\nYou set the mic down, look at the circled map coordinates for a quiet second, and step back to the middle of the room.");
 
                     });
 
@@ -15456,8 +15628,6 @@ namespace SundayLastBreath.UI
                         GiveOrDropItem("9mm Ammo", 12);
 
                         GiveOrDropItem("Scrap Metal", 3);
-
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:20", "UNIT 405 // AMMUNITION FOUND", "Recovered twelve rounds of 9mm ammunition and three pieces of scrap metal from the reloading bench.");
 
                         PlayClickSFX();
 
@@ -15531,7 +15701,7 @@ namespace SundayLastBreath.UI
 
 
 
-            string unit404Anchor = "The painted wood door of Unit 404. From deep within the apartment comes the dull, heavy scrape of furniture legs wedged hard against the floorboards. Buster's paws pace the hallway runner, his breath hitching audibly through the lower draft seal.";
+            string unit404Anchor = "The painted wood door of Unit 404. From inside comes the dull scrape of heavy furniture wedged against the floorboards. You can hear Buster pacing right behind the door, panting through the gap at the bottom.";
 
 
 
@@ -15539,32 +15709,32 @@ namespace SundayLastBreath.UI
 
             {
 
-                SetSituationNarration($"{unit404Anchor}\n\n{actionNarration}");
+                SetSituationNarration(actionNarration);
 
             }
 
             else
-
             {
-
                 if (spoke_to_mrs_gable)
-
                 {
-
-                    SetSituationNarration($"{unit404Anchor}\n\nThe door remains firmly deadbolted. Buster gives a soft, rhythmic huff from the hallway runner, and the distant hum of a radio provides gentle background noise. Mrs. Gable is safe behind her oak dresser.");
-
+                    ShowLocationAnchor(
+                        "ext_404",
+                        $"{unit404Anchor}\n\nThe door is still deadbolted tight. Buster lets out a soft puff of breath from the entryway rug, and a radio murmurs low inside. Mrs. Gable is staying put behind her oak dresser.",
+                        "You pause outside Unit 404. Inside, Buster pants softly by the draft stopper while a radio murmurs low behind her barricaded dresser.",
+                        "Unit 404's door stays wedged shut from the inside. Everything remains quiet behind Mrs. Gable's barricade."
+                    );
                 }
-
                 else
-
                 {
+                    string entranceText = "Before you can even knock, sharp barking breaks out inside, followed by claws scrabbling against the wood.\n\nFrom the dark entryway, an old, shaking voice calls through the deadbolt:\n\n\"Who's out there? Stay back! Buster, heel!\"\n\nBehind the lock, the heavy groan of wood scraping across hardwood tells you she shoved a dresser against it. She's scared, and she's not opening that door for anyone.";
 
-                    string entranceText = "Before your knuckles can tap the veneer, frantic barking erupts from within, followed by claws scrabbling hard against the bottom molding.\n\nFrom the entryway darkness, an elderly, shaking voice calls through the deadbolt:\n\n\"Who is out there? Stay back! Buster, heel!\"\n\nBehind the lock, the telltale groaning friction of a heavy oak dresser proves the door is jammed shut. She is terrified, but she has fortified herself completely.";
-
-                    SetSituationNarration($"{unit404Anchor}\n\n{entranceText}");
-
+                    ShowLocationAnchor(
+                        "ext_404",
+                        $"{unit404Anchor}\n\n{entranceText}",
+                        "Buster starts barking again the moment your boots touch the mat outside 404. Mrs. Gable stays silent behind the deadbolt.",
+                        "Wood scrapes faintly against floorboards inside 404 while the dog paces just behind the entryway."
+                    );
                 }
-
             }
 
 
@@ -15583,8 +15753,6 @@ namespace SundayLastBreath.UI
 
                     if (currentPlayer != null) currentPlayer.humanity = Mathf.Min(100, currentPlayer.humanity + 5);
 
-                    AppendStoryLog(gameClock?.GetTimeString() ?? "00:15", "UNIT 404 // MRS. GABLE", "Spoke through the door to soothe Mrs. Gable. She is securely barricaded with Buster. Reassured her and moved on.");
-
                     PlayClickSFX();
 
                     PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/SwitchLight2.wav", 0.75f);
@@ -15593,7 +15761,7 @@ namespace SundayLastBreath.UI
 
                     RefreshAllPDAPanels();
 
-                    InspectUnit404("<color=#10B981>[HUMANITY +5]</color> You step close to the doorframe, pressing your mouth near the lock seam, keeping your voice low and calm.\n\n\"Mrs. Gable, it's your neighbor from 407. Don't open the door. Keep the dresser wedged tight and stay away from the windows until morning.\"\n\nA tense pause settles across the hall. The frantic scratching ceases, replaced by Buster's soft, muffled whimper beneath the draft stopper. Her shaking voice steadies behind the wood:\n\n\"Thank God it is you, dear. Be careful out there.\"\n\nYou step back into the middle of the corridor, leaving her sanctuary intact.");
+                    InspectUnit404("<color=#10B981>[HUMANITY +5]</color> You lean close to the doorframe, keeping your voice low and steady near the lock.\n\n\"Mrs. Gable, it's me from 407. Don't open the door. Keep that dresser wedged tight and stay away from the windows tonight.\"\n\nThe hallway goes quiet for a beat. The scratching stops, replaced by Buster's soft whimper under the draft stopper. Her shaky voice steadies behind the wood:\n\n\"Thank God it's you, dear. Be careful out there.\"\n\nYou step back into the hall and leave her door alone.");
 
                 });
 
@@ -15631,7 +15799,12 @@ namespace SundayLastBreath.UI
 
 
 
-            SetSituationNarration("You test the brass lever handle of Unit 403. It holds rigid against the deadbolt, locked tight from the outside with a clean key turn.\n\nBeside the dark threshold sits a modest shoe rack holding indoor slippers, its lower shelf for running shoes empty. A Swedish Medical Center dispatch slip is clipped beneath the door knocker, stamped with an emergency 19:00 intake order.\n\nSarah left for her trauma ward shift hours before midnight. Early news reports showed the downtown hospital district was cordoned off by armed checkpoints when the wards were overwhelmed. The peephole is pitch black, and there is no sound from within. Nobody is home.");
+            ShowLocationAnchor(
+                "ext_403",
+                "You try the brass handle of Unit 403. It doesn't budge—deadbolted from the outside with a clean key turn.\n\nBy the mat sits a small shoe rack with house slippers still lined up, the spot for her running shoes empty. A Swedish Medical Center call-in slip is tucked under the knocker, stamped for a 19:00 emergency shift.\n\nSarah left for the hospital hours before midnight. The local news clips on your phone showed police blocking off the streets around the downtown ERs once the waiting rooms overflowed. The peephole is pitch black, and there's no sound inside. Nobody's home.",
+                "Unit 403 stays locked from the outside. Sarah's ER call-in slip still hangs tucked under the knocker.",
+                "Still nothing behind Sarah's peephole—just house slippers lined neatly beside the empty spot for her shoes."
+            );
 
 
 
@@ -15725,7 +15898,12 @@ namespace SundayLastBreath.UI
 
 
 
-                SetSituationNarration("The Andersons' apartment. The polite family from down the hall whose teenage daughter Emma always practiced classical piano on Sunday mornings. The front door is unlocked. You push it open two inches before a heavy steel chain catches against the doorjamb casing.\n\nThrough the narrow vertical gap, warm incandescent light spills into the corridor. In the living room corner, a turntable needle traces spinning black vinyl, filling the apartment with a slow, mournful piano nocturne. Along with the music drifts an acrid chemical stench—heavy household bleach, as if the entire floor was scrubbed spotless.");
+                ShowLocationAnchor(
+                    "ext_402",
+                    "The Andersons' place—the quiet family down the hall whose daughter Emma always practiced piano on Sunday mornings. The front door isn't locked. You push it open two inches before a heavy steel chain pulls tight against the frame.\n\nThrough the narrow crack, warm lamp light spills into the hall. Inside, a record player needle rides spinning black vinyl, sending a slow, sad piano piece drifting under the door. Mixing with the music is a sharp chemical smell—heavy household bleach, like someone scrubbed the whole floor tonight.",
+                    "You step back up to Unit 402's cracked doorway. Soft piano notes still drift out over the sharp smell of bleach.",
+                    "The heavy steel chain still holds Unit 402 two inches ajar against warm lamplight."
+                );
 
 
 
@@ -15801,7 +15979,7 @@ namespace SundayLastBreath.UI
 
                     "Unscrew the mounting bracket cleanly",
 
-                    5, 9,
+                    5, 3,
 
                     () => OpenUnit402Door("silent"),
 
@@ -15917,7 +16095,7 @@ namespace SundayLastBreath.UI
 
 
 
-                string unit402Anchor = "An immaculate apartment bathed in warm amber lamplight. On the sideboard, a turntable needle glides over spinning black vinyl, filling the room with a mournful piano nocturne. At the polished dining table, Mr. and Mrs. Anderson and their teenage daughter Emma sit upright in wooden chairs, dressed in Sunday clothes, heads resting against each other. Three crystal wine glasses sit on the table, their rims coated with fine white powder sediment.";
+                string unit402Anchor = "A spotless apartment lit by warm table lamps. In the corner, the record player needle keeps spinning over black vinyl, filling the room with slow piano music. At the dining table, Mr. and Mrs. Anderson and their daughter Emma sit upright in wooden chairs, dressed in Sunday clothes, heads leaning together. Three wine glasses sit in front of them, fine white powder crusted around the rims.";
 
 
 
@@ -15935,24 +16113,22 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetSituationNarration($"{unit402Anchor}\n\n{actionNarration}{completionNotice}");
+                    SetSituationNarration($"{actionNarration}{completionNotice}");
 
                 }
 
                 else
-
                 {
+                    string entranceText = room402_entry_method == "loud"
+                        ? "You step in past the splintered frame. The smell of bleach stings your nose and throat. There's no blood, no struggle, nothing broken. A .38 revolver lies on the wood floor beside Mr. Anderson's dress shoe."
+                        : "You ease the door open and step into the quiet room. The smell of bleach stings your nose and throat. There's no blood, no struggle, nothing out of place. A .38 revolver lies on the wood floor beside Mr. Anderson's dress shoe.";
 
-                    string entranceText = room402_entry_method == "loud" 
-
-                        ? "You step inside through the splintered doorframe. The sharp sting of bleach burns your sinuses. There is no blood, no struggle, and no sign of violence. A .38 revolver rests on the parquet floor beside Mr. Anderson's wingtip shoe." 
-
-                        : "You ease the door open and step into the stillness. The sharp sting of bleach burns your sinuses. There is no blood, no struggle, and no sign of violence. A .38 revolver rests on the parquet floor beside Mr. Anderson's wingtip shoe.";
-
-
-
-                    SetSituationNarration($"{entranceText}\n\n{unit402Anchor}{completionNotice}");
-
+                    ShowLocationAnchor(
+                        "int_402",
+                        $"{entranceText}\n\n{unit402Anchor}{completionNotice}",
+                        $"You step back into the Andersons' quiet living room. The turntable still spins soft piano into the bleach-sharp air.{completionNotice}",
+                        $"Back inside Unit 402. Warm lamps still glow over the tidy dining table and silent hall.{completionNotice}"
+                    );
                 }
 
 
@@ -15989,7 +16165,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, "[LORE] Read suicide note on table <color=#10B981>[PERCEPTION +1]</color> <color=#9CA3AF>(~1 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[NOTE] Read suicide note on table <color=#38BDF8>[+15 XP]</color> <color=#9CA3AF>(~1 min)</color>", () =>
 
                     {
 
@@ -15997,17 +16173,15 @@ namespace SundayLastBreath.UI
 
                         gameClock?.AddTime(1);
 
-                        if (currentPlayer != null) currentPlayer.per += 1;
+                        currentPlayer?.GainXP(15);
 
-                        loreSystem?.AddLore("The Andersons' Note", "They killed themselves after hearing a fake radio broadcast claiming the military was gassing the building. Misinformation travels faster than the virus.", gameClock?.GetTimeString() ?? "00:25");
-
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:25", "UNIT 402 // ANDERSON SUICIDE NOTE", "Logged the Anderson suicide note. A grim reminder: fear kills just as fast as the infected.");
+                        loreSystem?.AddLore("The Andersons' Note", "They killed themselves after hearing a rumor on shortwave radio claiming the police were locking people in and pumping gas through the vents before sunrise.", gameClock?.GetTimeString() ?? "00:25");
 
                         PlayClickSFX();
 
                         RefreshAllPDAPanels();
 
-                        InspectUnit402("<color=#10B981>[PERCEPTION +1]</color> You step to the dining table and pick up the folded stationery resting between the crystal glasses. In neat cursive handwriting, Mr. Anderson wrote:\n\n<color=#94A3B8>The radio says the cordon failed and they are dropping chemical defoliants at dawn. We will not choke in the cellar like animals. God forgive us.</color>\n\nA rogue pirate broadcast spread panic faster than the pathogen. You lay the note back down and step back to the middle of the room.");
+                        InspectUnit402("<color=#38BDF8>[+15 XP]</color> You step up to the dining table and pick up a folded sheet of stationery between the glasses. In neat handwriting, Mr. Anderson wrote:\n\n<color=#94A3B8>The shortwave station says the police lost control of downtown and they're shutting the vents and gassing the blocks before sunrise. We won't choke in the dark like animals. God forgive us.</color>\n\nSomebody got on an open band and started spreading panic—and they believed every word. You set the paper back down and step away from the table.");
 
                     });
 
@@ -16119,7 +16293,7 @@ namespace SundayLastBreath.UI
 
                         RefreshAllPDAPanels();
 
-                        InspectUnit402("<color=#EF4444>[HUMANITY −10]</color> You approach Mrs. Anderson's chair. Her cold hand rests upon her daughter's palm. You gently slide the heavy gold wedding band from her ring finger. The metal is freezing against your skin. You pocket the ring with a dry throat, feeling an unmistakable piece of your humanity slip away, and walk back to the middle of the room.");
+                        InspectUnit402("<color=#EF4444>[HUMANITY −10]</color> You walk over to Mrs. Anderson's chair. Her cold hand rests over her daughter's fingers. You carefully slide the gold wedding band off her ring finger—the metal feels like ice against your thumb. You drop it into your pocket with a dry throat and step away from the table.");
 
                     });
 
@@ -16163,7 +16337,7 @@ namespace SundayLastBreath.UI
 
 
 
-                string liftAnchor = "The door is wide open. Inside, blaring pop music pulses relentlessly through a blown subwoofer. Crushed red cups and sticky liquor cover the hardwood floor.\n\nIn the living room, a solid three-hundred-pound oak entertainment center has toppled forward, pinning a young man face down against the floorboards. Deep gouge marks in the wood indicate a panicked stampede shoved the heavy unit over as crowds scrambled for the hallway. His right arm is thrown forward across the carpet, his fingers loosely curled around a set of Car Keys.";
+                string liftAnchor = "The door hangs wide open. Inside, loud pop music thumps out of a blown speaker. Crushed red plastic cups and spilled beer cover the hardwood floor.\n\nIn the middle of the living room, a heavy oak TV stand has pitched forward, pinning a young man face down against the boards. Deep gouge marks in the wood look like people shoved past it in a stampede for the front door. His right arm sticks out across the rug, fingers curled loosely around a set of Car Keys.";
 
 
 
@@ -16171,16 +16345,18 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetSituationNarration($"{liftAnchor}\n\n{actionNarration}");
+                    SetSituationNarration(actionNarration);
 
                 }
 
                 else
-
                 {
-
-                    SetSituationNarration(liftAnchor);
-
+                    ShowLocationAnchor(
+                        "ext_401",
+                        liftAnchor,
+                        $"You step back through Unit 401's open doorway. Crushed cups crunch underfoot around the tipped oak TV stand{(turned_off_music ? ", the room finally quiet." : " while pop music still rattles the floorboards.")}",
+                        "Back in the wrecked party apartment. The young man's hand still rests on the rug beside the Car Keys."
+                    );
                 }
 
 
@@ -16401,7 +16577,7 @@ namespace SundayLastBreath.UI
 
                             PlayClickSFX();
 
-                            InspectUnit401("<color=#F59E0B>Car keys secured.</color> With a desperate grunt, you throw your shoulder into the wood, rocking the heavy unit upright against the wall. You loosen the Hyundai car keys from his fingers and pocket them. The apartment is clear to search.");
+                            InspectUnit401("<color=#F59E0B>Car keys secured.</color> With a heavy grunt, you get your shoulder under the wood and shove the oak unit back up against the wall. You pry the Hyundai keys out of his stiff fingers and drop them in your pocket. The rest of the place is clear to search.");
 
                         }
 
@@ -16413,9 +16589,7 @@ namespace SundayLastBreath.UI
 
                             TakeDamage(15, "Oak shelf collapse on back");
 
-                            ExertStamina(25);
-
-                            InspectUnit401("<color=#EF4444><b>LIFT FAILED (-15 HP, -25 Stamina).</b></color> The oak shelf slipped from your sweaty grip and slammed back down with a dull crash. You severely strained your lower back and bruised your ribs.");
+                            InspectUnit401("<color=#EF4444><b>LIFT FAILED (-15 HP, -25 Stamina).</b></color> The oak unit slipped out of your sweaty hands and crashed right back down. You wrenched your lower back and bruised your ribs.");
 
                         }
 
@@ -16453,7 +16627,7 @@ namespace SundayLastBreath.UI
 
                 string completionNotice = all401Done
 
-                    ? "\n\n<color=#10B981>There is nothing left to scavenge. Only the dark, the crushed cups, and the heavy silence where the music once played. You ease back out to the corridor.</color>"
+                    ? "\n\n<color=#10B981>Nothing left to grab in here—just the dark, the crushed cups, and quiet where the stereo used to be. You head back toward the door.</color>"
 
                     : "";
 
@@ -16461,13 +16635,13 @@ namespace SundayLastBreath.UI
 
                 string musicState = turned_off_music
 
-                    ? "The stereo is dead and silent. A heavy, hollow stillness hangs over the wreckage."
+                    ? "The stereo is dead. With the bass gone, the room feels cramped and too quiet."
 
-                    : "The stereo console vibrates relentlessly, blasting a looped pop chorus through the apartment.";
+                    : "The stereo still vibrates on the table, blasting the same pop chorus over and over.";
 
 
 
-                string unit401Anchor = $"The aftermath of an interrupted party. Crushed plastic cups and shattered glass litter the stained carpet, and the heavy oak entertainment center rests braced against the wall beside the victim. {musicState}";
+                string unit401Anchor = $"The remains of a house party cut short. Crushed plastic cups and broken glass litter the sticky carpet, and the heavy oak TV stand sits propped against the wall beside the guy on the floor. {musicState}";
 
 
 
@@ -16475,18 +16649,20 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetSituationNarration($"{unit401Anchor}\n\n{actionNarration}{completionNotice}");
+                    SetSituationNarration($"{actionNarration}{completionNotice}");
 
                 }
 
                 else
-
                 {
+                    string entranceText = "The oak shelf is braced upright against the wall now, and the car keys are in your pocket. The room smells of stale beer, spilled soda, and sweat.";
 
-                    string entranceText = "The heavy oak shelf is propped against the wall. The car keys are secured in your pocket. The apartment smells of stale beer, spilled soda, and sudden panic.";
-
-                    SetSituationNarration($"{entranceText}\n\n{unit401Anchor}{completionNotice}");
-
+                    ShowLocationAnchor(
+                        "int_401",
+                        $"{entranceText}\n\n{unit401Anchor}{completionNotice}",
+                        $"Back inside Unit 401. The oak TV stand leans propped against the wall{(turned_off_music ? " in dead silence." : " under thumping speakers.")}{completionNotice}",
+                        $"You glance around the trashed party room again—crushed plastic cups, spilled beer, and open cupboards.{completionNotice}"
+                    );
                 }
 
 
@@ -16619,7 +16795,7 @@ namespace SundayLastBreath.UI
 
                         PlaySFX("Audio/SFX/static", 0.35f);
 
-                        InspectUnit401("<color=#38BDF8>Stereo silenced.</color> You cross to the audio console and strike the power rocker switch. The blaring pop vocals cut out with a dull pop, plunging the apartment into complete, suffocating silence. Without the wall of sound, the quiet scratching from the hallway and distant sirens outside feel dangerously close. You step back to the middle of the room.");
+                        InspectUnit401("<color=#38BDF8>Stereo turned off.</color> You walk over to the speaker console and hit the power switch. The pop song cuts out with a dull thump, leaving the apartment dead quiet. Without the noise covering it up, the faint scratching in the hall and the sirens outside sound a lot closer. You step back toward the middle of the room.");
 
                     });
 
@@ -16701,7 +16877,7 @@ namespace SundayLastBreath.UI
 
 
 
-                string exteriorAnchor = "At the cul-de-sac ending the residential corridor, the faded carpet gives way to bare concrete slab. Standing before you is a heavy industrial steel service door stenciled in chipped yellow enamel: <b>MAINTENANCE — AUTHORIZED PERSONNEL ONLY</b>.\n\nA commercial magnetic holding lock secures the frame, emitting a low electric hum. A harsh stench of concentrated bleach and the metallic copper tang of dried blood seeps past the bottom rubber seal, while an erratic fluorescent tube flickers rhythmically from inside.";
+                string exteriorAnchor = "At the dead end of the hall, the worn carpet stops at bare concrete. In front of you is a heavy steel service door with faded yellow stencil paint: <b>MAINTENANCE — AUTHORIZED PERSONNEL ONLY</b>.\n\nA commercial magnetic lock holds the frame shut with a low electric hum. A strong smell of bleach and old rust—or dried blood—seeps under the rubber door sweep, while a dying fluorescent light flickers inside.";
 
 
 
@@ -16709,16 +16885,18 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetSituationNarration($"{exteriorAnchor}\n\n{actionNarration}");
+                    SetSituationNarration(actionNarration);
 
                 }
 
                 else
-
                 {
-
-                    SetSituationNarration(exteriorAnchor);
-
+                    ShowLocationAnchor(
+                        "ext_utility",
+                        exteriorAnchor,
+                        "You check Carl's heavy steel maintenance door again. The commercial mag-lock still hums against the frame.",
+                        "Bleach and rust linger under the rubber door sweep while the dying fluorescent flickers inside."
+                    );
                 }
 
 
@@ -16869,7 +17047,7 @@ namespace SundayLastBreath.UI
 
                         {
 
-                            OpenUtilityDoor("<color=#10B981>Door forced open.</color> Against all odds, your desperate tackle hits the exact microscopic flaw in the frame bracket, popping the magnetic seal.");
+                            OpenUtilityDoor("<color=#10B981>Door forced open.</color> Against all odds, your shoulder hits the weak spot in the old frame bracket, and the magnetic lock pops loose.");
 
                         }
 
@@ -16881,9 +17059,7 @@ namespace SundayLastBreath.UI
 
                             TakeDamage(20, "Violent collision against industrial steel door");
 
-                            ExertStamina(25);
-
-                            InspectUtilityCloset("<color=#EF4444><b>BRUTE FORCE FAILED (-20 HP, -25 Stamina).</b></color> You threw your entire body weight into the heavy industrial steel slab. The commercial magnetic lock didn't even flinch. The concussive shockwave jarred your collarbone and severely bruised your shoulder. Steel magnetic doors cannot be forced with bare shoulders without proper tools.");
+                            InspectUtilityCloset("<color=#EF4444><b>BRUTE FORCE FAILED (-20 HP, -25 Stamina).</b></color> You threw your whole weight into the heavy steel door, and the magnetic lock didn't budge an inch. The impact jarred your collarbone and left your shoulder throbbing. You aren't breaking a steel mag-lock door down with bare shoulders.");
 
                         }
 
@@ -16921,13 +17097,13 @@ namespace SundayLastBreath.UI
 
                 string completionNotice = allUtilityDone
 
-                    ? "\n\n<color=#10B981>The workshop has been stripped of useful hardware. Only the smell of bleach, the tipped bucket, and the dying hum of the fluorescent tube remain. You are ready to move toward the stairwell.</color>"
+                    ? "\n\n<color=#10B981>You've taken everything useful from the workshop. Only the bleach smell, the tipped mop bucket, and the buzzing overhead tube remain. Time to head for the stairwell.</color>"
 
                     : "";
 
 
 
-                string utilityAnchor = "A narrow, windowless maintenance workshop smelling powerfully of industrial bleach and damp concrete. A failing fluorescent ballast flickers overhead, casting strobing shadows over industrial supply racks. In the center, a yellow mop bucket lies overturned, its dried soapy trail leading toward the battered metal workbench in the back corner.";
+                string utilityAnchor = "A cramped, windowless maintenance room smelling strongly of industrial bleach and damp concrete. A dying fluorescent bulb strobes overhead across steel supply racks. A yellow mop bucket lies tipped over in the center, and right above the back workbench, a ceiling service hatch hangs pushed aside—muddy boot scuffs lead up the shelving edge into the dark crawlspace.";
 
 
 
@@ -16935,18 +17111,20 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetSituationNarration($"{utilityAnchor}\n\n{actionNarration}{completionNotice}");
+                    SetSituationNarration($"{actionNarration}{completionNotice}");
 
                 }
 
                 else
-
                 {
+                    string entranceText = "The heavy steel door sits propped behind you. Cool draft air drifts in from the hall, moving dust across the concrete floor.";
 
-                    string entranceText = "The heavy steel door stands ajar behind you. Cold air currents swirl in from the corridor, stirring dust motes across the concrete floor.";
-
-                    SetSituationNarration($"{entranceText}\n\n{utilityAnchor}{completionNotice}");
-
+                    ShowLocationAnchor(
+                        "int_utility",
+                        $"{entranceText}\n\n{utilityAnchor}{completionNotice}",
+                        $"You step back into the cramped maintenance room. The bulb still strobes across steel racks and the open ceiling hatch.{completionNotice}",
+                        $"Back inside Carl's utility closet. Tipped mop bucket, bare concrete, and a cool draft pulling down from the open hatch.{completionNotice}"
+                    );
                 }
 
 
@@ -16955,7 +17133,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, "[LORE] Read superintendent's logbook <color=#10B981>[PER +1]</color> <color=#9CA3AF>(~2 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "[NOTE] Read superintendent's logbook <color=#38BDF8>[+20 XP]</color> <color=#9CA3AF>(~2 min)</color>", () =>
 
                     {
 
@@ -16963,17 +17141,15 @@ namespace SundayLastBreath.UI
 
                         gameClock?.AddTime(2);
 
-                        if (currentPlayer != null) currentPlayer.per += 1;
+                        currentPlayer?.GainXP(20);
 
                         loreSystem?.AddLore("Maintenance Log - 4th Floor", "Tenants in 402 complaining about a chemical smell again. Told them I'm not a maid. Feeling feverish today. My joints are burning. Taking some aspirin from the kit and locking myself in here to sleep it off until shift ends.", gameClock?.GetTimeString() ?? "00:30");
-
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:30", "UTILITY ROOM // SUPERINTENDENT'S LOG", "Read Carl's maintenance notebook. The building superintendent locked himself inside after developing a high fever and burning joints.");
 
                         PlayClickSFX();
 
                         RefreshAllPDAPanels();
 
-                        InspectUtilityCloset("<color=#38BDF8>Logbook inspected (+1 Perception).</color> You walk across the concrete floor to the metal desk and brush aside curled architectural blueprints. Underneath sits Carl's spiral-bound maintenance ledger. The final entry was scrawled at 00:15—he locked himself inside after his joints began burning with high fever. He never unlocked the door. You close the ledger and step back to the center of the workshop.");
+                        InspectUtilityCloset("<color=#38BDF8>Logbook inspected (+20 XP).</color> You step across the concrete to the metal desk and push aside curled building blueprints. Underneath lies Carl's spiral maintenance ledger. The last entry is scrawled at 00:15—he locked himself inside after his joints started burning with a high fever. The mag-lock stayed shut from the hall, though the open ceiling hatch above the counter shows where he must have scrambled up into the ducts. You close the ledger and step back.");
 
                     });
 
@@ -16996,8 +17172,6 @@ namespace SundayLastBreath.UI
                         GiveOrDropItem("Bleach", 1);
 
                         GiveOrDropItem("Work Gloves", 1);
-
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:30", "UTILITY ROOM // CLEANING SUPPLIES", "Scavenged an unopened jug of industrial bleach and heavy work gloves from the overturned cart.");
 
                         PlayClickSFX();
 
@@ -17027,8 +17201,6 @@ namespace SundayLastBreath.UI
 
                         GiveOrDropItem("Rope", 1);
 
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:30", "UTILITY ROOM // HARDWARE SALVAGED", "Salvaged heavy-duty duct tape and a coil of nylon rope from the maintenance supply racks.");
-
                         PlayClickSFX();
 
                         RefreshAllPDAPanels();
@@ -17056,8 +17228,6 @@ namespace SundayLastBreath.UI
                         GiveOrDropItem("Flashlight", 1);
 
                         GiveOrDropItem("Batteries", 2);
-
-                        AppendStoryLog(gameClock?.GetTimeString() ?? "00:30", "UTILITY ROOM // DESK SEARCHED", "Recovered an aluminum LED flashlight and two fresh AA batteries from the workbench drawer.");
 
                         PlayClickSFX();
 
@@ -17091,7 +17261,7 @@ namespace SundayLastBreath.UI
 
 
 
-        public void InspectStairwell()
+        public void InspectStairwell(string actionFeedback = null)
 
         {
 
@@ -17113,9 +17283,13 @@ namespace SundayLastBreath.UI
 
                 PlayStageAnimation("Stairwell4F_Anim", "stairwell4F", 8f);
 
-                PlaySFX("Audio/SFX/firedoor_slam", 0.9f);
+                if (!stair_entered_sfx_played)
+                {
+                    stair_entered_sfx_played = true;
+                    PlaySFX("Audio/SFX/firedoor_slam", 0.9f);
+                }
 
-                PlayHubBGM("Audio/SFX/generator_hum", 0.45f);
+                PlayHubBGM("Audio/SFX/generator_hum", 0.45f, true);
 
 
 
@@ -17125,7 +17299,13 @@ namespace SundayLastBreath.UI
 
 
 
-                SetSituationNarration("The heavy fire door slams shut behind you, sealing off the 4th floor with a concussive boom that rattles the concrete frame.\n\nThe stairwell is bathed in the pulsing, dim red glow of emergency backup lights. The concrete steps plunge downward into murky shadows, the silence broken only by the distant, vibrating hum of a struggling generator.\n\nYou need to get down to the ground floor.");
+                float carryWeight = currentPlayer != null ? currentPlayer.GetTotalWeight() : 0f;
+                bool heavyPack = carryWeight >= 14f;
+                string weightNote = heavyPack
+                    ? $"\n\n<color=#F59E0B><b>[HEAVY PACK: {carryWeight:F1} KG]</b></color> Your loaded backpack pulls hard on your shoulders as you look down the steep concrete flight. Running in the dark with this much weight will throw off your balance."
+                    : "";
+
+                SetSituationNarration($"The heavy fire door swings shut behind you and the lock clicks into place. You try the handle once just to be sure. Locked. There's no going back into the 4th floor.\n\nDim red backup lights buzz along the wall, barely reaching the middle of the steps. Down at the bottom of the shaft, the building's backup generator hums through the concrete. You need to get down to the ground floor.{weightNote}");
 
 
 
@@ -17147,7 +17327,7 @@ namespace SundayLastBreath.UI
 
                     "[GEAR: FLASHLIGHT]",
 
-                    "Descend stairs with high-beam Flashlight",
+                    "Use your Flashlight to light the steps",
 
                     0, 4,
 
@@ -17161,13 +17341,13 @@ namespace SundayLastBreath.UI
 
                         stair_phase = 2;
 
-                        PlayClickSFX();
+                        PlaySFX("Audio/SFX/flashlight_click", 0.8f);
 
                         InspectStairwell();
 
                     },
 
-                    "Requires Flashlight — You have no portable electrical light"
+                    "Requires Flashlight - You don't have a strong light source"
 
                 );
 
@@ -17183,7 +17363,7 @@ namespace SundayLastBreath.UI
 
                     "[GEAR: LIGHTER]",
 
-                    "Descend stairs with flickering Lighter flame",
+                    "Use your Lighter to see a few steps ahead",
 
                     0, 6,
 
@@ -17197,13 +17377,13 @@ namespace SundayLastBreath.UI
 
                         stair_phase = 2;
 
-                        PlayClickSFX();
+                        PlaySFX("Audio/SFX/lighter_flick", 0.8f);
 
                         InspectStairwell();
 
                     },
 
-                    "Requires Lighter — You have no portable open flame"
+                    "Requires Lighter - You have nothing to spark a flame"
 
                 );
 
@@ -17211,7 +17391,7 @@ namespace SundayLastBreath.UI
 
                 // 3. Move Slowly and Carefully in dark (Always safe fallback)
 
-                SetHallwayChoice(choiceIdx++, "Move Slowly and Carefully in dark <color=#10B981>[SAFE]</color> <color=#9CA3AF>(Feel along walls, ~10 min)</color>", () =>
+                SetHallwayChoice(choiceIdx++, "Move slowly in the dark, one hand on the wall <color=#10B981>[SAFE]</color> <color=#9CA3AF>(~10 min)</color>", () =>
 
                 {
 
@@ -17221,7 +17401,7 @@ namespace SundayLastBreath.UI
 
                     stair_phase = 2;
 
-                    PlayClickSFX();
+                    PlaySFX("Audio/SFX/boots_slow_concrete", 0.7f);
 
                     InspectStairwell();
 
@@ -17229,23 +17409,28 @@ namespace SundayLastBreath.UI
 
 
 
-                // 4. Agility 5 Sprint vs Fallback Gamble
+                // 4. Agility Sprint vs Risky Sprint (scaled by backpack weight)
+                int reqAgi = heavyPack ? 6 : 5;
+                int sprintStam = heavyPack ? 10 : 5;
+                string loadTag = heavyPack ? $" [HEAVY PACK {carryWeight:F1} KG]" : "";
 
-                if (agiVal >= 5)
+                if (agiVal >= reqAgi)
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, $"[AGILITY {agiVal}/5] Sprint down the steps in darkness <color=#10B981>(-0 Stamina, 100% Guaranteed, ~1 min)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, $"[AGILITY {agiVal}/{reqAgi}]{loadTag} Move quickly down the steps in the dark <color=#10B981>(-{sprintStam} Stamina, Guaranteed, ~1 min)</color>", () =>
 
                     {
 
                         descentMethod = "quick";
 
+                        ExertStamina(sprintStam);
+
                         gameClock?.AddTime(1);
 
                         stair_phase = 2;
 
-                        PlayClickSFX();
+                        PlaySFX("Audio/SFX/boots_run_concrete", 0.8f);
 
                         InspectStairwell();
 
@@ -17257,9 +17442,10 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    int chance = Mathf.Clamp(agiVal * 18, 20, 75);
+                    int baseChance = agiVal * 18 - (heavyPack ? 15 : 0);
+                    int chance = Mathf.Clamp(baseChance, 15, 75);
 
-                    SetHallwayChoice(choiceIdx++, $"[RISKY SPRINT] Rush down the steps in darkness [Agility {agiVal}/5 — {chance}% Chance] <color=#EF4444>(High risk stumble, Severe Injury Risk)</color>", () =>
+                    SetHallwayChoice(choiceIdx++, $"[RISKY SPRINT]{loadTag} Rush down the dark steps [Agility {agiVal}/{reqAgi} - {chance}% Chance] <color=#EF4444>(-{sprintStam} Stamina, Fall & Noise Risk, ~1 min)</color>", () =>
 
                     {
 
@@ -17271,6 +17457,10 @@ namespace SundayLastBreath.UI
 
                             descentMethod = "quick";
 
+                            ExertStamina(sprintStam);
+
+                            PlaySFX("Audio/SFX/boots_run_concrete", 0.8f);
+
                         }
 
                         else
@@ -17279,15 +17469,19 @@ namespace SundayLastBreath.UI
 
                             descentMethod = "quick_fail";
 
-                            TakeDamage(15, "Catastrophic stumble down concrete stairs");
+                            stair_noise_made = true;
+
+                            currentPlayer?.SetFlag("made_noise", true);
+
+                            PlaySFX("Audio/SFX/stairs_tumble", 0.95f);
+
+                            TakeDamage(15, "Slipped hard on the wet stairwell steps");
 
                             ExertStamina(20);
 
                         }
 
                         stair_phase = 2;
-
-                        PlayClickSFX();
 
                         InspectStairwell();
 
@@ -17301,13 +17495,15 @@ namespace SundayLastBreath.UI
 
             {
 
-                SetLocation("stairs", "STAIRWELL // THE DESCENT");
+                SetLocation("stairs", "3RD FLOOR LANDING // THE DESCENT");
+
+                bool sawHorrors = room401_entered || room402_opened || room405_opened || room406_opened;
 
                 if (descentMethod == "quick_fail")
 
                 {
 
-                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell_tumble");
+                    PlayStageAnimation("StairwellTumble_Anim", "stairwell_tumble", 8f);
 
                 }
 
@@ -17315,7 +17511,12 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell_flashlight");
+                    PlayStageAnimation("StairwellFlashlight_Anim", "stairwell_flashlight", 8f);
+
+                    if (string.IsNullOrEmpty(actionFeedback))
+                    {
+                        PlaySFX("Audio/SFX/blood_drip", 0.6f);
+                    }
 
                 }
 
@@ -17323,8 +17524,23 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell4F");
+                    PlayStageAnimation("Stairwell4F_Anim", "stairwell4F", 8f);
 
+                }
+
+
+
+                bool seesBloodClearly = descentMethod == "quick_fail" || descentMethod == "flashlight" || descentMethod == "lighter";
+                bool justLostHumanity = false;
+                if (seesBloodClearly && !sawHorrors && !stair_hum_deducted)
+                {
+                    stair_hum_deducted = true;
+                    justLostHumanity = true;
+                    if (currentPlayer != null)
+                    {
+                        currentPlayer.humanity = Mathf.Max(0, currentPlayer.humanity - 5);
+                    }
+                    RefreshAllPDAPanels();
                 }
 
 
@@ -17335,7 +17551,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    descText = "<color=#10B981><b>[AGILITY SUCCESS]</b></color> You take the stairs two at a time. In the flickering strobe light, your boot hovers over a slick dark patch on the concrete. Your reflexes kick in — you grab the iron handrail, vaulting over the mess and landing safely on the landing below.";
+                    descText = "<color=#10B981><b>[AGILITY SUCCESS]</b></color> You take the steps two at a time, using the iron handrail to keep your balance.\n\nHalfway down to the 3rd-floor landing, your boot nearly comes down on a dark, wet patch beside a crushed red plastic cup. You catch the rail and hop wide onto the dry concrete below.\n\nUnder the dim red bulb, whatever you almost stepped in just looks like spilled beer or dirty water. You don't stop to check.";
 
                 }
 
@@ -17343,7 +17559,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    descText = "<color=#10B981><b>[SAFE DESCENT]</b></color> You grip the cold handrail, taking it one agonizing step at a time. As the light flares, something wet and dark glistens on the steps. You press your back against the wall and carefully step wide, avoiding the puddle entirely.";
+                    descText = "<color=#10B981><b>[SAFE DESCENT]</b></color> You keep one hand on the cold iron rail and slide your boots down one step at a time.\n\nNear the 3rd-floor landing, the red backup light glints off something wet pooled across the concrete next to a crushed plastic cup. In this dim light it just looks like spilled water. You press your back to the wall and step around the dry outer edge.";
 
                 }
 
@@ -17351,7 +17567,14 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    descText = "<color=#EF4444><b>[AGILITY FAILED - LOUD NOISE]</b></color> In the dark, your heel slides out on a thick slick puddle. You violently tumble forward into concrete and slam against the iron railing with a loud echoing <i>CLANG</i>.\n\nYour palms are coated in thick, sticky, arterial blood. Someone was dragged down these stairs recently.";
+                    string marcusNote = read_marcus_log
+                        ? "\n\nYou think of the note on Marcus's radio table upstairs. This must be where he got bit on his way down."
+                        : "";
+                    string humNote = sawHorrors
+                        ? "\n\nAfter what you already saw upstairs on the 4th floor, you just wipe your palms on your pants and keep moving."
+                        : $"\n\n{(justLostHumanity || stair_hum_deducted ? "<color=#EF4444><b>[-5 HUMANITY]</b></color> " : "")}Your stomach turns. Whoever bled here lost a lot of it, and it happened not long ago.";
+
+                    descText = $"<color=#EF4444><b>[FOOTING LOST // LOUD NOISE] (-15 HP, -20 STAMINA)</b></color>\n\nYou take the steps too fast in the dark. Halfway down, your heel hits something thick and slick on the concrete and goes straight out from under you. Your ribs slam the edge of the steps and your knee bangs the iron railing with a loud metallic <i>CLANG</i> that echoes all the way down the shaft.\n\nWhen you push yourself up on the 3rd-floor landing, your palms are sticky and warm. Even under the dim red bulb, you smell the sharp copper scent on your hands. It's blood - a wide puddle of it smeared across the concrete beside a torn piece of a jacket sleeve.{marcusNote}{humNote}";
 
                 }
 
@@ -17359,17 +17582,49 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    descText = "<color=#10B981><b>[LIGHT SOURCE]</b></color> Your light sweeps down the stairs and catches a thick dark reflection. A pool of arterial blood coats the middle of the flight. Keeping the beam steady, you safely navigate around the mess.";
+                    string lightIntro = descentMethod == "flashlight"
+                        ? "<color=#10B981><b>[FLASHLIGHT BEAM]</b></color> You click on your flashlight, cutting a white beam down the concrete steps."
+                        : "<color=#10B981><b>[LIGHTER FLAME]</b></color> You thumb your lighter. The small orange flame pushes back the dim red shadows a few steps at a time.";
+                    string marcusNote = read_marcus_log
+                        ? "\n\nYou remember the note by Marcus's radio upstairs. This is where he was bitten before he made it outside."
+                        : "";
+                    string humNote = sawHorrors
+                        ? "\n\nAfter what you left behind on the 4th floor, you don't linger on it. You keep the light pointed ahead."
+                        : $"\n\n{(justLostHumanity || stair_hum_deducted ? "<color=#EF4444><b>[-5 HUMANITY]</b></color> " : "")}Your throat tightens. Until now it was just sirens and voices on the radio, but this happened right outside your floor.";
 
+                    descText = $"{lightIntro}\n\nHalfway to the 3rd-floor landing, the light catches a crushed red party cup and a wide, wet puddle spreading across the middle steps. Keeping the light steady, you step around the dry edge onto the landing.\n\nShining the light back over the concrete, you see it isn't water. It's thick, dark blood, still wet near the center. Red handprints are smeared across the wall at shoulder height next to a torn strip of a jacket sleeve - whoever got hurt here was leaning hard against the wall to stay on their feet.{marcusNote}{humNote}";
+
+                }
+
+                if (!string.IsNullOrEmpty(actionFeedback))
+                {
+                    SetSituationNarration(actionFeedback);
+                }
+                else
+                {
+                    SetSituationNarration(descText);
                 }
 
 
 
-                SetSituationNarration(descText);
+                if (!stair_3f_door_checked)
+                {
+                    SetHallwayChoice(choiceIdx++, "[CHECK DOOR] Try the 3rd Floor fire door <color=#9CA3AF>(~1 min)</color>", () =>
+                    {
+                        stair_3f_door_checked = true;
+                        gameClock?.AddTime(1);
+                        PlaySFX("Audio/SFX/firedoor_click", 0.75f);
+                        loreSystem?.AddLore("3rd Floor Fire Door Sealed", "Someone knotted a heavy orange extension cord tightly around the inside push-bar and tied it to a hallway pipe. The 3rd-floor corridor is dark and inaccessible from the stairs.", gameClock?.GetTimeString() ?? "00:35");
+                        RefreshAllPDAPanels();
+                        InspectStairwell("<color=#F59E0B><b>[3RD FLOOR SEALED]</b></color> You grab the handle of the 3rd-floor fire door and pull. It moves half an inch and stops dead. Looking through the narrow wire-glass window, you see someone knotted a heavy orange extension cord tightly around the inside push-bar and tied it to a hallway pipe. The 3rd-floor corridor beyond the glass is dark and quiet. There's no getting through here.");
+                    }, true);
+                }
+                else
+                {
+                    SetHallwayChoice(choiceIdx++, "Try the 3rd Floor fire door <color=#EF4444>[TIED SHUT FROM INSIDE]</color>", null, false);
+                }
 
-
-
-                SetHallwayChoice(choiceIdx++, "Turn the corner to the next landing", () =>
+                SetHallwayChoice(choiceIdx++, "Turn the corner and head down toward the lower floors", () =>
 
                 {
 
@@ -17379,7 +17634,7 @@ namespace SundayLastBreath.UI
 
                     InspectStairwell();
 
-                });
+                }, true);
 
             }
 
@@ -17389,66 +17644,133 @@ namespace SundayLastBreath.UI
 
                 SetLocation("stairs", "STAIRWELL // THE BARRICADE");
 
-                if (stageBackdropImage != null) stageBackdropImage.sprite = GetAct1Sprite("stairwell_barricade");
+                PlayStageAnimation("StairwellBarricade_Anim", "stairwell_barricade", 8f);
 
 
 
-                SetSituationNarration("You continue your descent, hoping to reach the ground floor. But halfway between the 2nd and 1st floors, the stairs simply end.\n\n<color=#F59E0B><b>The way down is completely blocked.</b></color>\n\nHeavy oak desks, folding chairs, and a massive glass-front vending machine are wedged together into an impassable wall of junk. The dented, buckling steel shows whatever was trying to come up was monstrously strong.");
+                string baseNarration = "You head down past the 2nd-floor landing toward the ground floor lobby, but halfway between the 2nd and 1st floors, the steps are blocked.\n\n<color=#F59E0B><b>The stairs to the 1st Floor are jammed with furniture.</b></color>\n\nHeavy wooden desks, folding chairs, and a glass-front drink machine have been tipped over and wedged between the stairwell walls. Through a narrow gap beside the drink machine, you can see the 1st-floor lobby door just twenty feet below. The lower metal panel of the machine is dented inward and smeared with dark handprints from the bottom side.\n\nIt looks like if you could shift the drink machine a few inches, you might squeeze straight down to the 1st floor - otherwise you'll have to take the 2nd-floor door behind you.";
+
+                if (!string.IsNullOrEmpty(actionFeedback))
+                {
+                    SetSituationNarration(actionFeedback);
+                }
+                else
+                {
+                    if (barricade_pushed)
+                    {
+                        baseNarration += "\n\n<color=#EF4444><b>[IMPASSABLE // LOUD NOISE MADE]</b></color> The drink machine's steel legs are wedged tight under the iron rail posts. You can't clear this way.";
+                    }
+                    SetSituationNarration(baseNarration);
+                }
 
 
+
+                if (!barricade_inspected && !barricade_pushed)
+                {
+                    SetHallwayChoice(choiceIdx++, "[INSPECT] Look closely at how the drink machine is wedged <color=#9CA3AF>(~1 min)</color>", () =>
+                    {
+                        barricade_inspected = true;
+                        gameClock?.AddTime(1);
+                        PlayClickSFX();
+                        InspectStairwell("<color=#93C5FD><b>[BARRICADE INSPECTED]</b></color> You crouch by the gap and look at the frame. Whoever dumped this furniture from the upper floors wedged the drink machine's steel legs straight under the iron handrail posts. Shoving it by hand won't clear a path - it'll only scrape metal against concrete and make a loud racket down the shaft.");
+                    }, true);
+                }
 
                 if (!barricade_pushed)
 
                 {
 
-                    SetHallwayChoice(choiceIdx++, "Try to push the barricade out of the way <color=#EF4444>[RISK: NOISE]</color>", () =>
+                    SetHallwayChoice(choiceIdx++, "Try to shove the drink machine aside to squeeze through <color=#EF4444>[RISK: NOISE]</color> <color=#9CA3AF>(~1 min)</color>", () =>
 
                     {
 
                         barricade_pushed = true;
 
+                        stair_noise_made = true;
+
+                        currentPlayer?.SetFlag("made_noise", true);
+
                         gameClock?.AddTime(1);
 
-                        PlaySFX("Audio/SFX/firedoor_slam", 0.8f);
+                        PlaySFX("Audio/SFX/metal_shelf_crash", 0.85f);
 
-                        SetSituationNarration("<color=#EF4444><b>[FAILED - IMPASSABLE]</b></color> You throw your shoulder against the vending machine. The metal shrieks violently against concrete, echoing like a gunshot. The barricade doesn't budge an inch. But that shriek definitely woke something up below.");
+                        InspectStairwell("<color=#EF4444><b>[FAILED // LOUD NOISE MADE]</b></color> You brace your boots on the step and throw your shoulder into the side of the drink machine.\n\n<i>SCREEEEECH.</i>\n\nThe metal frame grinds hard against the concrete wall, echoing up and down the stairwell shaft like a gunshot. The machine doesn't budge an inch. Behind you on the 2nd-floor landing, something heavy thumps against the inside of the corridor wall.");
 
-                        InspectStairwell();
+                    }, true);
 
-                    });
-
+                }
+                else
+                {
+                    SetHallwayChoice(choiceIdx++, "Try to shove the drink machine aside <color=#EF4444>[IMPASSABLE - WEDGED TIGHT]</color>", null, false);
                 }
 
 
 
-                SetHallwayChoice(choiceIdx++, "Open the fire door to the 2nd Floor <color=#10B981>[DETOUR]</color>", () =>
+                if (!stair_listened_2f_door)
+                {
+                    SetHallwayChoice(choiceIdx++, "[LISTEN] Press your ear to the 2nd Floor fire door before opening it <color=#9CA3AF>(~1 min)</color>", () =>
+                    {
+                        stair_listened_2f_door = true;
+                        gameClock?.AddTime(1);
+                        if (stair_noise_made)
+                        {
+                            PlaySFX("Audio/SFX/zombie_rattle", 0.65f);
+                            InspectStairwell("<color=#EF4444><b>[SOUND BEHIND DOOR // DANGER]</b></color> You press your ear against the cold steel of the 2nd-floor fire door. The noise you made in the stairwell carried inside. Right on the other side of the door, you hear wet, ragged breathing and shoes scraping against the floor. Whatever is in that hallway is already facing the door. <i>(Make sure a weapon is equipped in your Backpack before opening.)</i>");
+                        }
+                        else
+                        {
+                            PlaySFX("Audio/SFX/head_thump_wet", 0.55f);
+                            InspectStairwell("<color=#F59E0B><b>[SOUND BEHIND DOOR]</b></color> You press your ear to the cold steel of the 2nd-floor door. For a second there's only the buzz of a failing hallway light - then a slow, wet, rhythmic <i>thump... thump...</i> about twenty feet down the hall, like someone tapping their forehead against the plaster wall. Whoever it is hasn't heard you yet. <i>(Check your Backpack if you need to equip a weapon first.)</i>");
+                        }
+                    }, true);
+                }
+
+
+
+                SetHallwayChoice(choiceIdx++, "Open the fire door to the 2nd Floor <color=#10B981>[DETOUR TO 2F]</color> <color=#9CA3AF>(~2 min)</color>", () =>
 
                 {
 
-                    PlayClickSFX();
+                    StopHubBGM();
+
+                    PlaySFX("Audio/SFX/firedoor_click", 0.8f);
+
+                    gameClock?.AddTime(2);
+
+                    currentPlayer?.SetFlag("made_noise", stair_noise_made);
 
                     objectiveSystem?.CompleteObjective("descend_stairs");
 
-                    objectiveSystem?.AddObjective("detour_2f", "Cross the 2nd Floor to find the East Wing stairs", ObjectiveStatus.Active);
+                    objectiveSystem?.AddObjective("detour_2f", "Cross the 2nd Floor to find the West Wing stairs", ObjectiveStatus.Active);
 
-                    AppendStoryLog(gameClock?.GetTimeString() ?? "00:40", "STAIRWELL // 2ND FLOOR DETOUR", "The 1st floor descent was completely barricaded with heavy office furniture. Forced to take the fire door into the 2nd Floor corridor.");
+                    stair_phase = 4;
 
-                    SetSituationNarration("<color=#10B981><b>FIRE DOOR UNLATCHED.</b></color> You step through the heavy emergency door onto the 2nd Floor corridor. The air is cold and smells of wet plaster. Ahead, the corridor stretches into darkness.");
+                    InspectStairwell();
 
-                    ClearHallwayChoices();
+                }, true);
 
-                    SetHallwayChoice(0, "Proceed into 2nd Floor Corridor...", () =>
+            }
+            else if (stair_phase >= 4)
+            {
+                SetLocation("stairs", "2ND FLOOR // EAST WING DOORWAY");
+                StopHubBGM();
 
-                    {
+                if (stair_noise_made)
+                {
+                    PlayStageAnimation("F2Aggro_Anim", "F2_1_aggro", 8f);
+                    SetSituationNarration("<color=#EF4444><b>[2ND FLOOR EAST WING // NOISE DETECTED]</b></color>\n\nThe heavy fire door clicks shut behind you. The loud noise from the stairwell carried straight down this hallway.\n\nTwenty feet ahead, under a single flickering tube light, a man in a torn suit stands in the middle of the corridor. He isn't facing the wall - he is staring straight at your door.");
+                }
+                else
+                {
+                    PlayStageAnimation("F2Thump_Anim", "F2_1_thump", 8f);
+                    SetSituationNarration("<color=#10B981><b>[2ND FLOOR EAST WING // SILENT ENTRY]</b></color>\n\nThe fire door clicks shut behind you. The backup lights in this hallway are out, leaving only a single tube light flickering at the far end of the corridor.\n\nAbout twenty feet ahead, a man in a messy business suit stands in the middle of the hall with his forehead pressed against the wallpaper. Slow, wet <i>thumps</i> echo down the corridor as he taps his head against the plaster. He hasn't noticed you yet.");
+                }
 
-                        EnterHallwayMode(1);
-
-                    });
-
-                    ReindexActiveChoiceHotkeys();
-
-                });
-
+                SetHallwayChoice(choiceIdx++, "[2ND FLOOR] Step into the 2nd Floor Corridor (Next Section)", () =>
+                {
+                    PlayClickSFX();
+                    InspectStairwell();
+                }, true);
             }
 
 
@@ -17522,6 +17844,12 @@ namespace SundayLastBreath.UI
             if (sp != null) return sp;
 
             path = "Assets/Sprites/Act1/" + spriteName + ".png";
+
+            sp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+
+            if (sp != null) return sp;
+
+            path = "Assets/Sprites/Act1/" + spriteName + ".gif";
 
             sp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
@@ -18091,7 +18419,7 @@ namespace SundayLastBreath.UI
 
                         string timeStr = gameClock != null ? $"{gameClock.GetTimeString()} DAY {gameClock.DayCount}" : "23:45 DAY 0";
 
-                        tmp.text = $"<b><color=#F5A623>● CURRENT SITUATION</color></b>  <color=#78909C>// {sector} ({timeStr})</color>";
+                        tmp.text = $"<b><color=#F5A623>// CURRENT SITUATION</color></b>  <color=#78909C>// {sector} ({timeStr})</color>";
 
                     }
 
@@ -18239,7 +18567,7 @@ namespace SundayLastBreath.UI
 
 
 
-        public void SetSituationNarration(string formattedText)
+        public void SetSituationNarration(string formattedText, bool recordInLog = true)
 
         {
 
@@ -18253,8 +18581,37 @@ namespace SundayLastBreath.UI
 
             }
 
+            if (recordInLog && !string.IsNullOrWhiteSpace(formattedText))
+            {
+                string trimmed = formattedText.Trim();
+                if (!string.Equals(trimmed, lastAutoLoggedSituationText, StringComparison.Ordinal))
+                {
+                    lastAutoLoggedSituationText = trimmed;
+                    string timestamp = gameClock != null ? gameClock.GetTimeString() : "00:00";
+                    string header = (locationText != null && !string.IsNullOrEmpty(locationText.text))
+                        ? locationText.text.Replace("\r", " ").Replace("\n", " ").TrimStart('/', ' ').Trim()
+                        : "CURRENT SITUATION";
+                    AppendStoryLog(timestamp, header, trimmed);
+                }
+            }
+
             UpdateSituationBoxTextAndHeight(formattedText);
 
+        }
+
+        private void ShowLocationAnchor(string anchorKey, string firstVisitText, params string[] returnVariants)
+        {
+            bool firstVisit = _visitedLocationAnchors.Add(anchorKey);
+            if (firstVisit || returnVariants == null || returnVariants.Length == 0)
+            {
+                SetSituationNarration(firstVisitText, recordInLog: true);
+                return;
+            }
+
+            int idx = _returnVariantIndices.TryGetValue(anchorKey, out int current) ? current : 0;
+            string text = returnVariants[idx % returnVariants.Length];
+            _returnVariantIndices[anchorKey] = idx + 1;
+            SetSituationNarration(text, recordInLog: false);
         }
 
 
@@ -20925,7 +21282,7 @@ namespace SundayLastBreath.UI
 
             string displayTitle = !string.IsNullOrEmpty(roomTitle) ? roomTitle.ToUpper() : "UNIT 407";
 
-            string formattedTop = $"■ {displayTitle}";
+            string formattedTop = $"// {displayTitle}";
 
 
 
@@ -20939,7 +21296,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    formattedTop = $"■ {sub}";
+                    formattedTop = $"// {sub}";
 
                 }
 
@@ -21145,7 +21502,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                floorItemsCountText.text = $"■ Floor Items ({tableStash.Count})";
+                floorItemsCountText.text = $"Floor Items ({tableStash.Count})";
 
             }
 
@@ -21326,6 +21683,22 @@ namespace SundayLastBreath.UI
         #region Story Log System (Option A)
 
         private readonly List<string> _storyLogs = new List<string>();
+        private readonly HashSet<string> _visitedLocationAnchors = new HashSet<string>();
+        private readonly Dictionary<string, int> _returnVariantIndices = new Dictionary<string, int>();
+        private string lastAutoLoggedSituationText = "";
+
+        private void SyncLastAutoLoggedSituationFromLogs()
+        {
+            if (_storyLogs.Count == 0)
+            {
+                lastAutoLoggedSituationText = "";
+                return;
+            }
+
+            string lastEntry = _storyLogs[_storyLogs.Count - 1];
+            int nl = lastEntry.IndexOf('\n');
+            lastAutoLoggedSituationText = nl >= 0 ? lastEntry.Substring(nl + 1).Trim() : lastEntry.Trim();
+        }
 
 
 
@@ -21341,11 +21714,11 @@ namespace SundayLastBreath.UI
 
                 "<b><color=#EF5350>[23:43] TV BROADCAST // EMERGENCY ALERT SYSTEM (CIVIL DANGER WARNING)</color></b>\n" +
 
-                "\"The following message is transmitted at the request of the King County Sheriff's Office. This is not a test.\n\n" +
+                "\"This message is transmitted at the request of the King County Sheriff's Office. This is not a test.\n\n" +
 
-                "A Civil Danger Warning is in effect for the Seattle metropolitan area. Authorities reported a rapidly spreading biological hazard. Affected individuals exhibit extreme, unprovoked violence. The pathogen is highly contagious through fluid contact.\n\n" +
+                "A Civil Danger Warning is in effect for the Seattle metro area. Authorities are responding to rapidly spreading violent incidents and a suspected contagious illness. Avoid all physical contact.\n\n" +
 
-                "Shelter in place immediately. Major interstates are closed. Lock all doors, turn off lights, and remain completely silent. The National Guard has been deployed. Lethal force is authorized.\""
+                "Shelter in place immediately. Major interstates are closed. Lock your doors, turn off lights, and stay inside. The National Guard is mobilizing. Lethal force is authorized.\""
 
             );
 
@@ -21355,9 +21728,9 @@ namespace SundayLastBreath.UI
 
                 "<b><color=#F5BF42>[23:44] REACTION // INNER MONOLOGUE</color></b>\n" +
 
-                "\"Lethal force authorized... They don't lock down the whole city for mass hysteria. And this front door isn't heavy enough to keep a panicked mob out.\"\n\n" +
+                "\"Lethal force authorized... They don't lock down the whole city over a normal riot. And this front door won't stop a crowd if panic hits the hallway.\"\n\n" +
 
-                "<i>Through the thin plaster of your apartment walls, you can hear it: the distant, overlapping chorus of emergency sirens. And closer... the muffled sound of heavy, frantic footsteps pounding down the hallway outside your door.</i>"
+                "<i>Through the wall, heavy footsteps run past in the corridor outside, followed by someone yelling and a fire door slamming shut.</i>"
 
             );
 
@@ -21367,15 +21740,17 @@ namespace SundayLastBreath.UI
 
                 "<b><color=#4FC3F7>[23:45] APARTMENT 407 // LIVING ROOM</color></b>\n" +
 
-                "You are standing in the middle of your living room in the pitch-black darkness. Sirens wail across the Seattle skyline.\n\n" +
+                "You're standing in your dark living room while sirens wail down the street.\n\n" +
 
-                "Your apartment keys, wallet, phone, and belongings are sitting on the coffee table. The front door deadbolt is locked—you cannot leave without your keys. Before heading into the hallway, you need your keys and whatever you can grab from around the apartment."
+                "Your keys, wallet, phone, and everyday gear are on the coffee table. Grab what you need from around the apartment before you unlock the deadbolt."
 
             );
 
 
 
             RefreshStoryLogUI();
+
+            SyncLastAutoLoggedSituationFromLogs();
 
         }
 
@@ -21387,9 +21762,25 @@ namespace SundayLastBreath.UI
 
             InitializeStoryLogs();
 
-            string entry = $"<b><color=#66BB6A>[{timestamp}] {header}</color></b>\n{content}";
+            string trimmedContent = (content ?? "").Trim();
+            if (string.IsNullOrEmpty(trimmedContent)) return;
+
+            if (_storyLogs.Count > 0)
+            {
+                string prev = _storyLogs[_storyLogs.Count - 1];
+                int nl = prev.IndexOf('\n');
+                string prevBody = nl >= 0 ? prev.Substring(nl + 1).Trim() : prev.Trim();
+                if (string.Equals(prevBody, trimmedContent, StringComparison.Ordinal))
+                {
+                    return;
+                }
+            }
+
+            string entry = $"<b><color=#66BB6A>[{timestamp}] {header}</color></b>\n{trimmedContent}";
 
             _storyLogs.Add(entry);
+
+            lastAutoLoggedSituationText = trimmedContent;
 
             RefreshStoryLogUI();
 
@@ -21397,32 +21788,130 @@ namespace SundayLastBreath.UI
 
 
 
-        private void RefreshStoryLogUI()
-
+        private void EnsureStoryLogScrollSetup()
         {
+            if (storyLogContentText == null) return;
 
-            if (storyLogContentText != null)
+            storyLogContentText.textWrappingMode = TextWrappingModes.Normal;
+            storyLogContentText.overflowMode = TextOverflowModes.Overflow;
 
+            Transform contentTransform = storyLogContentText.transform.parent;
+            if (contentTransform != null)
             {
+                var vlg = contentTransform.GetComponent<VerticalLayoutGroup>();
+                if (vlg != null)
+                {
+                    vlg.childControlWidth = true;
+                    vlg.childControlHeight = true;
+                    vlg.childForceExpandWidth = true;
+                    vlg.childForceExpandHeight = false;
+                }
 
-                storyLogContentText.text = string.Join("\n\n<color=#2C3E50>──────────────────────────────────────────────────────────────────────────</color>\n\n", _storyLogs);
-
+                var fitter = contentTransform.GetComponent<ContentSizeFitter>();
+                if (fitter == null) fitter = contentTransform.gameObject.AddComponent<ContentSizeFitter>();
+                fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+                fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             }
 
+            if (storyLogModal != null)
+            {
+                var scroll = storyLogModal.GetComponentInChildren<ScrollRect>(true);
+                if (scroll != null && scroll.verticalScrollbar == null)
+                {
+                    GameObject sbObj = new GameObject("VerticalScrollbar", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+                    sbObj.transform.SetParent(scroll.transform, false);
+
+                    RectTransform sbRt = sbObj.GetComponent<RectTransform>();
+                    sbRt.anchorMin = new Vector2(1f, 0f);
+                    sbRt.anchorMax = new Vector2(1f, 1f);
+                    sbRt.pivot = new Vector2(1f, 0.5f);
+                    sbRt.sizeDelta = new Vector2(8f, 0f);
+                    sbRt.anchoredPosition = Vector2.zero;
+
+                    Image trackImg = sbObj.GetComponent<Image>();
+                    trackImg.color = new Color(0.08f, 0.11f, 0.16f, 0.9f);
+
+                    GameObject slidingArea = new GameObject("Sliding Area", typeof(RectTransform));
+                    slidingArea.transform.SetParent(sbObj.transform, false);
+                    RectTransform saRt = slidingArea.GetComponent<RectTransform>();
+                    saRt.anchorMin = Vector2.zero;
+                    saRt.anchorMax = Vector2.one;
+                    saRt.offsetMin = new Vector2(1f, 2f);
+                    saRt.offsetMax = new Vector2(-1f, -2f);
+
+                    GameObject handleObj = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+                    handleObj.transform.SetParent(slidingArea.transform, false);
+                    RectTransform hRt = handleObj.GetComponent<RectTransform>();
+                    hRt.anchorMin = Vector2.zero;
+                    hRt.anchorMax = Vector2.one;
+                    hRt.sizeDelta = Vector2.zero;
+
+                    Image handleImg = handleObj.GetComponent<Image>();
+                    handleImg.color = new Color(0.31f, 0.76f, 0.97f, 0.65f);
+
+                    Scrollbar sb = sbObj.GetComponent<Scrollbar>();
+                    sb.direction = Scrollbar.Direction.BottomToTop;
+                    sb.handleRect = hRt;
+                    sb.targetGraphic = handleImg;
+
+                    scroll.verticalScrollbar = sb;
+                    scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+                    scroll.verticalScrollbarSpacing = 6f;
+                }
+            }
         }
 
+        private void RefreshStoryLogUI()
+        {
+            EnsureStoryLogScrollSetup();
 
+            if (storyLogContentText != null)
+            {
+                storyLogContentText.text = string.Join("\n\n<color=#2C3E50>--------------------------------------------------------------------------</color>\n\n", _storyLogs);
+                if (storyLogModal != null && storyLogModal.activeInHierarchy)
+                {
+                    storyLogContentText.ForceMeshUpdate();
+                    var contentRt = storyLogContentText.transform.parent as RectTransform;
+                    if (contentRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(contentRt);
+                }
+            }
+        }
 
         public void OnOpenStoryLogClicked()
-
         {
-
             PlayClickSFX();
-
             InitializeStoryLogs();
+            RefreshStoryLogUI();
 
-            if (storyLogModal != null) storyLogModal.SetActive(true);
+            if (storyLogModal != null)
+            {
+                storyLogModal.SetActive(true);
+                StartCoroutine(ScrollStoryLogToBottomNextFrame());
+            }
+        }
 
+        private IEnumerator ScrollStoryLogToBottomNextFrame()
+        {
+            EnsureStoryLogScrollSetup();
+            yield return null;
+            if (storyLogContentText != null)
+            {
+                storyLogContentText.ForceMeshUpdate();
+                var contentRt = storyLogContentText.transform.parent as RectTransform;
+                if (contentRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(contentRt);
+            }
+            Canvas.ForceUpdateCanvases();
+            if (storyLogModal != null)
+            {
+                var scroll = storyLogModal.GetComponentInChildren<ScrollRect>(true);
+                if (scroll != null)
+                {
+                    if (scroll.content != null) LayoutRebuilder.ForceRebuildLayoutImmediate(scroll.content);
+                    Canvas.ForceUpdateCanvases();
+                    scroll.velocity = Vector2.zero;
+                    scroll.verticalNormalizedPosition = 0f;
+                }
+            }
         }
 
 

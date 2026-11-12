@@ -1437,7 +1437,7 @@ namespace SundayLastBreath.Editor
             CreatePDATabButton(tabRow1.transform, "Tab_Skills", "SKILLS", out Button btnTabSkills);
             CreatePDATabButton(tabRow1.transform, "Tab_Traits", "TRAITS", out Button btnTabTraits);
             CreatePDATabButton(tabRow2.transform, "Tab_Map", "MAP", out Button btnTabMap);
-            CreatePDATabButton(tabRow2.transform, "Tab_Lore", "LORE", out Button btnTabLore);
+            CreatePDATabButton(tabRow2.transform, "Tab_Lore", "NOTES", out Button btnTabLore);
 
             // PDA Volume & Settings Footer
             GameObject pdaFooter = new GameObject("PDAFooter", typeof(RectTransform));
@@ -1760,7 +1760,7 @@ namespace SundayLastBreath.Editor
             plRect.offsetMin = new Vector2(16f, 14f); plRect.offsetMax = new Vector2(-16f, -14f);
             pLoreObj.SetActive(false);
 
-            CreateSectionBadge(pLoreObj.transform, "RECORDED INTEL & LOGS");
+            CreateSectionBadge(pLoreObj.transform, "NOTES & CLUES");
             GameObject loreCard = new GameObject("LoreCard", typeof(RectTransform));
             loreCard.transform.SetParent(pLoreObj.transform, false);
             RectTransform lc2Rect = loreCard.GetComponent<RectTransform>();
@@ -2893,7 +2893,9 @@ namespace SundayLastBreath.Editor
             VerticalLayoutGroup vlg = content.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(8, 8, 8, 8);
             vlg.childControlWidth = true;
-            vlg.childControlHeight = false;
+            vlg.childControlHeight = true;
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
 
             // Content text
             logContentTmp = CreateTMPText(content, "LogContentText", "", 13.5f, new Color(0.88f, 0.91f, 0.96f), TextAlignmentOptions.TopLeft);
@@ -3068,7 +3070,7 @@ namespace SundayLastBreath.Editor
             bhVlg.childForceExpandHeight = true;
 
             CreateApartmentMenuButton(btnHolder.transform, "Btn_ClosePhone", "<b>LOWER THE PHONE & RETURN</b>   <size=85%><color=#94A3B8>[ESC / SPACE]</color></size>",
-                "Add Intel to Lore Database.", new Color(0.95f, 0.55f, 0.20f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
+                "Save important info to Notes.", new Color(0.95f, 0.55f, 0.20f), out closeButton, out TextMeshProUGUI _, out TextMeshProUGUI _, choiceIndex: 1);
 
             // 2. RIGHT WING: SLEEK OBLONG SMARTPHONE CHASSIS (380 x 800 px, 19.5:9 Modern Flagship Silhouette)
             GameObject phoneChassis = new GameObject("PhoneChassis", typeof(RectTransform));
@@ -3259,19 +3261,19 @@ namespace SundayLastBreath.Editor
             // Feed Post 1: CityScanner
             CreatePhonePostCard(feedContent.transform, "C", new Color(0.10f, 0.16f, 0.24f), new Color(0.35f, 0.75f, 0.95f),
                 "CityScanner", "@CityScanner_WA • 2m",
-                "Does anyone know what's happening at the 5th St Hospital? Seeing police in gas masks and riot gear. They aren't letting ambulances through. Stay away!!",
+                "Anyone near 5th St Hospital know what's going on? Police in gas masks blocking the whole street. They turned two ambulances around.",
                 null, false, "RE: 412   RT: 1.2K   ♥ 890");
 
             // Feed Post 2: NewsWire Breaking [VERIFIED]
             CreatePhonePostCard(feedContent.transform, "N", new Color(0.04f, 0.22f, 0.40f), Color.white,
                 "NewsWire Breaking <color=#38bdf8>[VERIFIED]</color>", "@NewsWire_Alerts • 4m",
-                "EMERGENCY: CDC reporting 'unprecedented neuro-aggressive pathogen' causing extreme psychosis and unprovoked violence. Authorities urge citizens to avoid public spaces.",
-                "[ CDC HEALTH BULLETIN // EMERGENCY ]", false, "RE: 3.4K   RT: 14.8K   ♥ 2.1K");
+                "BREAKING: City health officials are checking reports of an aggressive flu-like illness behind tonight's assaults. Residents are urged to lock doors and ignore unverified rumors.",
+                "[ PUBLIC HEALTH BULLETIN // URGENT ]", false, "RE: 3.4K   RT: 14.8K   ♥ 2.1K");
 
             // Feed Post 3: User_9921
             CreatePhonePostCard(feedContent.transform, "U", new Color(0.32f, 0.08f, 0.08f), new Color(0.95f, 0.45f, 0.45f),
                 "User_9921", "@anon_9921 • 11m",
-                "Look at his face! That's not rabies! The cops shot him three times in the chest and he kept running! Oh my god, he's— <i>[VIDEO ENDS]</i>",
+                "Look at the video before they pull it! That wasn't a normal fight, the cop shot him three times in the chest and he didn't even slow down! Wait he's coming toward— <i>[VIDEO ENDS]</i>",
                 null, true, "RE: 8.9K   RT: 21.5K   ♥ 1.1K");
 
             // Feed Post 4: Connection Lost Alert Card
@@ -3687,22 +3689,22 @@ namespace SundayLastBreath.Editor
             terminalText.fontSize = 12f;
             terminalText.color = new Color(0.20f, 0.90f, 0.45f);
             terminalText.lineSpacing = 6f;
-            terminalText.text = "<color=#64748b>>_ terminal@unit407: scanning building fiber gateway...</color>\n" +
-                                "<color=#38bdf8>[*] SUBNET 192.168.1.1 — INTERCEPTING MUNICIPAL EMERGENCY FEED...</color>\n" +
-                                "<color=#10b981>[+] BYPASSING LOCAL CARRIER ENCRYPTION... [100% OK]</color>\n" +
-                                "<color=#f59e0b>[*] DOWNLOADING ACTIVE FEMA / DoD TRANSMISSION STREAM...</color>\n\n" +
-                                "<color=#ef4444><b>================== [ CLASSIFIED EMERGENCY DIRECTIVE ] ==================</b></color>\n" +
-                                "<color=#f1f5f9><b>OPERATION CODE :</b></color> <color=#38bdf8>WILDFIRE (CONTAINMENT PROTOCOL)</color>\n" +
-                                "<color=#f1f5f9><b>THREAT LEVEL   :</b></color> <color=#ef4444><b>CATEGORY 5 (EXTINCTION EVENT)</b></color>\n" +
-                                "<color=#f1f5f9><b>PATHOGEN       :</b></color> <color=#f59e0b>NEURO-AGGRESSIVE MUTAGEN (PRIMARY VECTOR: HARBORVIEW LAB)</color>\n" +
-                                "<color=#f1f5f9><b>STATUS         :</b></color> <color=#ef4444>QUARANTINE FAILED // INFECTION RATE: 87.4%</color>\n" +
-                                "<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>INITIATE SECTOR 4 PURGE (THERMAL FIREBOMBING) AT 0600 HOURS.</b></color>\n" +
-                                "<color=#f1f5f9><b>EXTRACTION LZ  :</b></color> <color=#10b981>POINT 'ECHO' // HARBORVIEW HELIPAD (47.604° N, 122.324° W)</color>\n" +
-                                "<color=#ef4444><b>========================================================================</b></color>\n\n" +
-                                "<color=#10b981>[+] EVACUATION COORDINATES & ATTACHMENTS SECURED (EVAC_PROTOCOLS.DAT).</color>\n" +
-                                "<color=#ffd700><b>[+] GENERATING TIER-1 CLEARANCE PASSKEY... TRANSFERRED TO PERSONAL PHONE!</b></color>\n\n" +
-                                "<color=#ef4444><b>[!] REMOTE DISPATCH DETECTED INTRUSION. CENTRAL KILL-SWITCH ENGAGED!</b></color>\n" +
-                                "<color=#94a3b8>[X] CONNECTION TERMINATED BY HOST. INTRANET ADAPTER SEVERED.</color>";
+            terminalText.text = "<color=#64748b>>_ terminal@unit407: scanning local building gateway...</color>\n" +
+                                "<color=#38bdf8>[*] SUBNET 192.168.1.1 — SNIFFING CITY EMERGENCY RELAY...</color>\n" +
+                                "<color=#10b981>[+] LOCAL ROUTER CACHE DUMPED... [OK]</color>\n" +
+                                "<color=#f59e0b>[*] READING LAST CACHED MUNICIPAL DISPATCH PACKETS...</color>\n\n" +
+                                "<color=#ef4444><b>================== [ CACHED CITY EMERGENCY MEMO ] ==================</b></color>\n" +
+                                "<color=#f1f5f9><b>INCIDENT CODE  :</b></color> <color=#38bdf8>AMBER-9 (UNCONTROLLED MASS VIOLENCE)</color>\n" +
+                                "<color=#f1f5f9><b>AFFECTED ZONES :</b></color> <color=#f59e0b>5TH ST HOSPITAL // DOWNTOWN CORRIDOR // I-5 RAMPS</color>\n" +
+                                "<color=#f1f5f9><b>MEDICAL NOTE   :</b></color> <color=#f59e0b>SUSPECTED ACUTE CONTAGION — BITING / EXTREME AGITATION</color>\n" +
+                                "<color=#f1f5f9><b>TRAFFIC STATUS :</b></color> <color=#ef4444>BRIDGES & FREEWAY ON-RAMPS CLOSING BY 0100</color>\n" +
+                                "<color=#f1f5f9><b>DIRECTIVE      :</b></color> <color=#ef4444><b>HOLD IN PLACE UNTIL FURTHER COUNTY ORDERS.</b></color>\n" +
+                                "<color=#f1f5f9><b>COUNTY STAGING :</b></color> <color=#10b981>EASTBOUND ROUTES / TIMBERLINE CORRIDOR (UNCONFIRMED)</color>\n" +
+                                "<color=#ef4444><b>====================================================================</b></color>\n\n" +
+                                "<color=#10b981>[+] CACHED ROAD CLOSURE LIST SAVED (ROAD_STATUS.DAT).</color>\n" +
+                                "<color=#ffd700><b>[+] FOUND UNREVOKED MUNICIPAL GATE PASSKEY... SAVED TO PHONE!</b></color>\n\n" +
+                                "<color=#ef4444><b>[!] UPSTREAM GATEWAY TIMED OUT. NO CARRIER ON WAN PORT.</b></color>\n" +
+                                "<color=#94a3b8>[X] CONNECTION DROPPED. FIBER LINE DEAD.</color>";
             SundayTypography.ApplyFont(terminalText, FontRole.Mono);
 
             // 5. Finish Container (Docked on chassis below LaptopScreen so it NEVER overlaps the terminal!)
@@ -3727,7 +3729,7 @@ namespace SundayLastBreath.Editor
             foTmp.fontSize = 12.5f;
             foTmp.lineSpacing = 4f;
             foTmp.color = new Color(0.92f, 0.94f, 0.98f);
-            foTmp.text = "<color=#ef4444><b>'SECTOR PURGE AT 0600 HOURS.'</b></color> The military isn't trying to contain the outbreak — they are firebombing the city at dawn. A <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> has been pushed to your personal phone.";
+            foTmp.text = "<color=#ef4444><b>'BRIDGES & FREEWAY ON-RAMPS CLOSING BY 0100.'</b></color> If the main roads lock down at 1 AM, waiting for morning means getting boxed in. You save the cached <b><color=#ffd700>Tier-1 Military Clearance Passkey</color></b> to your phone before the router goes dead.";
             SundayTypography.ApplyFont(foTmp, FontRole.Body);
 
             LayoutElement oLe = foObj.AddComponent<LayoutElement>();

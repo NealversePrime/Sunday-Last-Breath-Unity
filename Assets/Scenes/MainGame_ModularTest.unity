@@ -40228,7 +40228,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LORE
+  m_text: NOTES
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 1731877505}
   m_sharedMaterial: {fileID: 582420350}
@@ -59389,9 +59389,9 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
@@ -90199,7 +90199,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: RECORDED INTEL & LOGS
+  m_text: NOTES & CLUES
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 1779560032}
   m_sharedMaterial: {fileID: 261719154}
