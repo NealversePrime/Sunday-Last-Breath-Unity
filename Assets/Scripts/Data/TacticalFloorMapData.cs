@@ -37,12 +37,13 @@ namespace SundayLastBreath.Data
         public bool isLocked = false;
         public bool isBlocked = false;
         public bool isAccessible = true;
+        public bool isVisited = false;
 
         [Header("Tactical Recon Intel")]
         public bool isDiscovered = false;
         public string undiscoveredSub = "RESIDENTIAL";
         public string undiscoveredTitle = "RESIDENTIAL UNIT";
-        public string statusTag = "CURRENT SECTOR";
+        public string statusTag = "CURRENT LOCATION";
         public string threatLevel = "NONE";
         public string scavengeStatus = "LOOTED / SECURED";
         public string acousticScan = "60Hz TV STATIC HUM";

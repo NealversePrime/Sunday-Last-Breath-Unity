@@ -6984,8 +6984,8 @@ namespace SundayLastBreath.Editor
 
             CreateBlueprintFloorRow(mapCtrl, fpCanvas.transform, -100f,
                 "stairs", "STAIRWELL W", "FIRE EXIT",
-                "hallway_end", "STAIR FOYER", "SOUTH FOYER",
-                "empty_bot", "EAST WING", "EAST WING",
+                "hallway_4", "CORR-S4", "SOUTH HALLWAY",
+                "blocked_stairs", "COLLAPSED", "BLOCKED STAIRS",
                 hasSouthCorridorLink: false);
 
             // Bottom Clearance Legend Strip (Bottom 22px inside BlueprintViewport)
@@ -6999,8 +6999,9 @@ namespace SundayLastBreath.Editor
             lbRect.offsetMax = new Vector2(-10f, 23f);
 
             TextMeshProUGUI legendTmp = CreateTMPText(legendBar.transform, "LegendText",
-                "<color=#00e5ff>■</color> CURRENT SECTOR     <color=#14b87a>■</color> CLEARED / OPEN     <color=#f59e0b>■</color> LOCKED     <color=#f43f5e>■</color> BIOHAZARD / BLOCKED     <color=#94a3b8>■</color> COLLAPSED",
-                9.5f, new Color(0.78f, 0.88f, 0.96f), TextAlignmentOptions.Center, FontStyles.Bold);
+                "<color=#00e5ff>■</color> CURRENT LOCATION   <color=#94a3b8>■</color> VISITED / ACCESSIBLE   <color=#475569>■</color> UNVISITED",
+                7.8f, new Color(0.78f, 0.88f, 0.96f), TextAlignmentOptions.Center, FontStyles.Bold);
+            legendTmp.textWrappingMode = TextWrappingModes.NoWrap;
             StretchFull(legendTmp.rectTransform);
 
             // Tactical Blueprint Zoom & Pan Toolbar (Top-right of blueprint area)
@@ -7147,7 +7148,7 @@ namespace SundayLastBreath.Editor
 
             // Clearance Status Pill (y: -60 to -78)
             TextMeshProUGUI intelStatusTmp = CreateTMPText(intelCard.transform, "StatusTag",
-                "<color=#00e5ff><b>[ CURRENT SECTOR ]</b></color>",
+                "<color=#00e5ff><b>[ CURRENT LOCATION ]</b></color>",
                 10.5f, Color.white, TextAlignmentOptions.MidlineLeft, FontStyles.Bold);
             RectTransform stRect = intelStatusTmp.rectTransform;
             stRect.anchorMin = new Vector2(0f, 1f);
@@ -7401,29 +7402,30 @@ namespace SundayLastBreath.Editor
             Image iconImg = iconObj.AddComponent<Image>();
             iconImg.preserveAspect = true;
             iconImg.raycastTarget = false;
+            iconObj.SetActive(false);
 
             // Room Code Label (Top Line) — Pure crisp white for 16:1 contrast
             TextMeshProUGUI codeTmp = CreateTMPText(nodeObj.transform, "Code", code,
                 isHallway ? 8.5f : 10f,
                 Color.white,
-                isHallway ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft,
+                TextAlignmentOptions.Center,
                 FontStyles.Bold);
             RectTransform cRect = codeTmp.rectTransform;
             cRect.anchorMin = new Vector2(0f, 0.5f);
             cRect.anchorMax = new Vector2(1f, 1f);
-            cRect.offsetMin = new Vector2(isHallway ? 4f : 28f, -1f);
-            cRect.offsetMax = new Vector2(isHallway ? -4f : -48f, -3f);
+            cRect.offsetMin = new Vector2(4f, -1f);
+            cRect.offsetMax = new Vector2(-4f, -3f);
 
             // Sub-Label / Clearance Readout (Bottom Line)
             TextMeshProUGUI subTmp = CreateTMPText(nodeObj.transform, "SubLabel", subLabel,
                 isHallway ? 7f : 8f,
                 new Color(0.65f, 0.78f, 0.88f),
-                isHallway ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft);
+                TextAlignmentOptions.Center);
             RectTransform sRect = subTmp.rectTransform;
             sRect.anchorMin = new Vector2(0f, 0f);
             sRect.anchorMax = new Vector2(1f, 0.5f);
-            sRect.offsetMin = new Vector2(isHallway ? 4f : 28f, 3f);
-            sRect.offsetMax = new Vector2(isHallway ? -4f : -48f, 1f);
+            sRect.offsetMin = new Vector2(4f, 3f);
+            sRect.offsetMax = new Vector2(-4f, 1f);
 
             // Tactical Status Pill Badge (Top-Right Corner, e.g. [LOCK], [HERE], [EXIT])
             GameObject navBadge = new GameObject("NavBadge", typeof(RectTransform));

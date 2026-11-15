@@ -1013,7 +1013,110 @@ namespace SundayLastBreath.UI
 
         public string CurrentInspectedRoom => currentInspectedRoom;
 
+        public GameObject DockContainerNarrative => dockContainerNarrative;
+        public GameObject DockContainerPDA => dockContainerPDA;
+        public GameObject DockContainerGear => dockContainerGear;
+        public GameObject AwakeningContainer => awakeningContainer;
+        public GameObject HubMenuContainer => hubMenuContainer;
+        public GameObject SituationBox => situationBox;
+        public TextMeshProUGUI SituationBoxText => situationBoxText;
+        public GameObject PackedSuccessBanner => packedSuccessBanner;
+        public GameObject PdaPanelStatus => pdaPanelStatus;
+        public GameObject PdaPanelSkills => pdaPanelSkills;
+        public GameObject PdaPanelTraits => pdaPanelTraits;
+        public GameObject PdaPanelMap => pdaPanelMap;
+        public GameObject PdaPanelLore => pdaPanelLore;
+        public TextMeshProUGUI LocationText => locationText;
+        public TextMeshProUGUI ClockTimeText => clockTimeText;
+        public TextMeshProUGUI ClockDayText => clockDayText;
+        public GameObject PhoneModal => phoneModal;
+        public GameObject StoryLogModal => storyLogModal;
+        public GameObject RadioModal => radioModal;
+        public GameObject HackingModal => hackingModal;
+        public GameObject SystemMenuModal => systemMenuModal;
+        public bool IsOnSecondFloor => stair_phase >= 4;
 
+        private HybridCockpitController _hybridCockpit;
+        public bool IsHybridCockpitActive => _hybridCockpit != null && _hybridCockpit.enabled;
+        public IReadOnlyList<string> StoryLogs => _storyLogs;
+        public List<InventoryEntry> GetCurrentFloorStashPublic()
+        {
+            return GetCurrentFloorStash();
+        }
+        public void TriggerAdvanceAwakening() => OnDialogueAreaClicked();
+        public void TriggerOpenPhone() => OnCheckPhoneClicked();
+        public void TriggerSwitchPDATab(string tabName) => SwitchPDATab(tabName, playSound: true);
+        public void TriggerTakeAllFloorItems() => OnTakeAllFloorItemsClicked();
+        public bool TakeSingleFloorOrTableItem(string itemId)
+        {
+            if (currentPlayer == null || string.IsNullOrEmpty(itemId)) return false;
+
+            if (!isInHallway && !hasPacked && tableStash != null)
+            {
+                int tIdx = tableStash.FindIndex(i => string.Equals(i.itemId, itemId, StringComparison.OrdinalIgnoreCase));
+                if (tIdx >= 0)
+                {
+                    var entry = tableStash[tIdx];
+                    bool picked;
+                    if (string.Equals(entry.itemId, "Apartment Key", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(entry.itemId, "Apartment 407 Key", StringComparison.OrdinalIgnoreCase))
+                    {
+                        currentPlayer.AddKeyItem("Apartment Key", "Apartment 407 Key", "Brass tumbler key labeled 'Room 407'. Required once to unlock the front door deadbolt.", gameClock != null ? gameClock.GetTimeString() : "23:45");
+                        picked = true;
+                    }
+                    else
+                    {
+                        picked = currentPlayer.AddItem(entry.itemId, entry.quantity);
+                    }
+
+                    if (picked)
+                    {
+                        tableStash.RemoveAt(tIdx);
+                        AppendStoryLog(gameClock != null ? gameClock.GetTimeString() : "23:45", "LOOT // TABLE ITEM SECURED",
+                            $"You packed {entry.itemId} (x{entry.quantity}) from the coffee table.");
+                        if (tableStash.Count == 0)
+                        {
+                            hasPacked = true;
+                            objectiveSystem?.CompleteObjective("pack_gear");
+                            objectiveSystem?.ActivateObjective("leave_apt");
+                        }
+                        PopulateTableStashUI();
+                        RefreshFromHybridCockpit();
+                        return true;
+                    }
+                    else
+                    {
+                        if (situationBoxText != null)
+                        {
+                            UpdateSituationBoxTextAndHeight("<color=#EF4444>[!] Backpack capacity reached! Make room to carry this item.</color>");
+                        }
+                        return false;
+                    }
+                }
+            }
+
+            OnTakeSingleFloorItemClicked(itemId);
+            _hybridCockpit?.RefreshAll();
+            return true;
+        }
+        public void TriggerWaitMinutes(int mins)
+        {
+            if (Clock != null) Clock.AddTime(mins);
+            UpdateClockUI();
+            UpdateVitalsUI();
+            RefreshAllPDAPanels();
+            _hybridCockpit?.RefreshAll();
+        }
+        public void RefreshFromHybridCockpit()
+        {
+            UpdateVitalsUI();
+            UpdateClockUI();
+            RefreshAllPDAPanels();
+            RefreshRightGearPanel();
+            UpdateFloorItemsNotification();
+            EvaluateHubButtonStates();
+            _hybridCockpit?.RefreshAll();
+        }
 
         protected override void Awake()
 
@@ -1028,6 +1131,12 @@ namespace SundayLastBreath.UI
             InitializeAudioSources();
 
             InitializeSystems();
+
+            _hybridCockpit = GetComponent<HybridCockpitController>();
+            if (_hybridCockpit != null)
+            {
+                _hybridCockpit.InitializeCockpit(this);
+            }
 
             EnsureHubMenuSanitized();
 
@@ -1141,6 +1250,8 @@ namespace SundayLastBreath.UI
 
                     RefreshPDAStatusTab();
 
+                    _hybridCockpit?.RefreshAll();
+
                 };
 
             }
@@ -1153,7 +1264,11 @@ namespace SundayLastBreath.UI
 
                 loreSystem = new LoreSystem();
 
-                loreSystem.OnLoreAdded += (l) => RefreshPDALoreTab();
+                loreSystem.OnLoreAdded += (l) =>
+                {
+                    RefreshPDALoreTab();
+                    _hybridCockpit?.RefreshAll();
+                };
 
             }
 
@@ -1228,6 +1343,8 @@ namespace SundayLastBreath.UI
                     UpdateFloorItemsNotification();
 
                     RefreshStoryLogUI();
+
+                    _hybridCockpit?.RefreshAll();
 
                 };
 
@@ -1579,6 +1696,9 @@ namespace SundayLastBreath.UI
 
             if (hubMenuContainer == null) return;
 
+            if (_hybridCockpit == null) _hybridCockpit = GetComponent<HybridCockpitController>();
+            bool hybridActive = IsHybridCockpitActive;
+
 
 
             // 1. Hide any orphaned floor take button inside the narrative choice menu
@@ -1607,7 +1727,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                vlgRoot.spacing = 12f;
+                vlgRoot.spacing = hybridActive ? 4f : 12f;
 
                 vlgRoot.childControlHeight = true;
 
@@ -1621,13 +1741,13 @@ namespace SundayLastBreath.UI
 
 
 
-            // Ensure SituationBox layout element stays compact
+            // Ensure SituationBox layout element stays compact (or full height in Hybrid Story Reader)
 
             if (situationBox != null)
 
             {
 
-                if (situationBox.transform.parent != hubMenuContainer.transform)
+                if (!hybridActive && situationBox.transform.parent != hubMenuContainer.transform)
 
                 {
 
@@ -1637,7 +1757,15 @@ namespace SundayLastBreath.UI
 
                 LayoutElement sle = situationBox.GetComponent<LayoutElement>() ?? situationBox.AddComponent<LayoutElement>();
 
-                if (sle.preferredHeight <= 0f) sle.preferredHeight = 64f;
+                if (hybridActive)
+                {
+                    sle.minHeight = 250f;
+                    if (sle.preferredHeight < 250f) sle.preferredHeight = 270f;
+                }
+                else
+                {
+                    if (sle.preferredHeight <= 0f) sle.preferredHeight = 64f;
+                }
 
                 sle.flexibleHeight = 0f;
 
@@ -1653,11 +1781,15 @@ namespace SundayLastBreath.UI
 
             {
 
-                if (packedSuccessBanner.transform.parent != hubMenuContainer.transform)
+                Transform bannerTargetParent = (hybridActive && situationBox != null && situationBox.transform.parent != null)
+                    ? situationBox.transform.parent
+                    : hubMenuContainer.transform;
+
+                if (packedSuccessBanner.transform.parent != bannerTargetParent)
 
                 {
 
-                    packedSuccessBanner.transform.SetParent(hubMenuContainer.transform, false);
+                    packedSuccessBanner.transform.SetParent(bannerTargetParent, false);
 
                 }
 
@@ -1789,7 +1921,7 @@ namespace SundayLastBreath.UI
 
                 VerticalLayoutGroup vlg = content.AddComponent<VerticalLayoutGroup>();
 
-                vlg.spacing = 3f;
+                vlg.spacing = hybridActive ? 2f : 3f;
 
                 vlg.padding = new RectOffset(2, 6, 2, 2);
 
@@ -1869,7 +2001,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    cvlg.spacing = 3f;
+                    cvlg.spacing = hybridActive ? 2f : 3f;
 
                     cvlg.padding = new RectOffset(2, 6, 2, 2);
 
@@ -1891,9 +2023,9 @@ namespace SundayLastBreath.UI
 
             int sIdx = 0;
 
-            if (situationBox != null) situationBox.transform.SetSiblingIndex(sIdx++);
+            if (situationBox != null && situationBox.transform.parent == hubMenuContainer.transform) situationBox.transform.SetSiblingIndex(sIdx++);
 
-            if (packedSuccessBanner != null) packedSuccessBanner.transform.SetSiblingIndex(sIdx++);
+            if (packedSuccessBanner != null && packedSuccessBanner.transform.parent == hubMenuContainer.transform) packedSuccessBanner.transform.SetSiblingIndex(sIdx++);
 
             Transform sh = hubMenuContainer.transform.Find("ChoiceSubHeader");
 
@@ -1929,9 +2061,16 @@ namespace SundayLastBreath.UI
 
                 }
 
+                if (hybridActive)
+                {
+                    sh.gameObject.SetActive(false);
+                }
+
             }
 
             if (sr != null) sr.transform.SetSiblingIndex(sIdx++);
+
+            _hybridCockpit?.OnHubMenuSanitized();
 
 
 
@@ -3639,6 +3778,10 @@ namespace SundayLastBreath.UI
 
 
 
+            bool hybridActive = IsHybridCockpitActive;
+            float rowH = hybridActive ? 31f : 34f;
+            float rowSpacing = hybridActive ? 2f : 3f;
+
             // Ensure parent VerticalLayoutGroup drives heights and uses compact spacing
 
             var cvlg = contentParent.GetComponent<VerticalLayoutGroup>();
@@ -3647,7 +3790,7 @@ namespace SundayLastBreath.UI
 
             {
 
-                cvlg.spacing = 3f;
+                cvlg.spacing = rowSpacing;
 
                 cvlg.padding = new RectOffset(2, 6, 2, 2);
 
@@ -3673,7 +3816,7 @@ namespace SundayLastBreath.UI
 
 
 
-                // 1. Force 34px height for Direction A Fallout 4 FDI density
+                // 1. Force compact height (31px in 1+3 Hybrid deck so 8 choices fit without clipping; 34px legacy)
 
                 RectTransform crt = child.GetComponent<RectTransform>();
 
@@ -3681,7 +3824,7 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    crt.sizeDelta = new Vector2(crt.sizeDelta.x, 34f);
+                    crt.sizeDelta = new Vector2(crt.sizeDelta.x, rowH);
 
                 }
 
@@ -3693,9 +3836,9 @@ namespace SundayLastBreath.UI
 
                 {
 
-                    le.preferredHeight = 34f;
+                    le.preferredHeight = rowH;
 
-                    le.minHeight = 34f;
+                    le.minHeight = rowH;
 
                     le.flexibleHeight = 0f;
 
@@ -4404,7 +4547,7 @@ namespace SundayLastBreath.UI
 
 
 
-            SetSituationNarration(GetUnit407Anchor(), recordInLog: false);
+            SetSituationNarration(GetUnit407Anchor(), recordInLog: true);
 
 
 
@@ -5375,6 +5518,8 @@ namespace SundayLastBreath.UI
 
             if (playSound) PlayClickSFX();
 
+            _hybridCockpit?.OnConsoleModeChanged(mode);
+
         }
 
 
@@ -5793,12 +5938,20 @@ namespace SundayLastBreath.UI
 
                     }
 
-                    else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.F1)) && currentConsoleMode != ConsoleMode.Narrative)
-
+                    else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.F1))
                     {
-
-                        SwitchConsoleMode(ConsoleMode.Narrative);
-
+                        if (systemMenuModal != null && systemMenuModal.activeSelf)
+                        {
+                            CloseSystemMenuModal();
+                        }
+                        else if (currentConsoleMode != ConsoleMode.Narrative)
+                        {
+                            SwitchConsoleMode(ConsoleMode.Narrative);
+                        }
+                        else
+                        {
+                            OpenSystemMenuModal();
+                        }
                     }
 
                     else if (currentConsoleMode != ConsoleMode.Narrative && (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)))
@@ -6186,19 +6339,13 @@ namespace SundayLastBreath.UI
 
 
         private void RefreshAllPDAPanels()
-
         {
-
             RefreshPDAStatusTab();
-
             RefreshPDASkillsTab();
-
             RefreshPDATraitsTab();
-
             RefreshPDALoreTab();
-
             RefreshRightGearPanel();
-
+            _hybridCockpit?.RefreshAll();
         }
 
 
@@ -6701,6 +6848,8 @@ namespace SundayLastBreath.UI
 
             }
 
+            _hybridCockpit?.RefreshAll();
+
         }
 
 
@@ -6720,6 +6869,8 @@ namespace SundayLastBreath.UI
             {
 
                 tacticalGearController.Initialize(currentPlayer, activeFloor);
+
+                _hybridCockpit?.RefreshAll();
 
                 return;
 
@@ -6926,6 +7077,8 @@ namespace SundayLastBreath.UI
                 }
 
             }
+
+            _hybridCockpit?.RefreshAll();
 
         }
 
@@ -7787,6 +7940,8 @@ namespace SundayLastBreath.UI
 
             }
 
+            _hybridCockpit?.RefreshAll();
+
         }
 
 
@@ -8013,7 +8168,7 @@ namespace SundayLastBreath.UI
             UpdateSituationBoxHeader("LIVING ROOM");
             if (updateSituation)
             {
-                SetSituationNarration(GetUnit407Anchor(), recordInLog: false);
+                SetSituationNarration(GetUnit407Anchor(), recordInLog: true);
             }
 
 
@@ -8029,6 +8184,8 @@ namespace SundayLastBreath.UI
 
 
             EvaluateHubButtonStates();
+
+            _hybridCockpit?.RefreshAll();
 
         }
 
@@ -8610,6 +8767,8 @@ namespace SundayLastBreath.UI
 
             }
 
+            _hybridCockpit?.RefreshAll();
+
             return true;
 
         }
@@ -8900,9 +9059,20 @@ namespace SundayLastBreath.UI
 
             PlayClickSFX();
 
+            if (currentPlayer == null) return;
+
+            if (!isInHallway && !hasPacked && tableStash != null && tableStash.Count > 0)
+            {
+                OnPackGearClicked();
+            }
+
             var currentStash = GetCurrentFloorStash();
 
-            if (currentPlayer == null || currentStash.Count == 0) return;
+            if (currentStash.Count == 0)
+            {
+                _hybridCockpit?.RefreshAll();
+                return;
+            }
 
 
 
@@ -14347,31 +14517,37 @@ namespace SundayLastBreath.UI
 
                     }
 
+                    string folderPath = "Assets/Resources/Act1/" + animFolderName;
+
 #if UNITY_EDITOR
 
                     if (frames == null || frames.Count == 0)
 
                     {
 
-                        string folderPath = "Assets/Resources/Act1/" + animFolderName;
-
-                        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:Sprite", new[] { folderPath });
-
-                        if (guids != null && guids.Length > 0)
+                        if (UnityEditor.AssetDatabase.IsValidFolder(folderPath))
 
                         {
 
-                            frames = new List<Sprite>();
+                            string[] guids = UnityEditor.AssetDatabase.FindAssets("t:Sprite", new[] { folderPath });
 
-                            foreach (var guid in guids)
+                            if (guids != null && guids.Length > 0)
 
                             {
 
-                                string p = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                                frames = new List<Sprite>();
 
-                                Sprite s = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(p);
+                                foreach (var guid in guids)
 
-                                if (s != null) frames.Add(s);
+                                {
+
+                                    string p = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+
+                                    Sprite s = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(p);
+
+                                    if (s != null) frames.Add(s);
+
+                                }
 
                             }
 
@@ -14380,6 +14556,34 @@ namespace SundayLastBreath.UI
                     }
 
 #endif
+
+                    if ((frames == null || frames.Count == 0) && System.IO.Directory.Exists(folderPath))
+
+                    {
+
+                        string[] files = System.IO.Directory.GetFiles(folderPath, "*.png");
+
+                        if (files != null && files.Length > 0)
+
+                        {
+
+                            System.Array.Sort(files, System.StringComparer.Ordinal);
+
+                            frames = new List<Sprite>(files.Length);
+
+                            foreach (string file in files)
+
+                            {
+
+                                Sprite s = LoadSpriteFromDiskFile(file);
+
+                                if (s != null) frames.Add(s);
+
+                            }
+
+                        }
+
+                    }
 
                     if (frames != null && frames.Count > 0)
 
@@ -17857,8 +18061,52 @@ namespace SundayLastBreath.UI
 
 #endif
 
+            sp = LoadSpriteFromDiskFile("Assets/Resources/Act1/" + spriteName + ".png");
+
+            if (sp != null) return sp;
+
             return null;
 
+        }
+
+        /// <summary>
+        /// Loads a PNG sprite directly from disk as a fallback when AssetDatabase or Resources have not imported the file yet.
+        /// </summary>
+        private static Sprite LoadSpriteFromDiskFile(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath)) return null;
+
+#if UNITY_EDITOR
+            string assetPath = filePath.Replace("\\", "/");
+            Sprite assetSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+            if (assetSprite != null) return assetSprite;
+#endif
+
+            if (!System.IO.File.Exists(filePath)) return null;
+
+            try
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(filePath);
+                if (bytes == null || bytes.Length == 0) return null;
+
+                Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                if (!tex.LoadImage(bytes))
+                {
+                    UnityEngine.Object.Destroy(tex);
+                    return null;
+                }
+
+                tex.filterMode = FilterMode.Bilinear;
+                tex.wrapMode = TextureWrapMode.Clamp;
+
+                Sprite s = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+                s.name = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                return s;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
 
@@ -18459,6 +18707,12 @@ namespace SundayLastBreath.UI
 
                 situationBoxText.text = formattedText;
 
+                if (IsHybridCockpitActive)
+                {
+                    situationBoxText.fontSize = 14f;
+                    situationBoxText.lineSpacing = 4f;
+                }
+
 
 
                 RectTransform sbtRect = situationBoxText.rectTransform;
@@ -18511,9 +18765,9 @@ namespace SundayLastBreath.UI
 
                 float extraBreathingRoom = 8f;
 
-                float targetH = Mathf.Clamp(preferredTextH + topPadding + bottomPadding + extraBreathingRoom, 64f, 150f);
-
-
+                float targetH = IsHybridCockpitActive
+                    ? Mathf.Max(250f, preferredTextH + topPadding + bottomPadding + 14f)
+                    : Mathf.Clamp(preferredTextH + topPadding + bottomPadding + extraBreathingRoom, 64f, 150f);
 
                 LayoutElement le = situationBox.GetComponent<LayoutElement>();
 
@@ -18543,6 +18797,12 @@ namespace SundayLastBreath.UI
 
                 LayoutRebuilder.ForceRebuildLayoutImmediate(situationBox.GetComponent<RectTransform>());
 
+                if (situationBox.transform.parent != null)
+                {
+                    RectTransform sitParentRt = situationBox.transform.parent.GetComponent<RectTransform>();
+                    if (sitParentRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(sitParentRt);
+                }
+
                 if (hubMenuContainer != null)
 
                 {
@@ -18560,6 +18820,8 @@ namespace SundayLastBreath.UI
                     }
 
                 }
+
+                _hybridCockpit?.RefreshAll();
 
             }
 
@@ -18656,7 +18918,11 @@ namespace SundayLastBreath.UI
 
 
 
-            modularDialogueBox = Instantiate(monologueBox, hubMenuContainer.transform, false);
+            Transform targetDialogueParent = (IsHybridCockpitActive && situationBox != null && situationBox.transform.parent != null)
+                ? situationBox.transform.parent
+                : hubMenuContainer.transform;
+
+            modularDialogueBox = Instantiate(monologueBox, targetDialogueParent, false);
 
             modularDialogueBox.name = "ModularDialogueBox";
 
@@ -21272,6 +21538,8 @@ namespace SundayLastBreath.UI
 
             }
 
+            _hybridCockpit?.RefreshAll();
+
         }
 
 
@@ -21366,6 +21634,8 @@ namespace SundayLastBreath.UI
 
             }
 
+            _hybridCockpit?.RefreshAll();
+
         }
 
 
@@ -21409,6 +21679,8 @@ namespace SundayLastBreath.UI
             if (vitalsHpText != null) vitalsHpText.text = $"<color=#FF5555><b>HP</b></color> {currentPlayer.hp}/{currentPlayer.hpMax}";
 
             if (vitalsStaminaText != null) vitalsStaminaText.text = $"<color=#55FF88><b>STM</b></color> {currentPlayer.stamina}/{currentPlayer.staminaMax}";
+
+            _hybridCockpit?.RefreshAll();
 
         }
 
@@ -21740,9 +22012,7 @@ namespace SundayLastBreath.UI
 
                 "<b><color=#4FC3F7>[23:45] APARTMENT 407 // LIVING ROOM</color></b>\n" +
 
-                "You're standing in your dark living room while sirens wail down the street.\n\n" +
-
-                "Your keys, wallet, phone, and everyday gear are on the coffee table. Grab what you need from around the apartment before you unlock the deadbolt."
+                "Blue and red lights sweep across your living room curtains from the street below. The front deadbolt is still locked. Your keys, wallet, and everyday gear are sitting on the coffee table."
 
             );
 
@@ -21875,6 +22145,8 @@ namespace SundayLastBreath.UI
                     if (contentRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(contentRt);
                 }
             }
+
+            _hybridCockpit?.RefreshAll();
         }
 
         public void OnOpenStoryLogClicked()
