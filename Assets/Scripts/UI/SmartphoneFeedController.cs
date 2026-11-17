@@ -326,9 +326,9 @@ namespace SundayLastBreath.UI
             EnhanceFeedReadability();
             isNetworkDead = false;
 
-            if (SundayLastBreath.UI.ApartmentHubScreen.Instance != null && SundayLastBreath.UI.ApartmentHubScreen.Instance.CurrentPlayer != null)
+            if (SundayLastBreath.UI.GameStageScreen.Instance != null && SundayLastBreath.UI.GameStageScreen.Instance.CurrentPlayer != null)
             {
-                SundayLastBreath.UI.ApartmentHubScreen.Instance.CurrentPlayer.SetFlag("checked_phone_harmon", true);
+                SundayLastBreath.UI.GameStageScreen.Instance.CurrentPlayer.SetFlag("checked_phone_harmon", true);
             }
 
             // 1. Reset Feed Scroll to Top
@@ -339,9 +339,9 @@ namespace SundayLastBreath.UI
             }
 
             // 2. Reset Status Readouts
-            if (clockText != null && SundayLastBreath.UI.ApartmentHubScreen.Instance != null && SundayLastBreath.UI.ApartmentHubScreen.Instance.Clock != null)
+            if (clockText != null && SundayLastBreath.UI.GameStageScreen.Instance != null && SundayLastBreath.UI.GameStageScreen.Instance.Clock != null)
             {
-                clockText.text = SundayLastBreath.UI.ApartmentHubScreen.Instance.Clock.GetTimeString();
+                clockText.text = SundayLastBreath.UI.GameStageScreen.Instance.Clock.GetTimeString();
             }
             if (carrierStatusText != null)
             {

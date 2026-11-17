@@ -211,7 +211,7 @@ MonoBehaviour:
     iconType: 4
     isHallway: 0
     isStairs: 0
-    isLocked: 0
+    isLocked: 1
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
@@ -281,7 +281,7 @@ MonoBehaviour:
     iconType: 5
     isHallway: 0
     isStairs: 0
-    isLocked: 0
+    isLocked: 1
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0

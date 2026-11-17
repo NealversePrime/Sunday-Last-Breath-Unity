@@ -182,9 +182,9 @@ namespace SundayLastBreath.UI
             lastToggleTime = Time.unscaledTime;
 
             currentPlayer = GameManager.Instance != null ? GameManager.Instance.CurrentPlayer : null;
-            if (currentPlayer == null && ApartmentHubScreen.Instance != null)
+            if (currentPlayer == null && GameStageScreen.Instance != null)
             {
-                currentPlayer = ApartmentHubScreen.Instance.CurrentPlayer;
+                currentPlayer = GameStageScreen.Instance.CurrentPlayer;
             }
             if (currentPlayer == null)
             {
@@ -211,8 +211,8 @@ namespace SundayLastBreath.UI
             lastToggleTime = Time.unscaledTime;
             if (chassisContainer != null) chassisContainer.SetActive(false);
 
-            ApartmentHubScreen.Instance?.UpdateVitalsUI();
-            ApartmentHubScreen.Instance?.RefreshPDAStatusTab();
+            GameStageScreen.Instance?.UpdateVitalsUI();
+            GameStageScreen.Instance?.RefreshPDAStatusTab();
         }
 
         // ====================================================================
@@ -965,21 +965,21 @@ namespace SundayLastBreath.UI
 
             vitalsRefreshCallbacks.Add(() =>
             {
-                if (cTxt != null && ApartmentHubScreen.Instance != null && ApartmentHubScreen.Instance.Clock != null)
+                if (cTxt != null && GameStageScreen.Instance != null && GameStageScreen.Instance.Clock != null)
                 {
-                    var clk = ApartmentHubScreen.Instance.Clock;
+                    var clk = GameStageScreen.Instance.Clock;
                     cTxt.text = $"CURRENT TIME: <b>{clk.Hour:D2}:{clk.Minute:D2}</b> // {clk.DayName} (DAY {clk.DayCount})";
                 }
             });
 
             CreateSectionHeader(content.transform, "TIME ADVANCE / REVERSE");
 
-            CreateAdjusterRow(content.transform, "HOUR (+ / -)", () => ApartmentHubScreen.Instance?.Clock != null ? $"{ApartmentHubScreen.Instance.Clock.Hour:D2}:00" : "23:00",
+            CreateAdjusterRow(content.transform, "HOUR (+ / -)", () => GameStageScreen.Instance?.Clock != null ? $"{GameStageScreen.Instance.Clock.Hour:D2}:00" : "23:00",
                 () => { SetTimeRelative(-60); },
                 () => { SetTimeRelative(60); },
                 () => { SetTimeRelative(180); }, "+3 HOURS");
 
-            CreateAdjusterRow(content.transform, "MINUTE (+ / -)", () => ApartmentHubScreen.Instance?.Clock != null ? $"{ApartmentHubScreen.Instance.Clock.Minute:D2} MIN" : "45 MIN",
+            CreateAdjusterRow(content.transform, "MINUTE (+ / -)", () => GameStageScreen.Instance?.Clock != null ? $"{GameStageScreen.Instance.Clock.Minute:D2} MIN" : "45 MIN",
                 () => { SetTimeRelative(-10); },
                 () => { SetTimeRelative(10); },
                 () => { SetTimeRelative(30); }, "+30 MIN");
@@ -1003,9 +1003,9 @@ namespace SundayLastBreath.UI
 
         private void SetTimeRelative(int minutes)
         {
-            if (ApartmentHubScreen.Instance != null && ApartmentHubScreen.Instance.Clock != null)
+            if (GameStageScreen.Instance != null && GameStageScreen.Instance.Clock != null)
             {
-                var clk = ApartmentHubScreen.Instance.Clock;
+                var clk = GameStageScreen.Instance.Clock;
                 int totalMinutes = (clk.DayCount * 24 * 60) + (clk.Hour * 60) + clk.Minute + minutes;
                 if (totalMinutes < 0) totalMinutes = 0;
                 int newDay = totalMinutes / (24 * 60);
@@ -1019,9 +1019,9 @@ namespace SundayLastBreath.UI
 
         private void SetClockExact(int hour, int minute)
         {
-            if (ApartmentHubScreen.Instance != null && ApartmentHubScreen.Instance.Clock != null)
+            if (GameStageScreen.Instance != null && GameStageScreen.Instance.Clock != null)
             {
-                var clk = ApartmentHubScreen.Instance.Clock;
+                var clk = GameStageScreen.Instance.Clock;
                 clk.SetTime(clk.DayCount, hour, minute, clk.Date, clk.Month, clk.Year, clk.DayName);
                 SyncVitals();
             }
@@ -1207,18 +1207,18 @@ namespace SundayLastBreath.UI
             {
                 title.gameObject.SetActive(false);
             }
-            if (ApartmentHubScreen.Instance != null && !ApartmentHubScreen.Instance.gameObject.activeSelf)
+            if (GameStageScreen.Instance != null && !GameStageScreen.Instance.gameObject.activeSelf)
             {
-                ApartmentHubScreen.Instance.gameObject.SetActive(true);
+                GameStageScreen.Instance.gameObject.SetActive(true);
             }
         }
 
         private void WarpToHubMode()
         {
-            if (ApartmentHubScreen.Instance != null)
+            if (GameStageScreen.Instance != null)
             {
-                ApartmentHubScreen.Instance.SwitchConsoleMode(ApartmentHubScreen.ConsoleMode.Narrative);
-                ApartmentHubScreen.Instance.UpdateVitalsUI();
+                GameStageScreen.Instance.SwitchConsoleMode(GameStageScreen.ConsoleMode.Narrative);
+                GameStageScreen.Instance.UpdateVitalsUI();
             }
         }
 
@@ -1231,9 +1231,9 @@ namespace SundayLastBreath.UI
                 passage = Resources.Load<StoryPassageData>($"StoryPassages/{baseName}");
             }
 
-            if (passage != null && ApartmentHubScreen.Instance != null)
+            if (passage != null && GameStageScreen.Instance != null)
             {
-                ApartmentHubScreen.Instance.PlayStoryPassage(passage);
+                GameStageScreen.Instance.PlayStoryPassage(passage);
             }
             else
             {
@@ -1399,8 +1399,8 @@ namespace SundayLastBreath.UI
 
         private void SyncVitals()
         {
-            ApartmentHubScreen.Instance?.UpdateVitalsUI();
-            ApartmentHubScreen.Instance?.RefreshPDAStatusTab();
+            GameStageScreen.Instance?.UpdateVitalsUI();
+            GameStageScreen.Instance?.RefreshPDAStatusTab();
             RefreshActivePanel();
         }
 

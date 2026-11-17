@@ -219,11 +219,11 @@ namespace SundayLastBreath.Core
             return LoadGame(defaultSaveFileName);
         }
 
-        private ApartmentHubScreen ResolveApartmentHub()
+        private GameStageScreen ResolveGameStage()
         {
-            if (ApartmentHubScreen.Instance != null) return ApartmentHubScreen.Instance;
-            if (GameManager.Instance != null && GameManager.Instance.ApartmentHub != null) return GameManager.Instance.ApartmentHub;
-            var all = Resources.FindObjectsOfTypeAll<ApartmentHubScreen>();
+            if (GameStageScreen.Instance != null) return GameStageScreen.Instance;
+            if (GameManager.Instance != null && GameManager.Instance.GameStage != null) return GameManager.Instance.GameStage;
+            var all = Resources.FindObjectsOfTypeAll<GameStageScreen>();
             return (all != null && all.Length > 0) ? all[0] : null;
         }
 
@@ -236,17 +236,18 @@ namespace SundayLastBreath.Core
 
             try
             {
-                ApartmentHubScreen hub = ResolveApartmentHub();
+                GameStageScreen hub = ResolveGameStage();
 
-                // 1. Resolve Character Data
+                // 1. Resolve Character Data (prioritize active gameplay actor from stage and keep GameManager synced)
                 CharacterData character = null;
-                if (GameManager.Instance != null && GameManager.Instance.CurrentPlayer != null)
-                {
-                    character = GameManager.Instance.CurrentPlayer;
-                }
-                else if (hub != null && hub.CurrentPlayer != null)
+                if (hub != null && hub.CurrentPlayer != null)
                 {
                     character = hub.CurrentPlayer;
+                    if (GameManager.Instance != null) GameManager.Instance.SetCurrentPlayer(character);
+                }
+                else if (GameManager.Instance != null && GameManager.Instance.CurrentPlayer != null)
+                {
+                    character = GameManager.Instance.CurrentPlayer;
                 }
 
                 // Fallback creation for direct test runs
@@ -366,7 +367,7 @@ namespace SundayLastBreath.Core
 
             try
             {
-                ApartmentHubScreen hub = ResolveApartmentHub();
+                GameStageScreen hub = ResolveGameStage();
 
                 // 1. Load Character Data
                 CharacterData loadedChar = null;

@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a88fae75884c3cd47b7055258e0d7570, type: 3}
+  m_Name: FloorMap_Stairwell_2F
+  m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.TacticalFloorMapData
+  floorId: stairwell_2f
+  floorTitle: "ARCHITECTURAL BLUEPRINT // ASCOTT RESIDENCY \u2014 STAIRWELL SHAFT (2F - 1F)"
+  floorSubtitle: SCHEMATIC SCALE 1:100
+  gridCoordinate: 'SECTOR [ST-02:R-01] // SHAFT BIO-RADAR: ACTIVE'
+  vectorMapSprite: {fileID: 3286163911610860551, guid: 4864d1b43cfb0fe4b9b882d4acbd8b0d, type: 3}
+  rooms:
+  - roomId: f2_entrance
+    roomCode: 2F ENTRANCE
+    shortSub: 2F DOORWAY
+    fullTitle: 2ND FLOOR // STAIRWELL ACCESS DOOR
+    position: {x: -70, y: 70}
+    size: {x: 80, y: 80}
+    iconType: 6
+    isHallway: 0
+    isStairs: 1
+    isLocked: 0
+    isBlocked: 0
+    isAccessible: 1
+    isVisited: 0
+    isDiscovered: 1
+    undiscoveredSub: 2F DOORWAY
+    undiscoveredTitle: 2ND FLOOR // STAIRWELL ACCESS DOOR
+    statusTag: DETOUR ROUTE
+    threatLevel: MUTED BREATHING BEHIND DOOR
+    scavengeStatus: UNKNOWN
+    acousticScan: WET RHYTHMIC THUMP
+    reconIntel: The fire door to the 2nd floor residential wing. Behind the steel, rhythmic wet thuds echo against the plaster. With the stairs blocked below, this is the only remaining escape path.
+    connectedRoomIds:
+    - f1_landing
+  - roomId: f1_landing
+    roomCode: 1F BARRICADE
+    shortSub: IMPASSABLE
+    fullTitle: GROUND FLIGHT // STAIRWELL BARRICADE
+    position: {x: 70, y: -70}
+    size: {x: 80, y: 80}
+    iconType: 8
+    isHallway: 0
+    isStairs: 1
+    isLocked: 0
+    isBlocked: 1
+    isAccessible: 0
+    isVisited: 0
+    isDiscovered: 0
+    undiscoveredSub: IMPASSABLE
+    undiscoveredTitle: GROUND FLIGHT // STAIRWELL BARRICADE
+    statusTag: BLOCKED WITH FURNITURE
+    threatLevel: IMPASSABLE
+    scavengeStatus: HEAVY VENDING MACHINE
+    acousticScan: MUFFLED SHUFFLING BELOW
+    reconIntel: Halfway between the 2nd and 1st floors, desks, chairs, and a heavy vending machine are wedged tight against the iron handrail. Dented steel on the lower panel reveals something tried to force its way up.
+    connectedRoomIds:
+    - f2_entrance
+  doorways:
+  - doorId: stair_flight_2f_1f
+    connectedRoomId: f1_landing
+    position: {x: 0, y: 0}
+    size: {x: 140, y: 4}

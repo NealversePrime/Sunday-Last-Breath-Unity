@@ -22,10 +22,10 @@ namespace SundayLastBreath.Editor
 {
     public static class SundaySceneBuilder
     {
-        [InitializeOnLoadMethod]
+        // [InitializeOnLoadMethod] disabled to prevent automatic overwriting of MainGame.unity on domain reload / temp invalidation
         private static void AutoInit()
         {
-            EditorApplication.update += CheckAutoBuild;
+            // Disabled legacy auto-build
         }
 
         private static void CheckAutoBuild()
@@ -49,11 +49,11 @@ namespace SundayLastBreath.Editor
             BuildScene();
         }
 
-        [MenuItem("Tools/Sunday's Last Breath/Build Main Menu Scene", false, 0)]
+        [MenuItem("Tools/Sunday's Last Breath/Build Legacy Main Game Scene (v56)", false, 0)]
         public static void BuildScene()
         {
             // 1. Create or open scene
-            string scenePath = "Assets/Scenes/MainGame.unity";
+            string scenePath = "Assets/Scenes/MainGame_Generated_v56.unity";
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             // 2. Main Camera
@@ -134,7 +134,7 @@ namespace SundayLastBreath.Editor
             TitleScreen titleScreen = BuildTitleScreen(screensObj.transform);
             PrologueWakeUpScreen prologueScreen = BuildPrologueWakeUpScreen(screensObj.transform);
             CharacterCreationScreen creationScreen = BuildCharacterCreationScreen(screensObj.transform);
-            ApartmentHubScreen apartmentHubScreen = BuildApartmentHubScreen(screensObj.transform);
+            GameStageScreen gameStageScreen = BuildGameStageScreen(screensObj.transform);
             SundayTypography.ApplyHierarchy(screensObj.transform);
 
             // Initial Screen States: Boot cleanly into StudioSplashScreen
@@ -142,7 +142,7 @@ namespace SundayLastBreath.Editor
             titleScreen.gameObject.SetActive(false);
             prologueScreen.gameObject.SetActive(false);
             creationScreen.gameObject.SetActive(false);
-            apartmentHubScreen.gameObject.SetActive(false);
+            gameStageScreen.gameObject.SetActive(false);
             splashScreen.gameObject.SetActive(true);
 
             // 7. GameManager & SaveManager
@@ -156,7 +156,8 @@ namespace SundayLastBreath.Editor
             gameSo.FindProperty("titleScreen").objectReferenceValue = titleScreen;
             gameSo.FindProperty("prologueWakeUpScreen").objectReferenceValue = prologueScreen;
             gameSo.FindProperty("characterCreationScreen").objectReferenceValue = creationScreen;
-            gameSo.FindProperty("apartmentHubScreen").objectReferenceValue = apartmentHubScreen;
+            var stageProp = gameSo.FindProperty("gameStageScreen") ?? gameSo.FindProperty("apartmentHubScreen");
+            if (stageProp != null) stageProp.objectReferenceValue = gameStageScreen;
             gameSo.ApplyModifiedProperties();
 
             // Save Scene
@@ -508,7 +509,7 @@ namespace SundayLastBreath.Editor
             return screen;
         }
 
-                private static ApartmentHubScreen BuildApartmentHubScreen(Transform parent)
+                private static GameStageScreen BuildGameStageScreen(Transform parent)
         {
             GameObject obj = new GameObject("MainGameScreen", typeof(RectTransform));
             obj.transform.SetParent(parent, false);
@@ -519,7 +520,7 @@ namespace SundayLastBreath.Editor
             rootBg.color = new Color(0.04f, 0.045f, 0.06f, 1f);
             rootBg.raycastTarget = false;
 
-            ApartmentHubScreen screen = obj.AddComponent<ApartmentHubScreen>();
+            GameStageScreen screen = obj.AddComponent<GameStageScreen>();
 
             // =========================================================================
             // 1. TOP HUD BAR (46px Height - Authentic Twine #top-hud replica)

@@ -41,12 +41,14 @@ namespace SundayLastBreath.Core
         [SerializeField] private TitleScreen titleScreen;
         [SerializeField] private PrologueWakeUpScreen prologueWakeUpScreen;
         [SerializeField] private CharacterCreationScreen characterCreationScreen;
-        [SerializeField] private ApartmentHubScreen apartmentHubScreen;
+        [UnityEngine.Serialization.FormerlySerializedAs("apartmentHubScreen")]
+        [SerializeField] private GameStageScreen gameStageScreen;
 
         public GameState CurrentState => currentState;
         public SundayLastBreath.Data.CharacterData CurrentPlayer { get; private set; }
-        public ApartmentHubScreen ApartmentHub => apartmentHubScreen;
-        public ApartmentHubScreen MainGameScreen => apartmentHubScreen;
+        public GameStageScreen GameStage => gameStageScreen;
+        public GameStageScreen MainGameScreen => gameStageScreen;
+        public GameStageScreen ApartmentHub => gameStageScreen;
 
         public void SetCurrentPlayer(SundayLastBreath.Data.CharacterData player)
         {
@@ -70,7 +72,7 @@ namespace SundayLastBreath.Core
             if (titleScreen == null) titleScreen = FindAnyObjectByType<TitleScreen>(FindObjectsInactive.Include);
             if (prologueWakeUpScreen == null) prologueWakeUpScreen = FindAnyObjectByType<PrologueWakeUpScreen>(FindObjectsInactive.Include);
             if (characterCreationScreen == null) characterCreationScreen = FindAnyObjectByType<CharacterCreationScreen>(FindObjectsInactive.Include);
-            if (apartmentHubScreen == null) apartmentHubScreen = FindAnyObjectByType<ApartmentHubScreen>(FindObjectsInactive.Include);
+            if (gameStageScreen == null) gameStageScreen = FindAnyObjectByType<GameStageScreen>(FindObjectsInactive.Include);
         }
 
         private void Start()
@@ -170,25 +172,27 @@ namespace SundayLastBreath.Core
                       $"Vitals: HP {character.hp}/{character.hpMax}, Stamina {character.stamina}/{character.staminaMax}\n" +
                       $"Traits Acquired: {character.traits.Count} | Starting Items: {character.inventory.Count}");
 
-            GoToApartmentHub();
+            GoToGameStage();
         }
 
-        public void GoToApartmentHub()
+        public void GoToGameStage()
         {
             currentState = GameState.ApartmentHub;
             HideAllScreensInstant();
 
-            if (apartmentHubScreen != null)
+            if (gameStageScreen != null)
             {
-                apartmentHubScreen.gameObject.SetActive(true);
-                apartmentHubScreen.Show(0.8f);
-                apartmentHubScreen.InitializeWithCharacter(CurrentPlayer);
+                gameStageScreen.gameObject.SetActive(true);
+                gameStageScreen.Show(0.8f);
+                gameStageScreen.InitializeWithCharacter(CurrentPlayer);
             }
             else
             {
-                Debug.LogWarning("[GameManager] ApartmentHubScreen not assigned!");
+                Debug.LogWarning("[GameManager] GameStageScreen not assigned!");
             }
         }
+
+        public void GoToApartmentHub() => GoToGameStage();
 
         public void ResumeFromSave(SundayLastBreath.Data.CharacterData loadedChar, string roomId = null)
         {
@@ -196,15 +200,15 @@ namespace SundayLastBreath.Core
             currentState = GameState.ApartmentHub;
             HideAllScreensInstant();
 
-            if (apartmentHubScreen != null)
+            if (gameStageScreen != null)
             {
-                apartmentHubScreen.gameObject.SetActive(true);
-                apartmentHubScreen.Show(0.8f);
-                apartmentHubScreen.LoadCharacterState(CurrentPlayer, roomId);
+                gameStageScreen.gameObject.SetActive(true);
+                gameStageScreen.Show(0.8f);
+                gameStageScreen.LoadCharacterState(CurrentPlayer, roomId);
             }
             else
             {
-                Debug.LogWarning("[GameManager] ApartmentHubScreen not assigned!");
+                Debug.LogWarning("[GameManager] GameStageScreen not assigned!");
             }
         }
 
@@ -222,9 +226,9 @@ namespace SundayLastBreath.Core
                 CurrentPlayer.currentLocationId = roomId;
             }
 
-            if (apartmentHubScreen != null)
+            if (gameStageScreen != null)
             {
-                apartmentHubScreen.SetLocation(roomId, sectorName);
+                gameStageScreen.SetLocation(roomId, sectorName);
             }
         }
 
@@ -235,7 +239,7 @@ namespace SundayLastBreath.Core
             if (titleScreen != null) titleScreen.HideInstant();
             if (prologueWakeUpScreen != null) prologueWakeUpScreen.HideInstant();
             if (characterCreationScreen != null) characterCreationScreen.HideInstant();
-            if (apartmentHubScreen != null) apartmentHubScreen.HideInstant();
+            if (gameStageScreen != null) gameStageScreen.HideInstant();
         }
     }
 }

@@ -366245,7 +366245,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<color=#00c7f2>\u25A0</color> CURRENT LOCATION   <color=#94a3b8>\u25A0</color> VISITED / ACCESSIBLE   <color=#0a0f16>\u25A0</color> UNVISITED"
+  m_text: "<color=#00c7f2>\u25A0</color> CURRENT  <color=#94a3b8>\u25A0</color> VISITED  <color=#0a0f16>\u25A0</color> UNVISITED  <color=#ea2e38>\u25A0</color> LOCKED  <color=#f59e0b>\u25A0</color> BLOCKED"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 1262155449}
   m_sharedMaterial: {fileID: 1743583066}
@@ -366272,8 +366272,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 7.8
-  m_fontSizeBase: 7.8
+  m_fontSize: 6.8
+  m_fontSizeBase: 6.8
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 0

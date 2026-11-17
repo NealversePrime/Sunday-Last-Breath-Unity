@@ -1,0 +1,16 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="floor4stairs">
+        <!-- Connecting stair lines -->
+        <path id="Line_13" d="M 50 90 L 50 190 L 150 190" stroke="#3b5068" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path id="Line_14" d="M 90 50 L 190 50 L 190 150" stroke="#3b5068" stroke-width="3" stroke-linecap="round" fill="none"/>
+        
+        <!-- Stair descent chevron / step indicators -->
+        <line x1="50" y1="115" x2="68" y2="115" stroke="#263545" stroke-width="2"/>
+        <line x1="50" y1="140" x2="68" y2="140" stroke="#263545" stroke-width="2"/>
+        <line x1="50" y1="165" x2="68" y2="165" stroke="#263545" stroke-width="2"/>
+
+        <line x1="172" y1="75" x2="190" y2="75" stroke="#263545" stroke-width="2"/>
+        <line x1="172" y1="100" x2="190" y2="100" stroke="#263545" stroke-width="2"/>
+        <line x1="172" y1="125" x2="190" y2="125" stroke="#263545" stroke-width="2"/>
+    </g>
+</svg>

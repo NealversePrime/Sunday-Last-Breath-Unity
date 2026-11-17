@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,7 +81,7 @@ namespace SundayLastBreath.UI
         }
 
         [Header("Core Screen Reference")]
-        [SerializeField] private ApartmentHubScreen hubScreen;
+        [SerializeField] private GameStageScreen hubScreen;
         [SerializeField] private bool isBuilt;
 
         [Header("Cockpit Zones")]
@@ -181,7 +182,6 @@ namespace SundayLastBreath.UI
         private List<Sprite> _avatarFrames;
         private int _avatarFrameIndex;
         private float _avatarTimer;
-        private bool _hooksInitialized;
 
         // Palette constants matching blueprint_v4_hybrid_1_and_3.png
         private static readonly Color ColBgOuter = new Color(0.03f, 0.04f, 0.06f, 1f);
@@ -217,10 +217,10 @@ namespace SundayLastBreath.UI
             rt.localScale = Vector3.one;
         }
 
-        public void InitializeCockpit(ApartmentHubScreen screen)
+        public void InitializeCockpit(GameStageScreen screen)
         {
             if (screen != null) hubScreen = screen;
-            if (hubScreen == null) hubScreen = GetComponent<ApartmentHubScreen>();
+            if (hubScreen == null) hubScreen = GetComponent<GameStageScreen>();
             if (hubScreen == null) return;
 
             if (!isBuilt || topLeftInventoryPanel == null)
@@ -230,7 +230,7 @@ namespace SundayLastBreath.UI
 
             ReparentAndReframeExistingUI();
             HookInteractions();
-            OnConsoleModeChanged(ApartmentHubScreen.ConsoleMode.Narrative);
+            OnConsoleModeChanged(GameStageScreen.ConsoleMode.Narrative);
             SelectReaderTab(_activeTab, force: true);
             SelectSurvivorTab(_activeSurvivorTab, force: true);
             RefreshAll();
@@ -243,11 +243,11 @@ namespace SundayLastBreath.UI
             UpdateReaderAndActionDeckState();
         }
 
-        public void OnConsoleModeChanged(ApartmentHubScreen.ConsoleMode mode)
+        public void OnConsoleModeChanged(GameStageScreen.ConsoleMode mode)
         {
             if (hubScreen == null) return;
 
-            bool overlayOpen = mode == ApartmentHubScreen.ConsoleMode.PDA || mode == ApartmentHubScreen.ConsoleMode.Gear;
+            bool overlayOpen = mode == GameStageScreen.ConsoleMode.PDA || mode == GameStageScreen.ConsoleMode.Gear;
             Transform botConsole = transform.Find("BottomScreen_TouchConsole");
             if (botConsole != null)
             {
@@ -269,14 +269,14 @@ namespace SundayLastBreath.UI
 
             if (hubScreen.DockContainerPDA != null)
             {
-                bool activePda = mode == ApartmentHubScreen.ConsoleMode.PDA;
+                bool activePda = mode == GameStageScreen.ConsoleMode.PDA;
                 hubScreen.DockContainerPDA.SetActive(activePda);
                 if (activePda) StyleOverlayDockPanel(hubScreen.DockContainerPDA);
             }
 
             if (hubScreen.DockContainerGear != null)
             {
-                bool activeGear = mode == ApartmentHubScreen.ConsoleMode.Gear;
+                bool activeGear = mode == GameStageScreen.ConsoleMode.Gear;
                 hubScreen.DockContainerGear.SetActive(activeGear);
                 if (activeGear) StyleOverlayDockPanel(hubScreen.DockContainerGear);
             }
@@ -298,7 +298,13 @@ namespace SundayLastBreath.UI
 
         private void Awake()
         {
-            if (hubScreen == null) hubScreen = GetComponent<ApartmentHubScreen>();
+            if (hubScreen == null) hubScreen = GetComponent<GameStageScreen>();
+        }
+
+        private void OnEnable()
+        {
+            if (hubScreen == null) hubScreen = GetComponent<GameStageScreen>();
+            EnsureInteractionsHooked();
         }
 
         private void Start()
@@ -307,6 +313,13 @@ namespace SundayLastBreath.UI
             {
                 InitializeCockpit(hubScreen);
             }
+        }
+
+        public void EnsureInteractionsHooked()
+        {
+            if (hubScreen == null) hubScreen = GetComponent<GameStageScreen>();
+            if (hubScreen == null) return;
+            HookInteractions();
         }
 
         private void Update()
@@ -386,7 +399,7 @@ namespace SundayLastBreath.UI
                 }
                 else if (overlayOpen)
                 {
-                    hubScreen.SwitchConsoleMode(ApartmentHubScreen.ConsoleMode.Narrative);
+                    hubScreen.SwitchConsoleMode(GameStageScreen.ConsoleMode.Narrative);
                 }
                 else
                 {
@@ -447,7 +460,6 @@ namespace SundayLastBreath.UI
             BuildDockOverlayBackdrop();
 
             isBuilt = true;
-            _hooksInitialized = false;
         }
 
         private void ClearOldHybridNodes()
@@ -1917,20 +1929,16 @@ namespace SundayLastBreath.UI
                         Transform sl = subHdr.Find("ScaleLabel");
                         if (sl != null)
                         {
-                            RectTransform slRt = sl.GetComponent<RectTransform>();
-                            slRt.anchorMin = Vector2.zero;
-                            slRt.anchorMax = new Vector2(0.55f, 1f);
-                            slRt.offsetMin = Vector2.zero;
-                            slRt.offsetMax = Vector2.zero;
+                            sl.gameObject.SetActive(false);
                         }
                         Transform ap = subHdr.Find("ActivePosBanner");
                         if (ap != null)
                         {
                             RectTransform apRt = ap.GetComponent<RectTransform>();
-                            apRt.anchorMin = new Vector2(0.45f, 0f);
+                            apRt.anchorMin = Vector2.zero;
                             apRt.anchorMax = Vector2.one;
-                            apRt.offsetMin = Vector2.zero;
-                            apRt.offsetMax = Vector2.zero;
+                            apRt.offsetMin = new Vector2(4f, 0f);
+                            apRt.offsetMax = new Vector2(-4f, 0f);
                         }
                     }
 
@@ -1956,8 +1964,8 @@ namespace SundayLastBreath.UI
                 var lTmp = bpLegend.GetComponent<TextMeshProUGUI>();
                 if (lTmp != null)
                 {
-                    lTmp.text = "<color=#00c7f2>■</color> CURRENT LOCATION   <color=#94a3b8>■</color> VISITED / ACCESSIBLE   <color=#0a0f16>■</color> UNVISITED";
-                    lTmp.fontSize = 7.8f;
+                    lTmp.text = "<color=#00c7f2>■</color> CURRENT  <color=#94a3b8>■</color> VISITED  <color=#0a0f16>■</color> UNVISITED  <color=#ea2e38>■</color> LOCKED  <color=#f59e0b>■</color> BLOCKED";
+                    lTmp.fontSize = 6.8f;
                     lTmp.textWrappingMode = TextWrappingModes.NoWrap;
                 }
             }
@@ -2028,10 +2036,10 @@ namespace SundayLastBreath.UI
         #endregion
 
         #region Interactions & Hotkey Wiring
-        private void HookInteractions()
+        public void HookInteractions()
         {
-            if (_hooksInitialized || hubScreen == null) return;
-            _hooksInitialized = true;
+            if (hubScreen == null) hubScreen = GetComponent<GameStageScreen>();
+            if (hubScreen == null) return;
 
             for (int i = 0; i < inventorySlots.Count; i++)
             {
@@ -2043,18 +2051,50 @@ namespace SundayLastBreath.UI
                 }
             }
 
+            if (inspectorUseEquipBtn == null && topLeftInventoryPanel != null)
+            {
+                Transform tr = topLeftInventoryPanel.Find("Body/Inspector/Btn_QuickAction");
+                if (tr != null) inspectorUseEquipBtn = tr.GetComponent<Button>();
+            }
+
             if (inspectorUseEquipBtn != null)
             {
                 inspectorUseEquipBtn.onClick.RemoveAllListeners();
                 inspectorUseEquipBtn.onClick.AddListener(OnInspectorUseOrEquipClicked);
             }
 
+            if (inspectorOpenGearBtn == null && topLeftInventoryPanel != null)
+            {
+                Transform tr = topLeftInventoryPanel.Find("Body/Inspector/Btn_OpenFullGear");
+                if (tr != null) inspectorOpenGearBtn = tr.GetComponent<Button>();
+            }
+
             if (inspectorOpenGearBtn != null)
             {
                 inspectorOpenGearBtn.onClick.RemoveAllListeners();
-                inspectorOpenGearBtn.onClick.AddListener(() => hubScreen.SwitchConsoleMode(ApartmentHubScreen.ConsoleMode.Gear));
+                inspectorOpenGearBtn.onClick.AddListener(() => hubScreen.SwitchConsoleMode(GameStageScreen.ConsoleMode.Gear));
             }
 
+            if (survivorTabButtons.Count == 0 && topRightSurvivorPanel != null)
+            {
+                Transform stBar = topRightSurvivorPanel.Find("Body/TabsCard/SubTabBar");
+                if (stBar != null)
+                {
+                    survivorTabButtons.Clear();
+                    survivorTabBgs.Clear();
+                    survivorTabLabels.Clear();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Transform tChild = i < stBar.childCount ? stBar.GetChild(i) : null;
+                        if (tChild != null)
+                        {
+                            survivorTabButtons.Add(tChild.GetComponent<Button>());
+                            survivorTabBgs.Add(tChild.GetComponent<Image>());
+                            survivorTabLabels.Add(tChild.GetComponentInChildren<TextMeshProUGUI>());
+                        }
+                    }
+                }
+            }
 
             for (int i = 0; i < survivorTabButtons.Count; i++)
             {
@@ -2084,16 +2124,49 @@ namespace SundayLastBreath.UI
                 }
             }
 
+            if (expandMapBtn == null && bottomLeftMapPanel != null)
+            {
+                Transform tr = bottomLeftMapPanel.Find("Header/RightBadgeButton");
+                if (tr != null) expandMapBtn = tr.GetComponent<Button>();
+            }
+
             if (expandMapBtn != null)
             {
                 expandMapBtn.onClick.RemoveAllListeners();
                 expandMapBtn.onClick.AddListener(() => OpenPDATabOverlay("MAP"));
             }
 
+            if (pinnedNoteBtn == null && bottomLeftMapPanel != null)
+            {
+                Transform tr = bottomLeftMapPanel.Find("Body/PinnedNoteButton");
+                if (tr != null) pinnedNoteBtn = tr.GetComponent<Button>();
+            }
+
             if (pinnedNoteBtn != null)
             {
                 pinnedNoteBtn.onClick.RemoveAllListeners();
                 pinnedNoteBtn.onClick.AddListener(() => SelectReaderTab(ReaderTab.Notes));
+            }
+
+            if (readerTabButtons.Count == 0 && bottomCenterReaderPanel != null)
+            {
+                Transform tabBar = bottomCenterReaderPanel.Find("Body/TabBar");
+                if (tabBar != null)
+                {
+                    readerTabButtons.Clear();
+                    readerTabBgs.Clear();
+                    readerTabLabels.Clear();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Transform tChild = i < tabBar.childCount ? tabBar.GetChild(i) : null;
+                        if (tChild != null)
+                        {
+                            readerTabButtons.Add(tChild.GetComponent<Button>());
+                            readerTabBgs.Add(tChild.GetComponent<Image>());
+                            readerTabLabels.Add(tChild.GetComponentInChildren<TextMeshProUGUI>());
+                        }
+                    }
+                }
             }
 
             for (int i = 0; i < readerTabButtons.Count; i++)
@@ -2161,7 +2234,7 @@ namespace SundayLastBreath.UI
             if (dockOverlayCloseBtn != null)
             {
                 dockOverlayCloseBtn.onClick.RemoveAllListeners();
-                dockOverlayCloseBtn.onClick.AddListener(() => hubScreen.SwitchConsoleMode(ApartmentHubScreen.ConsoleMode.Narrative));
+                dockOverlayCloseBtn.onClick.AddListener(() => hubScreen.SwitchConsoleMode(GameStageScreen.ConsoleMode.Narrative));
             }
 
             HookCloseButtonOnDock(hubScreen.DockContainerPDA);
@@ -2176,7 +2249,7 @@ namespace SundayLastBreath.UI
             if (btn != null)
             {
                 btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(() => hubScreen.SwitchConsoleMode(ApartmentHubScreen.ConsoleMode.Narrative));
+                btn.onClick.AddListener(() => hubScreen.SwitchConsoleMode(GameStageScreen.ConsoleMode.Narrative));
             }
         }
 
@@ -2188,7 +2261,7 @@ namespace SundayLastBreath.UI
                 if (MapViewerOpen) CloseMapViewer(); else OpenMapViewer();
                 return;
             }
-            hubScreen.SwitchConsoleMode(ApartmentHubScreen.ConsoleMode.PDA);
+            hubScreen.SwitchConsoleMode(GameStageScreen.ConsoleMode.PDA);
             hubScreen.TriggerSwitchPDATab(tabName);
         }
 
@@ -2265,6 +2338,15 @@ namespace SundayLastBreath.UI
 
             if (mapViewerRoot == null) BuildMapViewer();
 
+            if (mapViewerRoot != null)
+            {
+                var titleTmp = mapViewerRoot.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (titleTmp != null && mapHeaderTitle != null && !string.IsNullOrEmpty(mapHeaderTitle.text))
+                {
+                    titleTmp.text = mapHeaderTitle.text;
+                }
+            }
+
             Canvas.ForceUpdateCanvases();
             Vector2 miniSize = ((RectTransform)miniMap).rect.size;
 
@@ -2278,6 +2360,26 @@ namespace SundayLastBreath.UI
             StretchFull((RectTransform)bp);
             Canvas.ForceUpdateCanvases();
 
+            Transform slOpen = bp.Find("BlueprintSubHeader/ScaleLabel");
+            if (slOpen != null)
+            {
+                slOpen.gameObject.SetActive(true);
+                RectTransform slRt = slOpen.GetComponent<RectTransform>();
+                slRt.anchorMin = Vector2.zero;
+                slRt.anchorMax = new Vector2(0.40f, 1f);
+                slRt.offsetMin = new Vector2(8f, 0f);
+                slRt.offsetMax = Vector2.zero;
+            }
+            Transform apOpen = bp.Find("BlueprintSubHeader/ActivePosBanner");
+            if (apOpen != null)
+            {
+                RectTransform apRt = apOpen.GetComponent<RectTransform>();
+                apRt.anchorMin = new Vector2(0.42f, 0f);
+                apRt.anchorMax = Vector2.one;
+                apRt.offsetMin = Vector2.zero;
+                apRt.offsetMax = new Vector2(-8f, 0f);
+            }
+
             Vector2 host = mapViewerHost.rect.size;
             float ratio = Mathf.Min(host.x / Mathf.Max(1f, miniSize.x), host.y / Mathf.Max(1f, miniSize.y));
             hubScreen.TacticalMap.SetHorizontalMiniMapMode(true, MiniMapBaseScale * ratio * 0.94f);
@@ -2289,6 +2391,18 @@ namespace SundayLastBreath.UI
             if (!MapViewerOpen) return;
             if (mapViewerBp != null && mapViewerOrigParent != null)
             {
+                Transform slClose = mapViewerBp.Find("BlueprintSubHeader/ScaleLabel");
+                if (slClose != null) slClose.gameObject.SetActive(false);
+                Transform apClose = mapViewerBp.Find("BlueprintSubHeader/ActivePosBanner");
+                if (apClose != null)
+                {
+                    RectTransform apRt = apClose.GetComponent<RectTransform>();
+                    apRt.anchorMin = Vector2.zero;
+                    apRt.anchorMax = Vector2.one;
+                    apRt.offsetMin = new Vector2(4f, 0f);
+                    apRt.offsetMax = new Vector2(-4f, 0f);
+                }
+
                 mapViewerBp.SetParent(mapViewerOrigParent, false);
                 StretchFull((RectTransform)mapViewerBp);
                 mapViewerBp.SetSiblingIndex(mapViewerOrigIndex);
@@ -2457,12 +2571,32 @@ namespace SundayLastBreath.UI
             BindCategorySlots("CONSUMABLE", conList);
             BindCategorySlots("UTILITY", utlList);
 
+            // Validate that the currently selected item actually exists in the character's gear or backpack
+            if (!string.IsNullOrEmpty(_selectedItemId))
+            {
+                bool itemStillExists = wpnList.Any(x => string.Equals(x.itemId, _selectedItemId, StringComparison.OrdinalIgnoreCase)) ||
+                                       appList.Any(x => string.Equals(x.itemId, _selectedItemId, StringComparison.OrdinalIgnoreCase)) ||
+                                       conList.Any(x => string.Equals(x.itemId, _selectedItemId, StringComparison.OrdinalIgnoreCase)) ||
+                                       utlList.Any(x => string.Equals(x.itemId, _selectedItemId, StringComparison.OrdinalIgnoreCase));
+                if (!itemStillExists)
+                {
+                    _selectedItemId = "";
+                    _selectedIsEquipped = false;
+                }
+            }
+
             if (string.IsNullOrEmpty(_selectedItemId))
             {
                 if (wpnList.Count > 0) SelectItemForInspector(wpnList[0].itemId, wpnList[0].isEquipped);
                 else if (conList.Count > 0) SelectItemForInspector(conList[0].itemId, false);
                 else if (utlList.Count > 0) SelectItemForInspector(utlList[0].itemId, false);
-                else RefreshInspector();
+                else if (appList.Count > 0) SelectItemForInspector(appList[0].itemId, appList[0].isEquipped);
+                else
+                {
+                    _selectedItemId = "";
+                    _selectedIsEquipped = false;
+                    RefreshInspector();
+                }
             }
             else
             {
@@ -2536,11 +2670,24 @@ namespace SundayLastBreath.UI
         {
             if (index < 0 || index >= inventorySlots.Count) return;
             SlotUI slot = inventorySlots[index];
-            if (string.IsNullOrEmpty(slot.boundItemId)) return;
+            if (string.IsNullOrEmpty(slot.boundItemId))
+            {
+                ClearSelection();
+                RefreshInventoryGrid();
+                RefreshTeamGearPanel(hubScreen != null ? hubScreen.CurrentPlayer : null);
+                return;
+            }
 
             SelectItemForInspector(slot.boundItemId, slot.isEquipped);
             RefreshInventoryGrid();
             RefreshTeamGearPanel(hubScreen != null ? hubScreen.CurrentPlayer : null);
+        }
+
+        public void ClearSelection()
+        {
+            _selectedItemId = "";
+            _selectedIsEquipped = false;
+            RefreshInspector();
         }
 
         private void SelectItemForInspector(string itemId, bool isEquipped)
@@ -2563,6 +2710,14 @@ namespace SundayLastBreath.UI
             }
 
             var def = ItemDatabase.GetDefinition(_selectedItemId);
+            if (def == null)
+            {
+                _selectedItemId = "";
+                _selectedIsEquipped = false;
+                RefreshInspector();
+                return;
+            }
+
             Sprite sp = ItemDatabase.GetItemIcon(_selectedItemId);
             if (inspectorIcon != null)
             {
@@ -2806,13 +2961,32 @@ namespace SundayLastBreath.UI
             if (hubScreen == null) return;
 
             string locId = hubScreen.GetCurrentLocationId() ?? "unit_407";
-            string floorTag = hubScreen.IsOnSecondFloor ? "2F" : "4F";
+            string floorTag = "4F";
+            if (hubScreen.TacticalMap != null && hubScreen.TacticalMap.CurrentFloorData != null)
+            {
+                string fid = hubScreen.TacticalMap.CurrentFloorData.floorId;
+                if (fid == "stairwell_4f") floorTag = "STAIRWELL (4F)";
+                else if (fid == "stairwell_2f") floorTag = "STAIRWELL (2F)";
+                else if (fid == "ascott_2f" || hubScreen.IsOnSecondFloor) floorTag = "2F";
+                else floorTag = "4F";
+            }
+            else if (hubScreen.IsOnSecondFloor)
+            {
+                floorTag = "2F";
+            }
+
             if (mapHeaderTitle != null) mapHeaderTitle.text = $"// FLOOR BLUEPRINT // {floorTag}";
 
             if (mapSubHeaderPosText != null)
             {
                 string displayLoc = locId.ToUpperInvariant().Replace('_', ' ');
-                if (hubScreen.IsInHallway) displayLoc = $"CORRIDOR // SEC {hubScreen.HallwaySection}";
+                if (locId == "f4_entrance") displayLoc = "F4 ENTRANCE";
+                else if (locId == "f3_landing") displayLoc = "F3 LANDING";
+                else if (locId == "f2_entrance") displayLoc = "F2 ENTRANCE";
+                else if (locId == "f1_landing") displayLoc = "F1 LANDING / BARRICADE";
+                else if (hubScreen.IsInHallway && string.IsNullOrEmpty(hubScreen.CurrentInspectedRoom))
+                    displayLoc = $"CORRIDOR // SEC {hubScreen.HallwaySection}";
+
                 mapSubHeaderPosText.text = $"<color=#00e5ff><b>POS:</b> {displayLoc}</color>";
             }
 
@@ -3033,15 +3207,6 @@ namespace SundayLastBreath.UI
                     ol.effectColor = new Color(0.0f, 0.85f, 1.0f, 0.85f);
                     ol.effectDistance = new Vector2(1.5f, -1.5f);
 
-                    narrativePromptBtn = narrativePromptCard.AddComponent<Button>();
-                    narrativePromptBtn.targetGraphic = bg;
-                    ConfigureButtonColors(narrativePromptBtn, bg.color, new Color(0.08f, 0.14f, 0.22f, 1f));
-                    narrativePromptBtn.onClick.AddListener(() =>
-                    {
-                        AudioManager.Instance?.PlayButtonClick();
-                        hubScreen.TriggerAdvanceAwakening();
-                    });
-
                     // Header
                     var hdr = CreateText(narrativePromptCard.transform, "PromptHeader",
                         "<color=#00e5ff><b>▶ INCOMING EMERGENCY TRANSMISSION</b></color>",
@@ -3085,6 +3250,49 @@ namespace SundayLastBreath.UI
                         11.5f, Color.white, TextAlignmentOptions.Center, FontStyles.Bold, FontRole.Mono, wrap: false);
                     StretchFull(actTmp.rectTransform);
                     actTmp.raycastTarget = false;
+                }
+            }
+
+            if (narrativePromptCard != null)
+            {
+                if (narrativePromptBtn == null)
+                {
+                    narrativePromptBtn = narrativePromptCard.GetComponent<Button>();
+                    if (narrativePromptBtn == null)
+                    {
+                        narrativePromptBtn = narrativePromptCard.AddComponent<Button>();
+                    }
+                }
+
+                var img = narrativePromptCard.GetComponent<Image>();
+                if (img != null)
+                {
+                    img.raycastTarget = true;
+                    narrativePromptBtn.targetGraphic = img;
+                    ConfigureButtonColors(narrativePromptBtn, img.color, new Color(0.08f, 0.14f, 0.22f, 1f));
+                }
+
+                narrativePromptBtn.onClick.RemoveAllListeners();
+                narrativePromptBtn.onClick.AddListener(() =>
+                {
+                    AudioManager.Instance?.PlayButtonClick();
+                    hubScreen.TriggerAdvanceAwakening();
+                });
+
+                Transform actionCallout = narrativePromptCard.transform.Find("ActionCallout");
+                if (actionCallout != null)
+                {
+                    var acImg = actionCallout.GetComponent<Image>();
+                    if (acImg != null) acImg.raycastTarget = true;
+                    Button acBtn = actionCallout.GetComponent<Button>();
+                    if (acBtn == null) acBtn = actionCallout.gameObject.AddComponent<Button>();
+                    if (acImg != null) acBtn.targetGraphic = acImg;
+                    acBtn.onClick.RemoveAllListeners();
+                    acBtn.onClick.AddListener(() =>
+                    {
+                        AudioManager.Instance?.PlayButtonClick();
+                        hubScreen.TriggerAdvanceAwakening();
+                    });
                 }
             }
 
@@ -3183,6 +3391,15 @@ namespace SundayLastBreath.UI
                             etTmp.lineSpacing = 1.5f;
                         }
                     }
+
+                    Button easBtn = easTr.GetComponent<Button>();
+                    if (easBtn == null) easBtn = easTr.gameObject.AddComponent<Button>();
+                    easBtn.onClick.RemoveAllListeners();
+                    easBtn.onClick.AddListener(() =>
+                    {
+                        AudioManager.Instance?.PlayButtonClick();
+                        hubScreen?.TriggerAdvanceAwakening();
+                    });
                 }
             }
 
@@ -3229,6 +3446,15 @@ namespace SundayLastBreath.UI
                             stTmp.lineSpacing = 2.5f;
                         }
                     }
+
+                    Button monoBtn = monoTr.GetComponent<Button>();
+                    if (monoBtn == null) monoBtn = monoTr.gameObject.AddComponent<Button>();
+                    monoBtn.onClick.RemoveAllListeners();
+                    monoBtn.onClick.AddListener(() =>
+                    {
+                        AudioManager.Instance?.PlayButtonClick();
+                        hubScreen?.TriggerAdvanceAwakening();
+                    });
                 }
 
                 Transform b2fTr = b2Tr.Find("Beat2FootnoteText");

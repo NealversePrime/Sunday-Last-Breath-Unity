@@ -34,6 +34,7 @@ namespace SundayLastBreath.UI
             public bool isAccessible;
             public bool isDiscovered;
             public bool isVisited;
+            public bool isChecked;
             public bool isStairs;
             public bool isHallway;
             public bool isBlocked;
@@ -64,6 +65,7 @@ namespace SundayLastBreath.UI
                 this.isAccessible = isAccessible;
                 this.isDiscovered = isDiscovered;
                 this.isVisited = false;
+                this.isChecked = false;
                 this.row = row;
                 this.col = col;
                 this.iconType = iconType;
@@ -74,6 +76,16 @@ namespace SundayLastBreath.UI
                 this.undiscoveredSub = !string.IsNullOrEmpty(undiscoveredSub) ? undiscoveredSub : (isHallway ? shortSub : (isStairs ? "FIRE EXIT" : (id.Contains("util") ? "SERVICE ROOM" : "RESIDENTIAL")));
                 this.undiscoveredTitle = !string.IsNullOrEmpty(undiscoveredTitle) ? undiscoveredTitle : (isHallway ? "CORRIDOR JUNCTION" : (isStairs ? "WEST FIRE STAIRWELL" : (id.Contains("util") ? "UTILITY SERVICE BAY" : "RESIDENTIAL UNIT")));
             }
+        }
+
+        private class RuntimeRoomState
+        {
+            public bool isVisited;
+            public bool isChecked;
+            public bool isDiscovered;
+            public bool isLocked;
+            public bool isBlocked;
+            public bool isAccessible;
         }
 
         [System.Serializable]
@@ -117,6 +129,7 @@ namespace SundayLastBreath.UI
 
         [Header("Modular Floor Data (Optional ScriptableObject)")]
         [SerializeField] private TacticalFloorMapData currentFloorData;
+        public TacticalFloorMapData CurrentFloorData => currentFloorData;
 
         [Header("Vector Graphics Floorplan (SVG)")]
         [SerializeField] private Image vectorMapBackdropImage;
@@ -167,6 +180,7 @@ namespace SundayLastBreath.UI
         [SerializeField] private TextMeshProUGUI transitActionBtnText;
 
         private readonly Dictionary<string, NodeModel> nodeRegistry = new Dictionary<string, NodeModel>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, RuntimeRoomState> persistentRoomStates = new Dictionary<string, RuntimeRoomState>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NodeUIHolder> uiHolders = new Dictionary<string, NodeUIHolder>(StringComparer.OrdinalIgnoreCase);
         private readonly List<GameObject> dynamicRoomHitboxes = new List<GameObject>();
 
@@ -261,6 +275,7 @@ namespace SundayLastBreath.UI
         }
 
         private static Sprite cachedHazardStripeSprite;
+        private static Sprite cachedRedStripeSprite;
         private static Sprite cachedExitSignSprite;
         private static Sprite cachedStairsStripeSprite;
 
@@ -278,7 +293,7 @@ namespace SundayLastBreath.UI
             return cachedExitSignSprite;
         }
 
-        // Same visual language as the SVG floorplan: amber hazard stripes for blocked rooms
+        // Same visual language as the SVG floorplan: amber hazard stripes for blocked/inaccessible rooms
         public static Sprite GetHazardStripeSprite()
         {
             if (cachedHazardStripeSprite != null) return cachedHazardStripeSprite;
@@ -291,6 +306,21 @@ namespace SundayLastBreath.UI
             tex.Apply();
             cachedHazardStripeSprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 32f);
             return cachedHazardStripeSprite;
+        }
+
+        // Red diagonal stripes for accessible but locked rooms
+        public static Sprite GetRedStripeSprite()
+        {
+            if (cachedRedStripeSprite != null) return cachedRedStripeSprite;
+            var tex = new Texture2D(32, 32, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Repeat };
+            Color red = new Color(0.92f, 0.18f, 0.22f, 1f);
+            Color dark = new Color(0.09f, 0.09f, 0.11f, 1f);
+            for (int y = 0; y < 32; y++)
+                for (int x = 0; x < 32; x++)
+                    tex.SetPixel(x, y, (((x + y) / 5) % 2 == 0) ? red : dark);
+            tex.Apply();
+            cachedRedStripeSprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 32f);
+            return cachedRedStripeSprite;
         }
 
         // Green stairwell lines (SVG pattern_stairs)
@@ -626,6 +656,12 @@ namespace SundayLastBreath.UI
             if (floorplanCanvasRect != null && canvasBasePosition == Vector2.zero)
             {
                 canvasBasePosition = floorplanCanvasRect.anchoredPosition;
+            }
+
+            if (vectorMapBackdropImage == null && floorplanCanvasRect != null)
+            {
+                Transform vmb = floorplanCanvasRect.Find("VectorMapBackdrop");
+                if (vmb != null) vectorMapBackdropImage = vmb.GetComponent<Image>();
             }
 
             if (currentFloorData == null)
@@ -1034,9 +1070,129 @@ namespace SundayLastBreath.UI
         // ARCHITECTURAL DATA MODEL (Modular ScriptableObject with 4F Defaults)
         // =========================================================================
 
+        public void LoadFloorById(string floorId)
+        {
+            if (string.IsNullOrEmpty(floorId)) return;
+            string cleanId = floorId.ToLowerInvariant().Trim().Replace(" ", "_").Replace("-", "_");
+
+            if (currentFloorData != null && string.Equals(currentFloorData.floorId, cleanId, StringComparison.OrdinalIgnoreCase))
+            {
+                return; // Already loaded
+            }
+
+            string resourcePath = "Maps/FloorMap_Ascott_4F";
+            if (cleanId == "ascott_4f" || cleanId == "4f" || cleanId == "floor4" || cleanId == "4th_floor")
+                resourcePath = "Maps/FloorMap_Ascott_4F";
+            else if (cleanId == "stairwell_4f" || cleanId == "stairs_4f" || cleanId == "stairwell")
+                resourcePath = "Maps/FloorMap_Stairwell_4F";
+            else if (cleanId == "stairwell_2f" || cleanId == "stairs_2f")
+                resourcePath = "Maps/FloorMap_Stairwell_2F";
+            else if (cleanId == "ascott_2f" || cleanId == "2f" || cleanId == "2f_hallway" || cleanId == "floor2")
+                resourcePath = "Maps/FloorMap_Ascott_2F";
+            else if (cleanId == "ascott_lobby" || cleanId == "lobby")
+                resourcePath = "Maps/FloorMap_Ascott_Lobby";
+            else if (cleanId.Contains("stairwell_4"))
+                resourcePath = "Maps/FloorMap_Stairwell_4F";
+            else if (cleanId.Contains("stairwell_2"))
+                resourcePath = "Maps/FloorMap_Stairwell_2F";
+            else
+                resourcePath = "Maps/FloorMap_" + cleanId;
+
+            TacticalFloorMapData data = Resources.Load<TacticalFloorMapData>(resourcePath);
+            if (data != null)
+            {
+                LoadFloor(data);
+            }
+            else
+            {
+                Debug.LogWarning($"[TacticalMap] Could not find FloorMap asset at Resources/{resourcePath}");
+            }
+        }
+
+        private void SaveNodeToPersistentState(NodeModel m)
+        {
+            if (m == null || string.IsNullOrEmpty(m.id)) return;
+            string key = NormalizeLocationId(m.id);
+            if (!persistentRoomStates.TryGetValue(key, out var st))
+            {
+                st = new RuntimeRoomState();
+                persistentRoomStates[key] = st;
+            }
+            st.isVisited = m.isVisited;
+            st.isChecked = m.isChecked;
+            st.isDiscovered = m.isDiscovered;
+            st.isLocked = m.isLocked;
+            st.isBlocked = m.isBlocked;
+            st.isAccessible = m.isAccessible;
+        }
+
+        private void ApplyPersistentStateIfPresent(NodeModel node)
+        {
+            if (node == null || string.IsNullOrEmpty(node.id)) return;
+            string key = NormalizeLocationId(node.id);
+            if (persistentRoomStates.TryGetValue(key, out var saved))
+            {
+                node.isVisited = saved.isVisited;
+                node.isChecked = saved.isChecked;
+                node.isDiscovered = saved.isDiscovered;
+                node.isLocked = saved.isLocked;
+                node.isBlocked = saved.isBlocked;
+                node.isAccessible = saved.isAccessible;
+            }
+        }
+
+        public void ResetAllRuntimeMapStates()
+        {
+            persistentRoomStates.Clear();
+            nodeRegistry.Clear();
+            InitializeDataModel();
+            RefreshAllNodes();
+        }
+
+        public void SyncRoomState(string roomId, bool isVisited, bool isChecked, bool isLocked, bool isBlocked, bool isAccessible)
+        {
+            if (string.IsNullOrEmpty(roomId)) return;
+            EnsureRuntimeBindings();
+            string normId = NormalizeLocationId(roomId);
+
+            if (!persistentRoomStates.TryGetValue(normId, out var st))
+            {
+                st = new RuntimeRoomState();
+                persistentRoomStates[normId] = st;
+            }
+            st.isVisited = isVisited;
+            st.isChecked = isChecked || isVisited;
+            st.isDiscovered = isChecked || isVisited;
+            st.isLocked = isLocked;
+            st.isBlocked = isBlocked;
+            st.isAccessible = isAccessible;
+
+            if (nodeRegistry.TryGetValue(normId, out NodeModel model) || nodeRegistry.TryGetValue(roomId, out model))
+            {
+                model.isVisited = st.isVisited;
+                model.isChecked = st.isChecked;
+                model.isDiscovered = st.isDiscovered;
+                model.isLocked = st.isLocked;
+                model.isBlocked = st.isBlocked;
+                model.isAccessible = st.isAccessible;
+
+                if (TryGetUIHolder(normId, out NodeUIHolder holder) || TryGetUIHolder(roomId, out holder))
+                {
+                    ApplyVisualState(holder);
+                    UpdateHorizontalNodeLabels();
+                }
+            }
+        }
+
         public void LoadFloor(TacticalFloorMapData floorData)
         {
             if (floorData == null) return;
+
+            foreach (var kvp in nodeRegistry)
+            {
+                SaveNodeToPersistentState(kvp.Value);
+            }
+
             currentFloorData = floorData;
 
             if (blueprintHeaderTitleTmp != null && !string.IsNullOrEmpty(floorData.floorTitle))
@@ -1155,10 +1311,10 @@ namespace SundayLastBreath.UI
                 rt.anchorMax = new Vector2(0.5f, 0.5f);
                 rt.pivot = new Vector2(0.5f, 0.5f);
                 rt.anchoredPosition = r.position;
-                rt.sizeDelta = (r.size.x > 5f && r.size.y > 5f) ? r.size : new Vector2(60f, 40f);
+                rt.sizeDelta = (r.size.x > 5f && r.size.y > 5f) ? r.size : new Vector2(80f, 80f);
 
                 Image bg = nodeObj.AddComponent<Image>();
-                bg.color = new Color(0f, 0f, 0f, 0f);
+                bg.color = new Color(0.02f, 0.035f, 0.05f, 1f);
                 bg.raycastTarget = true;
 
                 Outline ol = nodeObj.AddComponent<Outline>();
@@ -1175,6 +1331,37 @@ namespace SundayLastBreath.UI
                     OnNodeClicked(capturedId);
                 });
 
+                // Child Room Code / Label Text
+                GameObject textObj = new GameObject("RoomLabel", typeof(RectTransform));
+                textObj.transform.SetParent(nodeObj.transform, false);
+                RectTransform trt = textObj.GetComponent<RectTransform>();
+                trt.anchorMin = Vector2.zero;
+                trt.anchorMax = Vector2.one;
+                trt.offsetMin = Vector2.zero;
+                trt.offsetMax = Vector2.zero;
+
+                TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
+                string shortLabel = GetMiniMapRoomLabel(r.roomId, null);
+                tmp.text = !string.IsNullOrEmpty(shortLabel) ? shortLabel : (!string.IsNullOrEmpty(r.roomCode) ? r.roomCode : r.roomId.ToUpper());
+                tmp.fontSize = 12f;
+                tmp.fontStyle = FontStyles.Bold;
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.textWrappingMode = TextWrappingModes.NoWrap;
+                tmp.raycastTarget = false;
+                SundayTypography.ApplyFont(tmp, FontRole.Mono);
+
+                // Child Pattern Overlay for Hazard / Blocked
+                GameObject patObj = new GameObject("PatternOverlay", typeof(RectTransform));
+                patObj.transform.SetParent(nodeObj.transform, false);
+                RectTransform prt = patObj.GetComponent<RectTransform>();
+                prt.anchorMin = Vector2.zero;
+                prt.anchorMax = Vector2.one;
+                prt.offsetMin = Vector2.zero;
+                prt.offsetMax = Vector2.zero;
+                Image patImg = patObj.AddComponent<Image>();
+                patImg.raycastTarget = false;
+                patObj.SetActive(false);
+
                 nodeRegistry.TryGetValue(r.roomId, out NodeModel model);
 
                 var dynamicHolder = new NodeUIHolder
@@ -1184,6 +1371,8 @@ namespace SundayLastBreath.UI
                     rootObj = nodeObj,
                     bgImage = bg,
                     outline = ol,
+                    roomCodeTmp = tmp,
+                    patternOverlay = patImg,
                     button = btn
                 };
 
@@ -1383,7 +1572,9 @@ namespace SundayLastBreath.UI
                         r.isStairs, r.isHallway, r.isBlocked, r.isLocked,
                         r.undiscoveredSub, r.undiscoveredTitle);
                     node.isVisited = r.isVisited || string.Equals(r.roomId, "unit_407", StringComparison.OrdinalIgnoreCase);
+                    node.isChecked = node.isVisited;
                     node.connectedIds.AddRange(r.connectedRoomIds);
+                    ApplyPersistentStateIfPresent(node);
                     nodeRegistry[r.roomId] = node;
                 }
                 return;
@@ -1398,6 +1589,7 @@ namespace SundayLastBreath.UI
                 isAccessible: true, isDiscovered: true, row: 0, col: 2, iconType: TacticalRoomIconType.Home,
                 undiscoveredSub: "MY PLACE", undiscoveredTitle: "YOUR APARTMENT (LOCKED OUT)");
             u407.isVisited = true;
+            u407.isChecked = true;
 
             var h1 = new NodeModel(
                 "hallway_1", "CORR-N1", "UPPER HALL", "NORTH HALLWAY (406 / 407)", "DIM LIGHTING",
@@ -1410,7 +1602,7 @@ namespace SundayLastBreath.UI
                 "unit_406", "UNIT 406", "PROF. HARMON", "PROFESSOR HARMON'S PLACE", "KEYPAD LOCKED",
                 "QUIET / NO SOUND", "SURVIVAL NOTES & FOOD", "FAINT KEYPAD HUM",
                 "Professor Harmon's apartment. An eccentric sociology professor who spent years writing about societal collapse. He posted his keypad code (8445) before the cell towers died, telling neighbors to take whatever supplies they need.",
-                isAccessible: false, isDiscovered: false, row: 0, col: 0, iconType: TacticalRoomIconType.Locked, isLocked: true,
+                isAccessible: true, isDiscovered: false, row: 0, col: 0, iconType: TacticalRoomIconType.Locked, isLocked: true,
                 undiscoveredSub: "PROF. HARMON", undiscoveredTitle: "PROFESSOR HARMON'S PLACE");
 
             // ROW 1: Mid-North Wing (Unit 404 <-> Hallway 2 <-> Unit 405)
@@ -1418,7 +1610,7 @@ namespace SundayLastBreath.UI
                 "unit_405", "UNIT 405", "MARCUS", "MARCUS'S APARTMENT", "DOOR AJAR (TRIPPED?)",
                 "TRIPWIRE HAZARD", "GUNPOWDER & SAFE", "METALLIC CLINK",
                 "Marcus's place. The quiet veteran down the hall who always talked about home defense and bugging out. The door is cracked open an inch and smells sharply of gun oil and cordite—knowing Marcus, he didn't leave without booby-trapping the entrance.",
-                isAccessible: false, isDiscovered: false, row: 1, col: 2, iconType: TacticalRoomIconType.Locked, isLocked: true,
+                isAccessible: true, isDiscovered: false, row: 1, col: 2, iconType: TacticalRoomIconType.Locked, isLocked: true,
                 undiscoveredSub: "MARCUS", undiscoveredTitle: "MARCUS'S RESIDENCE");
 
             var h2 = new NodeModel(
@@ -1454,7 +1646,7 @@ namespace SundayLastBreath.UI
                 "unit_402", "UNIT 402", "THE ANDERSONS", "THE ANDERSONS' PLACE", "CHAIN LOCKED",
                 "CHILLING SILENCE", "MEDICINE & SUPP.", "CHOPIN ON VINYL",
                 "The Andersons' place. The polite family from down the hall whose daughter Emma plays classical piano. The door is cracked two inches on a brass security chain. The smell of harsh bleach seeps out, while Chopin's Nocturne plays softly on repeat from their living room.",
-                isAccessible: true, isDiscovered: false, row: 2, col: 0, iconType: TacticalRoomIconType.DoorAjar,
+                isAccessible: true, isDiscovered: false, row: 2, col: 0, iconType: TacticalRoomIconType.DoorAjar, isLocked: true,
                 undiscoveredSub: "THE ANDERSONS", undiscoveredTitle: "THE ANDERSONS' RESIDENCE");
 
             // ROW 3: South Wing (Utility Closet <-> Hallway 4 <-> Unit 401)
@@ -1476,7 +1668,7 @@ namespace SundayLastBreath.UI
                 "utility", "UTILITY", "MAINTENANCE", "CARL'S UTILITY CLOSET", "LOCKED DOOR",
                 "TRANSFORMER HUM", "TOOLS & FUSES", "FLUORESCENT BUZZ",
                 "Carl the building superintendent's maintenance closet. Houses the floor breaker panels, backup fuses, and janitorial supplies behind a heavy magnetic access door.",
-                isAccessible: true, isDiscovered: false, row: 3, col: 0, iconType: TacticalRoomIconType.Utility,
+                isAccessible: true, isDiscovered: false, row: 3, col: 0, iconType: TacticalRoomIconType.Utility, isLocked: true,
                 undiscoveredSub: "MAINTENANCE", undiscoveredTitle: "UTILITY SERVICE BAY");
 
             // ROW 4: Exit Foyer (Collapsed East Wing <-> Hallway End <-> Stairwell)
@@ -1522,7 +1714,11 @@ namespace SundayLastBreath.UI
             ConnectBi(hEnd, blocked);
 
             var list = new[] { u407, h1, u406, u405, h2, u404, u403, h3, u402, u401, h4, util, stairs, hEnd, blocked };
-            foreach (var n in list) nodeRegistry[n.id] = n;
+            foreach (var n in list)
+            {
+                ApplyPersistentStateIfPresent(n);
+                nodeRegistry[n.id] = n;
+            }
             // Seamless alias support for narrative/lore variants
             nodeRegistry["blocked_stairs"] = blocked;
             nodeRegistry["empty_bot"] = blocked;
@@ -1642,9 +1838,26 @@ namespace SundayLastBreath.UI
         private string NormalizeLocationId(string locId)
         {
             if (string.IsNullOrEmpty(locId)) return "unit_407";
-            if (string.Equals(locId, "utility_closet", StringComparison.OrdinalIgnoreCase)) return "utility";
-            if (string.Equals(locId, "empty_bot", StringComparison.OrdinalIgnoreCase)) return "blocked_stairs";
-            if (string.Equals(locId, "hallway_end", StringComparison.OrdinalIgnoreCase)) return "hallway_4";
+            string lower = locId.ToLowerInvariant().Trim();
+
+            if (currentFloorData != null && string.Equals(currentFloorData.floorId, "stairwell_4f", StringComparison.OrdinalIgnoreCase))
+            {
+                if (lower == "stairs" || lower == "stairwell" || lower == "f4_entrance" || lower == "f4 entrance" || lower == "f4")
+                    return "f4_entrance";
+                if (lower == "f3_landing" || lower == "f3 landing" || lower == "f3")
+                    return "f3_landing";
+            }
+            else if (currentFloorData != null && string.Equals(currentFloorData.floorId, "stairwell_2f", StringComparison.OrdinalIgnoreCase))
+            {
+                if (lower == "stairs" || lower == "stairwell" || lower == "f2_entrance" || lower == "f2 entrance" || lower == "f2")
+                    return "f2_entrance";
+                if (lower == "f1_landing" || lower == "f1 landing" || lower == "barricade" || lower == "f1")
+                    return "f1_landing";
+            }
+
+            if (string.Equals(lower, "utility_closet", StringComparison.OrdinalIgnoreCase)) return "utility";
+            if (string.Equals(lower, "empty_bot", StringComparison.OrdinalIgnoreCase)) return "blocked_stairs";
+            if (string.Equals(lower, "hallway_end", StringComparison.OrdinalIgnoreCase)) return "hallway_4";
             if (nodeRegistry != null && nodeRegistry.ContainsKey(locId)) return locId;
             return locId;
         }
@@ -1685,14 +1898,18 @@ namespace SundayLastBreath.UI
             currentThresholdRoomId = null;
             selectedNodeId = locationId;
 
-            nodeRegistry[locationId].isVisited = true;
-            nodeRegistry[locationId].isAccessible = true;
-            DiscoverRoom(locationId);
-            DiscoverAdjacentRooms(locationId);
+            var locNode = nodeRegistry[locationId];
+            locNode.isVisited = true;
+            locNode.isChecked = true;
+            locNode.isDiscovered = true;
+            locNode.isLocked = false;
+            locNode.isAccessible = true;
+            SaveNodeToPersistentState(locNode);
+
             RefreshAllNodes();
             SelectNode(locationId);
             UpdateDoorwayVisuals();
-            OnPlayerLocationChanged?.Invoke(locationId, nodeRegistry[locationId]);
+            OnPlayerLocationChanged?.Invoke(locationId, locNode);
         }
 
         public void SetThresholdLocation(string hallwayLocationId, string inspectingRoomId)
@@ -1706,16 +1923,22 @@ namespace SundayLastBreath.UI
             currentThresholdRoomId = inspectingRoomId;
             selectedNodeId = inspectingRoomId;
 
-            DiscoverRoom(hallwayLocationId);
-            DiscoverAdjacentRooms(hallwayLocationId);
-            if (!string.IsNullOrEmpty(inspectingRoomId))
+            var hallNode = nodeRegistry[hallwayLocationId];
+            hallNode.isVisited = true;
+            hallNode.isChecked = true;
+            hallNode.isDiscovered = true;
+            SaveNodeToPersistentState(hallNode);
+
+            if (!string.IsNullOrEmpty(inspectingRoomId) && nodeRegistry.TryGetValue(inspectingRoomId, out var targetNode))
             {
-                DiscoverRoom(inspectingRoomId);
+                targetNode.isChecked = true;
+                targetNode.isDiscovered = true;
+                SaveNodeToPersistentState(targetNode);
             }
             RefreshAllNodes();
             SelectNode(inspectingRoomId);
             UpdateDoorwayVisuals();
-            OnPlayerLocationChanged?.Invoke(hallwayLocationId, nodeRegistry[hallwayLocationId]);
+            OnPlayerLocationChanged?.Invoke(hallwayLocationId, hallNode);
         }
 
         public void DiscoverRoom(string roomId)
@@ -2048,16 +2271,21 @@ namespace SundayLastBreath.UI
         private static string GetMiniMapRoomLabel(string roomId, NodeModel model = null)
         {
             if (string.IsNullOrEmpty(roomId)) return null;
-            string lower = roomId.ToLowerInvariant();
-            if (model != null && (model.isBlocked || model.id.Contains("blocked") || model.isStairs)) return null;
-            if (lower.Contains("blocked") || lower == "empty_bot" || lower == "stairs" || lower == "stairwell") return null;
-            if (lower == "unit_404" || lower == "unit_403") return null;
+            string lower = roomId.ToLowerInvariant().Trim();
+            if (lower == "f4_entrance" || lower == "f4 entrance" || lower == "f4") return "4F";
+            if (lower == "f3_landing" || lower == "f3 landing" || lower == "f3") return "3F";
+            if (lower == "f2_entrance" || lower == "f2 entrance" || lower == "f2") return "2F";
+            if (lower == "f1_landing" || lower == "f1 landing" || lower == "barricade" || lower == "f1") return "1F";
+            if (lower == "stairs" || lower == "stairwell") return null;
+            if (lower.Contains("blocked") || lower == "empty_bot") return null;
 
             switch (lower)
             {
                 case "unit_407": return "407";
                 case "unit_406": return "406";
                 case "unit_405": return "405";
+                case "unit_404": return "404";
+                case "unit_403": return "403";
                 case "unit_402": return "402";
                 case "unit_401": return "401";
                 case "utility":
@@ -2104,6 +2332,7 @@ namespace SundayLastBreath.UI
                 }
 
                 plateObj.SetActive(true);
+                plateObj.transform.SetAsLastSibling();
                 RectTransform pRt = plateObj.GetComponent<RectTransform>();
                 pRt.anchorMin = new Vector2(0.5f, 0.5f);
                 pRt.anchorMax = new Vector2(0.5f, 0.5f);
@@ -2115,8 +2344,8 @@ namespace SundayLastBreath.UI
 
                 bool isPlayerInside = string.Equals(roomId, currentLocationId, StringComparison.OrdinalIgnoreCase)
                     && string.IsNullOrEmpty(currentThresholdRoomId);
-                bool isAccessibleRoom = holder.model != null && holder.model.isAccessible && !holder.model.isLocked && !holder.model.isBlocked;
-                bool isVisitedOrAccessible = (holder.model != null && (holder.model.isVisited || (isAccessibleRoom && holder.model.isDiscovered))) || isPlayerInside;
+                bool isRoomVisited = (holder.model != null && holder.model.isVisited) || isPlayerInside;
+                bool hasStripe = !isPlayerInside && !isRoomVisited && holder.patternOverlay != null && holder.patternOverlay.gameObject.activeSelf;
 
                 Image plateBg = plateObj.GetComponent<Image>() ?? plateObj.AddComponent<Image>();
                 plateBg.color = Color.clear;
@@ -2184,7 +2413,11 @@ namespace SundayLastBreath.UI
                         lblTmp.textWrappingMode = TextWrappingModes.NoWrap;
                         lblTmp.color = isPlayerInside
                             ? new Color(0.01f, 0.05f, 0.09f, 1f)
-                            : (isVisitedOrAccessible ? new Color(0.03f, 0.05f, 0.08f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f));
+                            : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : (hasStripe ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
+                        Outline lblOutline = lblTmp.GetComponent<Outline>() ?? lblTmp.gameObject.AddComponent<Outline>();
+                        lblOutline.enabled = !isPlayerInside && !isRoomVisited;
+                        lblOutline.effectColor = new Color(0f, 0f, 0f, 0.9f);
+                        lblOutline.effectDistance = new Vector2(1f, -1f);
                         lblTmp.raycastTarget = false;
                     }
                 }
@@ -2207,96 +2440,10 @@ namespace SundayLastBreath.UI
                 && string.Equals(holder.model.id, currentThresholdRoomId, StringComparison.OrdinalIgnoreCase);
             bool isDiscovered = holder.model.isDiscovered || isPlayerPhysicallyInside || isThresholdInspected;
 
-            bool isMiniMap = ShouldRotateFloorplanForMiniMap();
-            bool hasVectorMap = !isMiniMap && currentFloorData != null && currentFloorData.vectorMapSprite != null;
-
-            if (hasVectorMap)
-            {
-                if (holder.bgImage != null)
-                {
-                    holder.bgImage.color = isPlayerPhysicallyInside ? new Color(0.04f, 0.22f, 0.32f, 0.85f) : new Color(0f, 0f, 0f, 0f);
-                }
-                if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(false);
-                if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
-                if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
-                if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
-                if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
-                if (holder.beaconObj != null) holder.beaconObj.SetActive(false);
-
-                if (holder.outline != null)
-                {
-                    if (isPlayerPhysicallyInside)
-                    {
-                        holder.outline.enabled = true;
-                        holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 0.95f);
-                        holder.outline.effectDistance = new Vector2(2f, -2f);
-                    }
-                    else if (isThresholdInspected || isSelected)
-                    {
-                        holder.outline.enabled = true;
-                        holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 0.90f);
-                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
-                    }
-                    else
-                    {
-                        holder.outline.enabled = false;
-                    }
-                }
-                return;
-            }
-
             // Player Radar Halo (Illuminates soft pulsing aura around current sector)
             if (holder.beaconObj != null)
             {
                 holder.beaconObj.SetActive(isCurrent);
-            }
-
-            // Horizontal mini/large map: flat FILL colors only (cyan = here, grey = visited/accessible, black = unvisited).
-            // Blocked rooms and the stairwell keep the striped image from the SVG blueprint.
-            if (isMiniMap)
-            {
-                var m = holder.model;
-                bool accessibleRoom = m.isAccessible && !m.isLocked && !m.isBlocked;
-                bool visitedOrAccessible = m.isVisited || (accessibleRoom && m.isDiscovered) || isPlayerPhysicallyInside;
-                bool blockedRoom = m.isBlocked || m.id.Contains("blocked");
-
-                Color fill = isCurrent ? new Color(0.0f, 0.78f, 0.95f, 1f)
-                           : (m.isStairs ? new Color(0.01f, 0.015f, 0.025f, 1f)
-                           : (visitedOrAccessible ? new Color(0.58f, 0.64f, 0.72f, 1f)
-                           : new Color(0.01f, 0.015f, 0.025f, 1f)));
-                if (holder.bgImage != null) holder.bgImage.color = fill;
-
-                if (holder.outline != null)
-                {
-                    holder.outline.enabled = isSelected && !isCurrent;
-                    if (isSelected && !isCurrent)
-                    {
-                        holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 1f);
-                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
-                    }
-                }
-
-                if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
-                if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
-                if (holder.beaconObj != null) holder.beaconObj.SetActive(false);
-                if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(false);
-                if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
-                if (holder.doorTickImage != null) holder.doorTickImage.color = new Color(0f, 0f, 0f, 0f);
-
-                if (holder.patternOverlay != null)
-                {
-                    if (blockedRoom && !isCurrent)
-                    {
-                        holder.patternOverlay.sprite = GetHazardStripeSprite();
-                        holder.patternOverlay.color = new Color(1f, 1f, 1f, 0.75f);
-                        holder.patternOverlay.gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        holder.patternOverlay.gameObject.SetActive(false);
-                    }
-                }
-                return;
             }
 
             // Hallways: Clean architectural connectors (like Twine)
@@ -2308,13 +2455,14 @@ namespace SundayLastBreath.UI
                     holder.roomCodeTmp.color = new Color(0.0f, 0.95f, 1.0f, 1.0f);
                     holder.roomCodeTmp.fontSize = 11f;
                     holder.roomCodeTmp.alignment = TextAlignmentOptions.Center;
+                    holder.roomCodeTmp.gameObject.SetActive(true);
                 }
                 if (holder.subLabelTmp != null) holder.subLabelTmp.text = "";
                 if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
                 if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
                 if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
 
-                bool isHallwayVisitedOrAccessible = holder.model.isVisited || (holder.model.isAccessible && holder.model.isDiscovered) || isPlayerPhysicallyInside;
+                bool isHallwayVisited = holder.model.isVisited || isPlayerPhysicallyInside;
                 if (isCurrent)
                 {
                     if (holder.bgImage != null) holder.bgImage.color = new Color(0.04f, 0.22f, 0.32f, 1f);
@@ -2327,7 +2475,7 @@ namespace SundayLastBreath.UI
                 }
                 else if (isSelected)
                 {
-                    if (holder.bgImage != null) holder.bgImage.color = isHallwayVisitedOrAccessible ? new Color(0.24f, 0.28f, 0.36f, 1f) : new Color(0.04f, 0.05f, 0.07f, 1f);
+                    if (holder.bgImage != null) holder.bgImage.color = isHallwayVisited ? new Color(0.24f, 0.28f, 0.36f, 1f) : new Color(0.04f, 0.05f, 0.07f, 1f);
                     if (holder.outline != null)
                     {
                         holder.outline.enabled = true;
@@ -2335,7 +2483,7 @@ namespace SundayLastBreath.UI
                         holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
                     }
                 }
-                else if (isHallwayVisitedOrAccessible)
+                else if (isHallwayVisited)
                 {
                     if (holder.bgImage != null) holder.bgImage.color = new Color(0.22f, 0.26f, 0.33f, 1f);
                     if (holder.outline != null)
@@ -2358,129 +2506,90 @@ namespace SundayLastBreath.UI
                 return;
             }
 
-            // Keep room icon disabled: pure minimalist design with clean room text and color-changing squares
-            if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
+            // Room Nodes: Solid flat fill colors adhering to the legend
+            // (cyan = player pos, grey = visited, black = unvisited, red stripes = checked locked, yellow stripes = checked blocked/inaccessible)
+            var m = holder.model;
+            bool isRoomVisited = m.isVisited || isPlayerPhysicallyInside;
+            bool isRoomChecked = m.isChecked || isThresholdInspected || isRoomVisited;
+            bool isStairsExit = (m.isStairs && string.Equals(m.id, "stairs", StringComparison.OrdinalIgnoreCase));
 
-            // Turn off hatched pattern overlay so solid room colors are clear
-            if (holder.patternOverlay != null) holder.patternOverlay.gameObject.SetActive(false);
+            bool showYellowStripe = !isCurrent && !isRoomVisited && isRoomChecked && (!m.isAccessible || m.isBlocked);
+            bool showRedStripe = !isCurrent && !isRoomVisited && isRoomChecked && (m.isAccessible && !m.isBlocked && m.isLocked);
 
-            // Directional & Status Chip Badge (Top-Right of Sector)
-            if (holder.navBadgeObj != null)
+            Color fill = isCurrent ? new Color(0.0f, 0.78f, 0.95f, 1f)
+                       : (isStairsExit ? new Color(0.01f, 0.015f, 0.025f, 1f)
+                       : (isRoomVisited ? new Color(0.58f, 0.64f, 0.72f, 1f)
+                       : new Color(0.01f, 0.015f, 0.025f, 1f)));
+            if (holder.bgImage != null) holder.bgImage.color = fill;
+
+            if (holder.outline != null)
             {
-                if (holder.navBadgeTmp != null)
-                {
-                    if (isCurrent || !isDiscovered)
-                    {
-                        holder.navBadgeObj.SetActive(false);
-                    }
-                    else if (holder.model.isStairs)
-                    {
-                        holder.navBadgeObj.SetActive(true);
-                        holder.navBadgeTmp.text = "[EXIT]";
-                        holder.navBadgeTmp.color = new Color(0.18f, 0.85f, 0.55f);
-                    }
-                    else
-                    {
-                        holder.navBadgeObj.SetActive(false);
-                    }
-                }
-            }
-
-            // Doorway Threshold Tick Color
-            if (holder.doorTickImage != null)
-            {
+                holder.outline.enabled = isCurrent || (isSelected && !isCurrent);
                 if (isCurrent)
-                    holder.doorTickImage.color = new Color(0.0f, 0.90f, 1.0f, 0.95f);
-                else if (holder.model.isVisited || holder.model.isAccessible)
-                    holder.doorTickImage.color = new Color(0.48f, 0.58f, 0.70f, 0.85f);
-                else
-                    holder.doorTickImage.color = new Color(0.14f, 0.20f, 0.28f, 0.60f);
-            }
-
-            // High-Contrast Core Coloring:
-            // 1. Current Location (Cyan)
-            // 2. Visited / Accessible Room (Tactical Slate Grey)
-            // 3. Unvisited Room (Obsidian Black)
-            bool isAccessibleRoom = holder.model.isAccessible && !holder.model.isLocked && !holder.model.isBlocked;
-            bool isVisitedOrAccessible = holder.model.isVisited || (isAccessibleRoom && holder.model.isDiscovered) || isPlayerPhysicallyInside;
-
-            if (isCurrent)
-            {
-                // Player Location: Cyan Glow
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.04f, 0.22f, 0.32f, 1.0f);
-                if (holder.outline != null)
                 {
-                    holder.outline.enabled = true;
-                    holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 1.0f);
+                    holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 0.95f);
+                    holder.outline.effectDistance = new Vector2(2f, -2f);
+                }
+                else if (isSelected)
+                {
+                    holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 1f);
                     holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
                 }
-                if (holder.iconImage != null)
+            }
+
+            if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
+            if (holder.navBadgeObj != null) holder.navBadgeObj.SetActive(false);
+            if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(false);
+            if (holder.doorTickImage != null) holder.doorTickImage.color = new Color(0f, 0f, 0f, 0f);
+
+            if (holder.patternOverlay != null)
+            {
+                if (showYellowStripe)
                 {
-                    holder.iconImage.gameObject.SetActive(false);
+                    holder.patternOverlay.sprite = GetHazardStripeSprite();
+                    holder.patternOverlay.color = new Color(1f, 1f, 1f, 0.85f);
+                    holder.patternOverlay.gameObject.SetActive(true);
                 }
-                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = Color.white;
-                if (holder.subLabelTmp != null)
+                else if (showRedStripe)
                 {
-                    holder.subLabelTmp.text = "CURRENT POS";
-                    holder.subLabelTmp.color = new Color(0.0f, 0.92f, 1.0f);
+                    holder.patternOverlay.sprite = GetRedStripeSprite();
+                    holder.patternOverlay.color = new Color(1f, 1f, 1f, 0.85f);
+                    holder.patternOverlay.gameObject.SetActive(true);
+                }
+                else
+                {
+                    holder.patternOverlay.gameObject.SetActive(false);
                 }
             }
-            else if (isVisitedOrAccessible)
+
+            // Label Text (e.g. 407, 4F, 3F, 2F, 1F)
+            string shortLabel = GetMiniMapRoomLabel(holder.nodeId, holder.model);
+            if (holder.roomCodeTmp != null)
             {
-                // Visited or Accessible Room: Distinct Tactical Slate Grey
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.22f, 0.26f, 0.33f, 1.0f);
-                if (holder.outline != null)
+                if (isStairsExit)
                 {
-                    holder.outline.enabled = true;
-                    if (isSelected)
-                    {
-                        holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 1.0f);
-                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
-                    }
-                    else
-                    {
-                        holder.outline.effectColor = new Color(0.48f, 0.58f, 0.70f, 0.90f);
-                        holder.outline.effectDistance = new Vector2(1f, -1f);
-                    }
+                    holder.roomCodeTmp.gameObject.SetActive(false);
                 }
-                if (holder.iconImage != null)
+                else if (!string.IsNullOrEmpty(shortLabel))
                 {
-                    holder.iconImage.gameObject.SetActive(false);
-                }
-                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = Color.white;
-                if (holder.subLabelTmp != null)
-                {
-                    holder.subLabelTmp.text = isDiscovered ? holder.model.shortSub : holder.model.undiscoveredSub;
-                    holder.subLabelTmp.color = isSelected ? new Color(0.98f, 0.78f, 0.35f) : new Color(0.78f, 0.86f, 0.94f);
-                }
-            }
-            else
-            {
-                // Unvisited Room: Obsidian Black
-                if (holder.bgImage != null) holder.bgImage.color = new Color(0.025f, 0.035f, 0.05f, 1.0f);
-                if (holder.outline != null)
-                {
-                    holder.outline.enabled = true;
-                    if (isSelected)
+                    holder.roomCodeTmp.gameObject.SetActive(true);
+                    holder.roomCodeTmp.text = shortLabel;
+                    holder.roomCodeTmp.fontSize = (shortLabel.Length > 4) ? 9f : 12f;
+                    holder.roomCodeTmp.color = isCurrent
+                        ? new Color(0.01f, 0.05f, 0.09f, 1f) // Dark navy contrast on bright cyan fill
+                        : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : ((showYellowStripe || showRedStripe) ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
+                    Outline codeOutline = holder.roomCodeTmp.GetComponent<Outline>() ?? holder.roomCodeTmp.gameObject.AddComponent<Outline>();
+                    codeOutline.enabled = !isCurrent && !isRoomVisited;
+                    codeOutline.effectColor = new Color(0f, 0f, 0f, 0.9f);
+                    codeOutline.effectDistance = new Vector2(1f, -1f);
+                    if (holder.patternOverlay != null && holder.roomCodeTmp.transform.parent == holder.patternOverlay.transform.parent)
                     {
-                        holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 0.80f);
-                        holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
-                    }
-                    else
-                    {
-                        holder.outline.effectColor = new Color(0.14f, 0.20f, 0.28f, 0.65f);
-                        holder.outline.effectDistance = new Vector2(1f, -1f);
+                        holder.roomCodeTmp.transform.SetAsLastSibling();
                     }
                 }
-                if (holder.iconImage != null)
+                else
                 {
-                    holder.iconImage.gameObject.SetActive(false);
-                }
-                if (holder.roomCodeTmp != null) holder.roomCodeTmp.color = new Color(0.55f, 0.65f, 0.75f);
-                if (holder.subLabelTmp != null)
-                {
-                    holder.subLabelTmp.text = isDiscovered ? holder.model.shortSub : holder.model.undiscoveredSub;
-                    holder.subLabelTmp.color = new Color(0.35f, 0.45f, 0.55f);
+                    holder.roomCodeTmp.gameObject.SetActive(false);
                 }
             }
         }

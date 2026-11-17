@@ -170,10 +170,10 @@ namespace SundayLastBreath.UI
 
             // 3. Purge previous scene audio & reset channels
             SetProgress(0.25f, ">> Purging audio cache & recalibrating acoustic channels...");
-            if (ApartmentHubScreen.Instance != null)
+            if (GameStageScreen.Instance != null)
             {
-                ApartmentHubScreen.Instance.CloseSystemMenuModal();
-                ApartmentHubScreen.Instance.StopAllAudioSources();
+                GameStageScreen.Instance.CloseSystemMenuModal();
+                GameStageScreen.Instance.StopAllAudioSources();
             }
             if (AudioManager.Instance != null)
             {
@@ -195,9 +195,9 @@ namespace SundayLastBreath.UI
 
             // 5. Synchronize environmental acoustics for loaded location
             SetProgress(0.85f, ">> Synchronizing room acoustics & ambient feed...");
-            if (ApartmentHubScreen.Instance != null)
+            if (GameStageScreen.Instance != null)
             {
-                ApartmentHubScreen.Instance.RefreshLocationBGM();
+                GameStageScreen.Instance.RefreshLocationBGM();
             }
             yield return new WaitForSecondsRealtime(0.12f);
 

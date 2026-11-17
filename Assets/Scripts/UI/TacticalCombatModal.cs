@@ -102,6 +102,7 @@ namespace SundayLastBreath.UI
         private bool isBusyTurn = false;
         private bool combatEnded = false;
         private int turnNumber = 1;
+        private bool isTutorialCombat = false;
 
         private Action onVictoryCallback;
         private Action onDefeatCallback;
@@ -167,7 +168,7 @@ namespace SundayLastBreath.UI
             Action onDefeat = null,
             Action onFlee = null)
         {
-            var hub = FindAnyObjectByType<ApartmentHubScreen>(FindObjectsInactive.Include);
+            var hub = FindAnyObjectByType<GameStageScreen>(FindObjectsInactive.Include);
             var modal = FindAnyObjectByType<TacticalCombatModal>(FindObjectsInactive.Include);
             if (modal == null && hub != null)
             {
@@ -256,9 +257,11 @@ namespace SundayLastBreath.UI
             List<CombatEnemyData> enemies,
             Action onVictory = null,
             Action onDefeat = null,
-            Action onFlee = null)
+            Action onFlee = null,
+            bool isTutorial = false)
         {
             player = playerData;
+            isTutorialCombat = isTutorial;
             if (player == null && Core.GameManager.Instance != null)
             {
                 player = Core.GameManager.Instance.CurrentPlayer;
@@ -298,7 +301,7 @@ namespace SundayLastBreath.UI
             menuState = SubMenuState.MainCommands;
 
             // Hide global TopHUD so HP/Stamina is cleanly focused on the combat survivor card
-            ApartmentHubScreen.Instance?.SetTopHUDVisible(false);
+            GameStageScreen.Instance?.SetTopHUDVisible(false);
 
             BuildOrRefreshUI();
             transform.SetAsLastSibling();
@@ -320,7 +323,14 @@ namespace SundayLastBreath.UI
 
             LoadEnemyVisuals(CurrentEnemy);
             RefreshAllUI();
-            SetCombatLog($"<color=#F87171>[ENCOUNTER]</color> {horde.Count} hostiles blocking your path! Choose an action on the left ([1] ATTACK to target a limb).");
+            if (isTutorialCombat)
+            {
+                SetCombatLog("<color=#F59E0B><b>[SURVIVAL DIRECTIVE]</b></color> The attacker does not feel pain! Click <b>[1] ATTACK LIMB</b> to target anatomy (Legs force Crawlers, Head deals critical trauma).");
+            }
+            else
+            {
+                SetCombatLog($"<color=#F87171>[ENCOUNTER]</color> {horde.Count} hostiles blocking your path! Choose an action on the left ([1] ATTACK to target a limb).");
+            }
             PlayZombieGroanSFX();
         }
 
@@ -1063,9 +1073,9 @@ namespace SundayLastBreath.UI
         public void CloseModal()
         {
             // Restore global TopHUD and synchronize updated vitals & XP
-            ApartmentHubScreen.Instance?.SetTopHUDVisible(true);
-            ApartmentHubScreen.Instance?.UpdateVitalsUI();
-            ApartmentHubScreen.Instance?.RefreshPDAStatusTab();
+            GameStageScreen.Instance?.SetTopHUDVisible(true);
+            GameStageScreen.Instance?.UpdateVitalsUI();
+            GameStageScreen.Instance?.RefreshPDAStatusTab();
 
             gameObject.SetActive(false);
         }
@@ -1073,7 +1083,7 @@ namespace SundayLastBreath.UI
         private void OnDisable()
         {
             // Safeguard: Ensure TopHUD is always restored whenever combat modal is hidden or disabled
-            ApartmentHubScreen.Instance?.SetTopHUDVisible(true);
+            GameStageScreen.Instance?.SetTopHUDVisible(true);
         }
 
         // ====================================================================
@@ -1943,9 +1953,9 @@ namespace SundayLastBreath.UI
                 }
 
                 // Keep Top HUD Vitals bar (HP, Stamina, Hunger, Thirst) synchronized in real-time!
-                if (ApartmentHubScreen.Instance != null)
+                if (GameStageScreen.Instance != null)
                 {
-                    ApartmentHubScreen.Instance.UpdateVitalsUI();
+                    GameStageScreen.Instance.UpdateVitalsUI();
                 }
             }
         }
@@ -1992,12 +2002,27 @@ namespace SundayLastBreath.UI
                             ? "<color=#38BDF8><b>MAIMED (1 Arm Severed — -40% Damage)</b></color>"
                             : $"<color=#FCA5A5>ARMED ({enemy.weaponName} — {enemy.baseAttackDamage} Base DMG)</color>");
 
-                    string infoText =
-                        $"<size=17><color=#F87171><b>TARGET OBSERVATION // {enemy.enemyName.ToUpperInvariant()}</b></color></size>\n" +
-                        $"<color=#CBD5E1><i>\"{enemy.tacticalDescription}\"</i></color>\n\n" +
-                        $"<color=#94A3B8><b>POSTURE & MOBILITY:</b></color>   {legState}\n" +
-                        $"<color=#94A3B8><b>THREAT & LIMBS:</b></color>       {armState}   <color=#64748B>({intactLimbs}/6 Body Parts Intact)</color>\n\n" +
-                        $"<color=#38BDF8><b>► AWAITING COMMAND:</b></color> Click <b><color=#FCA5A5>[1] ATTACK LIMB</color></b> on the left (or press <b>[1]</b>) to open 6-limb targeting, or select <b>[2] GUARD</b>, <b>[3] USE ITEM</b>, or <b>[4] SHOVE</b>.";
+                    string infoText;
+                    if (isTutorialCombat && turnNumber <= 2)
+                    {
+                        infoText =
+                            $"<size=16><color=#EF4444><b>TACTICAL SURVIVAL DIRECTIVE // ANATOMICAL TARGETING</b></color></size>\n" +
+                            $"<color=#CBD5E1>This attacker is impervious to human pain. You must destroy specific anatomy to survive:</color>\n\n" +
+                            $"<color=#10B981><b>• LEGS [MOBILITY]:</b></color>   Severing legs forces a <color=#F59E0B><b>Crawler</b></color>, wiping out lunges & evasion.\n" +
+                            $"<color=#38BDF8><b>• ARMS [OFFENSE]:</b></color>    Breaking arms disables claw swipes & lethal grapples (-65% DMG).\n" +
+                            $"<color=#93C5FD><b>• TORSO [CENTER]:</b></color>   Highest hit chance, reliable stagger, exhausts vitality.\n" +
+                            $"<color=#F87171><b>• HEAD [CRITICAL]:</b></color>  Hardest to hit, but deals massive cranial destruction.\n\n" +
+                            $"<color=#38BDF8><b>► CLICK [1] ATTACK LIMB ON THE LEFT (OR PRESS [1]) TO CHOOSE A TARGET!</b></color>";
+                    }
+                    else
+                    {
+                        infoText =
+                            $"<size=17><color=#F87171><b>TARGET OBSERVATION // {enemy.enemyName.ToUpperInvariant()}</b></color></size>\n" +
+                            $"<color=#CBD5E1><i>\"{enemy.tacticalDescription}\"</i></color>\n\n" +
+                            $"<color=#94A3B8><b>POSTURE & MOBILITY:</b></color>   {legState}\n" +
+                            $"<color=#94A3B8><b>THREAT & LIMBS:</b></color>       {armState}   <color=#64748B>({intactLimbs}/6 Body Parts Intact)</color>\n\n" +
+                            $"<color=#38BDF8><b>► AWAITING COMMAND:</b></color> Click <b><color=#FCA5A5>[1] ATTACK LIMB</color></b> on the left (or press <b>[1]</b>) to open 6-limb targeting, or select <b>[2] GUARD</b>, <b>[3] USE ITEM</b>, or <b>[4] SHOVE</b>.";
+                    }
 
                     var readCell = CreateSubMenuCell(
                         infoText,
@@ -2148,6 +2173,31 @@ namespace SundayLastBreath.UI
                         ls.overlayReticleLabel.text = $"► {shortName} <color=#38BDF8>{hitPct}%</color>";
                     }
                 }
+            }
+
+            if (lt.HasValue)
+            {
+                switch (lt.Value)
+                {
+                    case LimbType.Head:
+                        SetCombatLog("<color=#EF4444><b>[TACTICAL ADVICE // HEAD]</b></color> High-risk target. Destroying the skull deals critical trauma and prevents reanimation!");
+                        break;
+                    case LimbType.Torso:
+                        SetCombatLog("<color=#38BDF8><b>[TACTICAL ADVICE // TORSO]</b></color> Center of mass. Highest accuracy. Reliable stagger that drains stamina and breaks enemy rhythm.");
+                        break;
+                    case LimbType.LeftArm:
+                    case LimbType.RightArm:
+                        SetCombatLog("<color=#F59E0B><b>[TACTICAL ADVICE // ARMS]</b></color> Severing arms strips claw swipes, prevents lethal grapple grabs, and reduces enemy DMG by up to 65%.");
+                        break;
+                    case LimbType.LeftLeg:
+                    case LimbType.RightLeg:
+                        SetCombatLog("<color=#10B981><b>[TACTICAL ADVICE // LEGS]</b></color> High accuracy. Severing both legs drops the enemy into a slow CRAWLER (0% evasion, 95% headshot accuracy)!");
+                        break;
+                }
+            }
+            else if (menuState == SubMenuState.TargetLimbs)
+            {
+                SetCombatLog("<color=#F87171>[TACTICAL TARGETING]</color> Hover over a limb to preview tactical impact, or click to strike!");
             }
         }
 
