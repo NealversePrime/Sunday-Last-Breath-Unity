@@ -9,21 +9,22 @@ namespace SundayLastBreath.Zones
 {
     /// <summary>
     /// Section 6: Floor 2 Hallway Zone & First Zombie Encounter (Actor / Screenplay).
-    /// Performs on the GameStageScreen Stage (Panggung).
+    /// Performs on the GameStageScreen Stage.
     /// 
-    /// Responsibilities:
-    /// - Owns the 2nd-floor corridor detour (Sections 1 through 4: East Wing Doorway, Encounter Corridor, Residential Corridor, West Fire Exit).
-    /// - Owns the First Zombie Encounter (Infected Commuter / David Keller):
-    ///   - Stealth Approach vs Alerted Lunging Confrontation
-    ///   - Full integration with TacticalCombatModal (Limb-targeting tactical combat system)
-    ///   - Procedural & Frame animations: F2Thump_Anim, F2Aggro_Anim, F2Lunge_Anim, F2Dead_Anim, F2Exit_Anim
-    /// - Owns 2F room inspections & scavenging:
-    ///   - David Keller's body (Apartment 203 Key, Matches, Lore entry)
-    ///   - Unit 201 (Barricaded survivors, pine scent, warning note)
-    ///   - Unit 202 (Sheriff's eviction notice, empty flat)
-    ///   - Unit 203 (David's studio apartment - Canned food, Medical supplies, Batteries)
-    ///   - West Wing Fire Exit (Direct descent to 1F Lobby)
-    /// - Manages state persistence via ES3 keys for all 2F flags.
+    /// Design:
+    /// - 100% pure-hallway corridor gauntlet (Sections 1 through 4: East Wing Doorway, Encounter Corridor,
+    ///   Residential Corridor, West Wing Fire Exit) with no enterable apartment rooms.
+    /// - First Zombie Encounter (Infected Commuter / David Keller):
+    ///   - The protagonist still believes the crisis is a riot/blackout and has no prior knowledge of zombies.
+    ///   - Silent entry vs. stairwell-noise alerted entry leads into an unavoidable self-defense confrontation
+    ///     that shatters denial and reveals the undead outbreak.
+    ///   - Restores the pre-combat Lunge Reflex Check (STR 4 Shove / AGI 5 Dive, eased when prepared)
+    ///     and the pinned-to-floor Tackle state (F2Tackle_Anim) before launching TacticalCombatModal.
+    /// - Pure-hallway aftermath & scavenging:
+    ///   - Searching David Keller's body & spilled commuter briefcase in the corridor (ID badge sticky-note clue).
+    ///   - Testing sealed/barricaded apartment doors (Units 201–203) from the corridor only.
+    ///   - West Exit corridor scavenging: Janitor's Maintenance Cart (PER 5 or ID Badge clue -> Inhaler, Battery, Bandage)
+    ///     and Discarded Luggage (Scavenging 1 / Scavenger / Field Forager -> Energy Bar, Bottled Water).
     /// </summary>
     public class Floor2HallwayZone : MonoBehaviour
     {
@@ -40,7 +41,17 @@ namespace SundayLastBreath.Zones
         public bool zombie_looted = false;
         public bool stealth_ambush_ready = false;
 
-        [Header("2F Room Inspections")]
+        [Header("2F Pure-Hallway Encounter & Scavenging States")]
+        public bool zombie_inspected = false;
+        public bool prepared_for_lunge = false;
+        public bool lunge_countered = false;
+        public bool zombie_tackled = false;
+        public bool lunge_resolved = false;
+        public bool hallway_doors_checked = false;
+        public bool janitor_cart_looted = false;
+        public bool luggage_looted = false;
+
+        [Header("2F Door Exterior Checks & Compatibility Flags")]
         public bool room201_checked = false;
         public bool room202_checked = false;
         public bool room203_unlocked = false;
@@ -60,6 +71,16 @@ namespace SundayLastBreath.Zones
             zombie_defeated = false;
             zombie_looted = false;
             stealth_ambush_ready = false;
+
+            zombie_inspected = false;
+            prepared_for_lunge = false;
+            lunge_countered = false;
+            zombie_tackled = false;
+            lunge_resolved = false;
+            hallway_doors_checked = false;
+            janitor_cart_looted = false;
+            luggage_looted = false;
+
             room201_checked = false;
             room202_checked = false;
             room203_unlocked = false;
@@ -77,7 +98,7 @@ namespace SundayLastBreath.Zones
 
             if (section > 0)
             {
-                hallwaySection = section;
+                hallwaySection = Mathf.Clamp(section, 1, 4);
             }
 
             if (alertState)
@@ -89,9 +110,10 @@ namespace SundayLastBreath.Zones
             stage.IsInHallwayInternal = true;
             stage.CurrentInspectedRoomInternal = GetCurrentSectionRoomId();
 
-            // Prepare stage UI
             stage.SetApartmentButtonsVisible(false);
             stage.EndAwakeningIntro();
+            stage.PlaySFX("Audio/SFX/firedoor_click", 0.8f);
+            stage.PlayHubBGM("Audio/SFX/fluorescent_buzz", 0.30f, true);
 
             InspectHallway();
         }
@@ -108,7 +130,7 @@ namespace SundayLastBreath.Zones
             }
         }
 
-        #region 2F Screenplay & Encounter Sections
+        #region 2F Screenplay & Corridor Sections
 
         public void InspectHallway(string actionFeedback = null)
         {
@@ -118,7 +140,6 @@ namespace SundayLastBreath.Zones
             string roomId = GetCurrentSectionRoomId();
             stage.CurrentInspectedRoomInternal = roomId;
 
-            // Load and synchronize tactical map for 2F
             stage.TacticalMap?.LoadFloorById("ascott_2f");
             stage.TacticalMap?.DiscoverRoom(roomId);
             stage.SyncTacticalMapRoomStates();
@@ -126,321 +147,502 @@ namespace SundayLastBreath.Zones
             stage.ClearChoices();
             int choiceIdx = 0;
             var player = stage.CurrentPlayer;
-            string job = GetNormalizedJob(player);
-            string calloutText = GetJobCallout(job);
-            string initialThought = GetJobInitialThought(job);
-            string panicReaction = GetJobPanicReaction(job);
 
             switch (hallwaySection)
             {
-                // =========================================================================================
-                // SECTION 1: EAST WING DOORWAY (Arrival from Fire Stairwell)
-                // =========================================================================================
                 case 1:
-                    stage.SetLocation("f2_hall_1", "2ND FLOOR // EAST WING DOORWAY");
-                    stage.TacticalMap?.SyncRoomState("f2_hall_1", isVisited: true, isChecked: true, isLocked: false, isBlocked: false, isAccessible: true);
-
-                    if (!zombie_defeated)
-                    {
-                        if (zombie_alerted)
-                        {
-                            stage.PlayStageAnimation("F2Aggro_Anim", "F2_1_aggro", 8f);
-                            stage.PlaySFX("Audio/SFX/zombie_rattle", 0.65f);
-
-                            string narration = "<color=#EF4444><b>[2ND FLOOR EAST WING // NOISE ECHOED]</b></color>\n\n" +
-                                "The heavy fire door clicks shut behind you. The loud metallic crash from the stairwell carried straight down this corridor.\n\n" +
-                                "Twenty feet ahead, under a single buzzing fluorescent tube light, a man in a rumpled business suit whips around with a sickening wet pop of his vertebrae. " +
-                                "Through cracked wire-frame spectacles, his eyes are milky white and ruptured with blood. Thick, dark fluid dribbles from his dislocated jaw.\n\n" +
-                                "A blue lanyard dangles from his collar: <b>David Keller – Junior Accountant</b>.\n\n" +
-                                panicReaction + "\n\n" +
-                                "<i>He is snarling—jaw snapping empty air as black bile drips onto the carpet. He lunges straight down the narrow corridor!</i>";
-
-                            stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : narration);
-
-                            stage.SetChoice(choiceIdx++, "<b><color=#EF4444>[DEFEND YOURSELF]</color> Raise weapon and fight off the attacker!</b>", () =>
-                            {
-                                hallwaySection = 2;
-                                InspectHallway();
-                            }, true, new Color(0.95f, 0.25f, 0.25f));
-
-                            stage.SetChoice(choiceIdx++, "[BRACE] Plant your footing and raise your guard <color=#10B981>(-5 Stamina)</color>", () =>
-                            {
-                                stage.ExertStamina(5);
-                                stage.PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.8f);
-                                hallwaySection = 2;
-                                InspectHallway("<color=#38BDF8><b>[GUARD RAISED]</b></color> You dig your boots into the runner carpet and brace your arms. The frenzied accountant lunges into the dim light!");
-                            }, true);
-                        }
-                        else
-                        {
-                            stage.PlayStageAnimation("F2Thump_Anim", "F2_1_thump", 8f);
-                            stage.PlaySFX("Audio/SFX/head_thump_wet", 0.55f);
-
-                            string narration = "<color=#10B981><b>[2ND FLOOR EAST WING // SILENT ENTRY]</b></color>\n\n" +
-                                "The fire door clicks softly shut behind you. The backup generator lights in this wing are completely dead, leaving only a single fluorescent tube flickering twenty feet down the corridor.\n\n" +
-                                "Ahead of you stands a man in a dark business suit, facing the wall. His forehead is pressed against the faded floral wallpaper.\n\n" +
-                                "Slow, wet, rhythmic <i>thuds</i> echo down the hall as he rhythmically taps his skull against the plaster:\n" +
-                                "<i>Thump... thump... thump...</i>\n\n" +
-                                "A blue lanyard hanging from his pocket reads: <b>David Keller – Junior Accountant</b>. A brass key ring glints at his belt loop. He hasn't noticed you yet.\n\n" +
-                                initialThought;
-
-                            stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : narration);
-
-                            stage.SetChoice(choiceIdx++, $"<b><color=#38BDF8>[CALL OUT]</color> Speak to the stranger:</b> <color=#E2E8F0>{calloutText}</color>", () =>
-                            {
-                                stage.PlayClickSFX();
-                                zombie_alerted = true;
-                                hallwaySection = 2;
-                                InspectHallway("<color=#EF4444><b>[THE REVELATION]</b></color>\n\n" +
-                                    "At the sound of your voice, the rhythmic thumping abruptly stops. The corridor plunges into dead silence.\n\n" +
-                                    "Slowly, with a wet, cracking pop of cartilage, the man turns his head. His jaw hangs open at an unnatural angle, black coagulated blood pooling on his tongue. " +
-                                    "Behind cracked glasses, his eyes are milky cataracts swimming in broken red veins.\n\n" +
-                                    panicReaction + "\n\n" +
-                                    "He doesn't speak. With a choking, wet hiss, he violently lunges toward you!");
-                            }, true);
-
-                            stage.SetChoice(choiceIdx++, "[APPROACH CAUTIOUSLY] Creep closer to inspect his condition <color=#9CA3AF>(~1 min)</color>", () =>
-                            {
-                                stage.Clock?.AddTime(1);
-                                stage.PlaySFX("Audio/SFX/boots_slow_concrete", 0.5f);
-                                InspectHallway("<color=#93C5FD><b>[CLOSE INSPECTION]</b></color>\n\n" +
-                                    "You take three slow, silent steps along the carpet runner. You are now six feet behind him.\n\n" +
-                                    "The smell hits you first—the sharp, unmistakable copper of arterial blood mixed with a rancid, sour decay. " +
-                                    "His collar is torn open, revealing deep, jagged lacerations where entire chunks of flesh have been torn from his neck.\n\n" +
-                                    "His chest is not rising or falling. A wet, suffocating rattle vibrates in his throat: <i>\"...hkkk... ghh... hrrr...\"</i>\n\n" +
-                                    "<i>Whatever is standing in front of you... it isn't breathing.</i>");
-                            }, true);
-
-                            stage.SetChoice(choiceIdx++, "[STEALTH CRAWL] Drop low beneath the wainscoting and slip behind him <color=#10B981>[AMBUSH ADVANTAGE]</color>", () =>
-                            {
-                                stealth_ambush_ready = true;
-                                stage.Clock?.AddTime(1);
-                                stage.PlaySFX("Audio/SFX/boots_slow_concrete", 0.6f);
-                                hallwaySection = 2;
-                                InspectHallway("<color=#10B981><b>[STEALTH SUCCESS]</b></color> You drop onto your knees and creep silently under the shadows of the door jambs. You slip directly behind the unresponsive tenant. His back is completely exposed to an opening strike!");
-                            }, true);
-                        }
-                    }
-                    else
-                    {
-                        stage.PlayStageAnimation("F2Thump_Anim", "F2_1_thump", 8f);
-                        stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback :
-                            "<color=#10B981><b>[2ND FLOOR EAST WING // SECURED]</b></color>\n\n" +
-                            "The East Wing fire door stands behind you, wedged safely ajar with a folded cardboard coaster so it won't lock you out. " +
-                            "The corridor ahead is silent. You can smell the sharp copper of fresh blood mixed with stale dust.");
-
-                        stage.SetChoice(choiceIdx++, "[ADVANCE] Walk west toward the Residential Corridor", () =>
-                        {
-                            hallwaySection = 3;
-                            stage.PlayClickSFX();
-                            InspectHallway();
-                        }, true);
-
-                        stage.SetChoice(choiceIdx++, "[EXAMINE STAIRWELL DOOR] Check the fire door leading back to the stairs", () =>
-                        {
-                            stage.PlayClickSFX();
-                            InspectHallway("<color=#94A3B8>The heavy fire door connects back to the stairwell landing. The stairs to the 1st Floor remain completely jammed by the drink machine and dumped furniture. Your only way down is the West Wing fire exit at the far end of this floor.</color>");
-                        }, true);
-                    }
+                    RenderSection1EastWing(player, ref choiceIdx, actionFeedback);
                     break;
-
-                // =========================================================================================
-                // SECTION 2: MID-EAST CORRIDOR (The First Zombie Encounter)
-                // =========================================================================================
                 case 2:
-                    stage.SetLocation("f2_hall_2", "2ND FLOOR // THE FIRST ENCOUNTER");
-                    stage.TacticalMap?.SyncRoomState("f2_hall_2", isVisited: true, isChecked: true, isLocked: false, isBlocked: !zombie_defeated, isAccessible: true);
-
-                    if (!zombie_defeated)
-                    {
-                        stage.PlayStageAnimation("F2Lunge_Anim", "F2_2_lunge", 8f);
-                        stage.PlaySFX("Audio/SFX/zombiewalking1", 0.9f);
-
-                        string encounterDesc = stealth_ambush_ready
-                            ? "<color=#10B981><b>[TACTICAL AMBUSH OPPORTUNITY]</b></color>\n\n" +
-                              "You are crouching three feet behind David Keller. His knuckles are bloody and gray from clawing the drywall, completely unaware of you.\n\n" +
-                              "You have a clean opening to strike first before he turns and lunges!"
-                            : "<color=#EF4444><b>[THE INFECTED COMMUTER // LUNGING THREAT]</b></color>\n\n" +
-                              "David Keller staggers forward into the light! His shredded tie whips as he lunges with blackened, splintered fingernails!\n\n" +
-                              panicReaction + "\n\n" +
-                              "There is no way to talk to him. He does not feel fear, reason, or pain. You must neutralize this threat to survive the 2nd Floor.";
-
-                        stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : encounterDesc);
-
-                        if (stealth_ambush_ready)
-                        {
-                            stage.SetChoice(choiceIdx++, "<b><color=#10B981>[SURPRISE ATTACK]</color> Strike from behind! (Pre-Damages Torso & Legs)</b>", () =>
-                            {
-                                LaunchZombieCombat(isAmbush: true);
-                            }, true, new Color(0.2f, 0.9f, 0.4f));
-                        }
-
-                        stage.SetChoice(choiceIdx++, "<b><color=#EF4444>[ENGAGE]</color> Enter Tactical Combat (Target Anatomy & Defend)</b>", () =>
-                        {
-                            LaunchZombieCombat(isAmbush: false);
-                        }, true, new Color(0.95f, 0.25f, 0.25f));
-
-                        stage.SetChoice(choiceIdx++, "[FALL BACK] Backpedal toward the East Wing doorway <color=#EF4444>(-10 Stamina)</color>", () =>
-                        {
-                            stage.ExertStamina(10);
-                            hallwaySection = 1;
-                            zombie_alerted = true;
-                            stealth_ambush_ready = false;
-                            stage.PlaySFX("Audio/SFX/boots_run_concrete", 0.8f);
-                            InspectHallway("<color=#F59E0B>You backpedal quickly into the doorway shadows, putting distance between you and the snarling tenant.</color>");
-                        }, true);
-                    }
-                    else
-                    {
-                        // Defeated -> auto-advance to Section 3
-                        hallwaySection = 3;
-                        InspectHallway();
-                    }
+                    RenderSection2Encounter(player, ref choiceIdx, actionFeedback);
                     break;
-
-                // =========================================================================================
-                // SECTION 3: RESIDENTIAL CORRIDOR (Aftermath, Looting, & Apartment Doors)
-                // =========================================================================================
                 case 3:
-                    stage.SetLocation("f2_hall_3", "2ND FLOOR // RESIDENTIAL CORRIDOR");
-                    stage.TacticalMap?.SyncRoomState("f2_hall_3", isVisited: true, isChecked: true, isLocked: false, isBlocked: false, isAccessible: true);
-
-                    stage.PlayStageAnimation("F2Dead_Anim", "F2_4_dead", 8f);
-
-                    string hallwayDesc = "<color=#10B981><b>[RESIDENTIAL CORRIDOR // AFTERMATH]</b></color>\n\n" +
-                        "The fallen tenant lies motionless on the floral carpet runner, black fluid pooling around his head. " +
-                        "The buzzing tube light casts sharp shadows across the doors of Units 201, 202, and 203.\n\n" +
-                        "At the far end of the hallway, a green emergency exit sign glows above the West Wing fire stairwell.";
-
-                    stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : hallwayDesc);
-
-                    // 1. Search David Keller's Body
-                    if (!zombie_looted)
-                    {
-                        stage.SetChoice(choiceIdx++, "<color=#F59E0B>[SEARCH BODY]</color> Search the fallen tenant's suit pockets <color=#9CA3AF>(~1 min)</color>", () =>
-                        {
-                            zombie_looted = true;
-                            stage.Clock?.AddTime(1);
-                            stage.PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/Keys1.wav", 0.85f);
-
-                            player?.AddItem("Apartment 203 Key", 1);
-                            player?.AddItem("Matches", 10);
-
-                            stage.Lore?.AddLore("David Keller's ID Badge",
-                                "Corporate ID badge for David Keller, resident of Unit 203. A worn sticky note on the back reads: 'Remember to pick up spare inhaler and battery pack from maintenance.'",
-                                stage.Clock?.GetTimeString() ?? "00:45");
-
-                            stage.RefreshAllPDAPanels();
-
-                            InspectHallway("<color=#10B981><b>[ITEMS RECOVERED]</b></color> You kneel beside the fallen body and carefully check his jacket.\n\n" +
-                                "From his breast pocket, you retrieve an Ascott Residency tenant ID: <b>David Keller, Unit 203</b>.\n" +
-                                "Attached to his belt is a brass key labeled <b><color=#F59E0B>[APARTMENT 203 KEY]</color></b> alongside a box of waterproof matches.\n\n" +
-                                "You slide the key into your pocket and step back to your feet.");
-                        }, true);
-                    }
-                    else
-                    {
-                        stage.SetChoice(choiceIdx++, "Search David Keller's body <color=#64748B>[ALREADY SEARCHED]</color>", null, false);
-                    }
-
-                    // 2. Unit 201 (Barricaded)
-                    string u201Tag = room201_checked ? "<color=#9CA3AF>[BARRICADED SURVIVORS]</color>" : "";
-                    stage.SetChoice(choiceIdx++, $"CHECK UNIT 201 {u201Tag} <color=#9CA3AF>— Heavy pine fragrance, barricaded from within.</color>", () =>
-                    {
-                        InspectUnit201();
-                    }, true);
-
-                    // 3. Unit 202 (Evicted / Abandoned)
-                    string u202Tag = room202_checked ? "<color=#9CA3AF>[ABANDONED / EVICTED]</color>" : "";
-                    stage.SetChoice(choiceIdx++, $"CHECK UNIT 202 {u202Tag} <color=#9CA3AF>— Pink sheriff notice on door, pitch dark inside.</color>", () =>
-                    {
-                        InspectUnit202();
-                    }, true);
-
-                    // 4. Unit 203 (David Keller's Apartment)
-                    string u203Tag = room203_looted ? "<color=#9CA3AF>[SEARCHED]</color>" : (room203_unlocked ? "<color=#10B981>[UNLOCKED]</color>" : "<color=#F59E0B>[LOCKED - UNIT 203]</color>");
-                    stage.SetChoice(choiceIdx++, $"CHECK UNIT 203 (DAVID'S FLAT) {u203Tag} <color=#9CA3AF>— The deceased tenant's apartment.</color>", () =>
-                    {
-                        InspectUnit203();
-                    }, true);
-
-                    // 5. Navigation: Advance to West Fire Exit
-                    stage.SetChoice(choiceIdx++, "<b><color=#38BDF8>[ADVANCE WEST]</color> Head toward the West Wing Fire Exit</b>", () =>
-                    {
-                        hallwaySection = 4;
-                        stage.PlayClickSFX();
-                        InspectHallway();
-                    }, true);
-
-                    // 6. Navigation: Retreat to East Wing
-                    stage.SetChoice(choiceIdx++, "[RETREAT EAST] Walk back toward the East Wing doorway", () =>
-                    {
-                        hallwaySection = 1;
-                        stage.PlayClickSFX();
-                        InspectHallway();
-                    }, true);
+                    RenderSection3CorridorAftermath(ref choiceIdx, actionFeedback);
                     break;
-
-                // =========================================================================================
-                // SECTION 4: WEST WING FIRE EXIT (Direct Descent to 1F Lobby)
-                // =========================================================================================
                 case 4:
-                    stage.SetLocation("f2_hall_4", "2ND FLOOR // WEST WING FIRE EXIT");
-                    stage.TacticalMap?.SyncRoomState("f2_hall_4", isVisited: true, isChecked: true, isLocked: false, isBlocked: false, isAccessible: true);
-
-                    stage.PlayStageAnimation("F2Exit_Anim", "F2_5_exit", 8f);
-
-                    string exitDesc = "<color=#10B981><b>[WEST WING FIRE EXIT // THE WAY DOWN]</b></color>\n\n" +
-                        "You stand at the western dead-end of the 2nd Floor. Before you is a heavy industrial steel door equipped with an emergency crash bar.\n\n" +
-                        "Above the lintel, an illuminated green sign reads: <b><color=#10B981>WEST FIRE STAIRS — DIRECT GROUND FLOOR ACCESS</color></b>.\n" +
-                        "Through the reinforced wire-mesh glass, the concrete stairs descending to the 1st Floor are completely clear and unobstructed.";
-
-                    stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : exitDesc);
-
-                    // 1. Inspect window
-                    if (!exit_stairs_inspected)
-                    {
-                        stage.SetChoice(choiceIdx++, "[INSPECT] Peer through the wire-mesh window down into the shaft <color=#9CA3AF>(~1 min)</color>", () =>
-                        {
-                            exit_stairs_inspected = true;
-                            stage.Clock?.AddTime(1);
-                            stage.PlayClickSFX();
-                            InspectHallway("<color=#93C5FD><b>[STAIRS CONFIRMED CLEAR]</b></color> You cup your hands against the cold wire-mesh glass. Unlike the East Wing stairwell, no furniture has been dumped here. A single flight of steps leads straight down to the ground floor glass doors of the main lobby. Faint streetlamp reflections shine on the lobby tile below.");
-                        }, true);
-                    }
-
-                    // 2. Open Fire Door and Descend to 1F
-                    stage.SetChoice(choiceIdx++, "<b><color=#EF4444>[PUSH FIRE DOOR]</color> Push through the fire exit and descend to 1F Lobby</b>", () =>
-                    {
-                        stage.PlayClickSFX();
-                        stage.Objectives?.CompleteObjective("detour_2f");
-                        stage.Objectives?.AddObjective("escape_lobby", "Cross the ground floor lobby to reach the street outside", ObjectiveStatus.Active);
-
-                        stage.PlayDoorTransition(
-                            "Videos/exit_stairs_door_transition",
-                            "[ WEST FIRE STAIRS // GROUND FLOOR DESCENT ]",
-                            "You push hard against the emergency crash bar.\n<color=#94A3B8>The heavy steel fire door swings smoothly open, revealing the clear flight down to the 1st Floor lobby...</color>",
-                            false,
-                            () =>
-                            {
-                                // Transition to Ground Floor / Lobby Screenplay
-                                OnReachedGroundFloor();
-                            },
-                            true
-                        );
-                    }, true, new Color(0.95f, 0.25f, 0.25f));
-
-                    // 3. Retreat back into 2F residential hall
-                    stage.SetChoice(choiceIdx++, "[BACK] Return to 2F Residential Corridor", () =>
-                    {
-                        hallwaySection = 3;
-                        stage.PlayClickSFX();
-                        InspectHallway();
-                    }, true);
+                    RenderSection4WestExit(player, ref choiceIdx, actionFeedback);
                     break;
             }
 
             stage.ReindexChoices();
+        }
+
+        private void RenderSection1EastWing(CharacterData player, ref int choiceIdx, string actionFeedback)
+        {
+            stage.SetLocation("f2_hall_1", "2ND FLOOR // EAST WING DOORWAY");
+            stage.TacticalMap?.SyncRoomState("f2_hall_1", isVisited: true, isChecked: true, isLocked: false, isBlocked: false, isAccessible: true);
+
+            if (!zombie_defeated)
+            {
+                string job = GetNormalizedJob(player);
+                string calloutText = GetJobCallout(job);
+                string initialThought = GetJobInitialThought(job);
+                string panicReaction = GetJobPanicReaction(job);
+
+                if (zombie_alerted)
+                {
+                    stage.PlayStageAnimation("F2Aggro_Anim", "F2_1_aggro", 8f);
+                    stage.PlaySFX("Audio/SFX/zombie_rattle", 0.65f);
+
+                    string loudNarration = "<color=#EF4444><b>[2ND FLOOR EAST WING // NOISE ECHOED]</b></color>\n\n" +
+                        "The heavy fire door clicks shut behind you. The loud metallic crash from the stairwell carried straight down this corridor.\n\n" +
+                        "Twenty feet ahead, under a single buzzing fluorescent tube light, a man in a rumpled business suit whips around with a sickening wet pop of his vertebrae. " +
+                        "Through cracked wire-frame spectacles, his eyes are milky white and ruptured with blood. Thick, dark fluid dribbles from his dislocated, half-torn jaw.\n\n" +
+                        "A blue lanyard dangles from his collar: <b>David Keller – Junior Accountant</b>.\n\n" +
+                        panicReaction + "\n\n" +
+                        "<i>He isn't listening to reason—he lets out a wet, gurgling shriek and sprints straight down the narrow corridor!</i>";
+
+                    stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : loudNarration);
+
+                    stage.SetChoice(choiceIdx++, "<b><color=#EF4444>[REACT TO CHARGE]</color> Meet his lunge in the corridor!</b>", () =>
+                    {
+                        stage.PlayClickSFX();
+                        hallwaySection = 2;
+                        InspectHallway();
+                    }, true, new Color(0.95f, 0.25f, 0.25f));
+
+                    stage.SetChoice(choiceIdx++, "[BRACE FOOTING] Dig your boots in and prepare for impact <color=#10B981>(-5 Stamina)</color>", () =>
+                    {
+                        stage.ExertStamina(5);
+                        stage.PlaySFX("Audio/SFX/boots_run_concrete", 0.7f);
+                        prepared_for_lunge = true;
+                        hallwaySection = 2;
+                        InspectHallway("<color=#38BDF8><b>[FOOTING PLANTED]</b></color> You plant your boots firmly into the worn runner carpet and square your shoulders as the frenzied accountant charges down the corridor!");
+                    }, true);
+                }
+                else
+                {
+                    stage.PlayStageAnimation("F2Thump_Anim", "F2_1_thump", 8f);
+                    stage.PlaySFX("Audio/SFX/head_thump_wet", 0.55f);
+
+                    string silentNarration = "<color=#10B981><b>[2ND FLOOR EAST WING // SILENT ENTRY]</b></color>\n\n" +
+                        "The heavy fire door clicks softly shut behind you. The emergency backup lights in this wing are dead, leaving only a single fluorescent tube flickering twenty feet down the corridor.\n\n" +
+                        "Ahead of you stands a man in a dark business suit, facing the wall. His forehead is pressed against the faded floral wallpaper, and a leather commuter briefcase lies spilled open at his heels.\n\n" +
+                        "Slow, wet, rhythmic <i>thumps</i> echo down the hall as he taps his skull against the plaster:\n" +
+                        "<i>Thump... thump... thump...</i>\n\n" +
+                        "A blue lanyard hanging from his pocket reads: <b>David Keller – Junior Accountant</b>. It's probably just panic, shock, or bad drugs from the riots outside—he hasn't noticed you yet.\n\n" +
+                        initialThought;
+
+                    stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : silentNarration);
+
+                    stage.SetChoice(choiceIdx++, $"<b><color=#38BDF8>[CALL OUT]</color> Speak to the stranger:</b> <color=#E2E8F0>{calloutText}</color>", () =>
+                    {
+                        stage.PlaySFX("Audio/SFX/zombie_rattle", 0.8f);
+                        stage.PlaySFX("Audio/SFX/bone_crack", 0.9f);
+                        zombie_alerted = true;
+                        hallwaySection = 2;
+                        InspectHallway("<color=#EF4444><b>[THE REVELATION]</b></color>\n\n" +
+                            "At the sound of your voice, the rhythmic thumping abruptly stops. The corridor plunges into dead silence.\n\n" +
+                            "Slowly, with a wet, cracking pop of neck cartilage, the man turns around. His lower jaw hangs torn and slack at an unnatural angle, black coagulated blood pooling on his collar. " +
+                            "Behind cracked glasses, his eyes are milky cataracts swimming in broken red veins.\n\n" +
+                            panicReaction + "\n\n" +
+                            "He doesn't speak. With a choking, wet hiss, he violently lunges straight down the corridor at you!");
+                    }, true);
+
+                    if (!zombie_inspected)
+                    {
+                        stage.SetChoice(choiceIdx++, "[OBSERVE CLOSELY] Creep a few paces closer to inspect his condition <color=#9CA3AF>(~1 min)</color>", () =>
+                        {
+                            zombie_inspected = true;
+                            prepared_for_lunge = true;
+                            stage.Clock?.AddTime(1);
+                            stage.PlaySFX("Audio/SFX/boots_slow_concrete", 0.5f);
+                            InspectHallway("<color=#93C5FD><b>[CLOSE INSPECTION // ALERTED NERVES]</b></color>\n\n" +
+                                "You take three slow, silent steps along the carpet runner, stopping six feet behind him.\n\n" +
+                                "The smell hits you first—the sharp, unmistakable copper of arterial blood mixed with rancid, sour decay. " +
+                                "His collar is torn open, revealing deep, jagged bite lacerations where entire chunks of flesh have been ripped from his neck.\n\n" +
+                                "His chest is not rising or falling. A wet, suffocating rattle vibrates in his throat: <i>\"...hkkk... ghh... hrrr...\"</i>\n\n" +
+                                "<i>Whatever is standing in front of you... it isn't breathing. Every muscle in your body locks tight, braced for him to turn.</i>");
+                        }, true);
+                    }
+
+                    stage.SetChoice(choiceIdx++, "[TRY TO SNEAK PAST] Edge silently along the opposite wall toward the West Exit <color=#10B981>[ALERT ADVANTAGE]</color> <color=#9CA3AF>(~1 min)</color>", () =>
+                    {
+                        prepared_for_lunge = true;
+                        zombie_alerted = true;
+                        stage.Clock?.AddTime(1);
+                        stage.PlaySFX("Audio/SFX/floorboard_groan", 0.7f);
+                        stage.PlaySFX("Audio/SFX/bone_crack", 0.85f);
+                        hallwaySection = 2;
+                        InspectHallway("<color=#F59E0B><b>[CORRIDOR CREAK // LUNGE TRIGGERED]</b></color>\n\n" +
+                            "You press your back flat against the opposite drywall and try to slip past this unstable stranger without starting a confrontation.\n\n" +
+                            "Halfway past him, a loose floorboard groans sharply beneath your heel. The rhythmic thumping stops instantly. " +
+                            "With a sickening crack of cartilage, David Keller whips around—milk-white eyes, half-torn jaw—and lunges straight at you!\n\n" +
+                            "Because you were watching him carefully as you crept past, you catch his movement the split-second he pivots!");
+                    }, true);
+                }
+            }
+            else
+            {
+                stage.PlayStageAnimation("F2Thump_Anim", "F2_1_thump", 8f);
+                stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback :
+                    "<color=#10B981><b>[2ND FLOOR EAST WING // SECURED]</b></color>\n\n" +
+                    "The East Wing fire door stands behind you, wedged ajar so it won't lock you in. " +
+                    "The narrow corridor ahead smells sharply of copper and stale carpet dust.");
+
+                stage.SetChoice(choiceIdx++, "[ADVANCE] Walk west toward the Residential Corridor", () =>
+                {
+                    hallwaySection = 3;
+                    stage.PlayClickSFX();
+                    InspectHallway();
+                }, true);
+
+                stage.SetChoice(choiceIdx++, "[EXAMINE STAIRWELL DOOR] Check the fire door leading back to the stairs", () =>
+                {
+                    stage.PlayClickSFX();
+                    InspectHallway("<color=#94A3B8>The heavy fire door connects back to the stairwell landing. The stairs to the 1st Floor remain completely jammed by the drink machine and dumped furniture. Your only way down is the West Wing fire exit at the far end of this floor.</color>");
+                }, true);
+            }
+        }
+
+        private void RenderSection2Encounter(CharacterData player, ref int choiceIdx, string actionFeedback)
+        {
+            stage.SetLocation("f2_hall_2", "2ND FLOOR // THE FIRST ENCOUNTER");
+            stage.TacticalMap?.SyncRoomState("f2_hall_2", isVisited: true, isChecked: zombie_defeated, isLocked: false, isBlocked: false, isAccessible: true);
+
+            if (zombie_defeated)
+            {
+                hallwaySection = 3;
+                InspectHallway(actionFeedback);
+                return;
+            }
+
+            int strVal = player != null ? player.str : 3;
+            int agiVal = player != null ? player.agi : 3;
+
+            // State 2B: Pinned on the corridor floor (F2Tackle_Anim)
+            if (zombie_tackled && !lunge_resolved)
+            {
+                stage.PlayStageAnimation("F2Tackle_Anim", "F2_3_tackle", 8f);
+                stage.PlaySFX("Audio/SFX/zombie_snapping", 0.9f);
+
+                string tackleNarration = "<color=#EF4444><b>[TACKLED TO THE FLOOR // -15 HP]</b></color>\n\n" +
+                    "He hits you like a freight train! The sheer, unhinged force knocks the wind out of you as you crash backward onto the worn linoleum.\n\n" +
+                    "Hot, putrid breath washes over your face. David Keller is thrashing wildly on top of you, snapping his ragged upper teeth inches from your throat as black blood drips down onto your collar. " +
+                    "His dead weight is crushing the air out of your lungs—you have to throw him off right now!";
+
+                stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : tackleNarration);
+
+                bool canKickFree = strVal >= 3 || agiVal >= 3;
+                if (canKickFree)
+                {
+                    stage.SetChoice(choiceIdx++, $"<b><color=#10B981>[STR {strVal}/3 OR AGI {agiVal}/3]</color> Wedge your knee against his chest and kick him off!</b> <color=#10B981>(-5 Stamina)</color>", () =>
+                    {
+                        stage.ExertStamina(5);
+                        stage.PlaySFX("Audio/SFX/boots_run_concrete", 0.8f);
+                        lunge_resolved = true;
+                        lunge_countered = false;
+                        stealth_ambush_ready = false;
+                        InspectHallway("<color=#10B981><b>[KICKED FREE]</b></color> You wedge your knee against his chest and deliver a desperate, powerful kick. He goes sliding backward across the carpet runner, leaving a smear of dark fluid. You scramble back to your feet!");
+                    }, true, new Color(0.2f, 0.9f, 0.4f));
+                }
+                else
+                {
+                    stage.SetChoice(choiceIdx++, $"<s>[STR 3 OR AGI 3] Wedge knee and kick him off</s> <color=#64748B><i>[Requires Might 3 or Reflex 3 — His dead weight pins you down]</i></color>", null, false);
+                }
+
+                stage.SetChoice(choiceIdx++, "<b><color=#EF4444>[DESPERATELY STRUGGLE]</color> Heave him off in a surge of adrenaline!</b> <color=#EF4444>(-10 HP Scratched, -10 Stamina)</color>", () =>
+                {
+                    stage.TakeDamage(10, "Clawed by David Keller while pinned on the 2nd Floor");
+                    stage.ExertStamina(10);
+                    stage.PlaySFX("Audio/SFX/blood_drip", 0.75f);
+                    lunge_resolved = true;
+                    lunge_countered = false;
+                    stealth_ambush_ready = false;
+                    InspectHallway("<color=#EF4444><b>[DESPERATE ESCAPE (-10 HP, -10 STAMINA)]</b></color> You struggle, but he's too heavy! His teeth and jagged nails rake across your collarbone, tearing flesh! " +
+                        "The blinding pain sends a jolt of pure adrenaline straight into your heart—with a primal shout, you violently heave him off your chest and scramble back to your feet!");
+                }, true, new Color(0.95f, 0.25f, 0.25f));
+
+                return;
+            }
+
+            stage.PlayStageAnimation("F2Lunge_Anim", "F2_2_lunge", 8f);
+
+            // State 2A: Pre-combat Lunge Reflex Check
+            if (!lunge_resolved)
+            {
+                stage.PlaySFX("Audio/SFX/zombie_lunge", 0.85f);
+
+                string panicReaction = GetJobPanicReaction(GetNormalizedJob(player));
+                string lungeNarration = "<color=#EF4444><b>[THE INFECTED COMMUTER // NARROW CORRIDOR LUNGE]</b></color>\n\n" +
+                    "David Keller launches himself down the six-foot-wide corridor! His shredded tie whips through the fluorescent flicker as he lunges with blackened, splintered fingernails!\n\n" +
+                    panicReaction + "\n\n" +
+                    "There are no open apartment doors to duck into—only bare walls and his snapping jaw coming straight at your throat.";
+
+                stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : lungeNarration);
+
+                int reqStr = prepared_for_lunge ? 3 : 4;
+                int reqAgi = prepared_for_lunge ? 4 : 5;
+                string prepHint = prepared_for_lunge ? " (Alert Bonus)" : "";
+
+                if (strVal >= reqStr)
+                {
+                    stage.SetChoice(choiceIdx++, $"<b><color=#10B981>[STR {strVal}/{reqStr}{prepHint}] Brace and Shove</color></b> Catch him by the shoulders and slam him into the wall! <color=#10B981>(-5 Stamina)</color>", () =>
+                    {
+                        stage.ExertStamina(5);
+                        stage.PlaySFX("Audio/SFX/metal_shelf_crash", 0.6f);
+                        lunge_resolved = true;
+                        lunge_countered = true;
+                        stealth_ambush_ready = true;
+                        InspectHallway("<color=#10B981><b>[STRENGTH SUCCESS // WALL SLAM]</b></color>\n\n" +
+                            "Pure fight-or-flight takes over. You plant your feet and catch him by the shoulders—his skin feels ice-cold and unnaturally greasy.\n\n" +
+                            "You shove him violently sideways into the corridor drywall! He hits the plaster with a wet crunch, staggering off-balance as you ready yourself to fight for your life!");
+                    }, true, new Color(0.2f, 0.9f, 0.4f));
+                }
+                else
+                {
+                    stage.SetChoice(choiceIdx++, $"<s>[STR {strVal}/{reqStr}{prepHint}] Brace and Shove</s> <color=#64748B><i>[Requires Might {reqStr}]</i></color>", null, false);
+                }
+
+                if (agiVal >= reqAgi)
+                {
+                    stage.SetChoice(choiceIdx++, $"<b><color=#10B981>[AGI {agiVal}/{reqAgi}{prepHint}] Dive Aside</color></b> Drop low and pivot out of his path! <color=#10B981>(-5 Stamina)</color>", () =>
+                    {
+                        stage.ExertStamina(5);
+                        stage.PlaySFX("Audio/SFX/boots_run_concrete", 0.75f);
+                        lunge_resolved = true;
+                        lunge_countered = true;
+                        stealth_ambush_ready = true;
+                        InspectHallway("<color=#10B981><b>[AGILITY SUCCESS // CLEAN DODGE]</b></color>\n\n" +
+                            "Pure instinct takes over. You drop low and pivot sharply on your heel. His snapping teeth miss your face by an inch!\n\n" +
+                            "His momentum carries him crashing knee-first into the opposite baseboard and plaster wall. You spring back up with a clear opening to defend yourself!");
+                    }, true, new Color(0.2f, 0.9f, 0.4f));
+                }
+                else
+                {
+                    stage.SetChoice(choiceIdx++, $"<s>[AGI {agiVal}/{reqAgi}{prepHint}] Dive Aside</s> <color=#64748B><i>[Requires Reflex {reqAgi}]</i></color>", null, false);
+                }
+
+                stage.SetChoice(choiceIdx++, "<b><color=#EF4444>[TAKE IMPACT]</color> Try to weather his charge!</b> <color=#EF4444>[RISK: TACKLED (-15 HP)]</color>", () =>
+                {
+                    zombie_tackled = true;
+                    stage.TakeDamage(15, "Tackled hard onto the 2nd Floor corridor floor");
+                    stage.PlaySFX("Audio/SFX/body_tackle", 0.9f);
+                    InspectHallway();
+                }, true, new Color(0.95f, 0.25f, 0.25f));
+
+                return;
+            }
+
+            // State 2C: Mandatory Self-Defense Tactical Combat
+            bool unarmed = player == null || string.IsNullOrEmpty(player.equippedWpn) ||
+                           string.Equals(player.equippedWpn, "none", StringComparison.OrdinalIgnoreCase);
+            string weaponReminder = unarmed
+                ? "\n\n<color=#F59E0B><i>[!] You currently have no weapon equipped—open your Backpack [I] first if you want to equip one before fighting!</i></color>"
+                : "";
+
+            string readyDesc = lunge_countered
+                ? "<color=#10B981><b>[CORRIDOR ADVANTAGE // ENEMY STAGGERED]</b></color>\n\n" +
+                  "David Keller pushes himself off the dented drywall with a wet snarl, visibly battered from the impact. You cannot outrun him down a locked corridor—you have to put him down to survive."
+                : "<color=#EF4444><b>[SELF-DEFENSE // NO ESCAPE]</b></color>\n\n" +
+                  "David Keller scrambles back onto his feet, eyes locked onto your throat. There is no reasoning with him and nowhere to hide in this corridor. You must fight for your life.";
+
+            stage.SetSituationNarration((!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : readyDesc) + weaponReminder);
+
+            string engageTag = lunge_countered
+                ? "<b><color=#EF4444>[ENGAGE — SELF-DEFENSE]</color> Ready weapon and defend yourself!</b> <color=#10B981>(Enemy Staggered: Torso & Leg Pre-Damaged)</color>"
+                : "<b><color=#EF4444>[ENGAGE — SELF-DEFENSE]</color> Ready weapon and fight to survive!</b>";
+
+            stage.SetChoice(choiceIdx++, engageTag, () =>
+            {
+                LaunchZombieCombat(isCountered: lunge_countered);
+            }, true, new Color(0.95f, 0.25f, 0.25f));
+        }
+
+        private void RenderSection3CorridorAftermath(ref int choiceIdx, string actionFeedback)
+        {
+            stage.SetLocation("f2_hall_3", "2ND FLOOR // RESIDENTIAL CORRIDOR");
+            stage.TacticalMap?.SyncRoomState("f2_hall_3", isVisited: true, isChecked: zombie_looted || room203_looted, isLocked: false, isBlocked: false, isAccessible: true);
+
+            stage.PlayStageAnimation("F2Dead_Anim", "F2_4_dead", 8f);
+
+            string hallwayDesc = "<color=#10B981><b>[RESIDENTIAL CORRIDOR // AFTERMATH]</b></color>\n\n" +
+                "David Keller lies motionless on the floral carpet runner, thick dark blood soaking into the fibers around his ruined head. " +
+                "His spilled leather commuter briefcase rests near the skirting board across from the closed doors of Units 201, 202, and 203.\n\n" +
+                "At the far western end of the corridor, a green emergency exit sign glows above the West Wing fire stairwell.";
+
+            stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : hallwayDesc);
+
+            if (!zombie_looted)
+            {
+                stage.SetChoice(choiceIdx++, "<color=#F59E0B>[SEARCH BODY & BRIEFCASE]</color> Check David's suit pockets and spilled briefcase in the hall <color=#9CA3AF>(~1 min)</color>", () =>
+                {
+                    zombie_looted = true;
+                    room203_looted = true;
+                    stage.Clock?.AddTime(1);
+                    stage.PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/Keys1.wav", 0.85f);
+
+                    stage.GiveOrDropItem("Matches", 10);
+                    stage.GiveOrDropItem("Canned Beans", 1);
+                    stage.GiveOrDropItem("Bandage", 1);
+
+                    stage.Lore?.AddLore("David Keller's ID Badge",
+                        "Corporate ID badge for David Keller, resident of Unit 203. A worn yellow sticky note on the back reads: 'Remember to pick up spare inhaler and battery pack from maintenance cart by West Stairs.'",
+                        stage.Clock?.GetTimeString() ?? "00:45");
+
+                    stage.RefreshAllPDAPanels();
+
+                    InspectHallway("<color=#10B981><b>[CORRIDOR GEAR RECOVERED]</b></color>\n\n" +
+                        "Swallowing hard, you kneel beside the body and check his jacket pockets and the leather briefcase spilled open beside the wall.\n\n" +
+                        "Inside his breast pocket is an Ascott Residency ID: <b>David Keller, Unit 203</b>. Stuck to the back is a crumpled yellow sticky note: " +
+                        "<i>\"Remember to pick up spare inhaler and battery pack from maintenance cart by West Stairs.\"</i>\n\n" +
+                        "From his coat and spilled commuter bag you salvage <b>Matches x10</b>, <b>Canned Beans x1</b>, and <b>Bandage x1</b>.");
+                }, true);
+            }
+            else
+            {
+                stage.SetChoice(choiceIdx++, "Search body & spilled briefcase <color=#64748B>[ALREADY SEARCHED]</color>", null, false);
+            }
+
+            string doorsTag = hallway_doors_checked ? "<color=#9CA3AF>[ALL SEALED FROM INSIDE]</color>" : "";
+            stage.SetChoice(choiceIdx++, $"[CHECK HALLWAY DOORS] {doorsTag} Test the apartment doors along the 2F corridor (Units 201–203)", () =>
+            {
+                stage.PlayClickSFX();
+                InspectHallwayDoorsFromCorridor();
+            }, true);
+
+            stage.SetChoice(choiceIdx++, "<b><color=#38BDF8>[ADVANCE WEST]</color> Head toward the West Wing Fire Exit</b>", () =>
+            {
+                hallwaySection = 4;
+                stage.PlayClickSFX();
+                InspectHallway();
+            }, true);
+
+            stage.SetChoice(choiceIdx++, "[RETREAT EAST] Walk back toward the East Wing doorway", () =>
+            {
+                hallwaySection = 1;
+                stage.PlayClickSFX();
+                InspectHallway();
+            }, true);
+        }
+
+        private void RenderSection4WestExit(CharacterData player, ref int choiceIdx, string actionFeedback)
+        {
+            stage.SetLocation("f2_hall_4", "2ND FLOOR // WEST WING FIRE EXIT");
+            stage.TacticalMap?.SyncRoomState("f2_hall_4", isVisited: true, isChecked: exit_stairs_inspected, isLocked: false, isBlocked: false, isAccessible: true);
+
+            stage.PlayStageAnimation("F2Exit_Anim", "F2_5_exit", 8f);
+
+            string exitDesc = "<color=#10B981><b>[WEST WING FIRE EXIT // THE WAY DOWN]</b></color>\n\n" +
+                "You reach the western dead-end of the 2nd Floor. Cold air drafts beneath a heavy steel fire door equipped with an emergency crash bar. " +
+                "Above the lintel, an illuminated green sign reads: <b><color=#10B981>WEST FIRE STAIRS — DIRECT GROUND FLOOR ACCESS</color></b>.\n\n" +
+                "Beyond the reinforced wire-mesh glass, faint, muffled sounds echo up from the Ground Floor Lobby below—shouting, heavy thuds, and the rhythmic <i>pop-pop-pop</i> of distant gunfire.\n\n" +
+                "<i>\"Gunfire... The police must be down there holding it together. If I can just get to them, maybe there's still a way out.\"</i>\n\n" +
+                "Beside the stairwell frame sit an abandoned janitorial maintenance cart draped in soiled cleaning rags and a pile of discarded overnight luggage dropped by fleeing residents.";
+
+            stage.SetSituationNarration(!string.IsNullOrEmpty(actionFeedback) ? actionFeedback : exitDesc);
+
+            if (!exit_stairs_inspected)
+            {
+                stage.SetChoice(choiceIdx++, "[INSPECT WINDOW] Peer through the wire-mesh glass down into the shaft <color=#9CA3AF>(~1 min)</color>", () =>
+                {
+                    exit_stairs_inspected = true;
+                    stage.Clock?.AddTime(1);
+                    stage.PlayClickSFX();
+                    InspectHallway("<color=#93C5FD><b>[STAIRS CONFIRMED CLEAR]</b></color>\n\n" +
+                        "You cup your hands against the cold wire-mesh glass. Unlike the East Wing stairwell, no furniture has been dumped here. " +
+                        "A single clear flight of concrete steps leads straight down to the ground floor lobby, lit by flashing red-and-blue emergency strobes filtering through the street glass below.");
+                }, true);
+            }
+
+            if (!janitor_cart_looted)
+            {
+                bool hasPer5 = player != null && player.per >= 5;
+                bool canSearchCart = hasPer5 || zombie_looted;
+                if (canSearchCart)
+                {
+                    string clueTag = hasPer5 ? "[PER 5]" : "[ID BADGE CLUE]";
+                    stage.SetChoice(choiceIdx++, $"<color=#10B981>{clueTag} [SEARCH JANITOR'S CART]</color> Pull aside the rags on the maintenance cart <color=#9CA3AF>(~2 min)</color>", () =>
+                    {
+                        janitor_cart_looted = true;
+                        stage.Clock?.AddTime(2);
+                        stage.PlaySFX("Audio/SFX/flashlight_click", 0.8f);
+
+                        stage.GiveOrDropItem("Inhaler", 1);
+                        stage.GiveOrDropItem("Battery", 2);
+                        stage.GiveOrDropItem("Bandage", 1);
+                        stage.RefreshAllPDAPanels();
+
+                        InspectHallway("<color=#10B981><b>[MAINTENANCE SUPPLIES RECOVERED]</b></color>\n\n" +
+                            "Hidden beneath a bundle of stiff cleaning rags on the lower shelf of the janitor's cart, you uncover a sealed medical canister and spare power cells—the exact cache David Keller's sticky note mentioned.\n\n" +
+                            "Recovered: <b>Inhaler x1</b>, <b>Battery x2</b>, and <b>Bandage x1</b>.");
+                    }, true);
+                }
+                else
+                {
+                    stage.SetChoice(choiceIdx++, "<s>[SEARCH JANITOR'S CART] Pull aside the rags on the maintenance cart</s> <color=#64748B><i>[REQUIRES PER 5 OR CLUE FROM TENANT'S ID]</i></color>", null, false);
+                }
+            }
+            else
+            {
+                stage.SetChoice(choiceIdx++, "Search the janitor's maintenance cart <color=#64748B>[ALREADY SEARCHED]</color>", null, false);
+            }
+
+            if (!luggage_looted)
+            {
+                bool fastScavenge = player != null && (player.scavenging >= 1 || player.HasTrait("SCAVENGER") || player.HasTrait("FIELD FORAGER"));
+                if (fastScavenge)
+                {
+                    stage.SetChoice(choiceIdx++, "<color=#10B981>[SCAVENGING] [SCOUR DISCARDED LUGGAGE]</color> Quickly check the bags worth opening by the exit <color=#9CA3AF>(~2 min)</color>", () =>
+                    {
+                        luggage_looted = true;
+                        stage.Clock?.AddTime(2);
+                        stage.PlayClickSFX();
+
+                        stage.GiveOrDropItem("Energy Bar", 1);
+                        stage.GiveOrDropItem("Bottled Water", 1);
+                        stage.RefreshAllPDAPanels();
+
+                        InspectHallway("<color=#10B981><b>[LUGGAGE SCAVENGED]</b></color>\n\n" +
+                            "You skip the empty garment bags and unzip a half-spilled hiking duffel beside the fire door, pulling out <b>Energy Bar x1</b> and <b>Bottled Water x1</b>.");
+                    }, true);
+                }
+                else
+                {
+                    stage.SetChoice(choiceIdx++, "<color=#F59E0B>[SCOUR DISCARDED LUGGAGE]</color> Rummage through the pile of abandoned bags <color=#EF4444>(-5 Stamina, ~4 min)</color>", () =>
+                    {
+                        luggage_looted = true;
+                        stage.ExertStamina(5);
+                        stage.Clock?.AddTime(4);
+                        stage.PlayClickSFX();
+
+                        stage.GiveOrDropItem("Energy Bar", 1);
+                        stage.GiveOrDropItem("Bottled Water", 1);
+                        stage.RefreshAllPDAPanels();
+
+                        InspectHallway("<color=#10B981><b>[LUGGAGE SCAVENGED]</b></color>\n\n" +
+                            "It takes several tense minutes of digging through spilled clothes and broken zippers, but you salvage <b>Energy Bar x1</b> and <b>Bottled Water x1</b> from an abandoned duffel bag.");
+                    }, true);
+                }
+            }
+            else
+            {
+                stage.SetChoice(choiceIdx++, "Scour the discarded luggage <color=#64748B>[ALREADY SEARCHED]</color>", null, false);
+            }
+
+            stage.SetChoice(choiceIdx++, "<b><color=#EF4444>[PUSH FIRE DOOR]</color> Push through the fire exit and descend to 1F Lobby</b>", () =>
+            {
+                stage.PlayClickSFX();
+                stage.Objectives?.CompleteObjective("detour_2f");
+                stage.Objectives?.CompleteObjective("reach_lobby");
+                stage.Objectives?.AddObjective("escape_lobby", "Cross the ground floor lobby to reach the street outside", ObjectiveStatus.Active);
+
+                stage.PlayDoorTransition(
+                    "Videos/exit_stairs_door_transition",
+                    "[ WEST FIRE STAIRS // GROUND FLOOR DESCENT ]",
+                    "You push hard against the emergency crash bar.\n<color=#94A3B8>The heavy steel fire door swings smoothly open, revealing the clear flight down to the 1st Floor lobby...</color>",
+                    false,
+                    () => OnReachedGroundFloor(),
+                    true
+                );
+            }, true, new Color(0.95f, 0.25f, 0.25f));
+
+            stage.SetChoice(choiceIdx++, "[BACK] Return to 2F Residential Corridor", () =>
+            {
+                hallwaySection = 3;
+                stage.PlayClickSFX();
+                InspectHallway();
+            }, true);
         }
 
         #endregion
@@ -527,13 +729,12 @@ namespace SundayLastBreath.Zones
 
         #region First Zombie Tactical Combat Integration
 
-        private void LaunchZombieCombat(bool isAmbush)
+        private void LaunchZombieCombat(bool isCountered)
         {
             if (stage == null) return;
 
             stage.PlayClickSFX();
 
-            // Create preset enemy for David Keller
             var zombie = TacticalCombatModal.CreatePresetEnemy(
                 id: "zombie_commuter",
                 name: "Infected Commuter (David Keller)",
@@ -545,9 +746,8 @@ namespace SundayLastBreath.Zones
                 xpReward: 35
             );
 
-            if (isAmbush)
+            if (isCountered)
             {
-                // Ambush bonus: Torso and Leg pre-damaged from sneak attack!
                 if (zombie.limbs.ContainsKey(TacticalCombatModal.LimbType.Torso))
                 {
                     zombie.limbs[TacticalCombatModal.LimbType.Torso].hp = Mathf.Max(10, zombie.limbs[TacticalCombatModal.LimbType.Torso].hp - 25);
@@ -568,181 +768,105 @@ namespace SundayLastBreath.Zones
                     zombie_defeated = true;
                     hallwaySection = 3;
 
-                    stage.PlaySFX("Audio/SFX/blood_drip", 0.75f);
-                    stage.AppendStoryLog(stage.Clock?.GetTimeString() ?? "00:40", "2ND FLOOR // FIRST INFECTED SLAIN",
-                        "Neutralized David Keller in close-quarters tactical combat. The reality of the infection has set in.");
+                    stage.PlaySFX("Audio/SFX/body_fall_wet", 0.75f);
+                    stage.AppendStoryLog(stage.Clock?.GetTimeString() ?? "00:40", "2ND FLOOR // THE OUTBREAK REVEALED",
+                        "Survived a close-quarters fight with David Keller in the 2nd Floor corridor. He wasn't sick or rioting—he was dead before he lunged.");
 
-                    stage.Objectives?.CompleteObjective("detour_2f");
                     stage.Objectives?.AddObjective("reach_lobby", "Proceed to the West Wing fire exit and descend to the ground floor", ObjectiveStatus.Active);
 
-                    InspectHallway("<color=#10B981><b>[THREAT ELIMINATED]</b></color>\n\nWith a final convulsive twitch, David Keller collapses face-first into the carpet runner and lies completely still.\n\n" +
-                        "Your breath comes in ragged, burning gasps. The corridor falls into heavy silence, broken only by the buzz of the failing tube light.\n\n" +
-                        "You stand over his body with your pulse hammering in your ears. <i>He wasn't drunk. He wasn't having a seizure. He was dead before he ever lunged at you.</i>");
+                    InspectHallway("<color=#10B981><b>[THREAT ELIMINATED // REALITY SHATTERED]</b></color>\n\n" +
+                        "With a final convulsive twitch, David Keller collapses face-first onto the carpet runner and lies completely still.\n\n" +
+                        "You stand over the body, your chest heaving, adrenaline burning like battery acid in your veins. Your hands are shaking uncontrollably as dark, thick blood pools into the frayed carpet.\n\n" +
+                        "<i>\"What just happened? Did I just... did I just kill someone?\"</i>\n\n" +
+                        "You stare down at his ruined, half-torn jaw, the unseeing milky eyes, and the ragged wounds across his neck that had stopped bleeding long before he ever turned around. His skin was ice-cold. He wasn't even breathing.\n\n" +
+                        "<i>\"No... that wasn't a person anymore. It couldn't be.\"</i>\n\n" +
+                        "For the first time since waking up in Unit 407, the truth hits you like ice water: this isn't a riot, and it isn't mass hysteria. Something is turning the people of Seattle into mindless, flesh-eating corpses.");
                 },
                 onDefeat: () =>
                 {
-                    stage.SetSituationNarration("<color=#EF4444><b>[TACTICAL DEFEAT // CORRIDOR OVERRUN]</b></color>\n\n" +
-                        "David Keller's frenzied assault knocked you onto your back! With a desperate kick to his chest, you shove him away and scramble backward through the fire door.\n\n" +
+                    ResetToCorridorRetreat();
+                    InspectHallway("<color=#EF4444><b>[TACTICAL DEFEAT // CORRIDOR OVERRUN]</b></color>\n\n" +
+                        "David Keller's frenzied assault knocked you onto your back! With a desperate kick to his chest, you shove him away and scramble backward toward the East Wing fire door, trapped in the 2nd-floor gauntlet.\n\n" +
                         "<i>Tactical Survival Tip: The attacker does not feel pain. Target his LEGS to force a Crawler and destroy his mobility, or GUARD to cut his damage in half!</i>");
-                    hallwaySection = 1;
-                    zombie_alerted = true;
-                    stealth_ambush_ready = false;
-                    stage.ExertStamina(10);
-                    InspectHallway();
                 },
                 onFlee: () =>
                 {
-                    hallwaySection = 1;
-                    zombie_alerted = true;
-                    stealth_ambush_ready = false;
-                    stage.ExertStamina(15);
-                    InspectHallway("<color=#F59E0B>You scramble backwards onto your feet and flee to the East Wing doorway, your chest heaving.</color>");
+                    ResetToCorridorRetreat(extraStaminaCost: 15);
+                    InspectHallway("<color=#F59E0B><b>[DRIVEN BACK]</b></color>\n\n" +
+                        "You scramble backward toward the East Wing doorway, chest heaving—but the stairwell behind you is a dead end and the West Exit lies past him. You'll have to put him down to cross this corridor.");
                 },
                 isTutorial: true
             );
         }
 
+        private void ResetToCorridorRetreat(int extraStaminaCost = 10)
+        {
+            hallwaySection = 1;
+            zombie_alerted = true;
+            lunge_resolved = false;
+            zombie_tackled = false;
+            lunge_countered = false;
+            stealth_ambush_ready = false;
+            stage?.ExertStamina(extraStaminaCost);
+        }
+
         #endregion
 
-        #region Room Inspections: Units 201, 202, 203
+        #region Corridor Exterior Door Checks (100% Pure Hallway — No Room Entry)
 
-        public void InspectUnit201()
+        private void InspectHallwayDoorsFromCorridor(string doorFeedback = null)
         {
             if (stage == null) return;
-            currentInspectedRoom = "201";
-            stage.CurrentInspectedRoomInternal = "201";
+
+            hallway_doors_checked = true;
+            currentInspectedRoom = null;
+            stage.CurrentInspectedRoomInternal = "f2_hall_3";
+            stage.SetLocation("f2_hall_3", "2ND FLOOR // SEALED APARTMENT DOORS");
             stage.ClearChoices();
             int choiceIdx = 0;
 
-            room201_checked = true;
-            stage.PlayClickSFX();
+            string defaultNarration = "<color=#93C5FD><b>[SEALED APARTMENT DOORS // NO SANCTUARY ON 2F]</b></color>\n\n" +
+                "You walk along the narrow residential corridor testing the brass handles of Units 201, 202, and 203. Every single apartment door on the 2nd Floor is shut tight from the hallway.\n\n" +
+                "There are no open rooms to duck into here—only locked wood, warning notes, and dead silence.";
 
-            stage.SetLocation("f2_hall_3", "UNIT 201 // BARRICADED FLAT");
-            stage.UpdateLocationDisplay("UNIT 201", "BARRICADED RESIDENCE");
+            stage.SetSituationNarration(!string.IsNullOrEmpty(doorFeedback) ? doorFeedback : defaultNarration);
 
-            string narration = "You approach the door of Unit 201. A thick scent of pine cleaner and melted beeswax seeps from under the draft stopper.\n\n" +
-                "Heavy 3-inch construction screws have been driven through the door frame, locking it securely to the studs. " +
-                "Taped over the peephole is a cardboard flap with handwritten red marker:\n\n" +
-                "<color=#EF4444><i>\"WE HAVE 12-GAUGE BUCKSHOT AND THREE MONTHS OF WATER. DO NOT KNOCK. DO NOT POUND. WE WILL FIRE THROUGH THE PLASTER.\"</i></color>\n\n" +
-                "You listen closely. From deep inside the flat, you can hear a battery-powered radio playing low emergency static. Whoever lives here prepared early and isn't opening for anyone.";
-
-            stage.SetSituationNarration(narration);
-
-            stage.SetChoice(choiceIdx++, "[LEAVE ALONE] Step back and leave the barricaded residents in peace", () =>
+            string tag201 = room201_checked ? " <color=#9CA3AF>[BARRICADED]</color>" : "";
+            stage.SetChoice(choiceIdx++, $"[TEST UNIT 201 DOOR]{tag201} Check the door smelling of pine cleaner", () =>
             {
-                InspectHallway();
+                room201_checked = true;
+                stage.PlaySFX("Audio/SFX/doorclosed1", 0.75f);
+                InspectHallwayDoorsFromCorridor("<color=#F59E0B><b>[UNIT 201 // BARRICADED FROM WITHIN]</b></color>\n\n" +
+                    "A thick scent of pine cleaner and melted beeswax seeps from under the draft stopper. Heavy 3-inch construction screws have been driven cleanly through the door frame into the studs.\n\n" +
+                    "Taped over the peephole is a cardboard flap with jagged red marker:\n" +
+                    "<color=#EF4444><i>\"WE HAVE 12-GAUGE BUCKSHOT AND THREE MONTHS OF WATER. DO NOT KNOCK. DO NOT POUND. WE WILL FIRE THROUGH THE PLASTER.\"</i></color>\n\n" +
+                    "From deep inside, a battery radio crackles with static. Whoever lives here sealed themselves in early and isn't opening for anyone.");
             }, true);
 
-            stage.ReindexChoices();
-        }
-
-        public void InspectUnit202()
-        {
-            if (stage == null) return;
-            currentInspectedRoom = "202";
-            stage.CurrentInspectedRoomInternal = "202";
-            stage.ClearChoices();
-            int choiceIdx = 0;
-
-            room202_checked = true;
-            stage.PlayClickSFX();
-
-            stage.SetLocation("f2_hall_3", "UNIT 202 // VACANT FLAT");
-            stage.UpdateLocationDisplay("UNIT 202", "ABANDONED UNIT");
-
-            string narration = "You examine the door of Unit 202. A bright pink legal eviction notice from the King County Sheriff's Office is taped squarely over the deadbolt, dated two weeks ago.\n\n" +
-                "The lock cylinder has been drilled out and replaced with a heavy brass padlocked hasp. Looking through the peephole hole, the apartment is completely stripped—bare floorboards, exposed ceiling wires, and clean concrete counters.\n\n" +
-                "Nobody is inside, and there is nothing of value left to scavenge.";
-
-            stage.SetSituationNarration(narration);
-
-            stage.SetChoice(choiceIdx++, "[BACK] Return to the corridor", () =>
+            string tag202 = room202_checked ? " <color=#9CA3AF>[VACANT]</color>" : "";
+            stage.SetChoice(choiceIdx++, $"[TEST UNIT 202 DOOR]{tag202} Check the flat with the pink notice", () =>
             {
-                InspectHallway();
+                room202_checked = true;
+                stage.PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.75f);
+                InspectHallwayDoorsFromCorridor("<color=#94A3B8><b>[UNIT 202 // EVICTED & PADLOCKED]</b></color>\n\n" +
+                    "A bright pink legal eviction notice from the King County Sheriff's Office is taped squarely over the deadbolt, dated two weeks ago. The lock cylinder has been drilled out and replaced with a heavy brass padlocked hasp.\n\n" +
+                    "Peeking through the empty peephole bore shows stripped floorboards and bare concrete counters. Nobody lives here.");
             }, true);
 
-            stage.ReindexChoices();
-        }
-
-        public void InspectUnit203()
-        {
-            if (stage == null) return;
-            currentInspectedRoom = "203";
-            stage.CurrentInspectedRoomInternal = "203";
-            stage.ClearChoices();
-            int choiceIdx = 0;
-
-            var player = stage.CurrentPlayer;
-            bool hasKey = player != null && player.HasItem("Apartment 203 Key");
-
-            stage.SetLocation("f2_hall_3", "UNIT 203 // DAVID KELLER'S FLAT");
-            stage.UpdateLocationDisplay("UNIT 203", "DAVID KELLER'S APARTMENT");
-
-            if (!room203_unlocked)
+            stage.SetChoice(choiceIdx++, "[TEST UNIT 203 DOOR] Check David Keller's front door", () =>
             {
-                string lockedNarration = "You stand in front of Unit 203, David Keller's apartment. The door is secured with a clean single-cylinder deadbolt.\n\n" +
-                    "A dry-erase whiteboard hung beside the doorbell reads: <i>\"Back from downtown at 6:30. Water is shut off again—boiler repair in basement.\"</i>";
+                stage.PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.8f);
+                InspectHallwayDoorsFromCorridor("<color=#EF4444><b>[UNIT 203 // LOCKED OUT IN THE DARK]</b></color>\n\n" +
+                    "Beside the doorbell hangs a dry-erase whiteboard: <i>\"Back from downtown at 6:30. Water is shut off again—boiler repair in basement.\"</i>\n\n" +
+                    "When you test the brass knob, your fingers brush wet ridges along the deadbolt plate. Deep, frantic fingernail scratches—caked with dark blood and broken nail—are raked down the outside wood of the doorframe.\n\n" +
+                    "The door is deadbolted shut from the inside, or jammed tight in its warped frame. David Keller never made it back inside his own apartment before the fever finished him in the hall.");
+            }, true);
 
-                stage.SetSituationNarration(lockedNarration);
-
-                if (hasKey)
-                {
-                    stage.SetChoice(choiceIdx++, "<b><color=#F59E0B>[USE KEY: 203 KEY]</color> Unlock David Keller's front deadbolt</b>", () =>
-                    {
-                        room203_unlocked = true;
-                        stage.PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/Keys1.wav", 0.9f);
-                        stage.Clock?.AddTime(1);
-                        InspectUnit203();
-                    }, true, new Color(0.95f, 0.75f, 0.25f));
-                }
-                else
-                {
-                    stage.SetChoice(choiceIdx++, "Try the door handle <color=#EF4444>[LOCKED — REQUIRES APARTMENT 203 KEY]</color>", () =>
-                    {
-                        stage.PlaySFX("Plugins/Feel/NiceVibrations/HapticSamples/Objects/DoorKnob1.wav", 0.8f);
-                        stage.SetSituationNarration("You rattle the brass handle, but the steel deadbolt holds firm. The key must still be on David Keller's body out in the corridor.");
-                    }, true);
-                }
-
-                stage.SetChoice(choiceIdx++, "[BACK] Return to the corridor", () =>
-                {
-                    InspectHallway();
-                }, true);
-            }
-            else
+            stage.SetChoice(choiceIdx++, "[RETURN TO CORRIDOR] Step back into the 2F Residential Corridor", () =>
             {
-                // Interior of Unit 203
-                string insideNarration = "You step into Unit 203 and gently close the door behind you. It's a modest studio apartment with a galley kitchenette and a neat work desk.\n\n" +
-                    "An empty briefcase sits open on the bed. An unplugged laptop sits on the desk beside an untouched glass of tap water.\n\n" +
-                    (room203_looted
-                        ? "You have already gathered all usable survival rations and medical supplies from this apartment."
-                        : "The kitchen pantry and bathroom medicine cabinet look undisturbed. You can scavenge for emergency rations.");
-
-                stage.SetSituationNarration(insideNarration);
-
-                if (!room203_looted)
-                {
-                    stage.SetChoice(choiceIdx++, "<color=#10B981>[SCAVENGE APARTMENT]</color> Search the kitchenette pantry & medicine cabinet <color=#9CA3AF>(~2 min)</color>", () =>
-                    {
-                        room203_looted = true;
-                        stage.Clock?.AddTime(2);
-                        stage.PlaySFX("Audio/SFX/flashlight_click", 0.85f);
-
-                        player?.AddItem("Canned Beans", 1);
-                        player?.AddItem("Bandage", 2);
-                        player?.AddItem("Battery", 2);
-
-                        stage.RefreshAllPDAPanels();
-
-                        InspectUnit203();
-                    }, true);
-                }
-
-                stage.SetChoice(choiceIdx++, "[LEAVE FLAT] Step back out into the 2nd Floor hallway", () =>
-                {
-                    InspectHallway();
-                }, true);
-            }
+                stage.PlayClickSFX();
+                InspectHallway();
+            }, true);
 
             stage.ReindexChoices();
         }
@@ -755,32 +879,17 @@ namespace SundayLastBreath.Zones
         {
             if (stage == null) return;
 
-            stage.IsInHallwayInternal = false;
-            stage.CurrentInspectedRoomInternal = "lobby";
-
-            // Update Tactical Map to Lobby
-            stage.TacticalMap?.LoadFloorById("ascott_lobby");
-            stage.SetLocation("lobby_entrance", "ASCOTT RESIDENCY // GROUND FLOOR LOBBY");
-
-            stage.PlayStageAnimation("Lobby_Main", "Lobby_Main", 8f);
-            stage.PlayHubBGM("Audio/SFX/generator_hum", 0.35f, true);
-
-            stage.SetSituationNarration("<color=#10B981><b>[GROUND FLOOR LOBBY // ARRIVAL]</b></color>\n\n" +
-                "You emerge from the West Wing fire stairwell into the expansive ground floor lobby of the Ascott Residency.\n\n" +
-                "Rain lashes against the two-story plate glass windows at the front entrance. Through the glass, flashing red and blue emergency strobes illuminate Seattle's rain-slicked pavement. " +
-                "Abandoned cars line the street with doors hanging open.\n\n" +
-                "Across the lobby floor, past overturned reception counters and smashed luggage carts, the revolving glass doors lead out into the city.");
-
-            stage.ClearChoices();
-            int choiceIdx = 0;
-
-            stage.SetChoice(choiceIdx++, "<b><color=#38BDF8>[RECON]</color> Survey the lobby reception desk and main entrance</b>", () =>
+            if (stage.GroundFloorLobbyZone != null)
             {
-                stage.PlayClickSFX();
-                stage.SetSituationNarration("You crouch behind a marble pillar and scan the shadows. The front lobby is eerily quiet, but shadows shift near the glass revolving doors. You need to prepare before making a run for the outside.");
-            }, true);
+                stage.GroundFloorLobbyZone.EnterZone(stage, "entry");
+                return;
+            }
 
-            stage.ReindexChoices();
+            stage.IsInHallwayInternal = true;
+            stage.CurrentInspectedRoomInternal = "nw_room";
+            stage.TacticalMap?.LoadFloorById("ascott_lobby");
+            stage.SetLocation("nw_room", "GROUND FLOOR // THE ASCOTT GRAND LOBBY");
+            stage.PlayStageAnimation("LobbyMain_Anim", "Lobby_Main", 8f);
         }
 
         #endregion
@@ -796,6 +905,16 @@ namespace SundayLastBreath.Zones
             ES3.Save<bool>("hub_f2_zombie_defeated", zombie_defeated, file);
             ES3.Save<bool>("hub_f2_zombie_looted", zombie_looted, file);
             ES3.Save<bool>("hub_f2_stealth_ready", stealth_ambush_ready, file);
+
+            ES3.Save<bool>("hub_f2_zombie_inspected", zombie_inspected, file);
+            ES3.Save<bool>("hub_f2_prepared_lunge", prepared_for_lunge, file);
+            ES3.Save<bool>("hub_f2_lunge_countered", lunge_countered, file);
+            ES3.Save<bool>("hub_f2_zombie_tackled", zombie_tackled, file);
+            ES3.Save<bool>("hub_f2_lunge_resolved", lunge_resolved, file);
+            ES3.Save<bool>("hub_f2_doors_checked", hallway_doors_checked, file);
+            ES3.Save<bool>("hub_f2_cart_looted", janitor_cart_looted, file);
+            ES3.Save<bool>("hub_f2_luggage_looted", luggage_looted, file);
+
             ES3.Save<bool>("hub_f2_room201_checked", room201_checked, file);
             ES3.Save<bool>("hub_f2_room202_checked", room202_checked, file);
             ES3.Save<bool>("hub_f2_room203_unlocked", room203_unlocked, file);
@@ -813,6 +932,16 @@ namespace SundayLastBreath.Zones
             if (ES3.KeyExists("hub_f2_zombie_defeated", file)) zombie_defeated = ES3.Load<bool>("hub_f2_zombie_defeated", file);
             if (ES3.KeyExists("hub_f2_zombie_looted", file)) zombie_looted = ES3.Load<bool>("hub_f2_zombie_looted", file);
             if (ES3.KeyExists("hub_f2_stealth_ready", file)) stealth_ambush_ready = ES3.Load<bool>("hub_f2_stealth_ready", file);
+
+            if (ES3.KeyExists("hub_f2_zombie_inspected", file)) zombie_inspected = ES3.Load<bool>("hub_f2_zombie_inspected", file);
+            if (ES3.KeyExists("hub_f2_prepared_lunge", file)) prepared_for_lunge = ES3.Load<bool>("hub_f2_prepared_lunge", file);
+            if (ES3.KeyExists("hub_f2_lunge_countered", file)) lunge_countered = ES3.Load<bool>("hub_f2_lunge_countered", file);
+            if (ES3.KeyExists("hub_f2_zombie_tackled", file)) zombie_tackled = ES3.Load<bool>("hub_f2_zombie_tackled", file);
+            if (ES3.KeyExists("hub_f2_lunge_resolved", file)) lunge_resolved = ES3.Load<bool>("hub_f2_lunge_resolved", file);
+            if (ES3.KeyExists("hub_f2_doors_checked", file)) hallway_doors_checked = ES3.Load<bool>("hub_f2_doors_checked", file);
+            if (ES3.KeyExists("hub_f2_cart_looted", file)) janitor_cart_looted = ES3.Load<bool>("hub_f2_cart_looted", file);
+            if (ES3.KeyExists("hub_f2_luggage_looted", file)) luggage_looted = ES3.Load<bool>("hub_f2_luggage_looted", file);
+
             if (ES3.KeyExists("hub_f2_room201_checked", file)) room201_checked = ES3.Load<bool>("hub_f2_room201_checked", file);
             if (ES3.KeyExists("hub_f2_room202_checked", file)) room202_checked = ES3.Load<bool>("hub_f2_room202_checked", file);
             if (ES3.KeyExists("hub_f2_room203_unlocked", file)) room203_unlocked = ES3.Load<bool>("hub_f2_room203_unlocked", file);

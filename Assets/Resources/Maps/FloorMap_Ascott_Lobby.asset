@@ -16,12 +16,12 @@ MonoBehaviour:
   floorTitle: "ARCHITECTURAL BLUEPRINT // ASCOTT GRAND RESIDENCY \u2014 MAIN LOBBY & FOYER"
   floorSubtitle: SCHEMATIC SCALE 1:100 // GROUND FLOOR ENTRY
   gridCoordinate: 'GRID [G-01:L-01] // BIO-RADAR: ELEVATED THREAT'
-  vectorMapSprite: {fileID: 3286163911610860551, guid: 44d0dee741572d94bb8fa5ebd20a532b, type: 3}
+  vectorMapSprite: {fileID: 0}
   rooms:
   - roomId: nw_room
-    roomCode: NW ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: NW ROOM // RESIDENTIAL
+    roomCode: WEST STAIRS
+    shortSub: 1F ENTRY
+    fullTitle: WEST FIRE STAIRS // LOBBY ENTRY
     position: {x: -70, y: 105}
     size: {x: 50, y: 50}
     iconType: 0
@@ -30,68 +30,68 @@ MonoBehaviour:
     isLocked: 0
     isBlocked: 0
     isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: NW ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector NW ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    isDiscovered: 1
+    undiscoveredSub: STAIR EXIT
+    undiscoveredTitle: WEST FIRE STAIRS // LOBBY ENTRY
+    statusTag: BREACH POINT
+    threatLevel: MODERATE
+    scavengeStatus: CLEAR
+    acousticScan: ECHOING GUNFIRE
+    reconIntel: Ground floor threshold of the West Wing emergency stairwell. Opens onto fifty feet of bone-white marble beneath burning chandeliers.
     connectedRoomIds:
     - n_room
     - w_room
   - roomId: n_room
-    roomCode: N ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: N ROOM // RESIDENTIAL
+    roomCode: SOLDIER PACK
+    shortSub: NORTH FLOOR
+    fullTitle: NORTH ROTUNDA // FALLEN COURIER
     position: {x: 0, y: 105}
     size: {x: 50, y: 50}
-    iconType: 0
+    iconType: 2
     isHallway: 0
     isStairs: 0
     isLocked: 0
     isBlocked: 0
     isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: N ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector N ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    isDiscovered: 1
+    undiscoveredSub: NORTH MARBLE
+    undiscoveredTitle: NORTH ROTUNDA // FALLEN COURIER
+    statusTag: SUPPLY DROP
+    threatLevel: HIGH (CORPSE RISK)
+    scavengeStatus: MILITARY MOLLE PACK
+    acousticScan: WET DRAGGING
+    reconIntel: Fallen National Guard courier lying ten feet across the open marble. Untouched MOLLE field pack visible beside his body.
     connectedRoomIds:
     - nw_room
     - ne_room
     - c_room
   - roomId: ne_room
-    roomCode: NE ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: NE ROOM // RESIDENTIAL
+    roomCode: RECEPTION
+    shortSub: MAYA & LILY
+    fullTitle: RECEPTION DESK // MAYA & LILY
     position: {x: 70, y: 105}
     size: {x: 50, y: 50}
-    iconType: 0
+    iconType: 2
     isHallway: 0
     isStairs: 0
     isLocked: 0
     isBlocked: 0
     isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: NE ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector NE ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    isDiscovered: 1
+    undiscoveredSub: FRONT DESK
+    undiscoveredTitle: RECEPTION DESK // MAYA & LILY
+    statusTag: CRITICAL CRISIS
+    threatLevel: EXTREME
+    scavengeStatus: CIVILIANS PINNED
+    acousticScan: SCREAMS & CLAWING
+    reconIntel: Marble reception counter in the northeast corner. An infected resident has vaulted the desk, cornering a woman and a seven-year-old girl against the wall.
     connectedRoomIds:
     - n_room
     - e_room
   - roomId: w_room
-    roomCode: W ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: W ROOM // RESIDENTIAL
+    roomCode: WEST GALLERY
+    shortSub: PILLAR LINE
+    fullTitle: WEST COLONNADE // SHATTERED GLASS
     position: {x: -70, y: 35}
     size: {x: 50, y: 50}
     iconType: 0
@@ -101,21 +101,21 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: W ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector W ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    undiscoveredSub: WEST GALLERY
+    undiscoveredTitle: WEST COLONNADE // SHATTERED GLASS
+    statusTag: COVER LINE
+    threatLevel: MODERATE
+    scavengeStatus: OVERTURNED CARTS
+    acousticScan: GLASS CRUNCHING
+    reconIntel: Western marble pillar arcade bordering the mailroom wall and broken decorative urns. Offers brief flanking cover across the lobby floor.
     connectedRoomIds:
     - nw_room
     - c_room
     - sw_room
   - roomId: c_room
-    roomCode: C ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: C ROOM // RESIDENTIAL
+    roomCode: ROTUNDA HUB
+    shortSub: CENTER FLOOR
+    fullTitle: GRAND ROTUNDA // CHANDELIER ATRIUM
     position: {x: 0, y: 35}
     size: {x: 50, y: 50}
     iconType: 0
@@ -125,46 +125,46 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: C ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector C ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    undiscoveredSub: ATRIUM CENTER
+    undiscoveredTitle: GRAND ROTUNDA // CHANDELIER ATRIUM
+    statusTag: EXPOSED ZONE
+    threatLevel: HIGH
+    scavengeStatus: BLOOD-SLICK MARBLE
+    acousticScan: LAYERED SCREAMING
+    reconIntel: Exposed marble rotunda beneath the main crystal chandelier. Central staging point for reading the room and deciding whether a second intervention is possible before the lobby collapses.
     connectedRoomIds:
     - w_room
     - n_room
     - e_room
     - s_room
   - roomId: e_room
-    roomCode: E ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: E ROOM // RESIDENTIAL
+    roomCode: ELEVATORS
+    shortSub: VANE PINNED
+    fullTitle: ELEVATOR BANK // VANE IN PERIL
     position: {x: 70, y: 35}
     size: {x: 50, y: 50}
-    iconType: 0
+    iconType: 2
     isHallway: 0
     isStairs: 0
     isLocked: 0
     isBlocked: 0
     isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: E ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector E ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    isDiscovered: 1
+    undiscoveredSub: ELEVATOR FOYER
+    undiscoveredTitle: ELEVATOR BANK // VANE IN PERIL
+    statusTag: CRITICAL CRISIS
+    threatLevel: EXTREME
+    scavengeStatus: SURVIVOR CORNERED
+    acousticScan: PELICAN CASE IMPACTS
+    reconIntel: Brushed-steel brass elevator alcoves along the east flank. A young man is cornered against the doors swinging a hard-shell camera case against a frenzied host.
     connectedRoomIds:
     - c_room
     - ne_room
     - se_room
   - roomId: sw_room
-    roomCode: SW ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: SW ROOM // RESIDENTIAL
+    roomCode: LOUNGE WEST
+    shortSub: OVERRUN
+    fullTitle: SOUTHWEST LOUNGE // BROKEN DISPLAY
     position: {x: -70, y: -35}
     size: {x: 50, y: 50}
     iconType: 0
@@ -174,20 +174,20 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: SW ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector SW ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    undiscoveredSub: WEST LOUNGE
+    undiscoveredTitle: SOUTHWEST LOUNGE // BROKEN DISPLAY
+    statusTag: FLANKING SHADOWS
+    threatLevel: HIGH
+    scavengeStatus: ABANDONED LUGGAGE
+    acousticScan: SHATTERING GLASS
+    reconIntel: Overturned leather armchairs and smashed mezzanine glass along the southwest vestibule. Hostiles are beginning to spill in from the side street.
     connectedRoomIds:
     - w_room
     - s_room
   - roomId: s_room
-    roomCode: S ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: S ROOM // RESIDENTIAL
+    roomCode: FOYER LANE
+    shortSub: APPROACH
+    fullTitle: SOUTH FOYER // BARRICADE APPROACH
     position: {x: 0, y: -35}
     size: {x: 50, y: 50}
     iconType: 0
@@ -197,22 +197,22 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: S ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector S ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    undiscoveredSub: APPROACH LANE
+    undiscoveredTitle: SOUTH FOYER // BARRICADE APPROACH
+    statusTag: KILL ZONE
+    threatLevel: HIGH (ARMED OVERWATCH)
+    scavengeStatus: CLEAR LINE
+    acousticScan: RIFLE SAFETIES OFF
+    reconIntel: Open marble approach directly in front of the luggage-cart barricade. Both police rifles track anyone crossing the final twenty feet toward the front doors.
     connectedRoomIds:
     - sw_room
     - c_room
     - lobby_exit
     - se_room
   - roomId: se_room
-    roomCode: SE ROOM
-    shortSub: RESIDENTIAL
-    fullTitle: SE ROOM // RESIDENTIAL
+    roomCode: EAST FOYER
+    shortSub: VESTIBULE
+    fullTitle: SOUTHEAST VESTIBULE // SHATTERED PANE
     position: {x: 70, y: -35}
     size: {x: 50, y: 50}
     iconType: 0
@@ -222,88 +222,88 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: SE ROOM // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector SE ROOM. Initial tactical scans show potential supply caches and survivor barricades.
+    undiscoveredSub: EAST FOYER
+    undiscoveredTitle: SOUTHEAST VESTIBULE // SHATTERED PANE
+    statusTag: COLLAPSING LINE
+    threatLevel: EXTREME
+    scavengeStatus: BROKEN PLANTERS
+    acousticScan: STREET SIRENS
+    reconIntel: Fractured floor-to-ceiling facade overlooking the burning avenue. More infected are pushing inward around the shattered planters.
     connectedRoomIds:
     - s_room
     - e_room
   - roomId: lobby_exit
-    roomCode: LOBBY EXIT
-    shortSub: RESIDENTIAL
-    fullTitle: LOBBY EXIT // RESIDENTIAL
+    roomCode: BARRICADE
+    shortSub: FRONT DOORS
+    fullTitle: FRONT DOORS // QUARANTINE BARRICADE
     position: {x: 0, y: -105}
     size: {x: 50, y: 50}
     iconType: 0
     isHallway: 0
     isStairs: 0
-    isLocked: 0
+    isLocked: 1
     isBlocked: 0
     isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: SECTOR RECON
-    undiscoveredTitle: LOBBY EXIT // RESIDENTIAL
-    statusTag: CLEAR
-    threatLevel: LOW
-    scavengeStatus: UNSEARCHED
-    acousticScan: DEAD SILENCE
-    reconIntel: Architectural sector LOBBY EXIT. Initial tactical scans show potential supply caches and survivor barricades.
+    isDiscovered: 1
+    undiscoveredSub: MAIN EXIT
+    undiscoveredTitle: FRONT DOORS // QUARANTINE BARRICADE
+    statusTag: ARMED STANDOFF
+    threatLevel: LETHAL (2 OFFICERS)
+    scavengeStatus: CHAINED GLASS EXIT
+    acousticScan: SIRENS & SHOUTING
+    reconIntel: Heavy chained glass doors leading to the Seattle streets. Blocked from the inside by two Seattle PD officers enforcing mandatory quarantine lockdown at gunpoint.
     connectedRoomIds:
     - s_room
   doorways:
   - doorId: door_nw_room_n_room
     connectedRoomId: n_room
     position: {x: -35, y: 105}
-    size: {x: 24, y: 4}
+    size: {x: 20, y: 4}
   - doorId: door_n_room_ne_room
     connectedRoomId: ne_room
     position: {x: 35, y: 105}
-    size: {x: 24, y: 4}
+    size: {x: 20, y: 4}
   - doorId: door_w_room_nw_room
     connectedRoomId: nw_room
     position: {x: -70, y: 70}
-    size: {x: 24, y: 4}
+    size: {x: 4, y: 20}
   - doorId: door_w_room_c_room
     connectedRoomId: c_room
     position: {x: -35, y: 35}
-    size: {x: 24, y: 4}
+    size: {x: 20, y: 4}
   - doorId: door_c_room_n_room
     connectedRoomId: n_room
     position: {x: 0, y: 70}
-    size: {x: 24, y: 4}
+    size: {x: 4, y: 20}
   - doorId: door_c_room_e_room
     connectedRoomId: e_room
     position: {x: 35, y: 35}
-    size: {x: 24, y: 4}
+    size: {x: 20, y: 4}
   - doorId: door_e_room_ne_room
     connectedRoomId: ne_room
     position: {x: 70, y: 70}
-    size: {x: 24, y: 4}
+    size: {x: 4, y: 20}
   - doorId: door_sw_room_w_room
     connectedRoomId: w_room
     position: {x: -70, y: 0}
-    size: {x: 24, y: 4}
+    size: {x: 4, y: 20}
   - doorId: door_sw_room_s_room
     connectedRoomId: s_room
     position: {x: -35, y: -35}
-    size: {x: 24, y: 4}
+    size: {x: 20, y: 4}
   - doorId: door_s_room_c_room
     connectedRoomId: c_room
     position: {x: 0, y: 0}
-    size: {x: 24, y: 4}
+    size: {x: 4, y: 20}
   - doorId: door_lobby_exit_s_room
     connectedRoomId: s_room
     position: {x: 0, y: -70}
-    size: {x: 24, y: 4}
+    size: {x: 4, y: 20}
   - doorId: door_s_room_se_room
     connectedRoomId: se_room
     position: {x: 35, y: -35}
-    size: {x: 24, y: 4}
+    size: {x: 20, y: 4}
   - doorId: door_se_room_e_room
     connectedRoomId: e_room
     position: {x: 70, y: 0}
-    size: {x: 24, y: 4}
+    size: {x: 4, y: 20}

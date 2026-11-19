@@ -14,38 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SundayLastBreath.Data.TacticalFloorMapData
   floorId: ascott_2f
   floorTitle: "ARCHITECTURAL BLUEPRINT // ASCOTT RESIDENCY \u2014 2ND FLOOR CORRIDOR"
-  floorSubtitle: SCHEMATIC SCALE 1:100 // RESIDENTIAL ACCESS
-  gridCoordinate: 'GRID [W-02:R-01] // BIO-RADAR: STANDBY'
-  vectorMapSprite: {fileID: 3286163911610860551, guid: 50147bee92bea274fa5aaf6c212aa0a6, type: 3}
+  floorSubtitle: SCHEMATIC SCALE 1:100 // RESIDENTIAL DETOUR
+  gridCoordinate: 'FLOOR 2 // EAST-TO-WEST CORRIDOR'
+  vectorMapSprite: {fileID: 0}
   rooms:
   - roomId: f2_hall_1
     roomCode: F2 HALL 1
-    shortSub: CORRIDOR
-    fullTitle: F2 HALL 1 // CORRIDOR
-    position: {x: -226, y: 0}
-    size: {x: 108, y: 108}
+    shortSub: EAST DOORWAY
+    fullTitle: F2 HALL 1 // EAST WING DOORWAY
+    position: {x: -102, y: 0}
+    size: {x: 46, y: 46}
     iconType: 7
     isHallway: 1
     isStairs: 0
     isLocked: 0
     isBlocked: 0
     isAccessible: 1
-    isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: F2 HALL 1 // CORRIDOR
-    statusTag: CLEAR
-    threatLevel: MEDIUM
-    scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    isDiscovered: 1
+    undiscoveredSub: EAST DOORWAY
+    undiscoveredTitle: F2 HALL 1 // EAST WING DOORWAY
+    statusTag: ENTRY POINT
+    threatLevel: LOW
+    scavengeStatus: CLEAR
+    acousticScan: FLICKERING FLUORESCENT
+    reconIntel: Heavy fire door entry from the East Wing stairwell landing. Backup lights are dead except for a single flickering tube down the hall.
     connectedRoomIds:
     - f2_hall_2
   - roomId: f2_hall_2
     roomCode: F2 HALL 2
-    shortSub: CORRIDOR
-    fullTitle: F2 HALL 2 // CORRIDOR
-    position: {x: -75, y: 0}
-    size: {x: 108, y: 108}
+    shortSub: MID-CORRIDOR
+    fullTitle: F2 HALL 2 // ENCOUNTER CORRIDOR
+    position: {x: -34, y: 0}
+    size: {x: 46, y: 46}
     iconType: 7
     isHallway: 1
     isStairs: 0
@@ -53,22 +53,22 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: F2 HALL 2 // CORRIDOR
-    statusTag: CLEAR
-    threatLevel: MEDIUM
+    undiscoveredSub: MID-CORRIDOR
+    undiscoveredTitle: F2 HALL 2 // ENCOUNTER CORRIDOR
+    statusTag: HOSTILE CONTACT
+    threatLevel: HIGH
     scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    acousticScan: WET THUMPING
+    reconIntel: Narrow central corridor under a failing tube light. A tenant in a rumpled business suit stands motionless against the wallpaper.
     connectedRoomIds:
     - f2_hall_1
     - f2_hall_3
   - roomId: f2_hall_3
     roomCode: F2 HALL 3
-    shortSub: CORRIDOR
-    fullTitle: F2 HALL 3 // CORRIDOR
-    position: {x: 75, y: 0}
-    size: {x: 108, y: 108}
+    shortSub: WEST CORRIDOR
+    fullTitle: F2 HALL 3 // RESIDENTIAL CORRIDOR
+    position: {x: 34, y: 0}
+    size: {x: 46, y: 46}
     iconType: 7
     isHallway: 1
     isStairs: 0
@@ -76,48 +76,48 @@ MonoBehaviour:
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: F2 HALL 3 // CORRIDOR
-    statusTag: CLEAR
-    threatLevel: MEDIUM
+    undiscoveredSub: WEST CORRIDOR
+    undiscoveredTitle: F2 HALL 3 // RESIDENTIAL CORRIDOR
+    statusTag: RESIDENTIAL
+    threatLevel: LOW
     scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    acousticScan: FAINT DRIPPING
+    reconIntel: Western residential corridor bordering Unit 203 (David Keller's studio) and leading toward the West Wing fire exit.
     connectedRoomIds:
     - f2_hall_2
     - f2_hall_4
   - roomId: f2_hall_4
-    roomCode: F2 HALL 4
-    shortSub: CORRIDOR
-    fullTitle: F2 HALL 4 // CORRIDOR
-    position: {x: 226, y: 0}
-    size: {x: 108, y: 108}
-    iconType: 7
-    isHallway: 1
-    isStairs: 0
+    roomCode: WEST EXIT
+    shortSub: FIRE STAIRS
+    fullTitle: F2 HALL 4 // WEST WING FIRE EXIT
+    position: {x: 102, y: 0}
+    size: {x: 46, y: 46}
+    iconType: 6
+    isHallway: 0
+    isStairs: 1
     isLocked: 0
     isBlocked: 0
     isAccessible: 1
     isDiscovered: 0
-    undiscoveredSub: CORRIDOR
-    undiscoveredTitle: F2 HALL 4 // CORRIDOR
-    statusTag: CLEAR
-    threatLevel: MEDIUM
-    scavengeStatus: UNSEARCHED
-    acousticScan: AIR DRAFT & SCRATCHING
-    reconIntel: Continuous corridor access spine. Low emergency amber illumination. Caution advised when clearing blind hallway corners.
+    undiscoveredSub: FIRE STAIRS
+    undiscoveredTitle: F2 HALL 4 // WEST WING FIRE EXIT
+    statusTag: ESCAPE ROUTE
+    threatLevel: CLEAR
+    scavengeStatus: DESCENT TO 1F LOBBY
+    acousticScan: RAIN & SIRENS BELOW
+    reconIntel: West Wing emergency fire exit door with reinforced wire-mesh glass overlooking the Ground Floor Lobby.
     connectedRoomIds:
     - f2_hall_3
   doorways:
   - doorId: door_f2_hall_1_f2_hall_2
     connectedRoomId: f2_hall_2
-    position: {x: -150.5, y: 0}
-    size: {x: 24, y: 4}
+    position: {x: -68, y: 0}
+    size: {x: 22, y: 2}
   - doorId: door_f2_hall_2_f2_hall_3
     connectedRoomId: f2_hall_3
     position: {x: 0, y: 0}
-    size: {x: 24, y: 4}
+    size: {x: 22, y: 2}
   - doorId: door_f2_hall_3_f2_hall_4
     connectedRoomId: f2_hall_4
-    position: {x: 150.5, y: 0}
-    size: {x: 24, y: 4}
+    position: {x: 68, y: 0}
+    size: {x: 22, y: 2}

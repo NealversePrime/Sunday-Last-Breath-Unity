@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -183,6 +184,7 @@ namespace SundayLastBreath.UI
         private readonly Dictionary<string, RuntimeRoomState> persistentRoomStates = new Dictionary<string, RuntimeRoomState>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, NodeUIHolder> uiHolders = new Dictionary<string, NodeUIHolder>(StringComparer.OrdinalIgnoreCase);
         private readonly List<GameObject> dynamicRoomHitboxes = new List<GameObject>();
+        private TacticalFloorMapData _lastSyncedFloorData;
 
         private static Sprite cachedBlueprintGridSprite;
         private static Sprite cachedHatchedSprite;
@@ -679,8 +681,11 @@ namespace SundayLastBreath.UI
                     blueprintCoordTmp.text = currentFloorData.gridCoordinate;
             }
 
-            SyncRoomHitboxes();
-            UpdateVectorMapDisplay();
+            if (_lastSyncedFloorData != currentFloorData || uiHolders.Count == 0)
+            {
+                SyncRoomHitboxes();
+                UpdateVectorMapDisplay();
+            }
         }
 
         public void BindVectorMapBackdrop(Image backdropImg)
@@ -771,6 +776,28 @@ namespace SundayLastBreath.UI
             {
                 // If no vector sprite assigned on floor data, keep backdrop image hidden
                 vectorMapBackdropImage.gameObject.SetActive(false);
+
+                bool isAscott4F = currentFloorData == null || string.Equals(currentFloorData.floorId, "ascott_4f", StringComparison.OrdinalIgnoreCase);
+                if (!isAscott4F)
+                {
+                    Transform parent = vectorMapBackdropImage.transform.parent;
+                    if (parent != null)
+                    {
+                        Transform sp = parent.Find("StructuralPerimeter");
+                        if (sp != null) sp.gameObject.SetActive(false);
+
+                        Transform cs = parent.Find("CentralCorridorShaft");
+                        if (cs != null) cs.gameObject.SetActive(false);
+                    }
+
+                    foreach (var holder in serializedHolders)
+                    {
+                        if (holder != null && holder.rootObj != null)
+                        {
+                            holder.rootObj.SetActive(false);
+                        }
+                    }
+                }
             }
 
             UpdateHorizontalNodeLabels();
@@ -783,6 +810,7 @@ namespace SundayLastBreath.UI
             // Pulse active glowing doorway connecting lines
             if (doorwayHolders != null && doorwayHolders.Count > 0)
             {
+                bool showStaticDoors = currentFloorData != null && currentFloorData.vectorMapSprite == null;
                 float pulse = Mathf.PingPong(Time.unscaledTime * 3.5f, 0.40f) + 0.60f;
                 for (int i = 0; i < doorwayHolders.Count; i++)
                 {
@@ -799,10 +827,34 @@ namespace SundayLastBreath.UI
                             d.glowImg.color = new Color(0.0f, 0.90f, 1.0f, pulse * 0.45f);
                         }
                     }
+                    else if (showStaticDoors)
+                    {
+                        if (d.rootObj != null && !d.rootObj.activeSelf) d.rootObj.SetActive(true);
+                        if (d.lineImg != null) d.lineImg.color = new Color(0.29f, 0.40f, 0.52f, 0.90f);
+                        if (d.glowImg != null && d.glowImg.gameObject.activeSelf) d.glowImg.gameObject.SetActive(false);
+                    }
                     else
                     {
                         // Clean Blueprint: Hide line overlay completely when idle (zero redundant dark rectangles)
                         if (d.rootObj != null && d.rootObj.activeSelf) d.rootObj.SetActive(false);
+                    }
+                }
+            }
+
+            // Pulse red '!' crisis alerts on 1F Lobby map (matching Twine .map-alert-icon)
+            if (IsLobbyMap() && uiHolders != null)
+            {
+                float alertAlpha = Mathf.PingPong(Time.unscaledTime * 3.0f, 0.55f) + 0.45f;
+                foreach (var kvp in uiHolders)
+                {
+                    var h = kvp.Value;
+                    if (h == null || h.roomCodeTmp == null || !h.roomCodeTmp.gameObject.activeSelf) continue;
+                    if (string.Equals(h.roomCodeTmp.text, "!", StringComparison.Ordinal))
+                    {
+                        Color c = h.roomCodeTmp.color;
+                        bool isCur = string.Equals(h.nodeId, currentLocationId, StringComparison.OrdinalIgnoreCase);
+                        c.a = isCur ? 1.0f : alertAlpha;
+                        h.roomCodeTmp.color = c;
                     }
                 }
             }
@@ -921,10 +973,17 @@ namespace SundayLastBreath.UI
             UpdateHorizontalNodeLabels();
         }
 
+        private bool IsLobbyMap()
+        {
+            return currentFloorData != null
+                && string.Equals(currentFloorData.floorId, "ascott_lobby", StringComparison.OrdinalIgnoreCase);
+        }
+
         private bool ShouldRotateFloorplanForMiniMap()
         {
             if (!isHorizontalMiniMap) return false;
-            return currentFloorData == null || string.Equals(currentFloorData.floorId, "ascott_4f", StringComparison.OrdinalIgnoreCase);
+            return currentFloorData == null
+                || string.Equals(currentFloorData.floorId, "ascott_4f", StringComparison.OrdinalIgnoreCase);
         }
 
         private void ApplyZoomAndPan()
@@ -932,7 +991,8 @@ namespace SundayLastBreath.UI
             if (floorplanCanvasRect == null) return;
 
             bool rotate90 = ShouldRotateFloorplanForMiniMap();
-            float effectiveScale = (isHorizontalMiniMap ? miniMapBaseScale : 1.0f) * currentZoom;
+            float floorFit = (isHorizontalMiniMap && IsLobbyMap()) ? 0.68f : 1.0f;
+            float effectiveScale = (isHorizontalMiniMap ? miniMapBaseScale * floorFit : 1.0f) * currentZoom;
             floorplanCanvasRect.localScale = Vector3.one * effectiveScale;
             floorplanCanvasRect.localRotation = rotate90 ? Quaternion.Euler(0f, 0f, 90f) : Quaternion.identity;
 
@@ -1160,9 +1220,11 @@ namespace SundayLastBreath.UI
                 st = new RuntimeRoomState();
                 persistentRoomStates[normId] = st;
             }
+            bool alreadyDiscovered = st.isDiscovered
+                || ((nodeRegistry.TryGetValue(normId, out NodeModel preModel) || nodeRegistry.TryGetValue(roomId, out preModel)) && preModel.isDiscovered);
             st.isVisited = isVisited;
             st.isChecked = isChecked || isVisited;
-            st.isDiscovered = isChecked || isVisited;
+            st.isDiscovered = alreadyDiscovered || isChecked || isVisited;
             st.isLocked = isLocked;
             st.isBlocked = isBlocked;
             st.isAccessible = isAccessible;
@@ -1269,8 +1331,11 @@ namespace SundayLastBreath.UI
 
             if (currentFloorData == null || currentFloorData.rooms == null || currentFloorData.rooms.Count == 0)
             {
+                _lastSyncedFloorData = currentFloorData;
                 return;
             }
+
+            _lastSyncedFloorData = currentFloorData;
 
             bool isAscott4F = string.Equals(currentFloorData.floorId, "ascott_4f", StringComparison.OrdinalIgnoreCase);
 
@@ -1378,6 +1443,7 @@ namespace SundayLastBreath.UI
 
                 uiHolders[r.roomId] = dynamicHolder;
                 dynamicRoomHitboxes.Add(nodeObj);
+                ApplyVisualState(dynamicHolder);
             }
 
             InitializeDoorwayLines();
@@ -1444,8 +1510,10 @@ namespace SundayLastBreath.UI
                 rt.anchoredPosition = dt.position;
 
                 bool isHorizontal = dt.size.x >= dt.size.y;
-                Vector2 lineSize = isHorizontal ? new Vector2(dt.size.x, 2.0f) : new Vector2(2.0f, dt.size.y);
-                Vector2 glowSize = isHorizontal ? new Vector2(dt.size.x, 4.5f) : new Vector2(4.5f, dt.size.y);
+                float thickness = IsLobbyMap() ? 3.0f : 2.0f;
+                float glowThickness = IsLobbyMap() ? 6.0f : 4.5f;
+                Vector2 lineSize = isHorizontal ? new Vector2(dt.size.x, thickness) : new Vector2(thickness, dt.size.y);
+                Vector2 glowSize = isHorizontal ? new Vector2(dt.size.x, glowThickness) : new Vector2(glowThickness, dt.size.y);
                 rt.sizeDelta = lineSize;
 
                 Image lineImg = doorObj.AddComponent<Image>();
@@ -1474,12 +1542,33 @@ namespace SundayLastBreath.UI
                 string cleanDoor = dt.doorId.StartsWith("door_") ? dt.doorId.Substring(5) : dt.doorId;
                 if (currentFloorData.rooms != null)
                 {
+                    // Exact prefix + suffix token match (prevents "n_room" falsely matching inside "nw_room")
                     foreach (var rm in currentFloorData.rooms)
                     {
-                        if (cleanDoor.Contains(rm.roomId))
+                        if (rm == null || string.IsNullOrEmpty(rm.roomId)) continue;
+                        string prefix = rm.roomId + "_";
+                        if (cleanDoor.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                         {
-                            if (string.IsNullOrEmpty(rA)) rA = rm.roomId;
-                            else if (string.IsNullOrEmpty(rB) && rm.roomId != rA) rB = rm.roomId;
+                            string remainder = cleanDoor.Substring(prefix.Length);
+                            if (currentFloorData.rooms.Exists(other => other != null && string.Equals(other.roomId, remainder, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                rA = rm.roomId;
+                                rB = remainder;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(rA))
+                    {
+                        foreach (var rm in currentFloorData.rooms.OrderByDescending(x => x != null && x.roomId != null ? x.roomId.Length : 0))
+                        {
+                            if (rm == null || string.IsNullOrEmpty(rm.roomId)) continue;
+                            if (cleanDoor.IndexOf(rm.roomId, StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                if (string.IsNullOrEmpty(rA)) rA = rm.roomId;
+                                else if (string.IsNullOrEmpty(rB) && !string.Equals(rm.roomId, rA, StringComparison.OrdinalIgnoreCase)) rB = rm.roomId;
+                            }
                         }
                     }
                 }
@@ -1508,6 +1597,8 @@ namespace SundayLastBreath.UI
         {
             if (doorwayHolders == null || doorwayHolders.Count == 0) return;
 
+            bool showStaticDoors = currentFloorData != null && currentFloorData.vectorMapSprite == null;
+
             foreach (var d in doorwayHolders)
             {
                 if (d == null) continue;
@@ -1527,17 +1618,27 @@ namespace SundayLastBreath.UI
                         shouldGlow = true;
                     }
                 }
-                else if (currentLocationId.StartsWith("hallway", StringComparison.OrdinalIgnoreCase))
+                else if (IsLobbyMap())
+                {
+                    if (string.Equals(d.roomA, currentLocationId, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(d.roomB, currentLocationId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        shouldGlow = true;
+                    }
+                }
+                else if (currentLocationId.StartsWith("hallway", StringComparison.OrdinalIgnoreCase)
+                      || currentLocationId.StartsWith("f2_hall", StringComparison.OrdinalIgnoreCase))
                 {
                     // Player is navigating the corridor without inspecting a specific exterior door
                     bool connectsCurrent = string.Equals(d.roomA, currentLocationId, StringComparison.OrdinalIgnoreCase) ||
                                            string.Equals(d.roomB, currentLocationId, StringComparison.OrdinalIgnoreCase);
                     if (connectsCurrent)
                     {
-                        // ONLY vertical corridor spine connections glow to illuminate player's corridor path (room doorways stay unlit)
+                        // Corridor spine connections glow to illuminate player's corridor path (room doorways stay unlit)
                         bool isVerticalSpine = d.size.y > d.size.x;
-                        bool connectsTwoHallways = !string.IsNullOrEmpty(d.roomA) && d.roomA.StartsWith("hallway", StringComparison.OrdinalIgnoreCase)
-                                                && !string.IsNullOrEmpty(d.roomB) && d.roomB.StartsWith("hallway", StringComparison.OrdinalIgnoreCase);
+                        bool isHallA = !string.IsNullOrEmpty(d.roomA) && (d.roomA.StartsWith("hallway", StringComparison.OrdinalIgnoreCase) || d.roomA.StartsWith("f2_hall", StringComparison.OrdinalIgnoreCase));
+                        bool isHallB = !string.IsNullOrEmpty(d.roomB) && (d.roomB.StartsWith("hallway", StringComparison.OrdinalIgnoreCase) || d.roomB.StartsWith("f2_hall", StringComparison.OrdinalIgnoreCase));
+                        bool connectsTwoHallways = isHallA && isHallB;
                         if (isVerticalSpine || connectsTwoHallways)
                         {
                             shouldGlow = true;
@@ -1548,7 +1649,11 @@ namespace SundayLastBreath.UI
                 d.isGlowing = shouldGlow;
                 if (d.rootObj != null)
                 {
-                    d.rootObj.SetActive(shouldGlow);
+                    d.rootObj.SetActive(shouldGlow || showStaticDoors);
+                }
+                if (d.lineImg != null)
+                {
+                    d.lineImg.color = shouldGlow ? new Color(0.0f, 0.95f, 1.0f, 1.0f) : new Color(0.29f, 0.40f, 0.52f, 0.90f);
                 }
                 if (d.glowImg != null)
                 {
@@ -2050,13 +2155,23 @@ namespace SundayLastBreath.UI
                 if (!string.IsNullOrEmpty(currentThresholdRoomId) && nodeRegistry.TryGetValue(currentThresholdRoomId, out NodeModel thresholdNode))
                 {
                     string hallName = nodeRegistry.TryGetValue(currentLocationId, out NodeModel hNode) ? hNode.roomCode : currentLocationId.ToUpper();
-                    blueprintFooterLocationTmp.text =
-                        $"<color=#00e5ff><b>PLAYER POS:</b> {hallName} (THRESHOLD // {thresholdNode.roomCode})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                    blueprintFooterLocationTmp.text = isHorizontalMiniMap
+                        ? $"<color=#00e5ff><b>POS:</b> {hallName} ({thresholdNode.roomCode})</color>"
+                        : $"<color=#00e5ff><b>PLAYER POS:</b> {hallName} (THRESHOLD // {thresholdNode.roomCode})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
                 }
                 else if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel playerNode))
                 {
-                    blueprintFooterLocationTmp.text =
-                        $"<color=#00e5ff><b>PLAYER POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                    if (isHorizontalMiniMap)
+                    {
+                        blueprintFooterLocationTmp.text = isPhysicallyInside
+                            ? $"<color=#00e5ff><b>POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>"
+                            : $"<color=#00e5ff><b>POS:</b> {playerNode.roomCode}</color> <color=#475569>|</color> <color=#f39c12><b>VIEW:</b> {model.roomCode}</color>";
+                    }
+                    else
+                    {
+                        blueprintFooterLocationTmp.text =
+                            $"<color=#00e5ff><b>PLAYER POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                    }
                 }
             }
 
@@ -2290,6 +2405,19 @@ namespace SundayLastBreath.UI
                 case "unit_401": return "401";
                 case "utility":
                 case "utility_closet": return "UTIL";
+                case "nw_room":
+                case "w_room":
+                case "c_room":
+                case "sw_room":
+                case "s_room":
+                case "se_room":
+                    return "";
+                case "n_room":
+                case "ne_room":
+                case "e_room":
+                    return (model == null || !model.isChecked) ? "!" : "";
+                case "lobby_exit":
+                    return (model == null || model.isLocked) ? "!" : "";
                 default:
                     if (lower.StartsWith("unit_")) return lower.Substring(5).ToUpperInvariant();
                     return null;
@@ -2304,17 +2432,29 @@ namespace SundayLastBreath.UI
                 var holder = kvp.Value;
                 if (holder == null || holder.rootObj == null) continue;
 
-                if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
-                if (holder.roomCodeTmp != null) holder.roomCodeTmp.gameObject.SetActive(!rotate90);
-                if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(!rotate90);
-
                 Transform existing = holder.rootObj.transform.Find("HorizontalLabelPlate");
                 string roomId = holder.model != null ? holder.model.id : holder.nodeId;
-                string labelText = rotate90 ? GetMiniMapRoomLabel(roomId, holder.model) : null;
-                bool isStairs = (holder.model != null && holder.model.isStairs && !holder.model.id.Contains("blocked"))
+                string shortLabel = GetMiniMapRoomLabel(roomId, holder.model);
+                bool isPlayerInsideNode = string.Equals(roomId, currentLocationId, StringComparison.OrdinalIgnoreCase)
+                    && string.IsNullOrEmpty(currentThresholdRoomId);
+                if (IsLobbyMap() && isPlayerInsideNode && string.IsNullOrEmpty(shortLabel))
+                {
+                    shortLabel = "YOU";
+                }
+                bool isExitStairsIcon = (holder.model != null && holder.model.isStairs && !holder.model.isBlocked && !holder.model.id.Contains("blocked") && string.IsNullOrEmpty(shortLabel))
                     || string.Equals(roomId, "stairs", StringComparison.OrdinalIgnoreCase);
 
-                if (string.IsNullOrEmpty(labelText) && (!isStairs || !rotate90))
+                if (holder.iconImage != null) holder.iconImage.gameObject.SetActive(false);
+                if (holder.roomCodeTmp != null)
+                {
+                    bool showDefaultCode = !rotate90 && !isExitStairsIcon && (holder.model == null || holder.model.isHallway || !string.IsNullOrEmpty(shortLabel));
+                    holder.roomCodeTmp.gameObject.SetActive(showDefaultCode);
+                }
+                if (holder.subLabelTmp != null) holder.subLabelTmp.gameObject.SetActive(!rotate90);
+
+                string labelText = rotate90 ? shortLabel : null;
+
+                if (string.IsNullOrEmpty(labelText) && !isExitStairsIcon)
                 {
                     if (existing != null) existing.gameObject.SetActive(false);
                     continue;
@@ -2338,9 +2478,13 @@ namespace SundayLastBreath.UI
                 pRt.anchorMax = new Vector2(0.5f, 0.5f);
                 pRt.pivot = new Vector2(0.5f, 0.5f);
                 pRt.anchoredPosition = Vector2.zero;
-                pRt.sizeDelta = new Vector2(31f, 31f);
+                RectTransform nodeRt = holder.rootObj.GetComponent<RectTransform>();
+                float plateSize = (nodeRt != null && Mathf.Min(nodeRt.sizeDelta.x, nodeRt.sizeDelta.y) > 38f)
+                    ? Mathf.Min(nodeRt.sizeDelta.x, nodeRt.sizeDelta.y) - 6f
+                    : 31f;
+                pRt.sizeDelta = new Vector2(plateSize, plateSize);
                 pRt.localScale = Vector3.one;
-                pRt.localRotation = Quaternion.Euler(0f, 0f, -90f);
+                pRt.localRotation = rotate90 ? Quaternion.Euler(0f, 0f, -90f) : Quaternion.identity;
 
                 bool isPlayerInside = string.Equals(roomId, currentLocationId, StringComparison.OrdinalIgnoreCase)
                     && string.IsNullOrEmpty(currentThresholdRoomId);
@@ -2390,7 +2534,7 @@ namespace SundayLastBreath.UI
                     SundayTypography.ApplyFont(lblTmp, FontRole.Mono);
                 }
 
-                if (isStairs)
+                if (isExitStairsIcon)
                 {
                     if (lblTmp != null) lblTmp.gameObject.SetActive(false);
                     if (exitImg != null)
@@ -2453,7 +2597,7 @@ namespace SundayLastBreath.UI
                 {
                     holder.roomCodeTmp.text = isCurrent ? "▲ YOU" : "";
                     holder.roomCodeTmp.color = new Color(0.0f, 0.95f, 1.0f, 1.0f);
-                    holder.roomCodeTmp.fontSize = 11f;
+                    holder.roomCodeTmp.fontSize = isHorizontalMiniMap ? 9f : 11f;
                     holder.roomCodeTmp.alignment = TextAlignmentOptions.Center;
                     holder.roomCodeTmp.gameObject.SetActive(true);
                 }
@@ -2509,31 +2653,48 @@ namespace SundayLastBreath.UI
             // Room Nodes: Solid flat fill colors adhering to the legend
             // (cyan = player pos, grey = visited, black = unvisited, red stripes = checked locked, yellow stripes = checked blocked/inaccessible)
             var m = holder.model;
+            bool isLobby = IsLobbyMap();
             bool isRoomVisited = m.isVisited || isPlayerPhysicallyInside;
             bool isRoomChecked = m.isChecked || isThresholdInspected || isRoomVisited;
-            bool isStairsExit = (m.isStairs && string.Equals(m.id, "stairs", StringComparison.OrdinalIgnoreCase));
+            string shortLabel = GetMiniMapRoomLabel(holder.nodeId, holder.model);
+            bool isLobbyAlert = isLobby && string.Equals(shortLabel, "!", StringComparison.Ordinal);
+            bool isStairsExit = (m.isStairs && !m.isBlocked && !m.id.Contains("blocked") && string.IsNullOrEmpty(shortLabel));
 
-            bool showYellowStripe = !isCurrent && !isRoomVisited && isRoomChecked && (!m.isAccessible || m.isBlocked);
-            bool showRedStripe = !isCurrent && !isRoomVisited && isRoomChecked && (m.isAccessible && !m.isBlocked && m.isLocked);
+            bool showYellowStripe = !isLobbyAlert && !isCurrent && !isRoomVisited && isRoomChecked && (!m.isAccessible || m.isBlocked);
+            bool showRedStripe = !isLobby && !isCurrent && !isRoomVisited && isRoomChecked && (m.isAccessible && !m.isBlocked && m.isLocked);
 
-            Color fill = isCurrent ? new Color(0.0f, 0.78f, 0.95f, 1f)
+            Color fill = isCurrent ? new Color(0.0f, 0.82f, 0.98f, 1f)
                        : (isStairsExit ? new Color(0.01f, 0.015f, 0.025f, 1f)
+                       : (isLobbyAlert ? new Color(0.01f, 0.015f, 0.025f, 1f)
                        : (isRoomVisited ? new Color(0.58f, 0.64f, 0.72f, 1f)
-                       : new Color(0.01f, 0.015f, 0.025f, 1f)));
+                       : new Color(0.01f, 0.015f, 0.025f, 1f))));
             if (holder.bgImage != null) holder.bgImage.color = fill;
 
             if (holder.outline != null)
             {
-                holder.outline.enabled = isCurrent || (isSelected && !isCurrent);
+                bool showStaticOutline = currentFloorData != null && currentFloorData.vectorMapSprite == null;
+                holder.outline.enabled = isCurrent || isSelected || showStaticOutline || isLobbyAlert;
                 if (isCurrent)
                 {
-                    holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 0.95f);
+                    holder.outline.effectColor = new Color(0.75f, 0.98f, 1.0f, 1f);
                     holder.outline.effectDistance = new Vector2(2f, -2f);
                 }
                 else if (isSelected)
                 {
                     holder.outline.effectColor = new Color(0.98f, 0.72f, 0.18f, 1f);
                     holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
+                }
+                else if (isLobbyAlert)
+                {
+                    holder.outline.effectColor = new Color(0.92f, 0.24f, 0.22f, 0.90f);
+                    holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
+                }
+                else if (showStaticOutline)
+                {
+                    holder.outline.effectColor = isLobby
+                        ? new Color(0.28f, 0.40f, 0.54f, 0.90f)
+                        : new Color(0.18f, 0.28f, 0.38f, 0.85f);
+                    holder.outline.effectDistance = new Vector2(1.3f, -1.3f);
                 }
             }
 
@@ -2562,8 +2723,11 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            // Label Text (e.g. 407, 4F, 3F, 2F, 1F)
-            string shortLabel = GetMiniMapRoomLabel(holder.nodeId, holder.model);
+            // Label Text (e.g. 407, 4F, 3F, 2F, 1F, YOU, or red '!' crisis markers on 1F Lobby)
+            if (isLobby && isCurrent && string.IsNullOrEmpty(shortLabel))
+            {
+                shortLabel = "YOU";
+            }
             if (holder.roomCodeTmp != null)
             {
                 if (isStairsExit)
@@ -2574,12 +2738,22 @@ namespace SundayLastBreath.UI
                 {
                     holder.roomCodeTmp.gameObject.SetActive(true);
                     holder.roomCodeTmp.text = shortLabel;
-                    holder.roomCodeTmp.fontSize = (shortLabel.Length > 4) ? 9f : 12f;
-                    holder.roomCodeTmp.color = isCurrent
-                        ? new Color(0.01f, 0.05f, 0.09f, 1f) // Dark navy contrast on bright cyan fill
-                        : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : ((showYellowStripe || showRedStripe) ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
+                    if (isLobbyAlert)
+                    {
+                        holder.roomCodeTmp.fontSize = 24f;
+                        holder.roomCodeTmp.color = isCurrent
+                            ? new Color(0.05f, 0.08f, 0.12f, 1f)
+                            : new Color(1.0f, 0.20f, 0.15f, 1.0f);
+                    }
+                    else
+                    {
+                        holder.roomCodeTmp.fontSize = (shortLabel.Length > 4) ? 9f : 12f;
+                        holder.roomCodeTmp.color = isCurrent
+                            ? new Color(0.01f, 0.05f, 0.09f, 1f) // Dark navy contrast on bright cyan fill
+                            : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : ((showYellowStripe || showRedStripe) ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
+                    }
                     Outline codeOutline = holder.roomCodeTmp.GetComponent<Outline>() ?? holder.roomCodeTmp.gameObject.AddComponent<Outline>();
-                    codeOutline.enabled = !isCurrent && !isRoomVisited;
+                    codeOutline.enabled = !isCurrent && !isRoomVisited && !isLobbyAlert;
                     codeOutline.effectColor = new Color(0f, 0f, 0f, 0.9f);
                     codeOutline.effectDistance = new Vector2(1f, -1f);
                     if (holder.patternOverlay != null && holder.roomCodeTmp.transform.parent == holder.patternOverlay.transform.parent)

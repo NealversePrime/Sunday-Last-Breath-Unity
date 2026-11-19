@@ -437,7 +437,8 @@ namespace SundayLastBreath.UI
         private bool IsAnyBlockingModalOpen()
         {
             if (hubScreen == null) return false;
-            return (hubScreen.PhoneModal != null && hubScreen.PhoneModal.activeSelf) ||
+            return hubScreen.IsCombatModalOpen ||
+                   (hubScreen.PhoneModal != null && hubScreen.PhoneModal.activeSelf) ||
                    (hubScreen.StoryLogModal != null && hubScreen.StoryLogModal.activeSelf) ||
                    (hubScreen.RadioModal != null && hubScreen.RadioModal.activeSelf) ||
                    (hubScreen.HackingModal != null && hubScreen.HackingModal.activeSelf) ||
@@ -1910,35 +1911,49 @@ namespace SundayLastBreath.UI
             }
             if (miniMap != null && panelMap != null)
             {
-                Transform bpViewport = panelMap.Find("BlueprintViewport");
-                if (bpViewport != null && bpViewport.parent != miniMap)
+                Transform bpViewport = panelMap.Find("BlueprintViewport") ?? miniMap.Find("BlueprintViewport");
+                if (bpViewport != null)
                 {
-                    bpViewport.SetParent(miniMap, false);
-                    RectTransform bpRt = bpViewport.GetComponent<RectTransform>();
-                    bpRt.anchorMin = Vector2.zero;
-                    bpRt.anchorMax = Vector2.one;
-                    bpRt.offsetMin = Vector2.zero;
-                    bpRt.offsetMax = Vector2.zero;
+                    if (bpViewport.parent != miniMap)
+                    {
+                        bpViewport.SetParent(miniMap, false);
+                        RectTransform bpRt = bpViewport.GetComponent<RectTransform>();
+                        bpRt.anchorMin = Vector2.zero;
+                        bpRt.anchorMax = Vector2.one;
+                        bpRt.offsetMin = Vector2.zero;
+                        bpRt.offsetMax = Vector2.zero;
+                    }
 
                     Transform zw = bpViewport.Find("BlueprintZoomWidget");
                     if (zw != null) zw.gameObject.SetActive(false);
 
-                    Transform subHdr = bpViewport.Find("BlueprintSubHeader");
-                    if (subHdr != null)
+                    if (!MapViewerOpen)
                     {
-                        Transform sl = subHdr.Find("ScaleLabel");
-                        if (sl != null)
+                        Transform subHdr = bpViewport.Find("BlueprintSubHeader");
+                        if (subHdr != null)
                         {
-                            sl.gameObject.SetActive(false);
-                        }
-                        Transform ap = subHdr.Find("ActivePosBanner");
-                        if (ap != null)
-                        {
-                            RectTransform apRt = ap.GetComponent<RectTransform>();
-                            apRt.anchorMin = Vector2.zero;
-                            apRt.anchorMax = Vector2.one;
-                            apRt.offsetMin = new Vector2(4f, 0f);
-                            apRt.offsetMax = new Vector2(-4f, 0f);
+                            Transform sl = subHdr.Find("ScaleLabel");
+                            if (sl != null)
+                            {
+                                sl.gameObject.SetActive(false);
+                            }
+                            Transform ap = subHdr.Find("ActivePosBanner");
+                            if (ap != null)
+                            {
+                                RectTransform apRt = ap.GetComponent<RectTransform>();
+                                apRt.anchorMin = Vector2.zero;
+                                apRt.anchorMax = Vector2.one;
+                                apRt.offsetMin = new Vector2(4f, 0f);
+                                apRt.offsetMax = new Vector2(-4f, 0f);
+                                var apTmp = ap.GetComponent<TextMeshProUGUI>();
+                                if (apTmp != null)
+                                {
+                                    apTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                                    apTmp.fontSize = 8.5f;
+                                    apTmp.textWrappingMode = TextWrappingModes.NoWrap;
+                                    apTmp.overflowMode = TextOverflowModes.Ellipsis;
+                                }
+                            }
                         }
                     }
 
@@ -2378,6 +2393,14 @@ namespace SundayLastBreath.UI
                 apRt.anchorMax = Vector2.one;
                 apRt.offsetMin = Vector2.zero;
                 apRt.offsetMax = new Vector2(-8f, 0f);
+                var apTmp = apOpen.GetComponent<TextMeshProUGUI>();
+                if (apTmp != null)
+                {
+                    apTmp.alignment = TextAlignmentOptions.MidlineRight;
+                    apTmp.fontSize = 10.5f;
+                    apTmp.textWrappingMode = TextWrappingModes.NoWrap;
+                    apTmp.overflowMode = TextOverflowModes.Ellipsis;
+                }
             }
 
             Vector2 host = mapViewerHost.rect.size;
@@ -2401,6 +2424,12 @@ namespace SundayLastBreath.UI
                     apRt.anchorMax = Vector2.one;
                     apRt.offsetMin = new Vector2(4f, 0f);
                     apRt.offsetMax = new Vector2(-4f, 0f);
+                    var apTmp = apClose.GetComponent<TextMeshProUGUI>();
+                    if (apTmp != null)
+                    {
+                        apTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                        apTmp.fontSize = 8.5f;
+                    }
                 }
 
                 mapViewerBp.SetParent(mapViewerOrigParent, false);
@@ -2967,8 +2996,13 @@ namespace SundayLastBreath.UI
                 string fid = hubScreen.TacticalMap.CurrentFloorData.floorId;
                 if (fid == "stairwell_4f") floorTag = "STAIRWELL (4F)";
                 else if (fid == "stairwell_2f") floorTag = "STAIRWELL (2F)";
+                else if (fid == "ascott_lobby") floorTag = "1F LOBBY";
                 else if (fid == "ascott_2f" || hubScreen.IsOnSecondFloor) floorTag = "2F";
                 else floorTag = "4F";
+            }
+            else if (hubScreen.GroundFloorLobbyZone != null && hubScreen.GroundFloorLobbyZone.isInLobby)
+            {
+                floorTag = "1F LOBBY";
             }
             else if (hubScreen.IsOnSecondFloor)
             {
@@ -2984,6 +3018,12 @@ namespace SundayLastBreath.UI
                 else if (locId == "f3_landing") displayLoc = "F3 LANDING";
                 else if (locId == "f2_entrance") displayLoc = "F2 ENTRANCE";
                 else if (locId == "f1_landing") displayLoc = "F1 LANDING / BARRICADE";
+                else if (locId == "nw_room") displayLoc = "WEST STAIRS EXIT";
+                else if (locId == "n_room") displayLoc = "FALLEN SOLDIER";
+                else if (locId == "ne_room") displayLoc = "RECEPTION DESK";
+                else if (locId == "e_room") displayLoc = "ELEVATOR BANK";
+                else if (locId == "c_room") displayLoc = "LOBBY ROTUNDA";
+                else if (locId == "lobby_exit") displayLoc = "FRONT BARRICADE";
                 else if (hubScreen.IsInHallway && string.IsNullOrEmpty(hubScreen.CurrentInspectedRoom))
                     displayLoc = $"CORRIDOR // SEC {hubScreen.HallwaySection}";
 

@@ -21,6 +21,7 @@ using SundayLastBreath.Data;
 using MoreMountains.Feedbacks;
 
 using UnityEngine.InputSystem;
+using UnityEngine.Networking;
 
 namespace SundayLastBreath.UI
 
@@ -346,6 +347,7 @@ private TextMeshProUGUI pdaNameJobText => pdaCharNameText;
                 return combatModal;
             }
         }
+        public bool IsCombatModalOpen => combatModal != null && combatModal.gameObject.activeInHierarchy;
 
 [Header("Modular Story Zones (Actors)")]
         [SerializeField] private SundayLastBreath.Zones.Unit407ApartmentZone unit407Zone;
@@ -397,6 +399,19 @@ private TextMeshProUGUI pdaNameJobText => pdaCharNameText;
                 if (floor2Zone == null)
                     floor2Zone = gameObject.AddComponent<SundayLastBreath.Zones.Floor2HallwayZone>();
                 return floor2Zone;
+            }
+        }
+
+        [SerializeField] private SundayLastBreath.Zones.GroundFloorLobbyZone groundFloorLobbyZone;
+        public SundayLastBreath.Zones.GroundFloorLobbyZone GroundFloorLobbyZone
+        {
+            get
+            {
+                if (groundFloorLobbyZone == null)
+                    groundFloorLobbyZone = GetComponentInChildren<SundayLastBreath.Zones.GroundFloorLobbyZone>(true);
+                if (groundFloorLobbyZone == null)
+                    groundFloorLobbyZone = gameObject.AddComponent<SundayLastBreath.Zones.GroundFloorLobbyZone>();
+                return groundFloorLobbyZone;
             }
         }
 
@@ -527,6 +542,21 @@ floorItems = u407;
 public string GetCurrentLocationId()
 
 {
+if (groundFloorLobbyZone != null && groundFloorLobbyZone.isInLobby)
+{
+    return !string.IsNullOrEmpty(currentInspectedRoom) ? currentInspectedRoom : "nw_room";
+}
+
+if (IsOnSecondFloor)
+{
+    if (!string.IsNullOrEmpty(currentInspectedRoom) && currentInspectedRoom.StartsWith("f2_hall_", StringComparison.OrdinalIgnoreCase))
+    {
+        return currentInspectedRoom;
+    }
+    int sec = floor2Zone != null ? Mathf.Clamp(floor2Zone.hallwaySection, 1, 4) : 1;
+    return $"f2_hall_{sec}";
+}
+
 if (!isInHallway) return "unit_407";
 
 if (!string.IsNullOrEmpty(currentInspectedRoom))
@@ -558,6 +588,13 @@ if (currentInspectedRoom == "stairs")
                 }
 
 if (currentInspectedRoom == "utility") return currentInspectedRoom;
+
+if (currentInspectedRoom.EndsWith("_room", StringComparison.OrdinalIgnoreCase)
+    || currentInspectedRoom == "lobby_exit"
+    || currentInspectedRoom.StartsWith("f2_hall_", StringComparison.OrdinalIgnoreCase))
+{
+    return currentInspectedRoom;
+}
 
 return "unit_" + currentInspectedRoom;
 }
@@ -944,9 +981,10 @@ public GameObject DockContainerNarrative => dockContainerNarrative;
                 return stageTransitionOverlay;
             }
         }
-        public bool IsOnSecondFloor => (floor2Zone != null && floor2Zone.hallwaySection > 0 && currentInspectedRoom != null && (currentInspectedRoom.StartsWith("f2_") || currentInspectedRoom.StartsWith("unit_2") || currentInspectedRoom.StartsWith("20")))
+        public bool IsOnSecondFloor => !(groundFloorLobbyZone != null && groundFloorLobbyZone.isInLobby)
+            && ((floor2Zone != null && floor2Zone.hallwaySection > 0 && currentInspectedRoom != null && (currentInspectedRoom.StartsWith("f2_") || currentInspectedRoom.StartsWith("unit_2") || currentInspectedRoom.StartsWith("20")))
             || (emergencyStairwellZone != null && emergencyStairwellZone.IsOnSecondFloor)
-            || stair_phase >= 4;
+            || stair_phase >= 4);
 
 private HybridCockpitController _hybridCockpit;
         public bool IsHybridCockpitActive => _hybridCockpit != null && _hybridCockpit.enabled;
@@ -1080,6 +1118,15 @@ if (emergencyStairwellZone == null)
                 if (floor2Zone == null)
                 {
                     floor2Zone = gameObject.AddComponent<SundayLastBreath.Zones.Floor2HallwayZone>();
+                }
+            }
+
+            if (groundFloorLobbyZone == null)
+            {
+                groundFloorLobbyZone = GetComponentInChildren<SundayLastBreath.Zones.GroundFloorLobbyZone>(true);
+                if (groundFloorLobbyZone == null)
+                {
+                    groundFloorLobbyZone = gameObject.AddComponent<SundayLastBreath.Zones.GroundFloorLobbyZone>();
                 }
             }
 
@@ -3659,6 +3706,11 @@ if (EmergencyStairwellZone != null)
                 Floor2Zone.ResetZoneState();
             }
 
+            if (GroundFloorLobbyZone != null)
+            {
+                GroundFloorLobbyZone.ResetZoneState();
+            }
+
 // Reset Lore and Story Logs for new game session
 
 if (loreSystem != null)
@@ -4238,7 +4290,7 @@ EvaluateHubButtonStates();
 
 // Restore awakening or hub sequence state (Beat 1, Beat 2, Beat 3, Hub Choices, or Hallway Exploration)
 
-if (isInHallway)
+if (isInHallway || (groundFloorLobbyZone != null && groundFloorLobbyZone.isInLobby))
 
 {
 introSeen = true;
@@ -4455,6 +4507,18 @@ public void RefreshLocationBGM()
 
 {
 StopAllAudioSources();
+
+if (groundFloorLobbyZone != null && groundFloorLobbyZone.isInLobby)
+{
+PlayHubBGM("Audio/BGM/lobby_slaughter", 0.6f, true);
+return;
+}
+
+if (IsOnSecondFloor)
+{
+PlayHubBGM("Audio/SFX/fluorescent_buzz", 0.3f, true);
+return;
+}
 
 if (!isInHallway)
 
@@ -5148,7 +5212,9 @@ string targetLoc = GetCurrentLocationId();
 
 if (currentPlayer != null) currentPlayer.currentLocationId = targetLoc;
 
-if (!string.IsNullOrEmpty(currentInspectedRoom))
+bool isLobbyOr2F = (groundFloorLobbyZone != null && groundFloorLobbyZone.isInLobby) || IsOnSecondFloor;
+
+if (!isLobbyOr2F && !string.IsNullOrEmpty(currentInspectedRoom))
 
 {
 string inspectId = currentInspectedRoom.StartsWith("unit_") ? currentInspectedRoom : (currentInspectedRoom == "utility" || currentInspectedRoom == "stairs" ? currentInspectedRoom : "unit_" + currentInspectedRoom);
@@ -5160,6 +5226,7 @@ else
 
 {
 tacticalMapController.SetCurrentLocation(targetLoc);
+SyncTacticalMapRoomStates();
 }
 
 tacticalMapController.RefreshAllNodes();
@@ -6807,7 +6874,7 @@ tcb.SetDisabledChoiceTag();
 private void EvaluateHubButtonStates()
 
 {
-if (isInHallway) return;
+if (isInHallway || (groundFloorLobbyZone != null && groundFloorLobbyZone.isInLobby)) return;
 
 if (Unit407Zone != null)
             {
@@ -7635,6 +7702,12 @@ if (stageBackdropImage != null)
 SetApartmentButtonsVisible(false);
             currentConsoleMode = ConsoleMode.Narrative;
 
+if (GroundFloorLobbyZone != null && GroundFloorLobbyZone.isInLobby)
+            {
+                GroundFloorLobbyZone.EnterZone(this);
+                return;
+            }
+
 if (IsOnSecondFloor && Floor2Zone != null)
             {
                 Floor2Zone.EnterZone(this, Floor2Zone.hallwaySection, Floor2Zone.zombie_alerted);
@@ -7732,6 +7805,11 @@ if (EmergencyStairwellZone != null)
             if (Floor2Zone != null)
             {
                 Floor2Zone.SaveZoneState(file);
+            }
+
+            if (GroundFloorLobbyZone != null)
+            {
+                GroundFloorLobbyZone.SaveZoneState(file);
             }
 
 ES3.Save<bool>("hub_is_in_hallway", isInHallway, file);
@@ -7875,6 +7953,11 @@ if (EmergencyStairwellZone != null)
             if (Floor2Zone != null)
             {
                 Floor2Zone.LoadZoneState(file);
+            }
+
+            if (GroundFloorLobbyZone != null)
+            {
+                GroundFloorLobbyZone.LoadZoneState(file);
             }
 
 if (ES3.KeyExists("hub_is_in_hallway", file)) isInHallway = ES3.Load<bool>("hub_is_in_hallway", file);
@@ -8089,9 +8172,20 @@ bool isUtilOpen = (floor4Zone != null && floor4Zone.utility_opened) || utility_o
             if (floor2Zone != null)
             {
                 tacticalMapController.SyncRoomState("f2_hall_1", isVisited: floor2Zone.hallwaySection >= 1, isChecked: floor2Zone.hallwaySection >= 1, isLocked: false, isBlocked: false, isAccessible: true);
-                tacticalMapController.SyncRoomState("f2_hall_2", isVisited: floor2Zone.hallwaySection >= 2, isChecked: floor2Zone.zombie_defeated, isLocked: false, isBlocked: !floor2Zone.zombie_defeated, isAccessible: true);
+                tacticalMapController.SyncRoomState("f2_hall_2", isVisited: floor2Zone.hallwaySection >= 2, isChecked: floor2Zone.zombie_defeated, isLocked: false, isBlocked: false, isAccessible: true);
                 tacticalMapController.SyncRoomState("f2_hall_3", isVisited: floor2Zone.hallwaySection >= 3, isChecked: floor2Zone.room203_looted, isLocked: false, isBlocked: false, isAccessible: true);
                 tacticalMapController.SyncRoomState("f2_hall_4", isVisited: floor2Zone.hallwaySection >= 4, isChecked: floor2Zone.exit_stairs_inspected, isLocked: false, isBlocked: false, isAccessible: true);
+            }
+
+            if (groundFloorLobbyZone != null && groundFloorLobbyZone.isInLobby)
+            {
+                tacticalMapController.SyncRoomState("nw_room", isVisited: true, isChecked: true, isLocked: false, isBlocked: false, isAccessible: true);
+                tacticalMapController.SyncRoomState("n_room", isVisited: groundFloorLobbyZone.pack_resolved, isChecked: groundFloorLobbyZone.pack_resolved, isLocked: false, isBlocked: false, isAccessible: true);
+                tacticalMapController.SyncRoomState("ne_room", isVisited: groundFloorLobbyZone.maya_resolved, isChecked: groundFloorLobbyZone.maya_resolved, isLocked: false, isBlocked: groundFloorLobbyZone.maya_status == "dead", isAccessible: groundFloorLobbyZone.maya_status != "dead");
+                tacticalMapController.SyncRoomState("e_room", isVisited: groundFloorLobbyZone.vane_resolved, isChecked: groundFloorLobbyZone.vane_resolved, isLocked: false, isBlocked: groundFloorLobbyZone.vane_status == "dead", isAccessible: groundFloorLobbyZone.vane_status != "dead");
+                tacticalMapController.SyncRoomState("c_room", isVisited: groundFloorLobbyZone.triageActionsTaken >= 1, isChecked: groundFloorLobbyZone.triageActionsTaken >= 2, isLocked: false, isBlocked: false, isAccessible: true);
+                bool exitUnlocked = groundFloorLobbyZone.lobbyPhase == "barricade_unlocked" || groundFloorLobbyZone.lobbyPhase == "act2_exit";
+                tacticalMapController.SyncRoomState("lobby_exit", isVisited: groundFloorLobbyZone.lobbyPhase.StartsWith("barricade") || exitUnlocked, isChecked: exitUnlocked, isLocked: !exitUnlocked, isBlocked: false, isAccessible: true);
             }
         }
 
@@ -8736,44 +8830,116 @@ Sprite s = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2
             }
         }
 
+private readonly Dictionary<string, AudioClip> _runtimeAudioCache = new Dictionary<string, AudioClip>(StringComparer.OrdinalIgnoreCase);
+private Coroutine _bgmDiskLoadCoroutine;
+private string _pendingBgmPath;
+
+private AudioClip ResolveAudioClipImmediate(string relPath)
+{
+    if (string.IsNullOrEmpty(relPath)) return null;
+    if (_runtimeAudioCache.TryGetValue(relPath, out var cached) && cached != null) return cached;
+
+    AudioClip clip = Resources.Load<AudioClip>(relPath);
+
+    if (clip == null)
+    {
+#if UNITY_EDITOR
+        string cleanPath = relPath.Replace("\\", "/");
+        if (!cleanPath.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase)) cleanPath = "Assets/" + cleanPath;
+        if (!cleanPath.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase)
+            && !cleanPath.EndsWith(".wav", StringComparison.OrdinalIgnoreCase)
+            && !cleanPath.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+        {
+            cleanPath += ".mp3";
+        }
+        clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(cleanPath);
+#endif
+    }
+
+    if (clip != null) _runtimeAudioCache[relPath] = clip;
+    return clip;
+}
+
+private string ResolveDiskAudioPath(string relPath)
+{
+    string normalized = relPath.Replace("\\", "/").TrimStart('/');
+    if (normalized.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
+    {
+        normalized = normalized.Substring("Assets/".Length);
+    }
+
+    string[] exts = normalized.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase)
+                 || normalized.EndsWith(".wav", StringComparison.OrdinalIgnoreCase)
+                 || normalized.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase)
+        ? new[] { "" }
+        : new[] { ".mp3", ".wav", ".ogg" };
+
+    foreach (string ext in exts)
+    {
+        string direct = System.IO.Path.Combine(Application.dataPath, normalized + ext);
+        if (System.IO.File.Exists(direct)) return direct;
+
+        string res = System.IO.Path.Combine(Application.dataPath, "Resources/" + normalized + ext);
+        if (System.IO.File.Exists(res)) return res;
+    }
+
+    return null;
+}
+
+private IEnumerator LoadAudioClipFromDiskRoutine(string relPath, Action<AudioClip> onLoaded)
+{
+    string diskPath = ResolveDiskAudioPath(relPath);
+    if (string.IsNullOrEmpty(diskPath)) yield break;
+
+    AudioType audioType = AudioType.MPEG;
+    if (diskPath.EndsWith(".wav", StringComparison.OrdinalIgnoreCase)) audioType = AudioType.WAV;
+    else if (diskPath.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase)) audioType = AudioType.OGGVORBIS;
+
+    string uri = new Uri(diskPath).AbsoluteUri;
+    using (UnityWebRequest req = UnityWebRequestMultimedia.GetAudioClip(uri, audioType))
+    {
+        yield return req.SendWebRequest();
+        if (req.result == UnityWebRequest.Result.Success)
+        {
+            AudioClip loaded = DownloadHandlerAudioClip.GetContent(req);
+            if (loaded != null)
+            {
+                loaded.name = System.IO.Path.GetFileNameWithoutExtension(diskPath);
+                _runtimeAudioCache[relPath] = loaded;
+                onLoaded?.Invoke(loaded);
+            }
+        }
+    }
+}
+
 public void PlayHubBGM(string relPath, float volume = 0.5f, bool loop = true)
 
 {
 if (string.IsNullOrEmpty(relPath)) return;
 
-AudioClip clip = Resources.Load<AudioClip>(relPath);
-
-if (clip == null)
-
+_pendingBgmPath = relPath;
+if (_bgmDiskLoadCoroutine != null)
 {
-#if UNITY_EDITOR
-
-string cleanPath = relPath.Replace("\\", "/");
-
-if (!cleanPath.StartsWith("Assets/")) cleanPath = "Assets/" + cleanPath;
-
-if (!cleanPath.EndsWith(".mp3") && !cleanPath.EndsWith(".wav") && !cleanPath.EndsWith(".ogg")) cleanPath += ".mp3";
-
-clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(cleanPath);
-
-#endif
+    StopCoroutine(_bgmDiskLoadCoroutine);
+    _bgmDiskLoadCoroutine = null;
 }
 
-if (clip != null && atmosphereSource != null)
-
+AudioClip clip = ResolveAudioClipImmediate(relPath);
+if (clip != null)
 {
-if (atmosphereSource.clip == clip && atmosphereSource.isPlaying) return;
-
-atmosphereSource.Stop();
-
-atmosphereSource.clip = clip;
-
-atmosphereSource.loop = loop;
-
-atmosphereSource.volume = volume;
-
-atmosphereSource.Play();
+    PlayHubBGM(clip, volume, loop);
+    return;
 }
+
+string requestedPath = relPath;
+_bgmDiskLoadCoroutine = StartCoroutine(LoadAudioClipFromDiskRoutine(requestedPath, loaded =>
+{
+    _bgmDiskLoadCoroutine = null;
+    if (string.Equals(_pendingBgmPath, requestedPath, StringComparison.OrdinalIgnoreCase))
+    {
+        PlayHubBGM(loaded, volume, loop);
+    }
+}));
 }
 
 public void PlayHubBGM(AudioClip clip, float volume = 0.5f, bool loop = true)
@@ -8797,6 +8963,12 @@ atmosphereSource.Play();
 public void StopHubBGM()
 
 {
+_pendingBgmPath = null;
+if (_bgmDiskLoadCoroutine != null)
+{
+    StopCoroutine(_bgmDiskLoadCoroutine);
+    _bgmDiskLoadCoroutine = null;
+}
 if (atmosphereSource != null && atmosphereSource.isPlaying)
 
 {
@@ -8839,29 +9011,17 @@ public void PlaySFX(string relPath, float volume = 0.8f)
 {
 if (string.IsNullOrEmpty(relPath)) return;
 
-AudioClip clip = Resources.Load<AudioClip>(relPath);
-
-if (clip == null)
-
-{
-#if UNITY_EDITOR
-
-string cleanPath = relPath.Replace("\\", "/");
-
-if (!cleanPath.StartsWith("Assets/")) cleanPath = "Assets/" + cleanPath;
-
-if (!cleanPath.EndsWith(".mp3") && !cleanPath.EndsWith(".wav") && !cleanPath.EndsWith(".ogg")) cleanPath += ".mp3";
-
-clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(cleanPath);
-
-#endif
-}
-
+AudioClip clip = ResolveAudioClipImmediate(relPath);
 if (clip != null)
-
 {
-AudioManager.Instance?.PlaySFX(clip, volume);
+    AudioManager.Instance?.PlaySFX(clip, volume);
+    return;
 }
+
+StartCoroutine(LoadAudioClipFromDiskRoutine(relPath, loaded =>
+{
+    AudioManager.Instance?.PlaySFX(loaded, volume);
+}));
 }
 
 // =================================================================================================

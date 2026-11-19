@@ -103,6 +103,7 @@ namespace SundayLastBreath.UI
         private bool combatEnded = false;
         private int turnNumber = 1;
         private bool isTutorialCombat = false;
+        private int arrowsFiredThisEncounter = 0;
 
         private Action onVictoryCallback;
         private Action onDefeatCallback;
@@ -143,6 +144,31 @@ namespace SundayLastBreath.UI
 
         private AudioSource audioSource;
         private readonly List<GameObject> subMenuRows = new List<GameObject>();
+
+        // Hybrid Cockpit Palette Constants (mirroring HybridCockpitController)
+        private static readonly Color ColPanelBg = new Color(0.063f, 0.082f, 0.118f, 0.98f);
+        private static readonly Color ColHeaderBg = new Color(0.094f, 0.125f, 0.173f, 1f);
+        private static readonly Color ColHeaderCombatBg = new Color(0.125f, 0.065f, 0.082f, 0.99f);
+        private static readonly Color ColBorderSlate = new Color(0.18f, 0.23f, 0.305f, 0.95f);
+        private static readonly Color ColBorderCrimson = new Color(0.68f, 0.16f, 0.18f, 0.95f);
+        private static readonly Color ColSlotBg = new Color(0.055f, 0.075f, 0.105f, 0.96f);
+        private static readonly Color ColCardBg = new Color(0.075f, 0.10f, 0.145f, 0.96f);
+        private static readonly Color ColAmber = new Color(0.96f, 0.62f, 0.043f, 1f);
+        private static readonly Color ColCyan = new Color(0.22f, 0.74f, 0.97f, 1f);
+        private static readonly Color ColCrimson = new Color(0.94f, 0.27f, 0.27f, 1f);
+        private static readonly Color ColEmerald = new Color(0.063f, 0.725f, 0.506f, 1f);
+        private static readonly Color ColTextMain = new Color(0.90f, 0.925f, 0.96f, 1f);
+        private static readonly Color ColTextMuted = new Color(0.55f, 0.62f, 0.72f, 1f);
+
+        // Hybrid Cockpit Layout References
+        private bool _builtForHybridLayout;
+        private GameObject hybridCommandsContainer;
+        private TextMeshProUGUI hybridIntelBodyText;
+        private TextMeshProUGUI hybridIntelBadgeText;
+        private TextMeshProUGUI hybridCommandHeaderText;
+        private Button hybridBackBtn;
+        private TextMeshProUGUI hybridWeaponBadgeText;
+        private string _lastDisplayedWeapon;
 
         private void Awake()
         {
@@ -296,12 +322,17 @@ namespace SundayLastBreath.UI
             isPlayerGuarding = false;
             isBusyTurn = false;
             combatEnded = false;
+            arrowsFiredThisEncounter = 0;
             hoveredLimb = null;
             // Start in MainCommands state: Player must click [1] ATTACK first before limb choices appear!
             menuState = SubMenuState.MainCommands;
 
-            // Hide global TopHUD so HP/Stamina is cleanly focused on the combat survivor card
-            GameStageScreen.Instance?.SetTopHUDVisible(false);
+            bool useHybrid = GameStageScreen.Instance != null && GameStageScreen.Instance.IsHybridCockpitActive;
+            if (!useHybrid)
+            {
+                // Hide legacy TopHUD so HP/Stamina is cleanly focused on the combat survivor card
+                GameStageScreen.Instance?.SetTopHUDVisible(false);
+            }
 
             BuildOrRefreshUI();
             transform.SetAsLastSibling();
@@ -326,6 +357,10 @@ namespace SundayLastBreath.UI
             if (isTutorialCombat)
             {
                 SetCombatLog("<color=#F59E0B><b>[SURVIVAL DIRECTIVE]</b></color> The attacker does not feel pain! Click <b>[1] ATTACK LIMB</b> to target anatomy (Legs force Crawlers, Head deals critical trauma).");
+            }
+            else if (useHybrid)
+            {
+                SetCombatLog($"<color=#F87171>[ENCOUNTER]</color> {horde.Count} hostiles blocking your path! Choose an action ([1] ATTACK LIMB to target anatomy).");
             }
             else
             {
@@ -444,6 +479,15 @@ namespace SundayLastBreath.UI
         {
             if (!gameObject.activeInHierarchy || isBusyTurn || combatEnded) return;
 
+            if (_builtForHybridLayout && player != null)
+            {
+                string currentWpn = player.equippedWpn ?? "";
+                if (!string.Equals(_lastDisplayedWeapon, currentWpn, StringComparison.Ordinal))
+                {
+                    RefreshAllUI();
+                }
+            }
+
             if (Keyboard.current != null)
             {
                 var kb = Keyboard.current;
@@ -453,6 +497,7 @@ namespace SundayLastBreath.UI
                 else if (kb.digit4Key.wasPressedThisFrame) OnCommandShove();
                 else if (kb.qKey.wasPressedThisFrame) CycleTarget(-1);
                 else if (kb.eKey.wasPressedThisFrame) CycleTarget(1);
+                else if ((kb.escapeKey.wasPressedThisFrame || kb.backspaceKey.wasPressedThisFrame) && menuState != SubMenuState.MainCommands) OnCommandBack();
             }
         }
 
@@ -594,6 +639,7 @@ namespace SundayLastBreath.UI
             // Check Ammo if ranged
             if (isRanged && !string.IsNullOrEmpty(ammoType) && player != null)
             {
+                bool ammoConsumed = false;
                 if (!player.HasItem(ammoType))
                 {
                     // Check alternate ammo naming
@@ -601,7 +647,7 @@ namespace SundayLastBreath.UI
                     var match = player.inventory.FirstOrDefault(i => i.itemId.IndexOf(altAmmo, StringComparison.OrdinalIgnoreCase) >= 0 && i.quantity > 0);
                     if (match != null)
                     {
-                        player.RemoveItem(match.itemId, 1);
+                        ammoConsumed = player.RemoveItem(match.itemId, 1);
                     }
                     else
                     {
@@ -615,7 +661,13 @@ namespace SundayLastBreath.UI
                 }
                 else
                 {
-                    player.RemoveItem(ammoType, 1);
+                    ammoConsumed = player.RemoveItem(ammoType, 1);
+                }
+
+                if (ammoConsumed && (string.Equals(ammoType, "Arrows", StringComparison.OrdinalIgnoreCase)
+                    || wpnName.IndexOf("Bow", StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    arrowsFiredThisEncounter++;
                 }
             }
 
@@ -747,7 +799,20 @@ namespace SundayLastBreath.UI
             PlayBeep(750f, 0.04f);
             hoveredLimb = null;
             menuState = SubMenuState.TargetLimbs;
-            SetCombatLog("<color=#F87171><b>[AIMING]</b></color> Choose a body part to strike in the center console below (hover a limb to highlight it on the target).");
+            string sideHint = _builtForHybridLayout
+                ? "Choose a body part to strike in the action panel on the right (hover a limb to lock reticle)."
+                : "Choose a body part to strike in the center console below (hover a limb to highlight it on the target).";
+            SetCombatLog($"<color=#F87171><b>[AIMING]</b></color> {sideHint}");
+            RefreshAllUI();
+        }
+
+        private void OnCommandBack()
+        {
+            if (isBusyTurn || combatEnded || menuState == SubMenuState.MainCommands) return;
+            PlayBeep(460f, 0.04f);
+            hoveredLimb = null;
+            menuState = SubMenuState.MainCommands;
+            SetCombatLog("<color=#38BDF8><b>[COMBAT]</b></color> Returned to main action commands. Choose your move.");
             RefreshAllUI();
         }
 
@@ -1034,10 +1099,19 @@ namespace SundayLastBreath.UI
                         bonusNote += $" <color=#10B981>[+{totalXpGained} XP ({player.xp}/{player.xpRequired})]</color>";
                     }
 
-                    if (player.HasTrait("SILENT HUNTER"))
+                    bool canRetrieveArrows = player.HasTrait("ARCHER")
+                        || player.HasTrait("SILENT HUNTER")
+                        || (!string.IsNullOrEmpty(player.equippedWpn) && player.equippedWpn.IndexOf("Bow", StringComparison.OrdinalIgnoreCase) >= 0);
+                    if (arrowsFiredThisEncounter > 0 && canRetrieveArrows)
                     {
-                        player.AddItem("Arrows", 1);
-                        bonusNote += " <color=#38BDF8>[SILENT HUNTER: +1 Arrow Retrieved]</color>";
+                        int retrieved = arrowsFiredThisEncounter;
+                        arrowsFiredThisEncounter = 0;
+                        if (!player.AddItem("Arrows", retrieved))
+                        {
+                            GameStageScreen.Instance?.GiveOrDropItem("Arrows", retrieved);
+                        }
+                        string traitLabel = player.HasTrait("ARCHER") ? "ARCHER" : "BOW RECOVERY";
+                        bonusNote += $" <color=#38BDF8>[{traitLabel}: +{retrieved} Arrow{(retrieved > 1 ? "s" : "")} Retrieved]</color>";
                     }
                 }
 
@@ -1072,18 +1146,25 @@ namespace SundayLastBreath.UI
 
         public void CloseModal()
         {
-            // Restore global TopHUD and synchronize updated vitals & XP
-            GameStageScreen.Instance?.SetTopHUDVisible(true);
+            if (!_builtForHybridLayout)
+            {
+                // Restore legacy TopHUD and synchronize updated vitals & XP
+                GameStageScreen.Instance?.SetTopHUDVisible(true);
+            }
             GameStageScreen.Instance?.UpdateVitalsUI();
             GameStageScreen.Instance?.RefreshPDAStatusTab();
+            GameStageScreen.Instance?.RefreshAllPDAPanels();
 
             gameObject.SetActive(false);
         }
 
         private void OnDisable()
         {
-            // Safeguard: Ensure TopHUD is always restored whenever combat modal is hidden or disabled
-            GameStageScreen.Instance?.SetTopHUDVisible(true);
+            if (!_builtForHybridLayout)
+            {
+                // Safeguard: Ensure legacy TopHUD is always restored whenever combat modal is hidden or disabled
+                GameStageScreen.Instance?.SetTopHUDVisible(true);
+            }
         }
 
         // ====================================================================
@@ -1364,11 +1445,25 @@ namespace SundayLastBreath.UI
         }
 
         // ====================================================================
-        // BUILD FULL DUAL-SCREEN 3DS FEAR & HUNGER TACTICAL UI
-        // (Top 3DS Stage: 1360x530 over RoomBackdrop | Center Seam: Combat Log | Bottom 3DS Console: 1620x390)
+        // BUILD TACTICAL COMBAT UI (HYBRID COCKPIT DOCKED OR LEGACY 3DS)
         // ====================================================================
         private void BuildOrRefreshUI()
         {
+            bool useHybrid = GameStageScreen.Instance != null && GameStageScreen.Instance.IsHybridCockpitActive;
+            if (modalContainer != null && _builtForHybridLayout != useHybrid)
+            {
+                Destroy(modalContainer);
+                modalContainer = null;
+                subMenuRows.Clear();
+                hybridCommandsContainer = null;
+                hybridIntelBodyText = null;
+                hybridIntelBadgeText = null;
+                hybridCommandHeaderText = null;
+                hybridBackBtn = null;
+                hybridWeaponBadgeText = null;
+                _lastDisplayedWeapon = null;
+            }
+
             if (modalContainer != null)
             {
                 BindEnemyLimbLayers(CurrentEnemy);
@@ -1381,11 +1476,395 @@ namespace SundayLastBreath.UI
             rootRect.anchorMax = Vector2.one;
             rootRect.sizeDelta = Vector2.zero;
 
-            // Keep root raycast blocker transparent so TopHUD & TopScreen RoomBackdrop remain visible!
+            _builtForHybridLayout = useHybrid;
+
             Image scrim = GetComponent<Image>();
             if (scrim == null) scrim = gameObject.AddComponent<Image>();
-            scrim.color = new Color(0f, 0f, 0f, 0.01f);
 
+            if (useHybrid)
+            {
+                scrim.color = new Color(0f, 0f, 0f, 0f);
+                scrim.raycastTarget = false;
+                BuildHybridCockpitUI();
+            }
+            else
+            {
+                // Keep root raycast blocker transparent so TopHUD & TopScreen RoomBackdrop remain visible!
+                scrim.color = new Color(0f, 0f, 0f, 0.01f);
+                scrim.raycastTarget = true;
+                BuildLegacy3DSUI();
+            }
+        }
+
+        private void BuildHybridCockpitUI()
+        {
+            modalContainer = new GameObject("CombatChassis_Hybrid", typeof(RectTransform));
+            modalContainer.transform.SetParent(transform, false);
+            RectTransform cRect = modalContainer.GetComponent<RectTransform>();
+            cRect.anchorMin = Vector2.zero;
+            cRect.anchorMax = Vector2.one;
+            cRect.offsetMin = Vector2.zero;
+            cRect.offsetMax = Vector2.zero;
+
+            // Clear legacy-only right-status refs (real Survivor/Inventory cockpit panels remain visible!)
+            playerNameJobText = null;
+            playerHpBarFill = null;
+            playerHpValueText = null;
+            playerStmBarFill = null;
+            playerStmValueText = null;
+            playerWeaponText = null;
+            playerTraitsText = null;
+
+            // ================================================================
+            // PANEL 1: TOP-CENTER BATTLE ARENA (412, 16) -> (1508, 668) [1096 x 652]
+            // ================================================================
+            GameObject arenaPanel = new GameObject("HybridCombat_ArenaPanel", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
+            arenaPanel.transform.SetParent(modalContainer.transform, false);
+            arenaRect = arenaPanel.GetComponent<RectTransform>();
+            HybridCockpitController.SetPixelBox(arenaRect, 412f, 16f, 1508f, 668f);
+
+            Image arenaBg = arenaPanel.GetComponent<Image>();
+            arenaBg.color = new Color(0.02f, 0.03f, 0.05f, 0.34f);
+            arenaBg.raycastTarget = true;
+            AddCrispBorder(arenaRect, ColBorderCrimson, 1.5f);
+
+            // Subtle Ground Horizon Shadow Strip at bottom of Arena
+            GameObject floorShadow = new GameObject("FloorShadow", typeof(RectTransform), typeof(Image));
+            floorShadow.transform.SetParent(arenaRect, false);
+            RectTransform fsRt = floorShadow.GetComponent<RectTransform>();
+            fsRt.anchorMin = new Vector2(0f, 0f);
+            fsRt.anchorMax = new Vector2(1f, 0f);
+            fsRt.pivot = new Vector2(0.5f, 0f);
+            fsRt.sizeDelta = new Vector2(0f, 54f);
+            fsRt.anchoredPosition = Vector2.zero;
+            Image fsImg = floorShadow.GetComponent<Image>();
+            fsImg.color = new Color(0.02f, 0.03f, 0.05f, 0.42f);
+            fsImg.raycastTarget = false;
+
+            // Arena Top Header Strip (36px tall)
+            GameObject headerBar = new GameObject("HeaderBar", typeof(RectTransform), typeof(Image));
+            headerBar.transform.SetParent(arenaRect, false);
+            RectTransform hbRt = headerBar.GetComponent<RectTransform>();
+            hbRt.anchorMin = new Vector2(0f, 1f);
+            hbRt.anchorMax = new Vector2(1f, 1f);
+            hbRt.pivot = new Vector2(0.5f, 1f);
+            hbRt.sizeDelta = new Vector2(0f, 36f);
+            hbRt.anchoredPosition = Vector2.zero;
+            headerBar.GetComponent<Image>().color = ColHeaderCombatBg;
+
+            GameObject hbLine = new GameObject("HeaderBottomLine", typeof(RectTransform), typeof(Image));
+            hbLine.transform.SetParent(headerBar.transform, false);
+            RectTransform hblRt = hbLine.GetComponent<RectTransform>();
+            hblRt.anchorMin = new Vector2(0f, 0f);
+            hblRt.anchorMax = new Vector2(1f, 0f);
+            hblRt.pivot = new Vector2(0.5f, 0f);
+            hblRt.sizeDelta = new Vector2(0f, 1f);
+            Image hblImg = hbLine.GetComponent<Image>();
+            hblImg.color = ColBorderCrimson;
+            hblImg.raycastTarget = false;
+
+            headerTitleText = CreateText(headerBar.transform, "HeaderTitle", "// TACTICAL COMBAT // ANATOMICAL TARGETING", 12.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
+            RectTransform htRt = headerTitleText.GetComponent<RectTransform>();
+            htRt.anchorMin = new Vector2(0f, 0f);
+            htRt.anchorMax = new Vector2(0.58f, 1f);
+            htRt.offsetMin = new Vector2(14f, 0f);
+            htRt.offsetMax = Vector2.zero;
+            headerTitleText.color = ColCrimson;
+
+            prevTargetBtn = CreateSmallButton(headerBar.transform, "PrevTargetBtn", "< [Q]", new Vector2(-284f, 0f), new Vector2(72f, 24f), () => CycleTarget(-1), useHybridStyle: true);
+            hordeCounterText = CreateText(headerBar.transform, "HordeCounter", "TARGET 1 / 1 (1 ALIVE)", 11f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
+            hordeCounterText.color = ColTextMain;
+            RectTransform hcRt = hordeCounterText.GetComponent<RectTransform>();
+            hcRt.anchorMin = new Vector2(1f, 0.5f);
+            hcRt.anchorMax = new Vector2(1f, 0.5f);
+            hcRt.sizeDelta = new Vector2(170f, 24f);
+            hcRt.anchoredPosition = new Vector2(-160f, 0f);
+            nextTargetBtn = CreateSmallButton(headerBar.transform, "NextTargetBtn", "[E] >", new Vector2(-38f, 0f), new Vector2(72f, 24f), () => CycleTarget(1), useHybridStyle: true);
+
+            // Enemy Composite Silhouette + Limb Rig (440x440)
+            BuildEnemyCompositeRig(arenaRect, anchorPoint: new Vector2(0.54f, 0.47f), hybridStyle: true);
+
+            // Player Foreground Silhouette (bottom-left of arena, balanced & atmospheric)
+            GameObject playerFgObj = new GameObject("PlayerForeground", typeof(RectTransform), typeof(Image));
+            playerFgObj.transform.SetParent(arenaRect, false);
+            RectTransform pfRt = playerFgObj.GetComponent<RectTransform>();
+            pfRt.anchorMin = new Vector2(0f, 0f);
+            pfRt.anchorMax = new Vector2(0f, 0f);
+            pfRt.pivot = new Vector2(0f, 0f);
+            pfRt.sizeDelta = new Vector2(235f, 275f);
+            pfRt.anchoredPosition = new Vector2(18f, -14f);
+
+            playerForegroundImage = playerFgObj.GetComponent<Image>();
+            playerForegroundImage.preserveAspect = true;
+            playerForegroundImage.raycastTarget = false;
+            playerForegroundImage.color = new Color(0.45f, 0.50f, 0.58f, 0.72f);
+            Sprite pBackSpr = Resources.Load<Sprite>("Enemies/player_back");
+            if (pBackSpr != null) playerForegroundImage.sprite = pBackSpr;
+
+            // Top-Left Weapon / Turn Pill inside Arena
+            GameObject wpnPill = new GameObject("WeaponTurnBadge", typeof(RectTransform), typeof(Image));
+            wpnPill.transform.SetParent(arenaRect, false);
+            RectTransform wpRt = wpnPill.GetComponent<RectTransform>();
+            wpRt.anchorMin = new Vector2(0f, 1f);
+            wpRt.anchorMax = new Vector2(0f, 1f);
+            wpRt.pivot = new Vector2(0f, 1f);
+            wpRt.sizeDelta = new Vector2(360f, 34f);
+            wpRt.anchoredPosition = new Vector2(14f, -48f);
+            Image wpBg = wpnPill.GetComponent<Image>();
+            wpBg.color = new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.94f);
+            wpBg.raycastTarget = false;
+            AddCrispBorder(wpnPill.transform, ColBorderSlate, 1f);
+            AddLeftAccentBar(wpnPill.transform, ColAmber, 3f);
+
+            hybridWeaponBadgeText = CreateText(wpnPill.transform, "WeaponTurnTxt", "TURN 1  //  UNARMED", 10.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
+            hybridWeaponBadgeText.color = ColTextMain;
+            RectTransform wtRt = hybridWeaponBadgeText.GetComponent<RectTransform>();
+            wtRt.anchorMin = Vector2.zero;
+            wtRt.anchorMax = Vector2.one;
+            wtRt.offsetMin = new Vector2(12f, 0f);
+            wtRt.offsetMax = new Vector2(-10f, 0f);
+
+            // Top-Right Enemy Name & Status Card inside Arena
+            GameObject bannerObj = new GameObject("EnemyBanner", typeof(RectTransform), typeof(Image));
+            bannerObj.transform.SetParent(arenaRect, false);
+            RectTransform bnRt = bannerObj.GetComponent<RectTransform>();
+            bnRt.anchorMin = new Vector2(1f, 1f);
+            bnRt.anchorMax = new Vector2(1f, 1f);
+            bnRt.pivot = new Vector2(1f, 1f);
+            bnRt.sizeDelta = new Vector2(340f, 64f);
+            bnRt.anchoredPosition = new Vector2(-14f, -48f);
+            Image bnBg = bannerObj.GetComponent<Image>();
+            bnBg.color = new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.94f);
+            bnBg.raycastTarget = false;
+            AddCrispBorder(bannerObj.transform, ColBorderSlate, 1f);
+            AddLeftAccentBar(bannerObj.transform, ColCrimson, 3f);
+
+            enemyTitleBanner = CreateText(bannerObj.transform, "EnemyName", "INFECTED COMMUTER", 13.5f, FontStyles.Bold, TextAlignmentOptions.TopLeft, FontRole.Display);
+            RectTransform etbRt = enemyTitleBanner.GetComponent<RectTransform>();
+            etbRt.anchorMin = Vector2.zero;
+            etbRt.anchorMax = Vector2.one;
+            etbRt.offsetMin = new Vector2(14f, 30f);
+            etbRt.offsetMax = new Vector2(-10f, -6f);
+
+            enemyStatusTagsText = CreateText(bannerObj.transform, "EnemyStatusTags", "[STANDING]", 10.5f, FontStyles.Bold, TextAlignmentOptions.BottomLeft, FontRole.Mono);
+            RectTransform estRt = enemyStatusTagsText.GetComponent<RectTransform>();
+            estRt.anchorMin = Vector2.zero;
+            estRt.anchorMax = Vector2.one;
+            estRt.offsetMin = new Vector2(14f, 6f);
+            estRt.offsetMax = new Vector2(-10f, -34f);
+
+            // Screen Flash Overlay inside Arena (below header bar)
+            GameObject flashObj = new GameObject("ScreenFlash", typeof(RectTransform), typeof(Image));
+            flashObj.transform.SetParent(arenaRect, false);
+            RectTransform flRt = flashObj.GetComponent<RectTransform>();
+            flRt.anchorMin = Vector2.zero;
+            flRt.anchorMax = Vector2.one;
+            flRt.offsetMin = Vector2.zero;
+            flRt.offsetMax = new Vector2(0f, -36f);
+            screenFlashOverlay = flashObj.GetComponent<Image>();
+            screenFlashOverlay.raycastTarget = false;
+            flashObj.SetActive(false);
+
+            // ================================================================
+            // PANEL 2: BOTTOM-CENTER COMBAT FEED & TELEMETRY (412, 682) -> (1116, 1064) [704 x 382]
+            // ================================================================
+            GameObject intelPanel = new GameObject("HybridCombat_IntelPanel", typeof(RectTransform), typeof(Image));
+            intelPanel.transform.SetParent(modalContainer.transform, false);
+            HybridCockpitController.SetPixelBox(intelPanel.GetComponent<RectTransform>(), 412f, 682f, 1116f, 1064f);
+            Image ipBg = intelPanel.GetComponent<Image>();
+            ipBg.color = ColPanelBg;
+            ipBg.raycastTarget = true;
+            AddCrispBorder(intelPanel.transform, ColBorderSlate, 1.5f);
+
+            // Header Strip (34px tall)
+            GameObject intelHeader = new GameObject("Header", typeof(RectTransform), typeof(Image));
+            intelHeader.transform.SetParent(intelPanel.transform, false);
+            RectTransform ihRt = intelHeader.GetComponent<RectTransform>();
+            ihRt.anchorMin = new Vector2(0f, 1f);
+            ihRt.anchorMax = new Vector2(1f, 1f);
+            ihRt.pivot = new Vector2(0.5f, 1f);
+            ihRt.sizeDelta = new Vector2(0f, 34f);
+            intelHeader.GetComponent<Image>().color = ColHeaderBg;
+
+            GameObject ihLine = new GameObject("Line", typeof(RectTransform), typeof(Image));
+            ihLine.transform.SetParent(intelHeader.transform, false);
+            RectTransform ihlRt = ihLine.GetComponent<RectTransform>();
+            ihlRt.anchorMin = new Vector2(0f, 0f);
+            ihlRt.anchorMax = new Vector2(1f, 0f);
+            ihlRt.pivot = new Vector2(0.5f, 0f);
+            ihlRt.sizeDelta = new Vector2(0f, 1f);
+            ihLine.GetComponent<Image>().color = ColBorderSlate;
+
+            TextMeshProUGUI intelHdrTitle = CreateText(intelHeader.transform, "Title", "// COMBAT FEED & TACTICAL TELEMETRY", 11.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
+            intelHdrTitle.color = ColAmber;
+            RectTransform ihtRt = intelHdrTitle.GetComponent<RectTransform>();
+            ihtRt.anchorMin = Vector2.zero;
+            ihtRt.anchorMax = new Vector2(0.65f, 1f);
+            ihtRt.offsetMin = new Vector2(14f, 0f);
+            ihtRt.offsetMax = Vector2.zero;
+
+            hybridIntelBadgeText = CreateText(intelHeader.transform, "TurnBadge", "TURN 1 // YOUR MOVE", 10.5f, FontStyles.Bold, TextAlignmentOptions.MidlineRight, FontRole.Mono);
+            hybridIntelBadgeText.color = ColCyan;
+            RectTransform ibdRt = hybridIntelBadgeText.GetComponent<RectTransform>();
+            ibdRt.anchorMin = new Vector2(0.65f, 0f);
+            ibdRt.anchorMax = Vector2.one;
+            ibdRt.offsetMin = Vector2.zero;
+            ibdRt.offsetMax = new Vector2(-14f, 0f);
+
+            // Live Combat Log Box (Top of Intel body)
+            GameObject logBox = new GameObject("LiveCombatLogBox", typeof(RectTransform), typeof(Image));
+            logBox.transform.SetParent(intelPanel.transform, false);
+            RectTransform lbRt = logBox.GetComponent<RectTransform>();
+            lbRt.anchorMin = new Vector2(0f, 1f);
+            lbRt.anchorMax = new Vector2(1f, 1f);
+            lbRt.pivot = new Vector2(0.5f, 1f);
+            lbRt.anchoredPosition = new Vector2(0f, -44f);
+            lbRt.sizeDelta = new Vector2(-24f, 84f);
+            logBox.GetComponent<Image>().color = ColSlotBg;
+            AddCrispBorder(logBox.transform, ColBorderSlate, 1f);
+            AddLeftAccentBar(logBox.transform, ColAmber, 3f);
+
+            combatLogText = CreateText(logBox.transform, "CombatLogText", "", 13f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Body);
+            combatLogText.textWrappingMode = TextWrappingModes.Normal;
+            combatLogText.color = ColTextMain;
+            RectTransform cltRt = combatLogText.GetComponent<RectTransform>();
+            cltRt.anchorMin = Vector2.zero;
+            cltRt.anchorMax = Vector2.one;
+            cltRt.offsetMin = new Vector2(14f, 8f);
+            cltRt.offsetMax = new Vector2(-12f, -8f);
+
+            // Enemy Intel / Survival Directive Card (Remainder of Intel body)
+            GameObject intelCard = new GameObject("EnemyIntelCard", typeof(RectTransform), typeof(Image));
+            intelCard.transform.SetParent(intelPanel.transform, false);
+            RectTransform icRt = intelCard.GetComponent<RectTransform>();
+            icRt.anchorMin = Vector2.zero;
+            icRt.anchorMax = Vector2.one;
+            icRt.offsetMin = new Vector2(12f, 12f);
+            icRt.offsetMax = new Vector2(-12f, -138f);
+            intelCard.GetComponent<Image>().color = ColCardBg;
+            AddCrispBorder(intelCard.transform, ColBorderSlate, 1f);
+
+            hybridIntelBodyText = CreateText(intelCard.transform, "IntelBody", "", 12.5f, FontStyles.Normal, TextAlignmentOptions.TopLeft, FontRole.Body);
+            hybridIntelBodyText.textWrappingMode = TextWrappingModes.Normal;
+            hybridIntelBodyText.lineSpacing = 4f;
+            hybridIntelBodyText.color = ColTextMain;
+            RectTransform icbRt = hybridIntelBodyText.GetComponent<RectTransform>();
+            icbRt.anchorMin = Vector2.zero;
+            icbRt.anchorMax = Vector2.one;
+            icbRt.offsetMin = new Vector2(14f, 10f);
+            icbRt.offsetMax = new Vector2(-14f, -10f);
+
+            // ================================================================
+            // PANEL 3: BOTTOM-RIGHT COMBAT ACTION DECK & LIMB GRID (1132, 682) -> (1904, 1064) [772 x 382]
+            // ================================================================
+            GameObject cmdPanel = new GameObject("HybridCombat_CommandPanel", typeof(RectTransform), typeof(Image));
+            cmdPanel.transform.SetParent(modalContainer.transform, false);
+            HybridCockpitController.SetPixelBox(cmdPanel.GetComponent<RectTransform>(), 1132f, 682f, 1904f, 1064f);
+            Image cpBg = cmdPanel.GetComponent<Image>();
+            cpBg.color = ColPanelBg;
+            cpBg.raycastTarget = true;
+            AddCrispBorder(cmdPanel.transform, ColBorderSlate, 1.5f);
+
+            // Header Strip (34px tall)
+            GameObject cmdHeader = new GameObject("Header", typeof(RectTransform), typeof(Image));
+            cmdHeader.transform.SetParent(cmdPanel.transform, false);
+            RectTransform chRt = cmdHeader.GetComponent<RectTransform>();
+            chRt.anchorMin = new Vector2(0f, 1f);
+            chRt.anchorMax = new Vector2(1f, 1f);
+            chRt.pivot = new Vector2(0.5f, 1f);
+            chRt.sizeDelta = new Vector2(0f, 34f);
+            cmdHeader.GetComponent<Image>().color = ColHeaderBg;
+
+            GameObject chLine = new GameObject("Line", typeof(RectTransform), typeof(Image));
+            chLine.transform.SetParent(cmdHeader.transform, false);
+            RectTransform chlRt = chLine.GetComponent<RectTransform>();
+            chlRt.anchorMin = new Vector2(0f, 0f);
+            chlRt.anchorMax = new Vector2(1f, 0f);
+            chlRt.pivot = new Vector2(0.5f, 0f);
+            chlRt.sizeDelta = new Vector2(0f, 1f);
+            chLine.GetComponent<Image>().color = ColBorderSlate;
+
+            hybridCommandHeaderText = CreateText(cmdHeader.transform, "Title", "// COMBAT ACTIONS // CHOOSE YOUR MOVE", 11.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
+            hybridCommandHeaderText.color = ColAmber;
+            RectTransform chtRt = hybridCommandHeaderText.GetComponent<RectTransform>();
+            chtRt.anchorMin = Vector2.zero;
+            chtRt.anchorMax = new Vector2(0.78f, 1f);
+            chtRt.offsetMin = new Vector2(14f, 0f);
+            chtRt.offsetMax = Vector2.zero;
+
+            // Right Clickable [ESC] BACK Pill inside Header
+            GameObject backObj = new GameObject("BackBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+            backObj.transform.SetParent(cmdHeader.transform, false);
+            RectTransform bkRt = backObj.GetComponent<RectTransform>();
+            bkRt.anchorMin = new Vector2(1f, 0.5f);
+            bkRt.anchorMax = new Vector2(1f, 0.5f);
+            bkRt.pivot = new Vector2(1f, 0.5f);
+            bkRt.sizeDelta = new Vector2(104f, 22f);
+            bkRt.anchoredPosition = new Vector2(-10f, 0f);
+            Image bkBg = backObj.GetComponent<Image>();
+            bkBg.color = ColCardBg;
+            AddCrispBorder(backObj.transform, ColCyan, 1f);
+            hybridBackBtn = backObj.GetComponent<Button>();
+            hybridBackBtn.targetGraphic = bkBg;
+            hybridBackBtn.onClick.AddListener(OnCommandBack);
+            ColorBlock bkCb = hybridBackBtn.colors;
+            bkCb.normalColor = ColCardBg;
+            bkCb.highlightedColor = new Color(0.11f, 0.16f, 0.24f, 1f);
+            bkCb.pressedColor = ColSlotBg;
+            hybridBackBtn.colors = bkCb;
+
+            TextMeshProUGUI bkTxt = CreateText(backObj.transform, "Lbl", "[ESC] BACK", 10f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
+            bkTxt.color = ColCyan;
+            RectTransform bktRt = bkTxt.GetComponent<RectTransform>();
+            bktRt.anchorMin = Vector2.zero;
+            bktRt.anchorMax = Vector2.one;
+            bktRt.sizeDelta = Vector2.zero;
+            backObj.SetActive(false);
+
+            // Body View A: Main Action Cards Stack
+            hybridCommandsContainer = new GameObject("HybridCommandsList", typeof(RectTransform), typeof(VerticalLayoutGroup));
+            hybridCommandsContainer.transform.SetParent(cmdPanel.transform, false);
+            RectTransform hccRt = hybridCommandsContainer.GetComponent<RectTransform>();
+            hccRt.anchorMin = Vector2.zero;
+            hccRt.anchorMax = Vector2.one;
+            hccRt.offsetMin = Vector2.zero;
+            hccRt.offsetMax = new Vector2(0f, -34f);
+
+            VerticalLayoutGroup vlg = hybridCommandsContainer.GetComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(14, 14, 12, 12);
+            vlg.spacing = 10f;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = true;
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = true;
+
+            cmdAttackBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 1, "ATTACK LIMB", "Open 6-limb targeting — sever legs, disarm arms, or aim for the head", ColCrimson, OnCommandAttack);
+            cmdGuardBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 2, "GUARD / BRACE", "Reduce incoming damage by 65% and recover +15 Stamina", ColCyan, OnCommandGuard);
+            cmdItemBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 3, "USE ITEM", "Use Bandages, First Aid Kits, Painkillers, or Energy Bars from inventory", ColEmerald, OnCommandItem);
+            cmdShoveBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 4, "SHOVE / KICK", "Stagger attacker back — instant crawler knockdown if a leg is severed", ColAmber, OnCommandShove);
+
+            // Body View B: 2-Column 6-Limb / Item Grid
+            GameObject subMenuObj = new GameObject("HybridSubMenuGrid", typeof(RectTransform), typeof(GridLayoutGroup));
+            subMenuObj.transform.SetParent(cmdPanel.transform, false);
+            subMenuContentRect = subMenuObj.GetComponent<RectTransform>();
+            subMenuContentRect.anchorMin = Vector2.zero;
+            subMenuContentRect.anchorMax = Vector2.one;
+            subMenuContentRect.offsetMin = Vector2.zero;
+            subMenuContentRect.offsetMax = new Vector2(0f, -34f);
+
+            GridLayoutGroup glg = subMenuObj.GetComponent<GridLayoutGroup>();
+            glg.padding = new RectOffset(12, 12, 12, 12);
+            glg.cellSize = new Vector2(368f, 101f);
+            glg.spacing = new Vector2(10f, 10f);
+            glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            glg.constraintCount = 2;
+            subMenuObj.SetActive(false);
+
+            BindEnemyLimbLayers(CurrentEnemy);
+        }
+
+        private void BuildLegacy3DSUI()
+        {
             // Full Dual-Screen Container using exact 1920x1080 normalized coordinates of ApartmentHubScreen!
             modalContainer = new GameObject("CombatChassis_3DS", typeof(RectTransform));
             modalContainer.transform.SetParent(transform, false);
@@ -1407,7 +1886,7 @@ namespace SundayLastBreath.UI
             tszRt.offsetMax = Vector2.zero;
 
             // Framed Battle Arena (1360 x 540 — fills the upper 3DS screen cleanly without top HUD obstruction!)
-            GameObject arenaObj = new GameObject("BattleArena", typeof(RectTransform), typeof(Image), typeof(RectMask2D), typeof(Outline));
+            GameObject arenaObj = new GameObject("BattleArena", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
             arenaObj.transform.SetParent(topStageZone.transform, false);
             arenaRect = arenaObj.GetComponent<RectTransform>();
             arenaRect.anchorMin = new Vector2(0.5f, 0.5f);
@@ -1417,9 +1896,7 @@ namespace SundayLastBreath.UI
             arenaRect.anchoredPosition = Vector2.zero;
             // Semi-transparent atmospheric tint so the actual RoomBackdrop scene shows right through!
             arenaObj.GetComponent<Image>().color = new Color(0.02f, 0.03f, 0.05f, 0.52f);
-            Outline aOut = arenaObj.GetComponent<Outline>();
-            aOut.effectColor = new Color(0.65f, 0.16f, 0.16f, 0.9f);
-            aOut.effectDistance = new Vector2(2f, -2f);
+            AddCrispBorder(arenaRect, new Color(0.65f, 0.16f, 0.16f, 0.9f), 2f);
 
             // Subtle Perspective Floor Shadow at bottom of Top 3DS Screen
             GameObject floorHorizon = new GameObject("FloorHorizon", typeof(RectTransform), typeof(Image));
@@ -1460,74 +1937,7 @@ namespace SundayLastBreath.UI
             nextTargetBtn = CreateSmallButton(headerBar.transform, "NextTargetBtn", "[E] NEXT >", new Vector2(-52f, 0f), new Vector2(92f, 30f), () => CycleTarget(1));
 
             // Enemy Composite Root in Center of Top 3DS Arena (440x440!)
-            GameObject enemyRootObj = new GameObject("EnemyCompositeRoot", typeof(RectTransform));
-            enemyRootObj.transform.SetParent(arenaRect, false);
-            enemyRootRect = enemyRootObj.GetComponent<RectTransform>();
-            enemyRootRect.anchorMin = new Vector2(0.54f, 0.46f);
-            enemyRootRect.anchorMax = new Vector2(0.54f, 0.46f);
-            enemyRootRect.sizeDelta = new Vector2(440f, 440f);
-            enemyRootRect.anchoredPosition = Vector2.zero;
-
-            GameObject pivotObj = new GameObject("EnemyBodyPivot", typeof(RectTransform));
-            pivotObj.transform.SetParent(enemyRootRect, false);
-            enemyBodyPivotRect = pivotObj.GetComponent<RectTransform>();
-            enemyBodyPivotRect.anchorMin = new Vector2(0.5f, 0.5f);
-            enemyBodyPivotRect.anchorMax = new Vector2(0.5f, 0.5f);
-            enemyBodyPivotRect.sizeDelta = new Vector2(440f, 440f);
-            enemyBodyPivotRect.anchoredPosition = Vector2.zero;
-
-            // Create the 6 Stacked Limb Image Layers + Bloody Stump markers
-            LimbType[] drawOrder = { LimbType.LeftLeg, LimbType.RightLeg, LimbType.Torso, LimbType.LeftArm, LimbType.RightArm, LimbType.Head };
-            foreach (var lt in drawOrder)
-            {
-                GameObject layerObj = new GameObject("Layer_" + lt, typeof(RectTransform), typeof(Image));
-                layerObj.transform.SetParent(enemyBodyPivotRect, false);
-                RectTransform lRt = layerObj.GetComponent<RectTransform>();
-                lRt.anchorMin = Vector2.zero;
-                lRt.anchorMax = Vector2.one;
-                lRt.sizeDelta = Vector2.zero;
-                Image lImg = layerObj.GetComponent<Image>();
-                lImg.preserveAspect = true;
-                lImg.raycastTarget = false;
-
-                // Bloody Stump Marker for this limb joint
-                GameObject stumpObj = new GameObject("Stump_" + lt, typeof(RectTransform), typeof(Image), typeof(Outline));
-                stumpObj.transform.SetParent(enemyBodyPivotRect, false);
-                RectTransform sRt = stumpObj.GetComponent<RectTransform>();
-                sRt.sizeDelta = new Vector2(28f, 22f);
-                Image sImg = stumpObj.GetComponent<Image>();
-                sImg.color = new Color(0.75f, 0.06f, 0.06f, 0.95f);
-                sImg.raycastTarget = false;
-                stumpObj.GetComponent<Outline>().effectColor = new Color(0.3f, 0.02f, 0.02f, 1f);
-                stumpObj.SetActive(false);
-            }
-
-            // Create Interactive On-Body Target Reticle Brackets for the 6 Limbs
-            foreach (LimbType lt in Enum.GetValues(typeof(LimbType)))
-            {
-                LimbType captured = lt;
-                GameObject retObj = new GameObject("Reticle_" + lt, typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
-                retObj.transform.SetParent(enemyBodyPivotRect, false);
-                RectTransform rRt = retObj.GetComponent<RectTransform>();
-                rRt.sizeDelta = new Vector2(108f, 30f);
-
-                Image rBg = retObj.GetComponent<Image>();
-                rBg.color = new Color(0.04f, 0.07f, 0.11f, 0.88f);
-
-                Outline rOut = retObj.GetComponent<Outline>();
-                rOut.effectColor = new Color(0.22f, 0.74f, 0.97f, 0.85f);
-                rOut.effectDistance = new Vector2(1.5f, -1.5f);
-
-                Button rBtn = retObj.GetComponent<Button>();
-                rBtn.targetGraphic = rBg;
-                rBtn.onClick.AddListener(() => OnLimbAttackSelected(captured));
-
-                TextMeshProUGUI rTxt = CreateText(retObj.transform, "Lbl", lt.ToString(), 12.5f, FontStyles.Bold, TextAlignmentOptions.Center);
-                RectTransform rtTxt = rTxt.GetComponent<RectTransform>();
-                rtTxt.anchorMin = Vector2.zero;
-                rtTxt.anchorMax = Vector2.one;
-                rtTxt.sizeDelta = Vector2.zero;
-            }
+            BuildEnemyCompositeRig(arenaRect, anchorPoint: new Vector2(0.54f, 0.46f), hybridStyle: false);
 
             // Player Silhouette in Bottom-Left Foreground (Large 330x390 Fear & Hunger Rear Perspective)
             GameObject playerFgObj = new GameObject("PlayerForeground", typeof(RectTransform), typeof(Image));
@@ -1684,6 +2094,155 @@ namespace SundayLastBreath.UI
 
             BuildRightPlayerStatusBox(rightStatusPanel.transform);
             BindEnemyLimbLayers(CurrentEnemy);
+        }
+
+        private void BuildEnemyCompositeRig(Transform parentArena, Vector2 anchorPoint, bool hybridStyle)
+        {
+            GameObject enemyRootObj = new GameObject("EnemyCompositeRoot", typeof(RectTransform));
+            enemyRootObj.transform.SetParent(parentArena, false);
+            enemyRootRect = enemyRootObj.GetComponent<RectTransform>();
+            enemyRootRect.anchorMin = anchorPoint;
+            enemyRootRect.anchorMax = anchorPoint;
+            enemyRootRect.sizeDelta = new Vector2(440f, 440f);
+            enemyRootRect.anchoredPosition = Vector2.zero;
+
+            GameObject pivotObj = new GameObject("EnemyBodyPivot", typeof(RectTransform));
+            pivotObj.transform.SetParent(enemyRootRect, false);
+            enemyBodyPivotRect = pivotObj.GetComponent<RectTransform>();
+            enemyBodyPivotRect.anchorMin = new Vector2(0.5f, 0.5f);
+            enemyBodyPivotRect.anchorMax = new Vector2(0.5f, 0.5f);
+            enemyBodyPivotRect.sizeDelta = new Vector2(440f, 440f);
+            enemyBodyPivotRect.anchoredPosition = Vector2.zero;
+
+            LimbType[] drawOrder = { LimbType.LeftLeg, LimbType.RightLeg, LimbType.Torso, LimbType.LeftArm, LimbType.RightArm, LimbType.Head };
+            foreach (var lt in drawOrder)
+            {
+                GameObject layerObj = new GameObject("Layer_" + lt, typeof(RectTransform), typeof(Image));
+                layerObj.transform.SetParent(enemyBodyPivotRect, false);
+                RectTransform lRt = layerObj.GetComponent<RectTransform>();
+                lRt.anchorMin = Vector2.zero;
+                lRt.anchorMax = Vector2.one;
+                lRt.sizeDelta = Vector2.zero;
+                Image lImg = layerObj.GetComponent<Image>();
+                lImg.preserveAspect = true;
+                lImg.raycastTarget = false;
+
+                GameObject stumpObj = new GameObject("Stump_" + lt, typeof(RectTransform), typeof(Image), typeof(Outline));
+                stumpObj.transform.SetParent(enemyBodyPivotRect, false);
+                RectTransform sRt = stumpObj.GetComponent<RectTransform>();
+                sRt.sizeDelta = new Vector2(28f, 22f);
+                Image sImg = stumpObj.GetComponent<Image>();
+                sImg.color = new Color(0.75f, 0.06f, 0.06f, 0.95f);
+                sImg.raycastTarget = false;
+                stumpObj.GetComponent<Outline>().effectColor = new Color(0.3f, 0.02f, 0.02f, 1f);
+                stumpObj.SetActive(false);
+            }
+
+            foreach (LimbType lt in Enum.GetValues(typeof(LimbType)))
+            {
+                LimbType captured = lt;
+                GameObject retObj = new GameObject("Reticle_" + lt, typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
+                retObj.transform.SetParent(enemyBodyPivotRect, false);
+                RectTransform rRt = retObj.GetComponent<RectTransform>();
+                rRt.sizeDelta = new Vector2(108f, 30f);
+
+                Image rBg = retObj.GetComponent<Image>();
+                rBg.color = hybridStyle
+                    ? new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.92f)
+                    : new Color(0.04f, 0.07f, 0.11f, 0.88f);
+
+                Outline rOut = retObj.GetComponent<Outline>();
+                rOut.effectColor = hybridStyle ? ColCyan : new Color(0.22f, 0.74f, 0.97f, 0.85f);
+                rOut.effectDistance = new Vector2(1.5f, -1.5f);
+
+                Button rBtn = retObj.GetComponent<Button>();
+                rBtn.targetGraphic = rBg;
+                rBtn.onClick.AddListener(() => OnLimbAttackSelected(captured));
+
+                TextMeshProUGUI rTxt = CreateText(retObj.transform, "Lbl", lt.ToString(), hybridStyle ? 11.5f : 12.5f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
+                RectTransform rtTxt = rTxt.GetComponent<RectTransform>();
+                rtTxt.anchorMin = Vector2.zero;
+                rtTxt.anchorMax = Vector2.one;
+                rtTxt.sizeDelta = Vector2.zero;
+            }
+        }
+
+        private static void AddCrispBorder(Transform parent, Color color, float thickness = 1.5f)
+        {
+            CreateBorderEdge(parent, "Border_Top", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, thickness), color);
+            CreateBorderEdge(parent, "Border_Bottom", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, thickness), color);
+            CreateBorderEdge(parent, "Border_Left", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(thickness, 0f), color);
+            CreateBorderEdge(parent, "Border_Right", new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(thickness, 0f), color);
+        }
+
+        private static void CreateBorderEdge(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 sizeDelta, Color color)
+        {
+            GameObject edge = new GameObject(name, typeof(RectTransform), typeof(Image));
+            edge.transform.SetParent(parent, false);
+            RectTransform rt = edge.GetComponent<RectTransform>();
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.pivot = pivot;
+            rt.sizeDelta = sizeDelta;
+            rt.anchoredPosition = Vector2.zero;
+            Image img = edge.GetComponent<Image>();
+            img.color = color;
+            img.raycastTarget = false;
+        }
+
+        private static void AddLeftAccentBar(Transform parent, Color color, float width = 3.5f)
+        {
+            CreateBorderEdge(parent, "LeftAccentBar", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(width, 0f), color);
+        }
+
+        private Button CreateHybridCommandRow(Transform parent, int hotkeyNum, string title, string subtitle, Color accentColor, Action onClick)
+        {
+            GameObject btnObj = new GameObject($"HybridCmd_{hotkeyNum}", typeof(RectTransform), typeof(Image), typeof(Button));
+            btnObj.transform.SetParent(parent, false);
+
+            Image bg = btnObj.GetComponent<Image>();
+            bg.color = ColCardBg;
+            AddCrispBorder(btnObj.transform, ColBorderSlate, 1f);
+            AddLeftAccentBar(btnObj.transform, accentColor, 4f);
+
+            Button btn = btnObj.GetComponent<Button>();
+            btn.targetGraphic = bg;
+            ColorBlock cb = btn.colors;
+            cb.normalColor = ColCardBg;
+            cb.highlightedColor = new Color(0.11f, 0.145f, 0.21f, 1f);
+            cb.pressedColor = ColSlotBg;
+            cb.selectedColor = ColCardBg;
+            cb.disabledColor = new Color(0.05f, 0.06f, 0.09f, 0.7f);
+            btn.colors = cb;
+            btn.onClick.AddListener(() => onClick?.Invoke());
+
+            TextMeshProUGUI keyBadge = CreateText(btnObj.transform, "HotkeyBadge", $"[ {hotkeyNum} ]", 12.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
+            keyBadge.color = accentColor;
+            RectTransform kbRt = keyBadge.GetComponent<RectTransform>();
+            kbRt.anchorMin = new Vector2(0f, 0f);
+            kbRt.anchorMax = new Vector2(0f, 1f);
+            kbRt.pivot = new Vector2(0f, 0.5f);
+            kbRt.anchoredPosition = new Vector2(14f, 0f);
+            kbRt.sizeDelta = new Vector2(50f, 0f);
+
+            TextMeshProUGUI titleTxt = CreateText(btnObj.transform, "Title", title, 13.5f, FontStyles.Bold, TextAlignmentOptions.BottomLeft, FontRole.Display);
+            titleTxt.color = ColTextMain;
+            RectTransform ttRt = titleTxt.GetComponent<RectTransform>();
+            ttRt.anchorMin = new Vector2(0f, 0.50f);
+            ttRt.anchorMax = new Vector2(1f, 1f);
+            ttRt.offsetMin = new Vector2(68f, 2f);
+            ttRt.offsetMax = new Vector2(-12f, -6f);
+
+            TextMeshProUGUI subTxt = CreateText(btnObj.transform, "Subtitle", subtitle, 11f, FontStyles.Normal, TextAlignmentOptions.TopLeft, FontRole.Body);
+            subTxt.color = ColTextMuted;
+            subTxt.textWrappingMode = TextWrappingModes.Normal;
+            RectTransform stRt = subTxt.GetComponent<RectTransform>();
+            stRt.anchorMin = new Vector2(0f, 0f);
+            stRt.anchorMax = new Vector2(1f, 0.50f);
+            stRt.offsetMin = new Vector2(68f, 6f);
+            stRt.offsetMax = new Vector2(-12f, -2f);
+
+            return btn;
         }
 
         private void BuildRightPlayerStatusBox(Transform parent)
@@ -1907,7 +2466,56 @@ namespace SundayLastBreath.UI
             // 3. Center Sub-Menu (Main Tactical Observation OR 6 Limb Targets OR Combat Items)
             RebuildCenterSubMenu(enemy);
 
-            // 4. Right Player Status Panel
+            // 4. Shared / Hybrid Weapon & Vitals Sync
+            GetEquippedWeaponStats(out string wpnName, out int dmg, out _, out bool isRanged, out _, out _, out string ammoType, out _);
+            string ammoInfo = "";
+            if (isRanged && !string.IsNullOrEmpty(ammoType) && player != null)
+            {
+                var entry = player.inventory.FirstOrDefault(i => string.Equals(i.itemId, ammoType, StringComparison.OrdinalIgnoreCase));
+                int qty = entry != null ? entry.quantity : 0;
+                ammoInfo = $" <color=#38BDF8>[{qty} {ammoType}]</color>";
+            }
+            _lastDisplayedWeapon = player != null ? (player.equippedWpn ?? "") : "";
+
+            if (_builtForHybridLayout)
+            {
+                if (hybridWeaponBadgeText != null)
+                {
+                    hybridWeaponBadgeText.text = $"TURN {turnNumber}  //  <color=#F59E0B>{wpnName.ToUpperInvariant()}</color> ({dmg} DMG){ammoInfo}";
+                }
+
+                if (hybridIntelBadgeText != null)
+                {
+                    if (isBusyTurn) hybridIntelBadgeText.text = "<color=#F59E0B>RESOLVING TURN...</color>";
+                    else if (menuState == SubMenuState.TargetLimbs) hybridIntelBadgeText.text = "<color=#F87171>SELECTING LIMB</color>";
+                    else if (menuState == SubMenuState.SelectItem) hybridIntelBadgeText.text = "<color=#10B981>SELECTING ITEM</color>";
+                    else hybridIntelBadgeText.text = $"TURN {turnNumber} // YOUR MOVE";
+                }
+
+                if (hybridIntelBodyText != null && enemy != null)
+                {
+                    hybridIntelBodyText.text = BuildEnemyIntelMarkup(enemy, compactForHybrid: true);
+                }
+
+                if (hybridCommandsContainer != null) hybridCommandsContainer.SetActive(menuState == SubMenuState.MainCommands);
+                if (subMenuContentRect != null) subMenuContentRect.gameObject.SetActive(menuState != SubMenuState.MainCommands);
+                if (hybridBackBtn != null) hybridBackBtn.gameObject.SetActive(menuState != SubMenuState.MainCommands && !isBusyTurn && !combatEnded);
+
+                if (hybridCommandHeaderText != null)
+                {
+                    if (menuState == SubMenuState.TargetLimbs) hybridCommandHeaderText.text = "// SELECT ANATOMICAL TARGET";
+                    else if (menuState == SubMenuState.SelectItem) hybridCommandHeaderText.text = "// FIELD MEDICINE & RATIONS";
+                    else hybridCommandHeaderText.text = "// COMBAT ACTIONS // CHOOSE YOUR MOVE";
+                }
+            }
+
+            bool cmdsInteractive = !isBusyTurn && !combatEnded;
+            if (cmdAttackBtn != null) cmdAttackBtn.interactable = cmdsInteractive;
+            if (cmdGuardBtn != null) cmdGuardBtn.interactable = cmdsInteractive;
+            if (cmdItemBtn != null) cmdItemBtn.interactable = cmdsInteractive;
+            if (cmdShoveBtn != null) cmdShoveBtn.interactable = cmdsInteractive;
+
+            // 5. Legacy Right Player Status Panel + Live Global Cockpit Refresh
             if (player != null)
             {
                 if (playerNameJobText != null)
@@ -1931,14 +2539,6 @@ namespace SundayLastBreath.UI
                 }
                 if (playerStmValueText != null) playerStmValueText.text = $"{player.stamina}/{player.staminaMax}";
 
-                GetEquippedWeaponStats(out string wpnName, out int dmg, out _, out bool isRanged, out _, out _, out string ammoType, out _);
-                string ammoInfo = "";
-                if (isRanged && !string.IsNullOrEmpty(ammoType))
-                {
-                    var entry = player.inventory.FirstOrDefault(i => string.Equals(i.itemId, ammoType, StringComparison.OrdinalIgnoreCase));
-                    int qty = entry != null ? entry.quantity : 0;
-                    ammoInfo = $" <color=#38BDF8>[{qty} {ammoType}]</color>";
-                }
                 if (playerWeaponText != null)
                 {
                     playerWeaponText.text = $"<color=#CBD5E1>WPN:</color> <color=#F59E0B>{wpnName.ToUpperInvariant()}</color> ({dmg} DMG){ammoInfo}";
@@ -1952,12 +2552,57 @@ namespace SundayLastBreath.UI
                         : "<color=#64748B>TRAITS: STANDARD SURVIVOR</color>";
                 }
 
-                // Keep Top HUD Vitals bar (HP, Stamina, Hunger, Thirst) synchronized in real-time!
+                // Keep Top HUD Vitals & Hybrid Cockpit panels (Inventory + Survivor Status) synchronized in real-time!
                 if (GameStageScreen.Instance != null)
                 {
                     GameStageScreen.Instance.UpdateVitalsUI();
                 }
             }
+        }
+
+        private string BuildEnemyIntelMarkup(CombatEnemyData enemy, bool compactForHybrid)
+        {
+            if (enemy == null) return "";
+
+            int intactLimbs = enemy.limbs.Values.Count(l => !l.isSevered);
+            string legState = enemy.HasBothLegsSevered
+                ? "<color=#F59E0B><b>CRAWLER (Both Legs Severed — 0% Evasion, Headshots 95%!)</b></color>"
+                : (enemy.HasOneLegSevered
+                    ? "<color=#38BDF8><b>HOBBLED (1 Leg Severed — -20% Evasion)</b></color>"
+                    : "<color=#94A3B8>STANDING (Both Legs Intact)</color>");
+
+            string armState = enemy.SeveredArmsCount >= 2
+                ? "<color=#10B981><b>DISARMED (Both Arms Severed — -65% Damage)</b></color>"
+                : (enemy.SeveredArmsCount == 1
+                    ? "<color=#38BDF8><b>MAIMED (1 Arm Severed — -40% Damage)</b></color>"
+                    : $"<color=#FCA5A5>ARMED ({enemy.weaponName} — {enemy.baseAttackDamage} Base DMG)</color>");
+
+            if (isTutorialCombat && turnNumber <= 2)
+            {
+                string promptHint = compactForHybrid
+                    ? "<color=#38BDF8><b>► SELECT [1] ATTACK LIMB ON THE RIGHT (OR PRESS [1]) TO TARGET A BODY PART!</b></color>"
+                    : "<color=#38BDF8><b>► CLICK [1] ATTACK LIMB ON THE LEFT (OR PRESS [1]) TO CHOOSE A TARGET!</b></color>";
+
+                return
+                    $"<size=15><color=#EF4444><b>TACTICAL SURVIVAL DIRECTIVE // ANATOMICAL TARGETING</b></color></size>\n" +
+                    $"<color=#CBD5E1>This attacker is impervious to human pain. Destroy specific anatomy to survive:</color>\n\n" +
+                    $"<color=#10B981><b>• LEGS [MOBILITY]:</b></color>  Severing legs forces a <color=#F59E0B><b>Crawler</b></color>, wiping out lunges & evasion.\n" +
+                    $"<color=#38BDF8><b>• ARMS [OFFENSE]:</b></color>   Breaking arms disables claw swipes & lethal grapples (-65% DMG).\n" +
+                    $"<color=#93C5FD><b>• TORSO [CENTER]:</b></color>  Highest hit chance, reliable stagger, exhausts vitality.\n" +
+                    $"<color=#F87171><b>• HEAD [CRITICAL]:</b></color> Hardest to hit, but deals massive cranial destruction.\n\n" +
+                    promptHint;
+            }
+
+            string commandHint = compactForHybrid
+                ? "<color=#64748B>TIP: Severing legs opens 95% headshots; severing arms cripples damage (-65%).</color>"
+                : "<color=#38BDF8><b>► AWAITING COMMAND:</b></color> Click <b><color=#FCA5A5>[1] ATTACK LIMB</color></b> on the left (or press <b>[1]</b>) to open 6-limb targeting, or select <b>[2] GUARD</b>, <b>[3] USE ITEM</b>, or <b>[4] SHOVE</b>.";
+
+            return
+                $"<size=16><color=#F87171><b>TARGET OBSERVATION // {enemy.enemyName.ToUpperInvariant()}</b></color></size>\n" +
+                $"<color=#CBD5E1><i>\"{enemy.tacticalDescription}\"</i></color>\n\n" +
+                $"<color=#94A3B8><b>POSTURE & MOBILITY:</b></color>  {legState}\n" +
+                $"<color=#94A3B8><b>THREAT & LIMBS:</b></color>      {armState}   <color=#64748B>({intactLimbs}/6 Body Parts Intact)</color>\n\n" +
+                commandHint;
         }
 
         private void RebuildCenterSubMenu(CombatEnemyData enemy)
@@ -1977,10 +2622,14 @@ namespace SundayLastBreath.UI
 
             // ----------------------------------------------------------------
             // STATE A: MAIN COMMANDS (Before clicking [1] ATTACK)
-            // Shows Enemy Tactical Observation & Stance Readout instead of Limb list!
             // ----------------------------------------------------------------
             if (menuState == SubMenuState.MainCommands)
             {
+                if (_builtForHybridLayout)
+                {
+                    return;
+                }
+
                 if (glg != null)
                 {
                     glg.constraintCount = 1;
@@ -1989,40 +2638,7 @@ namespace SundayLastBreath.UI
 
                 if (enemy != null)
                 {
-                    int intactLimbs = enemy.limbs.Values.Count(l => !l.isSevered);
-                    string legState = enemy.HasBothLegsSevered
-                        ? "<color=#F59E0B><b>CRAWLER (Both Legs Severed — 0% Evasion, Headshots 95%!)</b></color>"
-                        : (enemy.HasOneLegSevered
-                            ? "<color=#38BDF8><b>HOBBLED (1 Leg Severed — -20% Evasion)</b></color>"
-                            : "<color=#94A3B8>STANDING (Both Legs Intact)</color>");
-
-                    string armState = enemy.SeveredArmsCount >= 2
-                        ? "<color=#10B981><b>DISARMED (Both Arms Severed — -65% Damage)</b></color>"
-                        : (enemy.SeveredArmsCount == 1
-                            ? "<color=#38BDF8><b>MAIMED (1 Arm Severed — -40% Damage)</b></color>"
-                            : $"<color=#FCA5A5>ARMED ({enemy.weaponName} — {enemy.baseAttackDamage} Base DMG)</color>");
-
-                    string infoText;
-                    if (isTutorialCombat && turnNumber <= 2)
-                    {
-                        infoText =
-                            $"<size=16><color=#EF4444><b>TACTICAL SURVIVAL DIRECTIVE // ANATOMICAL TARGETING</b></color></size>\n" +
-                            $"<color=#CBD5E1>This attacker is impervious to human pain. You must destroy specific anatomy to survive:</color>\n\n" +
-                            $"<color=#10B981><b>• LEGS [MOBILITY]:</b></color>   Severing legs forces a <color=#F59E0B><b>Crawler</b></color>, wiping out lunges & evasion.\n" +
-                            $"<color=#38BDF8><b>• ARMS [OFFENSE]:</b></color>    Breaking arms disables claw swipes & lethal grapples (-65% DMG).\n" +
-                            $"<color=#93C5FD><b>• TORSO [CENTER]:</b></color>   Highest hit chance, reliable stagger, exhausts vitality.\n" +
-                            $"<color=#F87171><b>• HEAD [CRITICAL]:</b></color>  Hardest to hit, but deals massive cranial destruction.\n\n" +
-                            $"<color=#38BDF8><b>► CLICK [1] ATTACK LIMB ON THE LEFT (OR PRESS [1]) TO CHOOSE A TARGET!</b></color>";
-                    }
-                    else
-                    {
-                        infoText =
-                            $"<size=17><color=#F87171><b>TARGET OBSERVATION // {enemy.enemyName.ToUpperInvariant()}</b></color></size>\n" +
-                            $"<color=#CBD5E1><i>\"{enemy.tacticalDescription}\"</i></color>\n\n" +
-                            $"<color=#94A3B8><b>POSTURE & MOBILITY:</b></color>   {legState}\n" +
-                            $"<color=#94A3B8><b>THREAT & LIMBS:</b></color>       {armState}   <color=#64748B>({intactLimbs}/6 Body Parts Intact)</color>\n\n" +
-                            $"<color=#38BDF8><b>► AWAITING COMMAND:</b></color> Click <b><color=#FCA5A5>[1] ATTACK LIMB</color></b> on the left (or press <b>[1]</b>) to open 6-limb targeting, or select <b>[2] GUARD</b>, <b>[3] USE ITEM</b>, or <b>[4] SHOVE</b>.";
-                    }
+                    string infoText = BuildEnemyIntelMarkup(enemy, compactForHybrid: false);
 
                     var readCell = CreateSubMenuCell(
                         infoText,
@@ -2046,7 +2662,7 @@ namespace SundayLastBreath.UI
             if (glg != null)
             {
                 glg.constraintCount = 2;
-                glg.cellSize = new Vector2(408f, 108f);
+                glg.cellSize = _builtForHybridLayout ? new Vector2(368f, 101f) : new Vector2(408f, 108f);
             }
 
             // ----------------------------------------------------------------
@@ -2203,19 +2819,63 @@ namespace SundayLastBreath.UI
 
         private GameObject CreateSubMenuCell(string richText, Color bgCol, float hpBarFrac, bool interactable, Action onClick, LimbType? hoverLimb = null)
         {
-            GameObject cellObj = new GameObject("SubCell", typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
+            GameObject cellObj = _builtForHybridLayout
+                ? new GameObject("SubCell", typeof(RectTransform), typeof(Image), typeof(Button))
+                : new GameObject("SubCell", typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
             cellObj.transform.SetParent(subMenuContentRect, false);
 
             Image img = cellObj.GetComponent<Image>();
-            img.color = bgCol;
+            Color resolvedBg = _builtForHybridLayout
+                ? (!interactable ? ColSlotBg : ColCardBg)
+                : bgCol;
+            img.color = resolvedBg;
 
-            Outline outl = cellObj.GetComponent<Outline>();
-            outl.effectColor = interactable ? new Color(0.38f, 0.50f, 0.66f, 0.9f) : new Color(0.2f, 0.2f, 0.25f, 0.5f);
-            outl.effectDistance = new Vector2(1.5f, -1.5f);
+            if (_builtForHybridLayout)
+            {
+                AddCrispBorder(cellObj.transform, interactable ? ColBorderSlate : new Color(0.14f, 0.18f, 0.24f, 0.5f), 1f);
+                Color accent = ColBorderSlate;
+                if (hoverLimb.HasValue)
+                {
+                    switch (hoverLimb.Value)
+                    {
+                        case LimbType.Head: accent = ColCrimson; break;
+                        case LimbType.Torso: accent = ColCyan; break;
+                        case LimbType.LeftArm:
+                        case LimbType.RightArm: accent = ColAmber; break;
+                        case LimbType.LeftLeg:
+                        case LimbType.RightLeg: accent = ColEmerald; break;
+                    }
+                }
+                else if (menuState == SubMenuState.SelectItem && interactable)
+                {
+                    accent = ColEmerald;
+                }
+                else if (!interactable)
+                {
+                    accent = hpBarFrac == 0f ? ColBorderCrimson : ColTextMuted;
+                }
+                AddLeftAccentBar(cellObj.transform, accent, 3.5f);
+            }
+            else
+            {
+                Outline outl = cellObj.GetComponent<Outline>();
+                outl.effectColor = interactable ? new Color(0.38f, 0.50f, 0.66f, 0.9f) : new Color(0.2f, 0.2f, 0.25f, 0.5f);
+                outl.effectDistance = new Vector2(1.5f, -1.5f);
+            }
 
             Button btn = cellObj.GetComponent<Button>();
             btn.targetGraphic = img;
             btn.interactable = interactable;
+            if (_builtForHybridLayout)
+            {
+                ColorBlock cb = btn.colors;
+                cb.normalColor = resolvedBg;
+                cb.highlightedColor = interactable ? new Color(0.11f, 0.145f, 0.21f, 1f) : resolvedBg;
+                cb.pressedColor = ColSlotBg;
+                cb.selectedColor = resolvedBg;
+                cb.disabledColor = resolvedBg;
+                btn.colors = cb;
+            }
             if (onClick != null) btn.onClick.AddListener(() => onClick.Invoke());
 
             if (hoverLimb.HasValue && interactable)
@@ -2231,12 +2891,27 @@ namespace SundayLastBreath.UI
                 et.triggers.Add(exitEntry);
             }
 
-            TextMeshProUGUI txt = CreateText(cellObj.transform, "Txt", richText, 14f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            TextMeshProUGUI txt = CreateText(
+                cellObj.transform,
+                "Txt",
+                richText,
+                _builtForHybridLayout ? 12.5f : 14f,
+                FontStyles.Normal,
+                TextAlignmentOptions.TopLeft,
+                _builtForHybridLayout ? FontRole.Body : FontRole.Mono
+            );
+            if (_builtForHybridLayout)
+            {
+                txt.textWrappingMode = TextWrappingModes.Normal;
+                txt.lineSpacing = 2f;
+            }
             RectTransform tRt = txt.GetComponent<RectTransform>();
             tRt.anchorMin = Vector2.zero;
             tRt.anchorMax = Vector2.one;
-            tRt.offsetMin = new Vector2(14f, hpBarFrac >= 0f ? 18f : 12f);
-            tRt.offsetMax = new Vector2(-12f, -10f);
+            tRt.offsetMin = _builtForHybridLayout
+                ? new Vector2(14f, hpBarFrac >= 0f ? 16f : 10f)
+                : new Vector2(14f, hpBarFrac >= 0f ? 18f : 12f);
+            tRt.offsetMax = _builtForHybridLayout ? new Vector2(-10f, -8f) : new Vector2(-12f, -10f);
 
             if (hpBarFrac >= 0f)
             {
@@ -2247,7 +2922,7 @@ namespace SundayLastBreath.UI
                 bbRt.anchorMin = new Vector2(0f, 0f);
                 bbRt.anchorMax = new Vector2(1f, 0f);
                 bbRt.pivot = new Vector2(0.5f, 0f);
-                bbRt.sizeDelta = new Vector2(-28f, 7f);
+                bbRt.sizeDelta = new Vector2(_builtForHybridLayout ? -24f : -28f, _builtForHybridLayout ? 5f : 7f);
                 bbRt.anchoredPosition = new Vector2(0f, 8f);
                 barBg.GetComponent<Image>().color = new Color(0.03f, 0.04f, 0.06f, 0.9f);
 
@@ -2289,9 +2964,11 @@ namespace SundayLastBreath.UI
             return btn;
         }
 
-        private Button CreateSmallButton(Transform parent, string name, string label, Vector2 anchoredPos, Vector2 size, Action onClick)
+        private Button CreateSmallButton(Transform parent, string name, string label, Vector2 anchoredPos, Vector2 size, Action onClick, bool useHybridStyle = false)
         {
-            GameObject btnObj = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
+            GameObject btnObj = useHybridStyle
+                ? new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button))
+                : new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
             btnObj.transform.SetParent(parent, false);
             RectTransform rt = btnObj.GetComponent<RectTransform>();
             rt.anchorMin = new Vector2(1f, 0.5f);
@@ -2300,14 +2977,31 @@ namespace SundayLastBreath.UI
             rt.anchoredPosition = anchoredPos;
 
             Image img = btnObj.GetComponent<Image>();
-            img.color = new Color(0.18f, 0.22f, 0.30f, 0.95f);
-            btnObj.GetComponent<Outline>().effectColor = new Color(0.4f, 0.5f, 0.65f, 0.8f);
+            img.color = useHybridStyle ? ColCardBg : new Color(0.18f, 0.22f, 0.30f, 0.95f);
+            if (useHybridStyle)
+            {
+                AddCrispBorder(btnObj.transform, ColBorderSlate, 1f);
+            }
+            else
+            {
+                btnObj.GetComponent<Outline>().effectColor = new Color(0.4f, 0.5f, 0.65f, 0.8f);
+            }
 
             Button btn = btnObj.GetComponent<Button>();
             btn.targetGraphic = img;
+            if (useHybridStyle)
+            {
+                ColorBlock cb = btn.colors;
+                cb.normalColor = ColCardBg;
+                cb.highlightedColor = new Color(0.11f, 0.145f, 0.21f, 1f);
+                cb.pressedColor = ColSlotBg;
+                cb.disabledColor = new Color(0.05f, 0.06f, 0.09f, 0.45f);
+                btn.colors = cb;
+            }
             btn.onClick.AddListener(() => onClick?.Invoke());
 
-            TextMeshProUGUI txt = CreateText(btnObj.transform, "Lbl", label, 12f, FontStyles.Bold, TextAlignmentOptions.Center);
+            TextMeshProUGUI txt = CreateText(btnObj.transform, "Lbl", label, useHybridStyle ? 10.5f : 12f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
+            if (useHybridStyle) txt.color = ColCyan;
             RectTransform tRt = txt.GetComponent<RectTransform>();
             tRt.anchorMin = Vector2.zero;
             tRt.anchorMax = Vector2.one;
@@ -2316,7 +3010,7 @@ namespace SundayLastBreath.UI
             return btn;
         }
 
-        private TextMeshProUGUI CreateText(Transform parent, string name, string content, float fontSize, FontStyles style, TextAlignmentOptions align)
+        private TextMeshProUGUI CreateText(Transform parent, string name, string content, float fontSize, FontStyles style, TextAlignmentOptions align, FontRole role = FontRole.Mono)
         {
             GameObject obj = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
             obj.transform.SetParent(parent, false);
@@ -2328,6 +3022,7 @@ namespace SundayLastBreath.UI
             tmp.color = Color.white;
             tmp.textWrappingMode = TextWrappingModes.NoWrap;
             tmp.raycastTarget = false;
+            SundayTypography.ApplyFont(tmp, role);
             return tmp;
         }
 
