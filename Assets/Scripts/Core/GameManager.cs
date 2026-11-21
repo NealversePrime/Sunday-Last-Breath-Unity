@@ -216,7 +216,7 @@ namespace SundayLastBreath.Core
         {
             currentState = GameState.Hallway;
             Debug.Log("<color=yellow>[GameManager] Transitioning from Apartment Unit 407 to 4th Floor Hallway...</color>");
-            SetPlayerLocation("hallway_1", "CORRIDOR N // NORTH SPINE");
+            SetPlayerLocation("hallway_1", "UPPER HALLWAY (406 / 407)");
         }
 
         public void SetPlayerLocation(string roomId, string sectorName = null)

@@ -231,6 +231,138 @@ namespace SundayLastBreath.UI
                     selectButton.onClick.AddListener(TriggerSelect);
                 }
             }
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDHobbyCardVisuals(data, equippedStatus);
+            }
+        }
+
+        private void ApplyStyleDHobbyCardVisuals(HobbyData data, EquippedHobbyStatus equippedStatus)
+        {
+            _baseBorderColor = new Color(0.86f, 0.86f, 0.88f, 1f);
+            _hoverBorderColor = Color.white;
+
+            StyleDThemeUtility.ApplySliced(cardBorder, StyleDThemeUtility.CcDossierCard, 1.5f, _baseBorderColor, disableOutline: true);
+
+            Transform innerTr = transform.Find("Inner");
+            if (innerTr != null)
+            {
+                if (innerTr is RectTransform inRt)
+                {
+                    inRt.offsetMin = new Vector2(10f, 9f);
+                    inRt.offsetMax = new Vector2(-10f, -7f);
+                }
+                Image inImg = innerTr.GetComponent<Image>();
+                if (inImg != null) inImg.color = Color.clear;
+            }
+
+            if (topAccentBar != null) topAccentBar.gameObject.SetActive(false);
+
+            if (iconImage != null)
+            {
+                Transform bannerTr = iconImage.transform.parent;
+                if (bannerTr is RectTransform banRt)
+                {
+                    banRt.anchoredPosition = new Vector2(0f, -22f);
+                    banRt.sizeDelta = new Vector2(0f, 96f);
+                }
+                Image banBg = bannerTr?.GetComponent<Image>();
+                if (banBg != null) banBg.color = new Color(0.05f, 0.06f, 0.075f, 0.92f);
+
+                RectTransform icRt = iconImage.GetComponent<RectTransform>();
+                if (icRt != null)
+                {
+                    icRt.sizeDelta = new Vector2(82f, 82f);
+                    icRt.anchoredPosition = Vector2.zero;
+                }
+            }
+
+            if (titleText != null)
+            {
+                titleText.fontSize = 17.5f;
+                if (equippedStatus == EquippedHobbyStatus.None && !data.isWeakness)
+                    titleText.color = StyleDThemeUtility.ColBone;
+                RectTransform tRect = titleText.GetComponent<RectTransform>();
+                if (tRect != null)
+                {
+                    tRect.sizeDelta = new Vector2(-16f, 24f);
+                    tRect.anchoredPosition = new Vector2(0f, -122f);
+                }
+            }
+
+            if (descriptionText != null)
+            {
+                descriptionText.fontSize = 12f;
+                descriptionText.color = new Color(0.84f, 0.82f, 0.77f, 1f);
+                RectTransform dRect = descriptionText.GetComponent<RectTransform>();
+                if (dRect != null)
+                {
+                    dRect.sizeDelta = new Vector2(-20f, 46f);
+                    dRect.anchoredPosition = new Vector2(0f, -148f);
+                }
+            }
+
+            if (statsBg != null)
+            {
+                StyleDThemeUtility.ApplySliced(statsBg, StyleDThemeUtility.CcInputTerminal, 1.7f, Color.white, disableOutline: true);
+                RectTransform stRect = statsBg.GetComponent<RectTransform>();
+                if (stRect != null)
+                {
+                    stRect.sizeDelta = new Vector2(-20f, 26f);
+                    stRect.anchoredPosition = new Vector2(0f, -198f);
+                }
+            }
+
+            if (statsPreviewText != null)
+            {
+                statsPreviewText.fontSize = 11.5f;
+                if (equippedStatus == EquippedHobbyStatus.None && !data.isWeakness)
+                    statsPreviewText.color = StyleDThemeUtility.ColAmber;
+            }
+
+            if (categoryBadgeBg != null)
+            {
+                StyleDThemeUtility.ApplySliced(categoryBadgeBg, StyleDThemeUtility.CcInputTerminal, 1.7f, Color.white, disableOutline: true);
+            }
+
+            if (equippedStatus == EquippedHobbyStatus.Primary)
+            {
+                _baseBtnBgColor = new Color(0.20f, 0.44f, 0.30f, 1f);
+                _hoverBtnBgColor = _baseBtnBgColor;
+            }
+            else if (equippedStatus == EquippedHobbyStatus.Secondary)
+            {
+                _baseBtnBgColor = new Color(0.48f, 0.34f, 0.14f, 1f);
+                _hoverBtnBgColor = _baseBtnBgColor;
+            }
+            else if (data.isWeakness)
+            {
+                _baseBtnBgColor = new Color(0.46f, 0.16f, 0.14f, 1f);
+                _hoverBtnBgColor = new Color(0.68f, 0.24f, 0.20f, 1f);
+            }
+            else
+            {
+                _baseBtnBgColor = new Color(0.24f, 0.27f, 0.31f, 1f);
+                _hoverBtnBgColor = Color.Lerp(new Color(0.30f, 0.26f, 0.22f, 1f), _accentColor, 0.72f);
+            }
+
+            if (selectButton != null)
+            {
+                RectTransform bBtnRect = selectButton.GetComponent<RectTransform>();
+                if (bBtnRect != null)
+                {
+                    bBtnRect.sizeDelta = new Vector2(-20f, 36f);
+                    bBtnRect.anchoredPosition = new Vector2(0f, 6f);
+                }
+                StyleDThemeUtility.ApplyChipButton(selectButton, _baseBtnBgColor, _hoverBtnBgColor, 1.55f);
+            }
+
+            if (buttonText != null && equippedStatus == EquippedHobbyStatus.None)
+            {
+                buttonText.fontSize = 12.5f;
+                buttonText.color = StyleDThemeUtility.ColBone;
+            }
         }
 
         private void Update()
@@ -248,7 +380,13 @@ namespace SundayLastBreath.UI
             _isHovered = true;
 
             if (cardBorder != null) cardBorder.color = _hoverBorderColor;
-            if (_btnBgImage != null) _btnBgImage.color = _hoverBtnBgColor;
+            if (_btnBgImage != null)
+            {
+                if (StyleDThemeUtility.IsStyleDActive && _btnBgImage.canvasRenderer != null)
+                    _btnBgImage.canvasRenderer.SetColor(_hoverBtnBgColor);
+                else
+                    _btnBgImage.color = _hoverBtnBgColor;
+            }
             if (buttonText != null) buttonText.color = Color.white;
             if (iconImage != null) iconImage.color = Color.white;
 
@@ -264,7 +402,15 @@ namespace SundayLastBreath.UI
             _isHovered = false;
 
             if (cardBorder != null) cardBorder.color = _baseBorderColor;
-            if (_btnBgImage != null) _btnBgImage.color = _baseBtnBgColor;
+            if (_btnBgImage != null)
+            {
+                if (StyleDThemeUtility.IsStyleDActive && _btnBgImage.canvasRenderer != null)
+                    _btnBgImage.canvasRenderer.SetColor(_baseBtnBgColor);
+                else
+                    _btnBgImage.color = _baseBtnBgColor;
+            }
+            if (buttonText != null && StyleDThemeUtility.IsStyleDActive)
+                buttonText.color = StyleDThemeUtility.ColBone;
         }
 
         public void OnPointerClick(PointerEventData eventData)

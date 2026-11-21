@@ -161,14 +161,32 @@ namespace SundayLastBreath.UI
 
         private void RefreshDisplayModeButton(bool isFullscreen)
         {
+            bool styleD = StyleDThemeUtility.IsStyleDActive;
             if (displayModeBtnLabel != null)
             {
                 displayModeBtnLabel.text = isFullscreen
                     ? "<b>[ FULLSCREEN : ON ]</b>"
                     : "<b>[ WINDOWED MODE ]</b>";
-                displayModeBtnLabel.color = isFullscreen
-                    ? new Color(0.28f, 0.95f, 0.58f, 1f)
-                    : new Color(0.95f, 0.72f, 0.22f, 1f);
+                if (!styleD)
+                {
+                    displayModeBtnLabel.color = isFullscreen
+                        ? new Color(0.28f, 0.95f, 0.58f, 1f)
+                        : new Color(0.95f, 0.72f, 0.22f, 1f);
+                }
+            }
+            if (styleD)
+            {
+                if (displayModeButton != null)
+                {
+                    Color norm = isFullscreen
+                        ? StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.52f)
+                        : StyleDThemeUtility.ColMetalBtn;
+                    Color hov = isFullscreen
+                        ? StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.75f)
+                        : StyleDThemeUtility.ColMetalHover;
+                    StyleDThemeUtility.ApplyMetalButton(displayModeButton, norm, hov, 2.8f, StyleDThemeUtility.ColBone);
+                }
+                return;
             }
             if (displayModeBtnBg != null)
             {
@@ -211,10 +229,12 @@ namespace SundayLastBreath.UI
             if (isRuntimeBuilt && masterSlider != null && bgmSlider != null && sfxSlider != null) return;
             isRuntimeBuilt = true;
 
+            bool styleD = StyleDThemeUtility.IsStyleDActive;
+
             Image backdrop = GetComponent<Image>();
             if (backdrop != null)
             {
-                backdrop.color = new Color(0.005f, 0.008f, 0.015f, 0.92f);
+                backdrop.color = styleD ? StyleDThemeUtility.ColBackdrop : new Color(0.005f, 0.008f, 0.015f, 0.92f);
                 backdrop.raycastTarget = true;
             }
 
@@ -239,15 +259,18 @@ namespace SundayLastBreath.UI
             pRect.anchoredPosition = Vector2.zero;
 
             Image pBg = panelObj.GetComponent<Image>();
-            if (pBg != null)
-            {
-                pBg.color = new Color(0.012f, 0.018f, 0.028f, 0.98f);
-            }
-
             Outline pOutline = panelObj.GetComponent<Outline>();
             if (pOutline == null) pOutline = panelObj.AddComponent<Outline>();
             pOutline.effectColor = new Color(0.85f, 0.55f, 0.12f, 0.78f);
             pOutline.effectDistance = new Vector2(2f, -2f);
+            if (styleD)
+            {
+                StyleDThemeUtility.ApplySliced(pBg, StyleDThemeUtility.PanelChassis, 3.2f, Color.white, disableOutline: true);
+            }
+            else if (pBg != null)
+            {
+                pBg.color = new Color(0.012f, 0.018f, 0.028f, 0.98f);
+            }
 
             // Restyle or create Header Bar
             Transform existingTitle = panelTrans.Find("Title");
@@ -265,29 +288,43 @@ namespace SundayLastBreath.UI
                 hRect.anchorMin = new Vector2(0f, 1f);
                 hRect.anchorMax = new Vector2(1f, 1f);
                 hRect.pivot = new Vector2(0.5f, 1f);
-                hRect.sizeDelta = new Vector2(0f, 52f);
-                hRect.anchoredPosition = Vector2.zero;
 
                 Image hBg = headerObj.GetComponent<Image>();
-                hBg.color = new Color(0.03f, 0.045f, 0.07f, 0.98f);
+                if (styleD)
+                {
+                    hRect.offsetMin = new Vector2(18f, -62f);
+                    hRect.offsetMax = new Vector2(-18f, -18f);
+                    hBg.color = Color.clear;
+                    StyleDThemeUtility.AddHeaderDivider(headerObj.transform);
+                }
+                else
+                {
+                    hRect.sizeDelta = new Vector2(0f, 52f);
+                    hRect.anchoredPosition = Vector2.zero;
+                    hBg.color = new Color(0.03f, 0.045f, 0.07f, 0.98f);
+                }
 
                 TextMeshProUGUI hTitle = CreateLabel(headerObj.transform, "HeaderTitle",
-                    "SYSTEM SETTINGS // AUDIO & DISPLAY CONFIGURATION",
-                    15.5f, FontStyles.Bold, new Color(0.95f, 0.65f, 0.15f, 1f), TextAlignmentOptions.MidlineLeft, FontRole.Display);
+                    styleD ? "SYSTEM SETTINGS - AUDIO & DISPLAY" : "SYSTEM SETTINGS // AUDIO & DISPLAY CONFIGURATION",
+                    styleD ? 14f : 15.5f,
+                    FontStyles.Bold,
+                    styleD ? StyleDThemeUtility.ColBone : new Color(0.95f, 0.65f, 0.15f, 1f),
+                    TextAlignmentOptions.MidlineLeft,
+                    FontRole.Display);
                 RectTransform htRect = hTitle.rectTransform;
                 htRect.anchorMin = Vector2.zero;
                 htRect.anchorMax = Vector2.one;
-                htRect.offsetMin = new Vector2(22f, 0f);
+                htRect.offsetMin = new Vector2(styleD ? 8f : 22f, 0f);
                 htRect.offsetMax = new Vector2(-100f, 0f);
 
                 Button escBtn = CreateActionButton(headerObj.transform, "EscCloseBtn", "<b>[ ESC ]</b>",
-                    new Color(0.05f, 0.07f, 0.10f, 1f), new Color(0.82f, 0.86f, 0.92f, 1f), out _);
+                    new Color(0.05f, 0.07f, 0.10f, 1f), new Color(0.82f, 0.86f, 0.92f, 1f), out _, styleD);
                 RectTransform ebRect = escBtn.GetComponent<RectTransform>();
                 ebRect.anchorMin = new Vector2(1f, 0.5f);
                 ebRect.anchorMax = new Vector2(1f, 0.5f);
                 ebRect.pivot = new Vector2(1f, 0.5f);
-                ebRect.sizeDelta = new Vector2(72f, 30f);
-                ebRect.anchoredPosition = new Vector2(-14f, 0f);
+                ebRect.sizeDelta = new Vector2(72f, 28f);
+                ebRect.anchoredPosition = new Vector2(styleD ? -4f : -14f, 0f);
                 escBtn.onClick.AddListener(Close);
             }
 
@@ -295,23 +332,23 @@ namespace SundayLastBreath.UI
             if (masterSlider == null)
             {
                 masterSlider = CreateVolumeSliderRow(panelTrans, "MasterVolumeRow",
-                    "MASTER VOLUME", "Global output level for all game audio", -72f, out masterPctText);
+                    "MASTER VOLUME", "Global output level for all game audio", styleD ? -74f : -72f, out masterPctText, styleD);
             }
             if (bgmSlider == null)
             {
                 bgmSlider = CreateVolumeSliderRow(panelTrans, "BgmVolumeRow",
-                    "BGM & AMBIENCE", "Main menu theme, background music & atmospheric drones", -156f, out bgmPctText);
+                    "BGM & AMBIENCE", "Main menu theme, background music & atmospheric drones", styleD ? -154f : -156f, out bgmPctText, styleD);
             }
             if (sfxSlider == null)
             {
                 sfxSlider = CreateVolumeSliderRow(panelTrans, "SfxVolumeRow",
-                    "SFX & BROADCASTS", "UI clicks, emergency broadcasts, radio & alarms", -240f, out sfxPctText);
+                    "SFX & BROADCASTS", "UI clicks, emergency broadcasts, radio & alarms", styleD ? -234f : -240f, out sfxPctText, styleD);
             }
 
             // Display Mode Row (Fullscreen / Windowed Toggle)
             if (displayModeButton == null)
             {
-                CreateDisplayModeRow(panelTrans, -324f);
+                CreateDisplayModeRow(panelTrans, styleD ? -314f : -324f, styleD);
             }
 
             // Footer Buttons: Reset Defaults + Save & Close
@@ -319,12 +356,12 @@ namespace SundayLastBreath.UI
             if (resetTrans == null)
             {
                 Button resetBtn = CreateActionButton(panelTrans, "ResetDefaultsButton", "<b>[ RESET AUDIO DEFAULTS ]</b>",
-                    new Color(0.03f, 0.045f, 0.07f, 0.98f), new Color(0.75f, 0.82f, 0.90f, 1f), out _);
+                    new Color(0.03f, 0.045f, 0.07f, 0.98f), new Color(0.75f, 0.82f, 0.90f, 1f), out _, styleD);
                 RectTransform rbRect = resetBtn.GetComponent<RectTransform>();
                 rbRect.anchorMin = new Vector2(0.5f, 0f);
                 rbRect.anchorMax = new Vector2(0.5f, 0f);
                 rbRect.pivot = new Vector2(1f, 0f);
-                rbRect.sizeDelta = new Vector2(296f, 44f);
+                rbRect.sizeDelta = new Vector2(296f, 42f);
                 rbRect.anchoredPosition = new Vector2(-10f, 22f);
                 resetBtn.onClick.AddListener(OnResetDefaultsClicked);
             }
@@ -341,34 +378,46 @@ namespace SundayLastBreath.UI
                 cbRect.anchorMin = new Vector2(0.5f, 0f);
                 cbRect.anchorMax = new Vector2(0.5f, 0f);
                 cbRect.pivot = new Vector2(0f, 0f);
-                cbRect.sizeDelta = new Vector2(296f, 44f);
+                cbRect.sizeDelta = new Vector2(296f, 42f);
                 cbRect.anchoredPosition = new Vector2(10f, 22f);
-
-                closeButton.transition = Selectable.Transition.None;
-                Image cbBg = closeButton.GetComponent<Image>();
-                if (cbBg != null)
-                {
-                    cbBg.color = new Color(0.08f, 0.05f, 0.01f, 0.98f);
-                    if (cbBg.canvasRenderer != null) cbBg.canvasRenderer.SetColor(Color.white);
-                }
-
-                Outline cbOl = closeButton.GetComponent<Outline>();
-                if (cbOl == null) cbOl = closeButton.gameObject.AddComponent<Outline>();
-                cbOl.effectColor = new Color(0.95f, 0.65f, 0.15f, 0.80f);
-                cbOl.effectDistance = new Vector2(1.5f, -1.5f);
 
                 TextMeshProUGUI cbTmp = closeButton.GetComponentInChildren<TextMeshProUGUI>(true);
                 if (cbTmp != null)
                 {
                     cbTmp.text = "<b>[ < APPLY & CLOSE ]</b>";
                     cbTmp.fontSize = 13.5f;
-                    cbTmp.color = new Color(0.95f, 0.72f, 0.22f, 1f);
+                    cbTmp.color = styleD ? StyleDThemeUtility.ColBone : new Color(0.95f, 0.72f, 0.22f, 1f);
                     SundayTypography.ApplyFont(cbTmp, FontRole.Mono);
+                }
+
+                if (styleD)
+                {
+                    StyleDThemeUtility.ApplyMetalButton(
+                        closeButton,
+                        StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColRust, 0.75f),
+                        StyleDThemeUtility.ColRust,
+                        2.8f,
+                        StyleDThemeUtility.ColBone);
+                }
+                else
+                {
+                    closeButton.transition = Selectable.Transition.None;
+                    Image cbBg = closeButton.GetComponent<Image>();
+                    if (cbBg != null)
+                    {
+                        cbBg.color = new Color(0.08f, 0.05f, 0.01f, 0.98f);
+                        if (cbBg.canvasRenderer != null) cbBg.canvasRenderer.SetColor(Color.white);
+                    }
+
+                    Outline cbOl = closeButton.GetComponent<Outline>();
+                    if (cbOl == null) cbOl = closeButton.gameObject.AddComponent<Outline>();
+                    cbOl.effectColor = new Color(0.95f, 0.65f, 0.15f, 0.80f);
+                    cbOl.effectDistance = new Vector2(1.5f, -1.5f);
                 }
             }
         }
 
-        private Slider CreateVolumeSliderRow(Transform parent, string name, string title, string subtitle, float topOffset, out TextMeshProUGUI pctLabel)
+        private Slider CreateVolumeSliderRow(Transform parent, string name, string title, string subtitle, float topOffset, out TextMeshProUGUI pctLabel, bool styleD)
         {
             GameObject row = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Outline));
             row.transform.SetParent(parent, false);
@@ -377,18 +426,25 @@ namespace SundayLastBreath.UI
             rr.anchorMax = new Vector2(0.5f, 1f);
             rr.pivot = new Vector2(0.5f, 1f);
             rr.anchoredPosition = new Vector2(0f, topOffset);
-            rr.sizeDelta = new Vector2(612f, 72f);
+            rr.sizeDelta = new Vector2(styleD ? 608f : 612f, 70f);
 
             Image rowBg = row.GetComponent<Image>();
-            rowBg.color = new Color(0.025f, 0.035f, 0.055f, 0.96f);
-
             Outline rowOl = row.GetComponent<Outline>();
             rowOl.effectColor = new Color(0.20f, 0.26f, 0.34f, 0.65f);
             rowOl.effectDistance = new Vector2(1f, -1f);
+            if (styleD)
+            {
+                StyleDThemeUtility.ApplySliced(rowBg, StyleDThemeUtility.WellRecessed, 3.2f, Color.white, disableOutline: true);
+            }
+            else
+            {
+                rowBg.color = new Color(0.025f, 0.035f, 0.055f, 0.96f);
+            }
 
+            string subColor = styleD ? "#8C9486" : "#64748B";
             TextMeshProUGUI titleTmp = CreateLabel(row.transform, "Title",
-                $"<b>{title}</b>   <size=11><color=#64748B>{subtitle}</color></size>",
-                13f, FontStyles.Normal, new Color(0.94f, 0.96f, 0.98f, 1f), TextAlignmentOptions.MidlineLeft, FontRole.Body);
+                $"<b>{title}</b>   <size=11><color={subColor}>{subtitle}</color></size>",
+                13f, FontStyles.Normal, styleD ? StyleDThemeUtility.ColBone : new Color(0.94f, 0.96f, 0.98f, 1f), TextAlignmentOptions.MidlineLeft, FontRole.Body);
             RectTransform tr = titleTmp.rectTransform;
             tr.anchorMin = new Vector2(0f, 0.5f);
             tr.anchorMax = new Vector2(1f, 1f);
@@ -396,7 +452,7 @@ namespace SundayLastBreath.UI
             tr.offsetMax = new Vector2(-80f, -4f);
 
             pctLabel = CreateLabel(row.transform, "PctValue", "100%",
-                13.5f, FontStyles.Bold, new Color(0.95f, 0.72f, 0.22f, 1f), TextAlignmentOptions.MidlineRight, FontRole.Mono);
+                13.5f, FontStyles.Bold, styleD ? StyleDThemeUtility.ColAmber : new Color(0.95f, 0.72f, 0.22f, 1f), TextAlignmentOptions.MidlineRight, FontRole.Mono);
             RectTransform pr = pctLabel.rectTransform;
             pr.anchorMin = new Vector2(1f, 0.5f);
             pr.anchorMax = new Vector2(1f, 1f);
@@ -420,7 +476,7 @@ namespace SundayLastBreath.UI
             bgr.offsetMin = Vector2.zero;
             bgr.offsetMax = Vector2.zero;
             Image bgImg = bgTrack.GetComponent<Image>();
-            bgImg.color = new Color(0.005f, 0.008f, 0.014f, 1f);
+            bgImg.color = styleD ? new Color(0.05f, 0.055f, 0.06f, 1f) : new Color(0.005f, 0.008f, 0.014f, 1f);
 
             GameObject fillArea = new GameObject("Fill Area", typeof(RectTransform));
             fillArea.transform.SetParent(sliderObj.transform, false);
@@ -438,7 +494,7 @@ namespace SundayLastBreath.UI
             fr.offsetMin = Vector2.zero;
             fr.offsetMax = Vector2.zero;
             Image fillImg = fill.GetComponent<Image>();
-            fillImg.color = new Color(0.88f, 0.55f, 0.08f, 0.96f);
+            fillImg.color = styleD ? StyleDThemeUtility.ColAmber : new Color(0.88f, 0.55f, 0.08f, 0.96f);
 
             GameObject handleArea = new GameObject("Handle Slide Area", typeof(RectTransform));
             handleArea.transform.SetParent(sliderObj.transform, false);
@@ -453,7 +509,7 @@ namespace SundayLastBreath.UI
             RectTransform hr = handle.GetComponent<RectTransform>();
             hr.sizeDelta = new Vector2(14f, 22f);
             Image handleImg = handle.GetComponent<Image>();
-            handleImg.color = Color.white;
+            handleImg.color = styleD ? StyleDThemeUtility.ColBone : Color.white;
 
             Slider slider = sliderObj.AddComponent<Slider>();
             slider.transition = Selectable.Transition.None;
@@ -468,7 +524,7 @@ namespace SundayLastBreath.UI
             return slider;
         }
 
-        private void CreateDisplayModeRow(Transform parent, float topOffset)
+        private void CreateDisplayModeRow(Transform parent, float topOffset, bool styleD)
         {
             GameObject row = new GameObject("DisplayModeRow", typeof(RectTransform), typeof(Image), typeof(Outline));
             row.transform.SetParent(parent, false);
@@ -477,18 +533,25 @@ namespace SundayLastBreath.UI
             rr.anchorMax = new Vector2(0.5f, 1f);
             rr.pivot = new Vector2(0.5f, 1f);
             rr.anchoredPosition = new Vector2(0f, topOffset);
-            rr.sizeDelta = new Vector2(612f, 64f);
+            rr.sizeDelta = new Vector2(styleD ? 608f : 612f, 64f);
 
             Image rowBg = row.GetComponent<Image>();
-            rowBg.color = new Color(0.025f, 0.035f, 0.055f, 0.96f);
-
             Outline rowOl = row.GetComponent<Outline>();
             rowOl.effectColor = new Color(0.20f, 0.26f, 0.34f, 0.65f);
             rowOl.effectDistance = new Vector2(1f, -1f);
+            if (styleD)
+            {
+                StyleDThemeUtility.ApplySliced(rowBg, StyleDThemeUtility.WellRecessed, 3.2f, Color.white, disableOutline: true);
+            }
+            else
+            {
+                rowBg.color = new Color(0.025f, 0.035f, 0.055f, 0.96f);
+            }
 
+            string subColor = styleD ? "#8C9486" : "#64748B";
             TextMeshProUGUI titleTmp = CreateLabel(row.transform, "Title",
-                "<b>DISPLAY MODE</b>   <size=11><color=#64748B>Switch between borderless fullscreen and windowed display</color></size>",
-                13f, FontStyles.Normal, new Color(0.94f, 0.96f, 0.98f, 1f), TextAlignmentOptions.MidlineLeft, FontRole.Body);
+                $"<b>DISPLAY MODE</b>   <size=11><color={subColor}>Switch between borderless fullscreen and windowed display</color></size>",
+                13f, FontStyles.Normal, styleD ? StyleDThemeUtility.ColBone : new Color(0.94f, 0.96f, 0.98f, 1f), TextAlignmentOptions.MidlineLeft, FontRole.Body);
             RectTransform tr = titleTmp.rectTransform;
             tr.anchorMin = new Vector2(0f, 0f);
             tr.anchorMax = new Vector2(1f, 1f);
@@ -496,7 +559,7 @@ namespace SundayLastBreath.UI
             tr.offsetMax = new Vector2(-210f, 0f);
 
             displayModeButton = CreateActionButton(row.transform, "ToggleFullscreenBtn", "<b>[ FULLSCREEN : ON ]</b>",
-                new Color(0.02f, 0.08f, 0.05f, 0.96f), new Color(0.28f, 0.95f, 0.58f, 1f), out displayModeBtnLabel);
+                new Color(0.02f, 0.08f, 0.05f, 0.96f), new Color(0.28f, 0.95f, 0.58f, 1f), out displayModeBtnLabel, styleD);
             displayModeBtnBg = displayModeButton.GetComponent<Image>();
             displayModeBtnOutline = displayModeButton.GetComponent<Outline>();
 
@@ -510,7 +573,7 @@ namespace SundayLastBreath.UI
             displayModeButton.onClick.AddListener(OnDisplayModeButtonClicked);
         }
 
-        private static Button CreateActionButton(Transform parent, string name, string text, Color bgCol, Color accentCol, out TextMeshProUGUI labelOut)
+        private static Button CreateActionButton(Transform parent, string name, string text, Color bgCol, Color accentCol, out TextMeshProUGUI labelOut, bool styleD = false)
         {
             GameObject btnObj = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Outline), typeof(Button));
             btnObj.transform.SetParent(parent, false);
@@ -526,12 +589,17 @@ namespace SundayLastBreath.UI
             btn.targetGraphic = bg;
             btn.transition = Selectable.Transition.None;
 
-            labelOut = CreateLabel(btnObj.transform, "Label", text, 12.5f, FontStyles.Normal, accentCol, TextAlignmentOptions.Center, FontRole.Mono);
+            labelOut = CreateLabel(btnObj.transform, "Label", text, 12.5f, FontStyles.Normal, styleD ? StyleDThemeUtility.ColBone : accentCol, TextAlignmentOptions.Center, FontRole.Mono);
             RectTransform lr = labelOut.rectTransform;
             lr.anchorMin = Vector2.zero;
             lr.anchorMax = Vector2.one;
             lr.offsetMin = Vector2.zero;
             lr.offsetMax = Vector2.zero;
+
+            if (styleD)
+            {
+                StyleDThemeUtility.ApplyMetalButton(btn, StyleDThemeUtility.ColMetalBtn, StyleDThemeUtility.ColMetalHover, 2.8f, StyleDThemeUtility.ColBone);
+            }
 
             return btn;
         }

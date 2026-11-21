@@ -150,6 +150,10 @@ namespace SundayLastBreath.UI
         private static readonly Color ColHeaderBg = new Color(0.094f, 0.125f, 0.173f, 1f);
         private static readonly Color ColHeaderCombatBg = new Color(0.125f, 0.065f, 0.082f, 0.99f);
         private static readonly Color ColBorderSlate = new Color(0.18f, 0.23f, 0.305f, 0.95f);
+        private static readonly Color ColBorderPassive = new Color(0.13f, 0.17f, 0.23f, 0.38f);
+        private static readonly Color ColBorderSubtle = new Color(0.12f, 0.16f, 0.22f, 0.26f);
+        private static readonly Color ColBorderActiveAction = new Color(0.22f, 0.56f, 0.76f, 0.88f);
+        private static readonly Color ColBorderActiveTarget = new Color(0.82f, 0.22f, 0.24f, 0.92f);
         private static readonly Color ColBorderCrimson = new Color(0.68f, 0.16f, 0.18f, 0.95f);
         private static readonly Color ColSlotBg = new Color(0.055f, 0.075f, 0.105f, 0.96f);
         private static readonly Color ColCardBg = new Color(0.075f, 0.10f, 0.145f, 0.96f);
@@ -160,15 +164,86 @@ namespace SundayLastBreath.UI
         private static readonly Color ColTextMain = new Color(0.90f, 0.925f, 0.96f, 1f);
         private static readonly Color ColTextMuted = new Color(0.55f, 0.62f, 0.72f, 1f);
 
+        // Style D Tactical Hardware Palette (90s gunmetal CRT & warm phosphor)
+        private static bool IsStyleD => SundayTypography.StyleDThemeEnabled;
+        private static readonly Color ColStyleDBone = new Color(0.89f, 0.87f, 0.82f, 1f);
+        private static readonly Color ColStyleDMuted = new Color(0.60f, 0.58f, 0.54f, 1f);
+        private static readonly Color ColStyleDAmber = new Color(0.88f, 0.64f, 0.22f, 1f);
+        private static readonly Color ColStyleDRust = new Color(0.76f, 0.24f, 0.18f, 1f);
+        private static readonly Color ColStyleDMetalBtn = new Color(0.24f, 0.26f, 0.29f, 1f);
+        private static readonly Color ColStyleDMetalHover = new Color(0.34f, 0.36f, 0.40f, 1f);
+        private static readonly Color ColStyleDSage = new Color(0.32f, 0.64f, 0.44f, 1f);
+        private static readonly Color ColStyleDHairline = new Color(0.24f, 0.25f, 0.28f, 0.55f);
+
+        private static void ApplyStyleDSliced(Image img, Sprite spr, float ppuMult, Color tint)
+        {
+            if (img == null || spr == null) return;
+            img.sprite = spr;
+            img.type = Image.Type.Sliced;
+            img.pixelsPerUnitMultiplier = ppuMult;
+            img.color = tint;
+        }
+
+        private static void ApplyStyleDButtonSprite(Button btn, Image bg, Sprite spr, float ppuMult, Color normalTint, Color hoverTint, Color pressedTint, Color disabledTint)
+        {
+            if (bg != null && spr != null)
+            {
+                ApplyStyleDSliced(bg, spr, ppuMult, Color.white);
+                if (bg.canvasRenderer != null) bg.canvasRenderer.SetColor(normalTint);
+            }
+            if (btn != null)
+            {
+                ColorBlock cb = btn.colors;
+                cb.normalColor = normalTint;
+                cb.highlightedColor = hoverTint;
+                cb.pressedColor = pressedTint;
+                cb.selectedColor = normalTint;
+                cb.disabledColor = disabledTint;
+                cb.colorMultiplier = 1f;
+                cb.fadeDuration = 0.08f;
+                btn.colors = cb;
+            }
+        }
+
+        private static void AttachCrtOsdChromatic(TextMeshProUGUI tmp)
+        {
+            if (tmp == null) return;
+            var fx = tmp.GetComponent<CrtOsdChromaticEffect>();
+            if (fx == null) fx = tmp.gameObject.AddComponent<CrtOsdChromaticEffect>();
+            fx.SyncNow();
+        }
+
         // Hybrid Cockpit Layout References
         private bool _builtForHybridLayout;
         private GameObject hybridCommandsContainer;
+        private ScrollRect hybridIntelScrollRect;
         private TextMeshProUGUI hybridIntelBodyText;
         private TextMeshProUGUI hybridIntelBadgeText;
         private TextMeshProUGUI hybridCommandHeaderText;
         private Button hybridBackBtn;
         private TextMeshProUGUI hybridWeaponBadgeText;
         private string _lastDisplayedWeapon;
+
+        // Visual Hierarchy References (Hybrid & Legacy)
+        private RectTransform hybridArenaPanelRect;
+        private RectTransform hybridIntelPanelRect;
+        private RectTransform hybridCmdPanelRect;
+        private RectTransform hybridIntelCardRect;
+        private TextMeshProUGUI hybridIntelHeaderTitle;
+        private Image hybridIntelHeaderLine;
+        private Image hybridCmdHeaderLine;
+        private CanvasGroup hybridIntelPanelCg;
+        private CanvasGroup hybridIntelCardCg;
+        private CanvasGroup hybridCmdPanelCg;
+
+        private CanvasGroup legacyLeftCmdCg;
+        private Outline legacyLeftCmdOutline;
+        private CanvasGroup legacyCenterSelectCg;
+        private Outline legacyCenterSelectOutline;
+        private CanvasGroup legacyRightStatusCg;
+        private Outline legacyRightStatusOutline;
+        private Button hybridFontScaleBtn;
+        private TextMeshProUGUI hybridFontScaleLabel;
 
         private void Awake()
         {
@@ -328,15 +403,17 @@ namespace SundayLastBreath.UI
             menuState = SubMenuState.MainCommands;
 
             bool useHybrid = GameStageScreen.Instance != null && GameStageScreen.Instance.IsHybridCockpitActive;
-            if (!useHybrid)
+            if (!useHybrid || IsStyleD)
             {
-                // Hide legacy TopHUD so HP/Stamina is cleanly focused on the combat survivor card
+                // Hide TopHUD so legacy status or Style D CRT exploration OSD doesn't overlap combat overlay
                 GameStageScreen.Instance?.SetTopHUDVisible(false);
             }
 
             BuildOrRefreshUI();
             transform.SetAsLastSibling();
             gameObject.SetActive(true);
+            GameStageScreen.Instance?.SetCombatModal(this);
+            GameStageScreen.Instance?.RefreshCockpitVisualHierarchy();
 
             // Ensure mouse raycasts always reach the combat modal even if parent screen was force-activated!
             foreach (var cg in GetComponentsInParent<CanvasGroup>(true))
@@ -354,6 +431,10 @@ namespace SundayLastBreath.UI
 
             LoadEnemyVisuals(CurrentEnemy);
             RefreshAllUI();
+            if (hybridIntelScrollRect != null)
+            {
+                hybridIntelScrollRect.verticalNormalizedPosition = 1f;
+            }
             if (isTutorialCombat)
             {
                 SetCombatLog("<color=#F59E0B><b>[SURVIVAL DIRECTIVE]</b></color> The attacker does not feel pain! Click <b>[1] ATTACK LIMB</b> to target anatomy (Legs force Crawlers, Head deals critical trauma).");
@@ -1146,9 +1227,9 @@ namespace SundayLastBreath.UI
 
         public void CloseModal()
         {
-            if (!_builtForHybridLayout)
+            if (!_builtForHybridLayout || IsStyleD)
             {
-                // Restore legacy TopHUD and synchronize updated vitals & XP
+                // Restore TopHUD and synchronize updated vitals & XP
                 GameStageScreen.Instance?.SetTopHUDVisible(true);
             }
             GameStageScreen.Instance?.UpdateVitalsUI();
@@ -1156,14 +1237,32 @@ namespace SundayLastBreath.UI
             GameStageScreen.Instance?.RefreshAllPDAPanels();
 
             gameObject.SetActive(false);
+            GameStageScreen.Instance?.RefreshCockpitVisualHierarchy();
+        }
+
+        private void OnEnable()
+        {
+            SundayTypography.OnNarrativeScaleChanged -= OnCombatNarrativeScaleChanged;
+            SundayTypography.OnNarrativeScaleChanged += OnCombatNarrativeScaleChanged;
         }
 
         private void OnDisable()
         {
-            if (!_builtForHybridLayout)
+            SundayTypography.OnNarrativeScaleChanged -= OnCombatNarrativeScaleChanged;
+            if (!_builtForHybridLayout || IsStyleD)
             {
-                // Safeguard: Ensure legacy TopHUD is always restored whenever combat modal is hidden or disabled
+                // Safeguard: Ensure TopHUD is always restored whenever combat modal is hidden or disabled
                 GameStageScreen.Instance?.SetTopHUDVisible(true);
+            }
+            GameStageScreen.Instance?.RefreshCockpitVisualHierarchy();
+        }
+
+        private void OnCombatNarrativeScaleChanged()
+        {
+            ApplyCombatTextTypography();
+            if (gameObject.activeInHierarchy)
+            {
+                RefreshAllUI();
             }
         }
 
@@ -1462,6 +1561,24 @@ namespace SundayLastBreath.UI
                 hybridBackBtn = null;
                 hybridWeaponBadgeText = null;
                 _lastDisplayedWeapon = null;
+                hybridArenaPanelRect = null;
+                hybridIntelPanelRect = null;
+                hybridCmdPanelRect = null;
+                hybridIntelCardRect = null;
+                hybridIntelHeaderTitle = null;
+                hybridIntelHeaderLine = null;
+                hybridCmdHeaderLine = null;
+                hybridIntelPanelCg = null;
+                hybridIntelCardCg = null;
+                hybridCmdPanelCg = null;
+                legacyLeftCmdCg = null;
+                legacyLeftCmdOutline = null;
+                legacyCenterSelectCg = null;
+                legacyCenterSelectOutline = null;
+                legacyRightStatusCg = null;
+                legacyRightStatusOutline = null;
+                hybridFontScaleBtn = null;
+                hybridFontScaleLabel = null;
             }
 
             if (modalContainer != null)
@@ -1518,15 +1635,18 @@ namespace SundayLastBreath.UI
             // ================================================================
             // PANEL 1: TOP-CENTER BATTLE ARENA (412, 16) -> (1508, 668) [1096 x 652]
             // ================================================================
+            bool styleD = IsStyleD && HybridCockpitController.SharedStyleDPanelChassis != null;
+
             GameObject arenaPanel = new GameObject("HybridCombat_ArenaPanel", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
             arenaPanel.transform.SetParent(modalContainer.transform, false);
             arenaRect = arenaPanel.GetComponent<RectTransform>();
+            hybridArenaPanelRect = arenaRect;
             HybridCockpitController.SetPixelBox(arenaRect, 412f, 16f, 1508f, 668f);
 
             Image arenaBg = arenaPanel.GetComponent<Image>();
-            arenaBg.color = new Color(0.02f, 0.03f, 0.05f, 0.34f);
+            arenaBg.color = styleD ? new Color(0.02f, 0.01f, 0.015f, 0.24f) : new Color(0.02f, 0.03f, 0.05f, 0.34f);
             arenaBg.raycastTarget = true;
-            AddCrispBorder(arenaRect, ColBorderCrimson, 1.5f);
+            if (!styleD) AddCrispBorder(arenaRect, ColBorderCrimson, 1.5f);
 
             // Subtle Ground Horizon Shadow Strip at bottom of Arena
             GameObject floorShadow = new GameObject("FloorShadow", typeof(RectTransform), typeof(Image));
@@ -1541,16 +1661,27 @@ namespace SundayLastBreath.UI
             fsImg.color = new Color(0.02f, 0.03f, 0.05f, 0.42f);
             fsImg.raycastTarget = false;
 
-            // Arena Top Header Strip (36px tall)
+            // Arena Top Header Strip / Style D Diegetic CRT OSD
             GameObject headerBar = new GameObject("HeaderBar", typeof(RectTransform), typeof(Image));
             headerBar.transform.SetParent(arenaRect, false);
             RectTransform hbRt = headerBar.GetComponent<RectTransform>();
             hbRt.anchorMin = new Vector2(0f, 1f);
             hbRt.anchorMax = new Vector2(1f, 1f);
             hbRt.pivot = new Vector2(0.5f, 1f);
-            hbRt.sizeDelta = new Vector2(0f, 36f);
-            hbRt.anchoredPosition = Vector2.zero;
-            headerBar.GetComponent<Image>().color = ColHeaderCombatBg;
+            if (styleD)
+            {
+                hbRt.offsetMin = new Vector2(72f, -92f);
+                hbRt.offsetMax = new Vector2(-72f, -56f);
+                Image hbImg = headerBar.GetComponent<Image>();
+                hbImg.color = Color.clear;
+                hbImg.raycastTarget = false;
+            }
+            else
+            {
+                hbRt.sizeDelta = new Vector2(0f, 36f);
+                hbRt.anchoredPosition = Vector2.zero;
+                headerBar.GetComponent<Image>().color = ColHeaderCombatBg;
+            }
 
             GameObject hbLine = new GameObject("HeaderBottomLine", typeof(RectTransform), typeof(Image));
             hbLine.transform.SetParent(headerBar.transform, false);
@@ -1562,24 +1693,67 @@ namespace SundayLastBreath.UI
             Image hblImg = hbLine.GetComponent<Image>();
             hblImg.color = ColBorderCrimson;
             hblImg.raycastTarget = false;
+            if (styleD) hbLine.SetActive(false);
 
-            headerTitleText = CreateText(headerBar.transform, "HeaderTitle", "// TACTICAL COMBAT // ANATOMICAL TARGETING", 12.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
+            headerTitleText = CreateText(
+                headerBar.transform,
+                "HeaderTitle",
+                styleD ? "<color=#D9483B>●</color> COMBAT" : "// TACTICAL COMBAT // ANATOMICAL TARGETING",
+                styleD ? 13f : 12.5f,
+                styleD ? FontStyles.Normal : FontStyles.Bold,
+                TextAlignmentOptions.MidlineLeft,
+                styleD ? FontRole.VcrOsd : FontRole.Mono);
             RectTransform htRt = headerTitleText.GetComponent<RectTransform>();
             htRt.anchorMin = new Vector2(0f, 0f);
             htRt.anchorMax = new Vector2(0.58f, 1f);
-            htRt.offsetMin = new Vector2(14f, 0f);
+            htRt.offsetMin = new Vector2(styleD ? 4f : 14f, 0f);
             htRt.offsetMax = Vector2.zero;
-            headerTitleText.color = ColCrimson;
+            headerTitleText.color = styleD ? new Color(0.90f, 0.88f, 0.82f, 0.86f) : ColCrimson;
 
-            prevTargetBtn = CreateSmallButton(headerBar.transform, "PrevTargetBtn", "< [Q]", new Vector2(-284f, 0f), new Vector2(72f, 24f), () => CycleTarget(-1), useHybridStyle: true);
-            hordeCounterText = CreateText(headerBar.transform, "HordeCounter", "TARGET 1 / 1 (1 ALIVE)", 11f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
-            hordeCounterText.color = ColTextMain;
+            prevTargetBtn = CreateSmallButton(headerBar.transform, "PrevTargetBtn", "< [Q]",
+                new Vector2(styleD ? -258f : -284f, 0f),
+                styleD ? new Vector2(64f, 22f) : new Vector2(72f, 24f),
+                () => CycleTarget(-1), useHybridStyle: true);
+
+            hordeCounterText = CreateText(
+                headerBar.transform,
+                "HordeCounter",
+                "TARGET 1 / 1",
+                styleD ? 12.5f : 11f,
+                styleD ? FontStyles.Normal : FontStyles.Bold,
+                TextAlignmentOptions.Center,
+                styleD ? FontRole.VcrOsd : FontRole.Mono);
+            hordeCounterText.color = styleD ? ColStyleDAmber : ColTextMain;
             RectTransform hcRt = hordeCounterText.GetComponent<RectTransform>();
             hcRt.anchorMin = new Vector2(1f, 0.5f);
             hcRt.anchorMax = new Vector2(1f, 0.5f);
-            hcRt.sizeDelta = new Vector2(170f, 24f);
-            hcRt.anchoredPosition = new Vector2(-160f, 0f);
-            nextTargetBtn = CreateSmallButton(headerBar.transform, "NextTargetBtn", "[E] >", new Vector2(-38f, 0f), new Vector2(72f, 24f), () => CycleTarget(1), useHybridStyle: true);
+            hcRt.sizeDelta = styleD ? new Vector2(146f, 24f) : new Vector2(170f, 24f);
+            hcRt.anchoredPosition = new Vector2(styleD ? -150f : -160f, 0f);
+
+            nextTargetBtn = CreateSmallButton(headerBar.transform, "NextTargetBtn", "[E] >",
+                new Vector2(styleD ? -36f : -38f, 0f),
+                styleD ? new Vector2(64f, 22f) : new Vector2(72f, 24f),
+                () => CycleTarget(1), useHybridStyle: true);
+
+            if (styleD)
+            {
+                AttachCrtOsdChromatic(headerTitleText);
+                AttachCrtOsdChromatic(hordeCounterText);
+
+                GameObject scanGo = new GameObject("StyleD_CombatOsdScanlines", typeof(RectTransform), typeof(RawImage));
+                scanGo.transform.SetParent(headerBar.transform, false);
+                RectTransform scRt = scanGo.GetComponent<RectTransform>();
+                scRt.anchorMin = Vector2.zero;
+                scRt.anchorMax = Vector2.one;
+                scRt.offsetMin = Vector2.zero;
+                scRt.offsetMax = Vector2.zero;
+                RawImage rawImg = scanGo.GetComponent<RawImage>();
+                rawImg.texture = HybridCockpitController.GetSharedStyleDCrtScanlineTexture();
+                rawImg.color = Color.white;
+                rawImg.uvRect = new Rect(0f, 0f, 1f, 36f / 4f);
+                rawImg.raycastTarget = false;
+                scanGo.transform.SetAsLastSibling();
+            }
 
             // Enemy Composite Silhouette + Limb Rig (440x440)
             BuildEnemyCompositeRig(arenaRect, anchorPoint: new Vector2(0.54f, 0.47f), hybridStyle: true);
@@ -1592,7 +1766,7 @@ namespace SundayLastBreath.UI
             pfRt.anchorMax = new Vector2(0f, 0f);
             pfRt.pivot = new Vector2(0f, 0f);
             pfRt.sizeDelta = new Vector2(235f, 275f);
-            pfRt.anchoredPosition = new Vector2(18f, -14f);
+            pfRt.anchoredPosition = new Vector2(styleD ? 28f : 18f, -14f);
 
             playerForegroundImage = playerFgObj.GetComponent<Image>();
             playerForegroundImage.preserveAspect = true;
@@ -1608,16 +1782,16 @@ namespace SundayLastBreath.UI
             wpRt.anchorMin = new Vector2(0f, 1f);
             wpRt.anchorMax = new Vector2(0f, 1f);
             wpRt.pivot = new Vector2(0f, 1f);
-            wpRt.sizeDelta = new Vector2(360f, 34f);
-            wpRt.anchoredPosition = new Vector2(14f, -48f);
+            wpRt.sizeDelta = styleD ? new Vector2(310f, 28f) : new Vector2(360f, 34f);
+            wpRt.anchoredPosition = styleD ? new Vector2(72f, -100f) : new Vector2(14f, -48f);
             Image wpBg = wpnPill.GetComponent<Image>();
-            wpBg.color = new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.94f);
+            wpBg.color = styleD ? new Color(0.04f, 0.045f, 0.052f, 0.82f) : new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.94f);
             wpBg.raycastTarget = false;
-            AddCrispBorder(wpnPill.transform, ColBorderSlate, 1f);
-            AddLeftAccentBar(wpnPill.transform, ColAmber, 3f);
+            AddCrispBorder(wpnPill.transform, styleD ? new Color(0.24f, 0.25f, 0.28f, 0.65f) : ColBorderSubtle, 1f);
+            AddLeftAccentBar(wpnPill.transform, styleD ? ColStyleDAmber : ColAmber, 3f);
 
-            hybridWeaponBadgeText = CreateText(wpnPill.transform, "WeaponTurnTxt", "TURN 1  //  UNARMED", 10.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
-            hybridWeaponBadgeText.color = ColTextMain;
+            hybridWeaponBadgeText = CreateText(wpnPill.transform, "WeaponTurnTxt", "TURN 1  |  UNARMED", styleD ? 10f : 10.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
+            hybridWeaponBadgeText.color = styleD ? ColStyleDBone : ColTextMain;
             RectTransform wtRt = hybridWeaponBadgeText.GetComponent<RectTransform>();
             wtRt.anchorMin = Vector2.zero;
             wtRt.anchorMax = Vector2.one;
@@ -1631,60 +1805,96 @@ namespace SundayLastBreath.UI
             bnRt.anchorMin = new Vector2(1f, 1f);
             bnRt.anchorMax = new Vector2(1f, 1f);
             bnRt.pivot = new Vector2(1f, 1f);
-            bnRt.sizeDelta = new Vector2(340f, 64f);
-            bnRt.anchoredPosition = new Vector2(-14f, -48f);
+            bnRt.sizeDelta = styleD ? new Vector2(300f, 54f) : new Vector2(340f, 64f);
+            bnRt.anchoredPosition = styleD ? new Vector2(-72f, -100f) : new Vector2(-14f, -48f);
             Image bnBg = bannerObj.GetComponent<Image>();
-            bnBg.color = new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.94f);
+            bnBg.color = styleD ? new Color(0.04f, 0.045f, 0.052f, 0.82f) : new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.94f);
             bnBg.raycastTarget = false;
-            AddCrispBorder(bannerObj.transform, ColBorderSlate, 1f);
-            AddLeftAccentBar(bannerObj.transform, ColCrimson, 3f);
+            AddCrispBorder(bannerObj.transform, styleD ? new Color(0.24f, 0.25f, 0.28f, 0.65f) : ColBorderSubtle, 1f);
+            AddLeftAccentBar(bannerObj.transform, styleD ? ColStyleDRust : ColCrimson, 3f);
 
-            enemyTitleBanner = CreateText(bannerObj.transform, "EnemyName", "INFECTED COMMUTER", 13.5f, FontStyles.Bold, TextAlignmentOptions.TopLeft, FontRole.Display);
+            enemyTitleBanner = CreateText(bannerObj.transform, "EnemyName", "INFECTED COMMUTER", styleD ? 13f : 13.5f, FontStyles.Bold, TextAlignmentOptions.TopLeft, FontRole.Display);
             RectTransform etbRt = enemyTitleBanner.GetComponent<RectTransform>();
             etbRt.anchorMin = Vector2.zero;
             etbRt.anchorMax = Vector2.one;
-            etbRt.offsetMin = new Vector2(14f, 30f);
+            etbRt.offsetMin = new Vector2(14f, styleD ? 24f : 30f);
             etbRt.offsetMax = new Vector2(-10f, -6f);
 
-            enemyStatusTagsText = CreateText(bannerObj.transform, "EnemyStatusTags", "[STANDING]", 10.5f, FontStyles.Bold, TextAlignmentOptions.BottomLeft, FontRole.Mono);
+            enemyStatusTagsText = CreateText(bannerObj.transform, "EnemyStatusTags", "[STANDING]", styleD ? 9.5f : 10.5f, FontStyles.Bold, TextAlignmentOptions.BottomLeft, FontRole.Mono);
             RectTransform estRt = enemyStatusTagsText.GetComponent<RectTransform>();
             estRt.anchorMin = Vector2.zero;
             estRt.anchorMax = Vector2.one;
             estRt.offsetMin = new Vector2(14f, 6f);
-            estRt.offsetMax = new Vector2(-10f, -34f);
+            estRt.offsetMax = new Vector2(-10f, styleD ? -27f : -34f);
 
-            // Screen Flash Overlay inside Arena (below header bar)
+            // Screen Flash Overlay inside Arena (behind CRT bezel in Style D)
             GameObject flashObj = new GameObject("ScreenFlash", typeof(RectTransform), typeof(Image));
             flashObj.transform.SetParent(arenaRect, false);
             RectTransform flRt = flashObj.GetComponent<RectTransform>();
             flRt.anchorMin = Vector2.zero;
             flRt.anchorMax = Vector2.one;
             flRt.offsetMin = Vector2.zero;
-            flRt.offsetMax = new Vector2(0f, -36f);
+            flRt.offsetMax = styleD ? Vector2.zero : new Vector2(0f, -36f);
             screenFlashOverlay = flashObj.GetComponent<Image>();
             screenFlashOverlay.raycastTarget = false;
             flashObj.SetActive(false);
+
+            if (styleD && HybridCockpitController.SharedStyleDCrtBezel != null)
+            {
+                GameObject bezelObj = new GameObject("StyleD_CombatCRTBezelOverlay", typeof(RectTransform), typeof(Image));
+                bezelObj.transform.SetParent(arenaRect, false);
+                RectTransform bzRt = bezelObj.GetComponent<RectTransform>();
+                bzRt.anchorMin = Vector2.zero;
+                bzRt.anchorMax = Vector2.one;
+                bzRt.offsetMin = Vector2.zero;
+                bzRt.offsetMax = Vector2.zero;
+                Image bzImg = bezelObj.GetComponent<Image>();
+                bzImg.sprite = HybridCockpitController.SharedStyleDCrtBezel;
+                bzImg.type = Image.Type.Simple;
+                bzImg.preserveAspect = false;
+                bzImg.color = Color.white;
+                bzImg.raycastTarget = false;
+                headerBar.transform.SetAsLastSibling();
+            }
 
             // ================================================================
             // PANEL 2: BOTTOM-CENTER COMBAT FEED & TELEMETRY (412, 682) -> (1116, 1064) [704 x 382]
             // ================================================================
             GameObject intelPanel = new GameObject("HybridCombat_IntelPanel", typeof(RectTransform), typeof(Image));
             intelPanel.transform.SetParent(modalContainer.transform, false);
-            HybridCockpitController.SetPixelBox(intelPanel.GetComponent<RectTransform>(), 412f, 682f, 1116f, 1064f);
+            hybridIntelPanelRect = intelPanel.GetComponent<RectTransform>();
+            HybridCockpitController.SetPixelBox(hybridIntelPanelRect, 412f, 682f, 1116f, 1064f);
+            hybridIntelPanelCg = intelPanel.AddComponent<CanvasGroup>();
             Image ipBg = intelPanel.GetComponent<Image>();
-            ipBg.color = ColPanelBg;
             ipBg.raycastTarget = true;
-            AddCrispBorder(intelPanel.transform, ColBorderSlate, 1.5f);
+            if (styleD)
+            {
+                ApplyStyleDSliced(ipBg, HybridCockpitController.SharedStyleDPanelChassis, 3.2f, Color.white);
+            }
+            else
+            {
+                ipBg.color = ColPanelBg;
+                AddCrispBorder(intelPanel.transform, ColBorderPassive, 1.5f);
+            }
 
-            // Header Strip (34px tall)
+            // Header Strip
             GameObject intelHeader = new GameObject("Header", typeof(RectTransform), typeof(Image));
             intelHeader.transform.SetParent(intelPanel.transform, false);
             RectTransform ihRt = intelHeader.GetComponent<RectTransform>();
             ihRt.anchorMin = new Vector2(0f, 1f);
             ihRt.anchorMax = new Vector2(1f, 1f);
             ihRt.pivot = new Vector2(0.5f, 1f);
-            ihRt.sizeDelta = new Vector2(0f, 34f);
-            intelHeader.GetComponent<Image>().color = ColHeaderBg;
+            if (styleD)
+            {
+                ihRt.offsetMin = new Vector2(18f, -46f);
+                ihRt.offsetMax = new Vector2(-18f, -18f);
+                intelHeader.GetComponent<Image>().color = Color.clear;
+            }
+            else
+            {
+                ihRt.sizeDelta = new Vector2(0f, 34f);
+                intelHeader.GetComponent<Image>().color = ColHeaderBg;
+            }
 
             GameObject ihLine = new GameObject("Line", typeof(RectTransform), typeof(Image));
             ihLine.transform.SetParent(intelHeader.transform, false);
@@ -1693,87 +1903,223 @@ namespace SundayLastBreath.UI
             ihlRt.anchorMax = new Vector2(1f, 0f);
             ihlRt.pivot = new Vector2(0.5f, 0f);
             ihlRt.sizeDelta = new Vector2(0f, 1f);
-            ihLine.GetComponent<Image>().color = ColBorderSlate;
+            hybridIntelHeaderLine = ihLine.GetComponent<Image>();
+            hybridIntelHeaderLine.color = styleD ? ColStyleDHairline : ColBorderPassive;
 
-            TextMeshProUGUI intelHdrTitle = CreateText(intelHeader.transform, "Title", "// COMBAT FEED & TACTICAL TELEMETRY", 11.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
-            intelHdrTitle.color = ColAmber;
+            TextMeshProUGUI intelHdrTitle = CreateText(
+                intelHeader.transform,
+                "Title",
+                styleD ? "COMBAT LOG & INTEL" : "// COMBAT FEED & TACTICAL TELEMETRY",
+                11.5f,
+                FontStyles.Bold,
+                TextAlignmentOptions.MidlineLeft,
+                styleD ? FontRole.Display : FontRole.Mono);
+            hybridIntelHeaderTitle = intelHdrTitle;
+            intelHdrTitle.color = styleD ? ColStyleDBone : ColAmber;
             RectTransform ihtRt = intelHdrTitle.GetComponent<RectTransform>();
             ihtRt.anchorMin = Vector2.zero;
-            ihtRt.anchorMax = new Vector2(0.65f, 1f);
-            ihtRt.offsetMin = new Vector2(14f, 0f);
+            ihtRt.anchorMax = new Vector2(0.55f, 1f);
+            ihtRt.offsetMin = new Vector2(styleD ? 6f : 14f, 0f);
             ihtRt.offsetMax = Vector2.zero;
 
-            hybridIntelBadgeText = CreateText(intelHeader.transform, "TurnBadge", "TURN 1 // YOUR MOVE", 10.5f, FontStyles.Bold, TextAlignmentOptions.MidlineRight, FontRole.Mono);
-            hybridIntelBadgeText.color = ColCyan;
+            hybridIntelBadgeText = CreateText(intelHeader.transform, "TurnBadge", "TURN 1 | YOUR MOVE", styleD ? 10f : 10.5f, FontStyles.Bold, TextAlignmentOptions.MidlineRight, FontRole.Mono);
+            hybridIntelBadgeText.color = styleD ? ColStyleDAmber : ColCyan;
             RectTransform ibdRt = hybridIntelBadgeText.GetComponent<RectTransform>();
-            ibdRt.anchorMin = new Vector2(0.65f, 0f);
+            ibdRt.anchorMin = new Vector2(0.55f, 0f);
             ibdRt.anchorMax = Vector2.one;
             ibdRt.offsetMin = Vector2.zero;
-            ibdRt.offsetMax = new Vector2(-14f, 0f);
+            ibdRt.offsetMax = new Vector2(styleD ? -88f : -96f, 0f);
+
+            hybridFontScaleBtn = CreateSmallButton(
+                intelHeader.transform,
+                "CombatFontScaleBtn",
+                $"AA {SundayTypography.NarrativeFontScalePercent}%",
+                new Vector2(styleD ? -42f : -49f, 0f),
+                styleD ? new Vector2(78f, 20f) : new Vector2(78f, 22f),
+                () =>
+                {
+                    Core.AudioManager.Instance?.PlayButtonClick();
+                    SundayTypography.CycleNarrativeFontScale();
+                },
+                useHybridStyle: true);
+            hybridFontScaleLabel = hybridFontScaleBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (hybridFontScaleLabel != null)
+            {
+                hybridFontScaleLabel.fontSize = 9.5f;
+                hybridFontScaleLabel.color = styleD ? ColStyleDAmber : ColAmber;
+            }
 
             // Live Combat Log Box (Top of Intel body)
-            GameObject logBox = new GameObject("LiveCombatLogBox", typeof(RectTransform), typeof(Image));
+            GameObject logBox = new GameObject("LiveCombatLogBox", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
             logBox.transform.SetParent(intelPanel.transform, false);
             RectTransform lbRt = logBox.GetComponent<RectTransform>();
             lbRt.anchorMin = new Vector2(0f, 1f);
             lbRt.anchorMax = new Vector2(1f, 1f);
             lbRt.pivot = new Vector2(0.5f, 1f);
-            lbRt.anchoredPosition = new Vector2(0f, -44f);
-            lbRt.sizeDelta = new Vector2(-24f, 84f);
-            logBox.GetComponent<Image>().color = ColSlotBg;
-            AddCrispBorder(logBox.transform, ColBorderSlate, 1f);
-            AddLeftAccentBar(logBox.transform, ColAmber, 3f);
+            if (styleD)
+            {
+                lbRt.offsetMin = new Vector2(18f, -138f);
+                lbRt.offsetMax = new Vector2(-18f, -52f);
+                ApplyStyleDSliced(logBox.GetComponent<Image>(), HybridCockpitController.SharedStyleDWellRecessed, 3.2f, Color.white);
+                AddLeftAccentBar(logBox.transform, ColStyleDRust, 3f);
+            }
+            else
+            {
+                lbRt.anchoredPosition = new Vector2(0f, -44f);
+                lbRt.sizeDelta = new Vector2(-24f, 84f);
+                logBox.GetComponent<Image>().color = ColSlotBg;
+                AddCrispBorder(logBox.transform, ColBorderSubtle, 1f);
+                AddLeftAccentBar(logBox.transform, ColAmber, 3f);
+            }
 
-            combatLogText = CreateText(logBox.transform, "CombatLogText", "", 13f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Body);
+            combatLogText = CreateText(
+                logBox.transform,
+                "CombatLogText",
+                "",
+                13f,
+                styleD ? FontStyles.Normal : FontStyles.Bold,
+                TextAlignmentOptions.MidlineLeft,
+                styleD ? FontRole.Narrative : FontRole.Body);
             combatLogText.textWrappingMode = TextWrappingModes.Normal;
-            combatLogText.color = ColTextMain;
+            combatLogText.enableAutoSizing = true;
+            combatLogText.fontSizeMin = 9.5f;
+            combatLogText.fontSizeMax = 13f;
+            combatLogText.overflowMode = TextOverflowModes.Truncate;
+            combatLogText.color = styleD ? ColStyleDBone : ColTextMain;
             RectTransform cltRt = combatLogText.GetComponent<RectTransform>();
             cltRt.anchorMin = Vector2.zero;
             cltRt.anchorMax = Vector2.one;
             cltRt.offsetMin = new Vector2(14f, 8f);
             cltRt.offsetMax = new Vector2(-12f, -8f);
 
-            // Enemy Intel / Survival Directive Card (Remainder of Intel body)
-            GameObject intelCard = new GameObject("EnemyIntelCard", typeof(RectTransform), typeof(Image));
+            // Enemy Intel / Survival Directive Card (Remainder of Intel body - Masked & Scrollable)
+            GameObject intelCard = new GameObject("EnemyIntelCard", typeof(RectTransform), typeof(Image), typeof(ScrollRect));
             intelCard.transform.SetParent(intelPanel.transform, false);
             RectTransform icRt = intelCard.GetComponent<RectTransform>();
+            hybridIntelCardRect = icRt;
+            hybridIntelCardCg = intelCard.AddComponent<CanvasGroup>();
             icRt.anchorMin = Vector2.zero;
             icRt.anchorMax = Vector2.one;
-            icRt.offsetMin = new Vector2(12f, 12f);
-            icRt.offsetMax = new Vector2(-12f, -138f);
-            intelCard.GetComponent<Image>().color = ColCardBg;
-            AddCrispBorder(intelCard.transform, ColBorderSlate, 1f);
+            Image icImg = intelCard.GetComponent<Image>();
+            icImg.raycastTarget = true;
+            if (styleD)
+            {
+                icRt.offsetMin = new Vector2(18f, 18f);
+                icRt.offsetMax = new Vector2(-18f, -144f);
+                ApplyStyleDSliced(icImg, HybridCockpitController.SharedStyleDWellRecessed, 3.2f, Color.white);
+            }
+            else
+            {
+                icRt.offsetMin = new Vector2(12f, 12f);
+                icRt.offsetMax = new Vector2(-12f, -138f);
+                icImg.color = ColCardBg;
+                AddCrispBorder(intelCard.transform, ColBorderSubtle, 1f);
+            }
 
-            hybridIntelBodyText = CreateText(intelCard.transform, "IntelBody", "", 12.5f, FontStyles.Normal, TextAlignmentOptions.TopLeft, FontRole.Body);
+            GameObject intelViewport = new GameObject("IntelViewport", typeof(RectTransform), typeof(RectMask2D));
+            intelViewport.transform.SetParent(intelCard.transform, false);
+            RectTransform ivRt = intelViewport.GetComponent<RectTransform>();
+            ivRt.anchorMin = Vector2.zero;
+            ivRt.anchorMax = Vector2.one;
+            ivRt.offsetMin = new Vector2(14f, 10f);
+            ivRt.offsetMax = new Vector2(-16f, -10f);
+
+            hybridIntelBodyText = CreateText(intelViewport.transform, "IntelBody", "", 12.5f, FontStyles.Normal, TextAlignmentOptions.TopLeft, FontRole.Body);
             hybridIntelBodyText.textWrappingMode = TextWrappingModes.Normal;
-            hybridIntelBodyText.lineSpacing = 4f;
-            hybridIntelBodyText.color = ColTextMain;
+            hybridIntelBodyText.lineSpacing = 3f;
+            hybridIntelBodyText.color = styleD ? ColStyleDBone : ColTextMain;
             RectTransform icbRt = hybridIntelBodyText.GetComponent<RectTransform>();
-            icbRt.anchorMin = Vector2.zero;
-            icbRt.anchorMax = Vector2.one;
-            icbRt.offsetMin = new Vector2(14f, 10f);
-            icbRt.offsetMax = new Vector2(-14f, -10f);
+            icbRt.anchorMin = new Vector2(0f, 1f);
+            icbRt.anchorMax = new Vector2(1f, 1f);
+            icbRt.pivot = new Vector2(0.5f, 1f);
+            icbRt.anchoredPosition = Vector2.zero;
+            icbRt.sizeDelta = Vector2.zero;
+
+            ContentSizeFitter icCsf = hybridIntelBodyText.gameObject.AddComponent<ContentSizeFitter>();
+            icCsf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            icCsf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            GameObject sbObj = new GameObject("IntelScrollbar", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+            sbObj.transform.SetParent(intelCard.transform, false);
+            RectTransform sbRt = sbObj.GetComponent<RectTransform>();
+            sbRt.anchorMin = new Vector2(1f, 0f);
+            sbRt.anchorMax = new Vector2(1f, 1f);
+            sbRt.pivot = new Vector2(1f, 0.5f);
+            sbRt.offsetMin = new Vector2(-9f, 10f);
+            sbRt.offsetMax = new Vector2(-5f, -10f);
+            sbObj.GetComponent<Image>().color = styleD
+                ? new Color(0.06f, 0.065f, 0.07f, 0.45f)
+                : new Color(0.05f, 0.07f, 0.11f, 0.45f);
+
+            GameObject slideArea = new GameObject("Sliding Area", typeof(RectTransform));
+            slideArea.transform.SetParent(sbObj.transform, false);
+            RectTransform saRt = slideArea.GetComponent<RectTransform>();
+            saRt.anchorMin = Vector2.zero;
+            saRt.anchorMax = Vector2.one;
+            saRt.sizeDelta = Vector2.zero;
+
+            GameObject handleObj = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+            handleObj.transform.SetParent(slideArea.transform, false);
+            RectTransform hdlRt = handleObj.GetComponent<RectTransform>();
+            hdlRt.sizeDelta = Vector2.zero;
+            Image hdlImg = handleObj.GetComponent<Image>();
+            hdlImg.color = styleD ? ColStyleDMuted : new Color(0.42f, 0.50f, 0.62f, 0.72f);
+
+            Scrollbar intelSb = sbObj.GetComponent<Scrollbar>();
+            intelSb.direction = Scrollbar.Direction.BottomToTop;
+            intelSb.handleRect = hdlRt;
+            intelSb.targetGraphic = hdlImg;
+
+            hybridIntelScrollRect = intelCard.GetComponent<ScrollRect>();
+            hybridIntelScrollRect.horizontal = false;
+            hybridIntelScrollRect.vertical = true;
+            hybridIntelScrollRect.movementType = ScrollRect.MovementType.Clamped;
+            hybridIntelScrollRect.scrollSensitivity = 32f;
+            hybridIntelScrollRect.inertia = true;
+            hybridIntelScrollRect.viewport = ivRt;
+            hybridIntelScrollRect.content = icbRt;
+            hybridIntelScrollRect.verticalScrollbar = intelSb;
+            hybridIntelScrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+            hybridIntelScrollRect.verticalScrollbarSpacing = 0f;
 
             // ================================================================
             // PANEL 3: BOTTOM-RIGHT COMBAT ACTION DECK & LIMB GRID (1132, 682) -> (1904, 1064) [772 x 382]
             // ================================================================
             GameObject cmdPanel = new GameObject("HybridCombat_CommandPanel", typeof(RectTransform), typeof(Image));
             cmdPanel.transform.SetParent(modalContainer.transform, false);
-            HybridCockpitController.SetPixelBox(cmdPanel.GetComponent<RectTransform>(), 1132f, 682f, 1904f, 1064f);
+            hybridCmdPanelRect = cmdPanel.GetComponent<RectTransform>();
+            HybridCockpitController.SetPixelBox(hybridCmdPanelRect, 1132f, 682f, 1904f, 1064f);
+            hybridCmdPanelCg = cmdPanel.AddComponent<CanvasGroup>();
             Image cpBg = cmdPanel.GetComponent<Image>();
-            cpBg.color = ColPanelBg;
             cpBg.raycastTarget = true;
-            AddCrispBorder(cmdPanel.transform, ColBorderSlate, 1.5f);
+            if (styleD)
+            {
+                ApplyStyleDSliced(cpBg, HybridCockpitController.SharedStyleDPanelChassis, 3.2f, Color.white);
+            }
+            else
+            {
+                cpBg.color = ColPanelBg;
+                AddCrispBorder(cmdPanel.transform, ColBorderActiveAction, 1.5f);
+            }
 
-            // Header Strip (34px tall)
+            // Header Strip
             GameObject cmdHeader = new GameObject("Header", typeof(RectTransform), typeof(Image));
             cmdHeader.transform.SetParent(cmdPanel.transform, false);
             RectTransform chRt = cmdHeader.GetComponent<RectTransform>();
             chRt.anchorMin = new Vector2(0f, 1f);
             chRt.anchorMax = new Vector2(1f, 1f);
             chRt.pivot = new Vector2(0.5f, 1f);
-            chRt.sizeDelta = new Vector2(0f, 34f);
-            cmdHeader.GetComponent<Image>().color = ColHeaderBg;
+            if (styleD)
+            {
+                chRt.offsetMin = new Vector2(18f, -46f);
+                chRt.offsetMax = new Vector2(-18f, -18f);
+                cmdHeader.GetComponent<Image>().color = Color.clear;
+            }
+            else
+            {
+                chRt.sizeDelta = new Vector2(0f, 34f);
+                cmdHeader.GetComponent<Image>().color = ColHeaderBg;
+            }
 
             GameObject chLine = new GameObject("Line", typeof(RectTransform), typeof(Image));
             chLine.transform.SetParent(cmdHeader.transform, false);
@@ -1782,14 +2128,22 @@ namespace SundayLastBreath.UI
             chlRt.anchorMax = new Vector2(1f, 0f);
             chlRt.pivot = new Vector2(0.5f, 0f);
             chlRt.sizeDelta = new Vector2(0f, 1f);
-            chLine.GetComponent<Image>().color = ColBorderSlate;
+            hybridCmdHeaderLine = chLine.GetComponent<Image>();
+            hybridCmdHeaderLine.color = styleD ? ColStyleDHairline : ColBorderActiveAction;
 
-            hybridCommandHeaderText = CreateText(cmdHeader.transform, "Title", "// COMBAT ACTIONS // CHOOSE YOUR MOVE", 11.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
-            hybridCommandHeaderText.color = ColAmber;
+            hybridCommandHeaderText = CreateText(
+                cmdHeader.transform,
+                "Title",
+                styleD ? "COMBAT ACTIONS" : "// COMBAT ACTIONS // CHOOSE YOUR MOVE",
+                11.5f,
+                FontStyles.Bold,
+                TextAlignmentOptions.MidlineLeft,
+                styleD ? FontRole.Display : FontRole.Mono);
+            hybridCommandHeaderText.color = styleD ? ColStyleDBone : ColAmber;
             RectTransform chtRt = hybridCommandHeaderText.GetComponent<RectTransform>();
             chtRt.anchorMin = Vector2.zero;
             chtRt.anchorMax = new Vector2(0.78f, 1f);
-            chtRt.offsetMin = new Vector2(14f, 0f);
+            chtRt.offsetMin = new Vector2(styleD ? 6f : 14f, 0f);
             chtRt.offsetMax = Vector2.zero;
 
             // Right Clickable [ESC] BACK Pill inside Header
@@ -1799,27 +2153,49 @@ namespace SundayLastBreath.UI
             bkRt.anchorMin = new Vector2(1f, 0.5f);
             bkRt.anchorMax = new Vector2(1f, 0.5f);
             bkRt.pivot = new Vector2(1f, 0.5f);
-            bkRt.sizeDelta = new Vector2(104f, 22f);
-            bkRt.anchoredPosition = new Vector2(-10f, 0f);
+            bkRt.sizeDelta = styleD ? new Vector2(96f, 20f) : new Vector2(104f, 22f);
+            bkRt.anchoredPosition = new Vector2(styleD ? -4f : -10f, 0f);
             Image bkBg = backObj.GetComponent<Image>();
-            bkBg.color = ColCardBg;
-            AddCrispBorder(backObj.transform, ColCyan, 1f);
             hybridBackBtn = backObj.GetComponent<Button>();
             hybridBackBtn.targetGraphic = bkBg;
             hybridBackBtn.onClick.AddListener(OnCommandBack);
-            ColorBlock bkCb = hybridBackBtn.colors;
-            bkCb.normalColor = ColCardBg;
-            bkCb.highlightedColor = new Color(0.11f, 0.16f, 0.24f, 1f);
-            bkCb.pressedColor = ColSlotBg;
-            hybridBackBtn.colors = bkCb;
+            if (styleD && HybridCockpitController.SharedStyleDButtonMetal != null)
+            {
+                ApplyStyleDButtonSprite(hybridBackBtn, bkBg, HybridCockpitController.SharedStyleDButtonMetal, 3.2f,
+                    ColStyleDMetalBtn, ColStyleDMetalHover, ColStyleDMetalBtn * 0.7f, ColStyleDMetalBtn * 0.5f);
+            }
+            else
+            {
+                bkBg.color = ColCardBg;
+                AddCrispBorder(backObj.transform, ColCyan, 1f);
+                ColorBlock bkCb = hybridBackBtn.colors;
+                bkCb.normalColor = ColCardBg;
+                bkCb.highlightedColor = new Color(0.11f, 0.16f, 0.24f, 1f);
+                bkCb.pressedColor = ColSlotBg;
+                hybridBackBtn.colors = bkCb;
+            }
 
-            TextMeshProUGUI bkTxt = CreateText(backObj.transform, "Lbl", "[ESC] BACK", 10f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
-            bkTxt.color = ColCyan;
+            TextMeshProUGUI bkTxt = CreateText(backObj.transform, "Lbl", "[ESC] BACK", styleD ? 9.5f : 10f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
+            bkTxt.color = styleD ? ColStyleDBone : ColCyan;
             RectTransform bktRt = bkTxt.GetComponent<RectTransform>();
             bktRt.anchorMin = Vector2.zero;
             bktRt.anchorMax = Vector2.one;
             bktRt.sizeDelta = Vector2.zero;
             backObj.SetActive(false);
+
+            if (styleD && HybridCockpitController.SharedStyleDWellRecessed != null)
+            {
+                GameObject cmdWell = new GameObject("StyleD_CommandWell", typeof(RectTransform), typeof(Image));
+                cmdWell.transform.SetParent(cmdPanel.transform, false);
+                RectTransform cwRt = cmdWell.GetComponent<RectTransform>();
+                cwRt.anchorMin = Vector2.zero;
+                cwRt.anchorMax = Vector2.one;
+                cwRt.offsetMin = new Vector2(18f, 18f);
+                cwRt.offsetMax = new Vector2(-18f, -50f);
+                Image cwImg = cmdWell.GetComponent<Image>();
+                cwImg.raycastTarget = false;
+                ApplyStyleDSliced(cwImg, HybridCockpitController.SharedStyleDWellRecessed, 3.2f, Color.white);
+            }
 
             // Body View A: Main Action Cards Stack
             hybridCommandsContainer = new GameObject("HybridCommandsList", typeof(RectTransform), typeof(VerticalLayoutGroup));
@@ -1827,21 +2203,21 @@ namespace SundayLastBreath.UI
             RectTransform hccRt = hybridCommandsContainer.GetComponent<RectTransform>();
             hccRt.anchorMin = Vector2.zero;
             hccRt.anchorMax = Vector2.one;
-            hccRt.offsetMin = Vector2.zero;
-            hccRt.offsetMax = new Vector2(0f, -34f);
+            hccRt.offsetMin = styleD ? new Vector2(18f, 18f) : Vector2.zero;
+            hccRt.offsetMax = styleD ? new Vector2(-18f, -50f) : new Vector2(0f, -34f);
 
             VerticalLayoutGroup vlg = hybridCommandsContainer.GetComponent<VerticalLayoutGroup>();
-            vlg.padding = new RectOffset(14, 14, 12, 12);
-            vlg.spacing = 10f;
+            vlg.padding = styleD ? new RectOffset(10, 10, 10, 10) : new RectOffset(14, 14, 12, 12);
+            vlg.spacing = styleD ? 8f : 10f;
             vlg.childControlWidth = true;
             vlg.childControlHeight = true;
             vlg.childForceExpandWidth = true;
             vlg.childForceExpandHeight = true;
 
-            cmdAttackBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 1, "ATTACK LIMB", "Open 6-limb targeting — sever legs, disarm arms, or aim for the head", ColCrimson, OnCommandAttack);
-            cmdGuardBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 2, "GUARD / BRACE", "Reduce incoming damage by 65% and recover +15 Stamina", ColCyan, OnCommandGuard);
-            cmdItemBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 3, "USE ITEM", "Use Bandages, First Aid Kits, Painkillers, or Energy Bars from inventory", ColEmerald, OnCommandItem);
-            cmdShoveBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 4, "SHOVE / KICK", "Stagger attacker back — instant crawler knockdown if a leg is severed", ColAmber, OnCommandShove);
+            cmdAttackBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 1, "ATTACK LIMB", "Open 6-limb targeting — sever legs, disarm arms, or aim for the head", styleD ? ColStyleDRust : ColCrimson, OnCommandAttack);
+            cmdGuardBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 2, "GUARD / BRACE", "Reduce incoming damage by 65% and recover +15 Stamina", styleD ? ColStyleDBone : ColCyan, OnCommandGuard);
+            cmdItemBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 3, "USE ITEM", "Use Bandages, First Aid Kits, Painkillers, or Energy Bars from inventory", styleD ? ColStyleDSage : ColEmerald, OnCommandItem);
+            cmdShoveBtn = CreateHybridCommandRow(hybridCommandsContainer.transform, 4, "SHOVE / KICK", "Stagger attacker back — instant crawler knockdown if a leg is severed", styleD ? ColStyleDAmber : ColAmber, OnCommandShove);
 
             // Body View B: 2-Column 6-Limb / Item Grid
             GameObject subMenuObj = new GameObject("HybridSubMenuGrid", typeof(RectTransform), typeof(GridLayoutGroup));
@@ -1849,13 +2225,13 @@ namespace SundayLastBreath.UI
             subMenuContentRect = subMenuObj.GetComponent<RectTransform>();
             subMenuContentRect.anchorMin = Vector2.zero;
             subMenuContentRect.anchorMax = Vector2.one;
-            subMenuContentRect.offsetMin = Vector2.zero;
-            subMenuContentRect.offsetMax = new Vector2(0f, -34f);
+            subMenuContentRect.offsetMin = styleD ? new Vector2(18f, 18f) : Vector2.zero;
+            subMenuContentRect.offsetMax = styleD ? new Vector2(-18f, -50f) : new Vector2(0f, -34f);
 
             GridLayoutGroup glg = subMenuObj.GetComponent<GridLayoutGroup>();
-            glg.padding = new RectOffset(12, 12, 12, 12);
-            glg.cellSize = new Vector2(368f, 101f);
-            glg.spacing = new Vector2(10f, 10f);
+            glg.padding = styleD ? new RectOffset(10, 10, 10, 10) : new RectOffset(12, 12, 12, 12);
+            glg.cellSize = styleD ? new Vector2(354f, 92f) : new Vector2(368f, 101f);
+            glg.spacing = styleD ? new Vector2(8f, 8f) : new Vector2(10f, 10f);
             glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             glg.constraintCount = 2;
             subMenuObj.SetActive(false);
@@ -2046,7 +2422,9 @@ namespace SundayLastBreath.UI
             lcRt.sizeDelta = new Vector2(290f, 0f);
             lcRt.anchoredPosition = Vector2.zero;
             leftCmdPanel.GetComponent<Image>().color = new Color(0.06f, 0.07f, 0.11f, 1f);
-            leftCmdPanel.GetComponent<Outline>().effectColor = new Color(0.35f, 0.42f, 0.52f, 0.85f);
+            legacyLeftCmdCg = leftCmdPanel.AddComponent<CanvasGroup>();
+            legacyLeftCmdOutline = leftCmdPanel.GetComponent<Outline>();
+            legacyLeftCmdOutline.effectColor = new Color(0.35f, 0.42f, 0.52f, 0.85f);
 
             VerticalLayoutGroup vlgCmd = leftCmdPanel.GetComponent<VerticalLayoutGroup>();
             vlgCmd.padding = new RectOffset(12, 12, 12, 12);
@@ -2071,7 +2449,9 @@ namespace SundayLastBreath.UI
             subMenuContentRect.sizeDelta = new Vector2(860f, 0f);
             subMenuContentRect.anchoredPosition = new Vector2(306f, 0f);
             centerSelectPanel.GetComponent<Image>().color = new Color(0.05f, 0.06f, 0.09f, 1f);
-            centerSelectPanel.GetComponent<Outline>().effectColor = new Color(0.35f, 0.42f, 0.52f, 0.85f);
+            legacyCenterSelectCg = centerSelectPanel.AddComponent<CanvasGroup>();
+            legacyCenterSelectOutline = centerSelectPanel.GetComponent<Outline>();
+            legacyCenterSelectOutline.effectColor = new Color(0.35f, 0.42f, 0.52f, 0.85f);
 
             GridLayoutGroup glg = centerSelectPanel.GetComponent<GridLayoutGroup>();
             glg.padding = new RectOffset(14, 14, 14, 14);
@@ -2090,7 +2470,9 @@ namespace SundayLastBreath.UI
             rsRt.sizeDelta = new Vector2(438f, 0f);
             rsRt.anchoredPosition = Vector2.zero;
             rightStatusPanel.GetComponent<Image>().color = new Color(0.06f, 0.07f, 0.11f, 1f);
-            rightStatusPanel.GetComponent<Outline>().effectColor = new Color(0.35f, 0.42f, 0.52f, 0.85f);
+            legacyRightStatusCg = rightStatusPanel.AddComponent<CanvasGroup>();
+            legacyRightStatusOutline = rightStatusPanel.GetComponent<Outline>();
+            legacyRightStatusOutline.effectColor = new Color(0.35f, 0.42f, 0.52f, 0.85f);
 
             BuildRightPlayerStatusBox(rightStatusPanel.transform);
             BindEnemyLimbLayers(CurrentEnemy);
@@ -2146,13 +2528,19 @@ namespace SundayLastBreath.UI
                 RectTransform rRt = retObj.GetComponent<RectTransform>();
                 rRt.sizeDelta = new Vector2(108f, 30f);
 
+                bool styleD = hybridStyle && IsStyleD;
+
                 Image rBg = retObj.GetComponent<Image>();
-                rBg.color = hybridStyle
-                    ? new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.92f)
-                    : new Color(0.04f, 0.07f, 0.11f, 0.88f);
+                rBg.color = styleD
+                    ? new Color(0.05f, 0.055f, 0.06f, 0.92f)
+                    : (hybridStyle
+                        ? new Color(ColPanelBg.r, ColPanelBg.g, ColPanelBg.b, 0.92f)
+                        : new Color(0.04f, 0.07f, 0.11f, 0.88f));
 
                 Outline rOut = retObj.GetComponent<Outline>();
-                rOut.effectColor = hybridStyle ? ColCyan : new Color(0.22f, 0.74f, 0.97f, 0.85f);
+                rOut.effectColor = styleD
+                    ? ColStyleDAmber
+                    : (hybridStyle ? ColCyan : new Color(0.22f, 0.74f, 0.97f, 0.85f));
                 rOut.effectDistance = new Vector2(1.5f, -1.5f);
 
                 Button rBtn = retObj.GetComponent<Button>();
@@ -2173,6 +2561,21 @@ namespace SundayLastBreath.UI
             CreateBorderEdge(parent, "Border_Bottom", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, thickness), color);
             CreateBorderEdge(parent, "Border_Left", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(thickness, 0f), color);
             CreateBorderEdge(parent, "Border_Right", new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(thickness, 0f), color);
+        }
+
+        private static void SetCrispBorderColor(Transform parent, Color color)
+        {
+            if (parent == null) return;
+            string[] edgeNames = { "Border_Top", "Border_Bottom", "Border_Left", "Border_Right" };
+            for (int i = 0; i < edgeNames.Length; i++)
+            {
+                Transform edge = parent.Find(edgeNames[i]);
+                if (edge != null)
+                {
+                    Image img = edge.GetComponent<Image>();
+                    if (img != null) img.color = color;
+                }
+            }
         }
 
         private static void CreateBorderEdge(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 sizeDelta, Color color)
@@ -2200,20 +2603,48 @@ namespace SundayLastBreath.UI
             GameObject btnObj = new GameObject($"HybridCmd_{hotkeyNum}", typeof(RectTransform), typeof(Image), typeof(Button));
             btnObj.transform.SetParent(parent, false);
 
+            bool styleD = IsStyleD && HybridCockpitController.SharedStyleDButtonMetal != null;
             Image bg = btnObj.GetComponent<Image>();
-            bg.color = ColCardBg;
-            AddCrispBorder(btnObj.transform, ColBorderSlate, 1f);
-            AddLeftAccentBar(btnObj.transform, accentColor, 4f);
-
             Button btn = btnObj.GetComponent<Button>();
             btn.targetGraphic = bg;
-            ColorBlock cb = btn.colors;
-            cb.normalColor = ColCardBg;
-            cb.highlightedColor = new Color(0.11f, 0.145f, 0.21f, 1f);
-            cb.pressedColor = ColSlotBg;
-            cb.selectedColor = ColCardBg;
-            cb.disabledColor = new Color(0.05f, 0.06f, 0.09f, 0.7f);
-            btn.colors = cb;
+
+            if (styleD)
+            {
+                ApplyStyleDButtonSprite(
+                    btn,
+                    bg,
+                    HybridCockpitController.SharedStyleDButtonMetal,
+                    2.8f,
+                    ColStyleDMetalBtn,
+                    ColStyleDMetalHover,
+                    ColStyleDMetalBtn * 0.72f,
+                    ColStyleDMetalBtn * 0.45f
+                );
+            }
+            else
+            {
+                bg.color = ColCardBg;
+                AddCrispBorder(btnObj.transform, ColBorderSubtle, 1f);
+
+                Color hoverBorderCol = new Color(accentColor.r, accentColor.g, accentColor.b, 0.85f);
+                EventTrigger et = btnObj.AddComponent<EventTrigger>();
+                var enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                enterEntry.callback.AddListener(_ => SetCrispBorderColor(btnObj.transform, hoverBorderCol));
+                et.triggers.Add(enterEntry);
+                var exitEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+                exitEntry.callback.AddListener(_ => SetCrispBorderColor(btnObj.transform, ColBorderSubtle));
+                et.triggers.Add(exitEntry);
+
+                ColorBlock cb = btn.colors;
+                cb.normalColor = ColCardBg;
+                cb.highlightedColor = new Color(0.11f, 0.145f, 0.21f, 1f);
+                cb.pressedColor = ColSlotBg;
+                cb.selectedColor = ColCardBg;
+                cb.disabledColor = new Color(0.05f, 0.06f, 0.09f, 0.7f);
+                btn.colors = cb;
+            }
+
+            AddLeftAccentBar(btnObj.transform, accentColor, 4f);
             btn.onClick.AddListener(() => onClick?.Invoke());
 
             TextMeshProUGUI keyBadge = CreateText(btnObj.transform, "HotkeyBadge", $"[ {hotkeyNum} ]", 12.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft, FontRole.Mono);
@@ -2226,7 +2657,7 @@ namespace SundayLastBreath.UI
             kbRt.sizeDelta = new Vector2(50f, 0f);
 
             TextMeshProUGUI titleTxt = CreateText(btnObj.transform, "Title", title, 13.5f, FontStyles.Bold, TextAlignmentOptions.BottomLeft, FontRole.Display);
-            titleTxt.color = ColTextMain;
+            titleTxt.color = styleD ? ColStyleDBone : ColTextMain;
             RectTransform ttRt = titleTxt.GetComponent<RectTransform>();
             ttRt.anchorMin = new Vector2(0f, 0.50f);
             ttRt.anchorMax = new Vector2(1f, 1f);
@@ -2234,7 +2665,7 @@ namespace SundayLastBreath.UI
             ttRt.offsetMax = new Vector2(-12f, -6f);
 
             TextMeshProUGUI subTxt = CreateText(btnObj.transform, "Subtitle", subtitle, 11f, FontStyles.Normal, TextAlignmentOptions.TopLeft, FontRole.Body);
-            subTxt.color = ColTextMuted;
+            subTxt.color = styleD ? ColStyleDMuted : ColTextMuted;
             subTxt.textWrappingMode = TextWrappingModes.Normal;
             RectTransform stRt = subTxt.GetComponent<RectTransform>();
             stRt.anchorMin = new Vector2(0f, 0f);
@@ -2272,7 +2703,7 @@ namespace SundayLastBreath.UI
             wcRt.sizeDelta = new Vector2(-32f, 48f);
             wcRt.anchoredPosition = new Vector2(0f, -166f);
             wpnCard.GetComponent<Image>().color = new Color(0.09f, 0.11f, 0.16f, 0.95f);
-            wpnCard.GetComponent<Outline>().effectColor = new Color(0.28f, 0.36f, 0.48f, 0.8f);
+            wpnCard.GetComponent<Outline>().effectColor = new Color(0.28f, 0.36f, 0.48f, 0.32f);
 
             playerWeaponText = CreateText(wpnCard.transform, "WeaponLine", "WPN: GLOCK 19", 13.5f, FontStyles.Bold, TextAlignmentOptions.MidlineLeft);
             RectTransform pwRt = playerWeaponText.GetComponent<RectTransform>();
@@ -2300,7 +2731,7 @@ namespace SundayLastBreath.UI
             tbRt.sizeDelta = new Vector2(-32f, 82f);
             tbRt.anchoredPosition = new Vector2(0f, 14f);
             tipBox.GetComponent<Image>().color = new Color(0.08f, 0.06f, 0.09f, 0.95f);
-            tipBox.GetComponent<Outline>().effectColor = new Color(0.45f, 0.22f, 0.25f, 0.7f);
+            tipBox.GetComponent<Outline>().effectColor = new Color(0.45f, 0.22f, 0.25f, 0.32f);
 
             TextMeshProUGUI tipTxt = CreateText(
                 tipBox.transform,
@@ -2408,11 +2839,23 @@ namespace SundayLastBreath.UI
             var enemy = CurrentEnemy;
             BindEnemyLimbLayers(enemy);
 
+            bool styleD = _builtForHybridLayout && IsStyleD;
+
             // 1. Header & Horde Counter
             int aliveCount = horde.Count(e => !e.isDead);
+            if (styleD && headerTitleText != null)
+            {
+                headerTitleText.text = enemy != null
+                    ? $"<color=#D9483B>●</color> COMBAT - {enemy.enemyName.ToUpperInvariant()}"
+                    : "<color=#D9483B>●</color> COMBAT";
+                AttachCrtOsdChromatic(headerTitleText);
+            }
             if (hordeCounterText != null)
             {
-                hordeCounterText.text = $"TARGET {currentEnemyIndex + 1} / {horde.Count} ({aliveCount} ALIVE)";
+                hordeCounterText.text = styleD
+                    ? $"TARGET {currentEnemyIndex + 1}/{horde.Count}"
+                    : $"TARGET {currentEnemyIndex + 1} / {horde.Count} ({aliveCount} ALIVE)";
+                if (styleD) AttachCrtOsdChromatic(hordeCounterText);
             }
             if (prevTargetBtn != null) prevTargetBtn.interactable = horde.Count > 1;
             if (nextTargetBtn != null) nextTargetBtn.interactable = horde.Count > 1;
@@ -2422,19 +2865,20 @@ namespace SundayLastBreath.UI
             {
                 if (enemyTitleBanner != null)
                 {
-                    enemyTitleBanner.text = $"<color=#F87171>{enemy.enemyName.ToUpperInvariant()}</color>";
+                    string bannerCol = styleD ? "#D95829" : "#F87171";
+                    enemyTitleBanner.text = $"<color={bannerCol}>{enemy.enemyName.ToUpperInvariant()}</color>";
                 }
 
                 if (enemyStatusTagsText != null)
                 {
                     List<string> tags = new List<string>();
-                    if (enemy.HasBothLegsSevered) tags.Add("<color=#F59E0B>[CRAWLER: 0% EVASION]</color>");
-                    else if (enemy.HasOneLegSevered) tags.Add("<color=#38BDF8>[HOBBLED: -20% EV]</color>");
-                    else tags.Add("<color=#94A3B8>[STANDING]</color>");
+                    if (enemy.HasBothLegsSevered) tags.Add(styleD ? "<color=#E0A43A>[CRAWLER: 0% EVASION]</color>" : "<color=#F59E0B>[CRAWLER: 0% EVASION]</color>");
+                    else if (enemy.HasOneLegSevered) tags.Add(styleD ? "<color=#D9B26F>[HOBBLED: -20% EV]</color>" : "<color=#38BDF8>[HOBBLED: -20% EV]</color>");
+                    else tags.Add(styleD ? "<color=#8C9486>[STANDING]</color>" : "<color=#94A3B8>[STANDING]</color>");
 
-                    if (enemy.SeveredArmsCount >= 2) tags.Add("<color=#10B981>[ARMLESS]</color>");
-                    else if (enemy.SeveredArmsCount == 1) tags.Add("<color=#38BDF8>[MAIMED ARM]</color>");
-                    else tags.Add($"<color=#CBD5E1>[{enemy.weaponName.ToUpperInvariant()}]</color>");
+                    if (enemy.SeveredArmsCount >= 2) tags.Add(styleD ? "<color=#6EE7B7>[ARMLESS]</color>" : "<color=#10B981>[ARMLESS]</color>");
+                    else if (enemy.SeveredArmsCount == 1) tags.Add(styleD ? "<color=#E0A43A>[MAIMED ARM]</color>" : "<color=#38BDF8>[MAIMED ARM]</color>");
+                    else tags.Add(styleD ? $"<color=#E4DFD1>[{enemy.weaponName.ToUpperInvariant()}]</color>" : $"<color=#CBD5E1>[{enemy.weaponName.ToUpperInvariant()}]</color>");
 
                     enemyStatusTagsText.text = string.Join(" ", tags);
                 }
@@ -2457,7 +2901,8 @@ namespace SundayLastBreath.UI
                         {
                             int hitPct = CalculateLimbHitChance(enemy, ls);
                             string shortName = ls.displayName.Replace("LEFT ", "L.").Replace("RIGHT ", "R.");
-                            ls.overlayReticleLabel.text = $"► {shortName} <color=#38BDF8>{hitPct}%</color>";
+                            string pctCol = styleD ? "#E0A43A" : "#38BDF8";
+                            ls.overlayReticleLabel.text = $"► {shortName} <color={pctCol}>{hitPct}%</color>";
                         }
                     }
                 }
@@ -2473,7 +2918,9 @@ namespace SundayLastBreath.UI
             {
                 var entry = player.inventory.FirstOrDefault(i => string.Equals(i.itemId, ammoType, StringComparison.OrdinalIgnoreCase));
                 int qty = entry != null ? entry.quantity : 0;
-                ammoInfo = $" <color=#38BDF8>[{qty} {ammoType}]</color>";
+                ammoInfo = styleD
+                    ? $" <color=#8C9486>[{qty} {ammoType}]</color>"
+                    : $" <color=#38BDF8>[{qty} {ammoType}]</color>";
             }
             _lastDisplayedWeapon = player != null ? (player.equippedWpn ?? "") : "";
 
@@ -2481,20 +2928,34 @@ namespace SundayLastBreath.UI
             {
                 if (hybridWeaponBadgeText != null)
                 {
-                    hybridWeaponBadgeText.text = $"TURN {turnNumber}  //  <color=#F59E0B>{wpnName.ToUpperInvariant()}</color> ({dmg} DMG){ammoInfo}";
+                    hybridWeaponBadgeText.text = styleD
+                        ? $"TURN {turnNumber}  |  <color=#E0A43A>{wpnName.ToUpperInvariant()}</color> ({dmg} DMG){ammoInfo}"
+                        : $"TURN {turnNumber}  //  <color=#F59E0B>{wpnName.ToUpperInvariant()}</color> ({dmg} DMG){ammoInfo}";
                 }
 
                 if (hybridIntelBadgeText != null)
                 {
-                    if (isBusyTurn) hybridIntelBadgeText.text = "<color=#F59E0B>RESOLVING TURN...</color>";
-                    else if (menuState == SubMenuState.TargetLimbs) hybridIntelBadgeText.text = "<color=#F87171>SELECTING LIMB</color>";
-                    else if (menuState == SubMenuState.SelectItem) hybridIntelBadgeText.text = "<color=#10B981>SELECTING ITEM</color>";
-                    else hybridIntelBadgeText.text = $"TURN {turnNumber} // YOUR MOVE";
+                    if (styleD)
+                    {
+                        if (isBusyTurn) hybridIntelBadgeText.text = "<color=#E0A43A>RESOLVING TURN...</color>";
+                        else if (menuState == SubMenuState.TargetLimbs) hybridIntelBadgeText.text = "<color=#D95829>SELECTING LIMB</color>";
+                        else if (menuState == SubMenuState.SelectItem) hybridIntelBadgeText.text = "<color=#6EE7B7>SELECTING ITEM</color>";
+                        else hybridIntelBadgeText.text = $"TURN {turnNumber} | YOUR MOVE";
+                    }
+                    else
+                    {
+                        if (isBusyTurn) hybridIntelBadgeText.text = "<color=#F59E0B>RESOLVING TURN...</color>";
+                        else if (menuState == SubMenuState.TargetLimbs) hybridIntelBadgeText.text = "<color=#F87171>SELECTING LIMB</color>";
+                        else if (menuState == SubMenuState.SelectItem) hybridIntelBadgeText.text = "<color=#10B981>SELECTING ITEM</color>";
+                        else hybridIntelBadgeText.text = $"TURN {turnNumber} // YOUR MOVE";
+                    }
                 }
 
                 if (hybridIntelBodyText != null && enemy != null)
                 {
                     hybridIntelBodyText.text = BuildEnemyIntelMarkup(enemy, compactForHybrid: true);
+                    hybridIntelBodyText.ForceMeshUpdate();
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(hybridIntelBodyText.rectTransform);
                 }
 
                 if (hybridCommandsContainer != null) hybridCommandsContainer.SetActive(menuState == SubMenuState.MainCommands);
@@ -2503,9 +2964,18 @@ namespace SundayLastBreath.UI
 
                 if (hybridCommandHeaderText != null)
                 {
-                    if (menuState == SubMenuState.TargetLimbs) hybridCommandHeaderText.text = "// SELECT ANATOMICAL TARGET";
-                    else if (menuState == SubMenuState.SelectItem) hybridCommandHeaderText.text = "// FIELD MEDICINE & RATIONS";
-                    else hybridCommandHeaderText.text = "// COMBAT ACTIONS // CHOOSE YOUR MOVE";
+                    if (styleD)
+                    {
+                        if (menuState == SubMenuState.TargetLimbs) hybridCommandHeaderText.text = "TARGETING - PICK LIMB";
+                        else if (menuState == SubMenuState.SelectItem) hybridCommandHeaderText.text = "FIELD MEDICINE & RATIONS";
+                        else hybridCommandHeaderText.text = "COMBAT ACTIONS";
+                    }
+                    else
+                    {
+                        if (menuState == SubMenuState.TargetLimbs) hybridCommandHeaderText.text = "// SELECT ANATOMICAL TARGET";
+                        else if (menuState == SubMenuState.SelectItem) hybridCommandHeaderText.text = "// FIELD MEDICINE & RATIONS";
+                        else hybridCommandHeaderText.text = "// COMBAT ACTIONS // CHOOSE YOUR MOVE";
+                    }
                 }
             }
 
@@ -2558,47 +3028,219 @@ namespace SundayLastBreath.UI
                     GameStageScreen.Instance.UpdateVitalsUI();
                 }
             }
+
+            ApplyCombatVisualHierarchy();
+            ApplyCombatTextTypography();
+        }
+
+        private void ApplyCombatTextTypography()
+        {
+            float scale = SundayTypography.NarrativeFontScale;
+            if (hybridFontScaleLabel != null)
+            {
+                hybridFontScaleLabel.text = $"AA {SundayTypography.NarrativeFontScalePercent}%";
+                if (_builtForHybridLayout && IsStyleD)
+                    hybridFontScaleLabel.color = Mathf.Approximately(scale, 1.0f) ? ColStyleDAmber : ColStyleDBone;
+                else
+                    hybridFontScaleLabel.color = Mathf.Approximately(scale, 1.0f) ? ColAmber : ColCyan;
+            }
+            if (combatLogText != null)
+            {
+                float logSize = Mathf.Round((_builtForHybridLayout ? 13f : 15f) * scale * 2f) * 0.5f;
+                combatLogText.fontSize = logSize;
+                combatLogText.fontSizeMax = logSize;
+                combatLogText.fontSizeMin = 9.5f;
+                combatLogText.lineSpacing = _builtForHybridLayout ? 2.5f : 5f;
+            }
+            if (hybridIntelBodyText != null)
+            {
+                hybridIntelBodyText.fontSize = Mathf.Round(12.5f * scale * 2f) * 0.5f;
+                hybridIntelBodyText.lineSpacing = 3f;
+                hybridIntelBodyText.ForceMeshUpdate();
+                LayoutRebuilder.ForceRebuildLayoutImmediate(hybridIntelBodyText.rectTransform);
+            }
+        }
+
+        private void ApplyCombatVisualHierarchy()
+        {
+            if (_builtForHybridLayout)
+            {
+                if (IsStyleD)
+                {
+                    if (hybridCmdHeaderLine != null) hybridCmdHeaderLine.color = ColStyleDHairline;
+                    if (hybridIntelHeaderLine != null) hybridIntelHeaderLine.color = ColStyleDHairline;
+
+                    if (isBusyTurn)
+                    {
+                        if (hybridCmdPanelCg != null) hybridCmdPanelCg.alpha = 0.60f;
+                        if (hybridIntelPanelCg != null) hybridIntelPanelCg.alpha = 1.0f;
+                        if (hybridIntelCardCg != null) hybridIntelCardCg.alpha = 0.72f;
+                        if (hybridIntelHeaderTitle != null) hybridIntelHeaderTitle.color = ColStyleDAmber;
+                    }
+                    else if (menuState == SubMenuState.MainCommands)
+                    {
+                        if (hybridCmdPanelCg != null) hybridCmdPanelCg.alpha = 1.0f;
+                        if (hybridCommandHeaderText != null) hybridCommandHeaderText.color = ColStyleDBone;
+
+                        if (hybridIntelPanelCg != null) hybridIntelPanelCg.alpha = 0.92f;
+                        if (hybridIntelCardCg != null) hybridIntelCardCg.alpha = 0.85f;
+                        if (hybridIntelHeaderTitle != null) hybridIntelHeaderTitle.color = ColStyleDMuted;
+                    }
+                    else
+                    {
+                        if (hybridCmdPanelCg != null) hybridCmdPanelCg.alpha = 1.0f;
+                        if (hybridCommandHeaderText != null) hybridCommandHeaderText.color = menuState == SubMenuState.TargetLimbs ? ColStyleDRust : ColStyleDSage;
+
+                        if (hybridIntelPanelCg != null) hybridIntelPanelCg.alpha = 0.90f;
+                        if (hybridIntelCardCg != null) hybridIntelCardCg.alpha = 0.68f;
+                        if (hybridIntelHeaderTitle != null) hybridIntelHeaderTitle.color = ColStyleDMuted;
+                    }
+                }
+                else if (isBusyTurn)
+                {
+                    if (hybridCmdPanelCg != null) hybridCmdPanelCg.alpha = 0.45f;
+                    SetCrispBorderColor(hybridCmdPanelRect, ColBorderPassive);
+                    if (hybridCmdHeaderLine != null) hybridCmdHeaderLine.color = ColBorderPassive;
+
+                    if (hybridIntelPanelCg != null) hybridIntelPanelCg.alpha = 1.0f;
+                    if (hybridIntelCardCg != null) hybridIntelCardCg.alpha = 0.65f;
+                    SetCrispBorderColor(hybridIntelPanelRect, ColBorderSlate);
+                    if (hybridIntelHeaderLine != null) hybridIntelHeaderLine.color = ColBorderSlate;
+                    if (hybridIntelHeaderTitle != null) hybridIntelHeaderTitle.color = ColAmber;
+                }
+                else if (menuState == SubMenuState.MainCommands)
+                {
+                    if (hybridCmdPanelCg != null) hybridCmdPanelCg.alpha = 1.0f;
+                    SetCrispBorderColor(hybridCmdPanelRect, ColBorderActiveAction);
+                    if (hybridCmdHeaderLine != null) hybridCmdHeaderLine.color = ColBorderActiveAction;
+                    if (hybridCommandHeaderText != null) hybridCommandHeaderText.color = ColAmber;
+
+                    if (hybridIntelPanelCg != null) hybridIntelPanelCg.alpha = 0.85f;
+                    if (hybridIntelCardCg != null) hybridIntelCardCg.alpha = 0.72f;
+                    SetCrispBorderColor(hybridIntelPanelRect, ColBorderPassive);
+                    if (hybridIntelHeaderLine != null) hybridIntelHeaderLine.color = ColBorderPassive;
+                    if (hybridIntelHeaderTitle != null) hybridIntelHeaderTitle.color = new Color(0.68f, 0.56f, 0.38f, 0.82f);
+                }
+                else
+                {
+                    Color activeCol = menuState == SubMenuState.TargetLimbs ? ColBorderActiveTarget : new Color(0.12f, 0.68f, 0.48f, 0.88f);
+                    if (hybridCmdPanelCg != null) hybridCmdPanelCg.alpha = 1.0f;
+                    SetCrispBorderColor(hybridCmdPanelRect, activeCol);
+                    if (hybridCmdHeaderLine != null) hybridCmdHeaderLine.color = activeCol;
+                    if (hybridCommandHeaderText != null) hybridCommandHeaderText.color = menuState == SubMenuState.TargetLimbs ? ColCrimson : ColEmerald;
+
+                    if (hybridIntelPanelCg != null) hybridIntelPanelCg.alpha = 0.82f;
+                    if (hybridIntelCardCg != null) hybridIntelCardCg.alpha = 0.48f;
+                    SetCrispBorderColor(hybridIntelPanelRect, ColBorderPassive);
+                    if (hybridIntelHeaderLine != null) hybridIntelHeaderLine.color = ColBorderPassive;
+                    if (hybridIntelHeaderTitle != null) hybridIntelHeaderTitle.color = new Color(0.68f, 0.56f, 0.38f, 0.82f);
+                }
+            }
+            else
+            {
+                if (menuState == SubMenuState.MainCommands)
+                {
+                    if (legacyLeftCmdCg != null) legacyLeftCmdCg.alpha = 1.0f;
+                    if (legacyLeftCmdOutline != null) legacyLeftCmdOutline.effectColor = new Color(0.38f, 0.56f, 0.74f, 0.90f);
+                    if (legacyCenterSelectCg != null) legacyCenterSelectCg.alpha = 0.78f;
+                    if (legacyCenterSelectOutline != null) legacyCenterSelectOutline.effectColor = ColBorderPassive;
+                    if (legacyRightStatusCg != null) legacyRightStatusCg.alpha = 0.62f;
+                    if (legacyRightStatusOutline != null) legacyRightStatusOutline.effectColor = ColBorderPassive;
+                }
+                else
+                {
+                    if (legacyLeftCmdCg != null) legacyLeftCmdCg.alpha = 0.52f;
+                    if (legacyLeftCmdOutline != null) legacyLeftCmdOutline.effectColor = ColBorderPassive;
+                    if (legacyCenterSelectCg != null) legacyCenterSelectCg.alpha = 1.0f;
+                    if (legacyCenterSelectOutline != null)
+                        legacyCenterSelectOutline.effectColor = menuState == SubMenuState.TargetLimbs ? ColBorderActiveTarget : new Color(0.16f, 0.68f, 0.48f, 0.90f);
+                    if (legacyRightStatusCg != null) legacyRightStatusCg.alpha = 0.55f;
+                    if (legacyRightStatusOutline != null) legacyRightStatusOutline.effectColor = ColBorderPassive;
+                }
+            }
         }
 
         private string BuildEnemyIntelMarkup(CombatEnemyData enemy, bool compactForHybrid)
         {
             if (enemy == null) return "";
 
+            bool styleD = compactForHybrid && IsStyleD;
             int intactLimbs = enemy.limbs.Values.Count(l => !l.isSevered);
             string legState = enemy.HasBothLegsSevered
-                ? "<color=#F59E0B><b>CRAWLER (Both Legs Severed — 0% Evasion, Headshots 95%!)</b></color>"
+                ? (styleD
+                    ? "<color=#E0A43A><b>CRAWLER (Both Legs Severed - 0% Evasion, Headshots 95%!)</b></color>"
+                    : "<color=#F59E0B><b>CRAWLER (Both Legs Severed — 0% Evasion, Headshots 95%!)</b></color>")
                 : (enemy.HasOneLegSevered
-                    ? "<color=#38BDF8><b>HOBBLED (1 Leg Severed — -20% Evasion)</b></color>"
-                    : "<color=#94A3B8>STANDING (Both Legs Intact)</color>");
+                    ? (styleD
+                        ? "<color=#D9B26F><b>HOBBLED (1 Leg Severed - -20% Evasion)</b></color>"
+                        : "<color=#38BDF8><b>HOBBLED (1 Leg Severed — -20% Evasion)</b></color>")
+                    : (styleD
+                        ? "<color=#8C9486>STANDING (Both Legs Intact)</color>"
+                        : "<color=#94A3B8>STANDING (Both Legs Intact)</color>"));
 
             string armState = enemy.SeveredArmsCount >= 2
-                ? "<color=#10B981><b>DISARMED (Both Arms Severed — -65% Damage)</b></color>"
+                ? (styleD
+                    ? "<color=#6EE7B7><b>DISARMED (Both Arms Severed - -65% Damage)</b></color>"
+                    : "<color=#10B981><b>DISARMED (Both Arms Severed — -65% Damage)</b></color>")
                 : (enemy.SeveredArmsCount == 1
-                    ? "<color=#38BDF8><b>MAIMED (1 Arm Severed — -40% Damage)</b></color>"
-                    : $"<color=#FCA5A5>ARMED ({enemy.weaponName} — {enemy.baseAttackDamage} Base DMG)</color>");
+                    ? (styleD
+                        ? "<color=#E0A43A><b>MAIMED (1 Arm Severed - -40% Damage)</b></color>"
+                        : "<color=#38BDF8><b>MAIMED (1 Arm Severed — -40% Damage)</b></color>")
+                    : (styleD
+                        ? $"<color=#E4DFD1>ARMED ({enemy.weaponName} - {enemy.baseAttackDamage} Base DMG)</color>"
+                        : $"<color=#FCA5A5>ARMED ({enemy.weaponName} — {enemy.baseAttackDamage} Base DMG)</color>"));
 
             if (isTutorialCombat && turnNumber <= 2)
             {
+                int tutTitleSize = Mathf.RoundToInt(15f * SundayTypography.NarrativeFontScale);
                 string promptHint = compactForHybrid
-                    ? "<color=#38BDF8><b>► SELECT [1] ATTACK LIMB ON THE RIGHT (OR PRESS [1]) TO TARGET A BODY PART!</b></color>"
+                    ? (styleD
+                        ? "<color=#E0A43A><b>► SELECT [1] ATTACK LIMB ON THE RIGHT (OR PRESS [1]) TO TARGET A BODY PART!</b></color>"
+                        : "<color=#38BDF8><b>► SELECT [1] ATTACK LIMB ON THE RIGHT (OR PRESS [1]) TO TARGET A BODY PART!</b></color>")
                     : "<color=#38BDF8><b>► CLICK [1] ATTACK LIMB ON THE LEFT (OR PRESS [1]) TO CHOOSE A TARGET!</b></color>";
 
+                if (styleD)
+                {
+                    return
+                        $"<size={tutTitleSize}><color=#D95829><b>TACTICAL SURVIVAL DIRECTIVE | ANATOMICAL TARGETING</b></color></size>\n" +
+                        $"<color=#E4DFD1>This attacker is impervious to human pain. Destroy specific anatomy to survive:</color>\n" +
+                        $"<color=#6EE7B7><b>• LEGS [MOBILITY]:</b></color>  Severing legs forces a <color=#E0A43A><b>Crawler</b></color>, wiping out lunges & evasion.\n" +
+                        $"<color=#E0A43A><b>• ARMS [OFFENSE]:</b></color>   Breaking arms disables claw swipes & lethal grapples (-65% DMG).\n" +
+                        $"<color=#E4DFD1><b>• TORSO [CENTER]:</b></color>  Highest hit chance, reliable stagger, exhausts vitality.\n" +
+                        $"<color=#D95829><b>• HEAD [CRITICAL]:</b></color> Hardest to hit, but deals massive cranial destruction.\n" +
+                        promptHint;
+                }
+
+                string tutGap = compactForHybrid ? "\n" : "\n\n";
                 return
-                    $"<size=15><color=#EF4444><b>TACTICAL SURVIVAL DIRECTIVE // ANATOMICAL TARGETING</b></color></size>\n" +
-                    $"<color=#CBD5E1>This attacker is impervious to human pain. Destroy specific anatomy to survive:</color>\n\n" +
+                    $"<size={tutTitleSize}><color=#EF4444><b>TACTICAL SURVIVAL DIRECTIVE // ANATOMICAL TARGETING</b></color></size>\n" +
+                    $"<color=#CBD5E1>This attacker is impervious to human pain. Destroy specific anatomy to survive:</color>{tutGap}" +
                     $"<color=#10B981><b>• LEGS [MOBILITY]:</b></color>  Severing legs forces a <color=#F59E0B><b>Crawler</b></color>, wiping out lunges & evasion.\n" +
                     $"<color=#38BDF8><b>• ARMS [OFFENSE]:</b></color>   Breaking arms disables claw swipes & lethal grapples (-65% DMG).\n" +
                     $"<color=#93C5FD><b>• TORSO [CENTER]:</b></color>  Highest hit chance, reliable stagger, exhausts vitality.\n" +
-                    $"<color=#F87171><b>• HEAD [CRITICAL]:</b></color> Hardest to hit, but deals massive cranial destruction.\n\n" +
+                    $"<color=#F87171><b>• HEAD [CRITICAL]:</b></color> Hardest to hit, but deals massive cranial destruction.{tutGap}" +
                     promptHint;
             }
 
             string commandHint = compactForHybrid
-                ? "<color=#64748B>TIP: Severing legs opens 95% headshots; severing arms cripples damage (-65%).</color>"
+                ? (styleD
+                    ? "<color=#8C9486>TIP: Severing legs opens 95% headshots; severing arms cripples damage (-65%).</color>"
+                    : "<color=#64748B>TIP: Severing legs opens 95% headshots; severing arms cripples damage (-65%).</color>")
                 : "<color=#38BDF8><b>► AWAITING COMMAND:</b></color> Click <b><color=#FCA5A5>[1] ATTACK LIMB</color></b> on the left (or press <b>[1]</b>) to open 6-limb targeting, or select <b>[2] GUARD</b>, <b>[3] USE ITEM</b>, or <b>[4] SHOVE</b>.";
 
+            int titleSize = Mathf.RoundToInt(16f * SundayTypography.NarrativeFontScale);
+            if (styleD)
+            {
+                return
+                    $"<size={titleSize}><color=#D95829><b>TARGET OBSERVATION | {enemy.enemyName.ToUpperInvariant()}</b></color></size>\n" +
+                    $"<color=#E4DFD1><i>\"{enemy.tacticalDescription}\"</i></color>\n\n" +
+                    $"<color=#8C9486><b>POSTURE:</b></color> {legState}\n" +
+                    $"<color=#8C9486><b>THREAT:</b></color>  {armState} <color=#8C9486>({intactLimbs}/6 Intact)</color>\n\n" +
+                    commandHint;
+            }
+
             return
-                $"<size=16><color=#F87171><b>TARGET OBSERVATION // {enemy.enemyName.ToUpperInvariant()}</b></color></size>\n" +
+                $"<size={titleSize}><color=#F87171><b>TARGET OBSERVATION // {enemy.enemyName.ToUpperInvariant()}</b></color></size>\n" +
                 $"<color=#CBD5E1><i>\"{enemy.tacticalDescription}\"</i></color>\n\n" +
                 $"<color=#94A3B8><b>POSTURE & MOBILITY:</b></color>  {legState}\n" +
                 $"<color=#94A3B8><b>THREAT & LIMBS:</b></color>      {armState}   <color=#64748B>({intactLimbs}/6 Body Parts Intact)</color>\n\n" +
@@ -2658,11 +3300,15 @@ namespace SundayLastBreath.UI
                 return;
             }
 
+            bool styleD = _builtForHybridLayout && IsStyleD;
+
             // Restore 2-column grid for TargetLimbs and SelectItem
             if (glg != null)
             {
                 glg.constraintCount = 2;
-                glg.cellSize = _builtForHybridLayout ? new Vector2(368f, 101f) : new Vector2(408f, 108f);
+                glg.cellSize = _builtForHybridLayout
+                    ? (styleD ? new Vector2(354f, 92f) : new Vector2(368f, 101f))
+                    : new Vector2(408f, 108f);
             }
 
             // ----------------------------------------------------------------
@@ -2691,8 +3337,11 @@ namespace SundayLastBreath.UI
                             string capturedId = inv.itemId;
                             int h = u.hp;
                             int s = u.stm;
+                            string itemLabel = styleD
+                                ? $"<color=#E4DFD1><b>{inv.itemId.ToUpperInvariant()}</b> (x{inv.quantity})</color>\n<color=#6EE7B7>RESTORES +{h} HP   +{s} STAMINA</color>"
+                                : $"<b>{inv.itemId.ToUpperInvariant()}</b> (x{inv.quantity})\n<color=#10B981>RESTORES +{h} HP   +{s} STAMINA</color>";
                             var btnObj = CreateSubMenuCell(
-                                $"<b>{inv.itemId.ToUpperInvariant()}</b> (x{inv.quantity})\n<color=#10B981>RESTORES +{h} HP   +{s} STAMINA</color>",
+                                itemLabel,
                                 new Color(0.10f, 0.24f, 0.18f, 0.96f),
                                 1f,
                                 true,
@@ -2706,8 +3355,11 @@ namespace SundayLastBreath.UI
 
                 if (shown == 0)
                 {
+                    string emptyLabel = styleD
+                        ? "<color=#E4DFD1><b>NO MEDICAL ITEMS IN BACKPACK</b></color>\n<color=#8C9486>Click [1] ATTACK LIMB to aim at enemy</color>"
+                        : "<color=#94A3B8><b>NO MEDICAL ITEMS IN BACKPACK</b></color>\n<color=#64748B>Click [1] ATTACK LIMB to aim at enemy</color>";
                     var emptyObj = CreateSubMenuCell(
-                        "<color=#94A3B8><b>NO MEDICAL ITEMS IN BACKPACK</b></color>\n<color=#64748B>Click [1] ATTACK LIMB to aim at enemy</color>",
+                        emptyLabel,
                         new Color(0.12f, 0.14f, 0.18f, 0.9f),
                         -1f,
                         false,
@@ -2731,8 +3383,11 @@ namespace SundayLastBreath.UI
 
                 if (limb.isSevered)
                 {
+                    string sevLabel = styleD
+                        ? $"<color=#8C9486><s><b>{limb.displayName}</b></s></color>   <color=#D95829><b>[SEVERED]</b></color>\n<color=#8C9486>0 / {limb.maxHp} HP - LIMB DESTROYED</color>"
+                        : $"<color=#64748B><s><b>{limb.displayName}</b></s></color>   <color=#EF4444><b>[SEVERED]</b></color>\n<color=#475569>0 / {limb.maxHp} HP — LIMB DESTROYED</color>";
                     var cell = CreateSubMenuCell(
-                        $"<color=#64748B><s><b>{limb.displayName}</b></s></color>   <color=#EF4444><b>[SEVERED]</b></color>\n<color=#475569>0 / {limb.maxHp} HP — LIMB DESTROYED</color>",
+                        sevLabel,
                         new Color(0.08f, 0.05f, 0.06f, 0.80f),
                         0f,
                         false,
@@ -2743,9 +3398,13 @@ namespace SundayLastBreath.UI
                 else
                 {
                     int hitPct = CalculateLimbHitChance(enemy, limb);
-                    string hitColor = hitPct >= 80 ? "#10B981" : (hitPct >= 55 ? "#38BDF8" : "#F59E0B");
+                    string hitColor = styleD
+                        ? (hitPct >= 80 ? "#6EE7B7" : (hitPct >= 55 ? "#E0A43A" : "#D95829"))
+                        : (hitPct >= 80 ? "#10B981" : (hitPct >= 55 ? "#38BDF8" : "#F59E0B"));
                     float hpFrac = limb.maxHp > 0 ? Mathf.Clamp01((float)limb.hp / limb.maxHp) : 1f;
-                    string label = $"<b>{limb.displayName}</b>   <color={hitColor}><b>[{hitPct}% HIT]</b></color>\n<color=#CBD5E1>HP: {limb.hp}/{limb.maxHp}</color>   <color=#F87171>[{limb.tacticalTag}]</color>";
+                    string label = styleD
+                        ? $"<color=#E4DFD1><b>{limb.displayName}</b></color>   <color={hitColor}><b>[{hitPct}% HIT]</b></color>\n<color=#9CA396>HP: {limb.hp}/{limb.maxHp}</color>   <color=#D95829>[{limb.tacticalTag}]</color>"
+                        : $"<b>{limb.displayName}</b>   <color={hitColor}><b>[{hitPct}% HIT]</b></color>\n<color=#CBD5E1>HP: {limb.hp}/{limb.maxHp}</color>   <color=#F87171>[{limb.tacticalTag}]</color>";
 
                     Color bgCol = lt == LimbType.Head
                         ? new Color(0.28f, 0.10f, 0.12f, 0.96f)
@@ -2771,6 +3430,8 @@ namespace SundayLastBreath.UI
             var enemy = CurrentEnemy;
             if (enemy == null) return;
 
+            bool styleD = _builtForHybridLayout && IsStyleD;
+
             foreach (var kvp in enemy.limbs)
             {
                 var ls = kvp.Value;
@@ -2786,7 +3447,9 @@ namespace SundayLastBreath.UI
                     {
                         int hitPct = CalculateLimbHitChance(enemy, ls);
                         string shortName = ls.displayName.Replace("LEFT ", "L.").Replace("RIGHT ", "R.");
-                        ls.overlayReticleLabel.text = $"► {shortName} <color=#38BDF8>{hitPct}%</color>";
+                        ls.overlayReticleLabel.text = styleD
+                            ? $"► {shortName} <color=#E0A43A>{hitPct}%</color>"
+                            : $"► {shortName} <color=#38BDF8>{hitPct}%</color>";
                     }
                 }
             }
@@ -2796,24 +3459,34 @@ namespace SundayLastBreath.UI
                 switch (lt.Value)
                 {
                     case LimbType.Head:
-                        SetCombatLog("<color=#EF4444><b>[TACTICAL ADVICE // HEAD]</b></color> High-risk target. Destroying the skull deals critical trauma and prevents reanimation!");
+                        SetCombatLog(styleD
+                            ? "<color=#D95829><b>[TACTICAL ADVICE | HEAD]</b></color> High-risk target. Destroying the skull deals critical trauma and prevents reanimation!"
+                            : "<color=#EF4444><b>[TACTICAL ADVICE // HEAD]</b></color> High-risk target. Destroying the skull deals critical trauma and prevents reanimation!");
                         break;
                     case LimbType.Torso:
-                        SetCombatLog("<color=#38BDF8><b>[TACTICAL ADVICE // TORSO]</b></color> Center of mass. Highest accuracy. Reliable stagger that drains stamina and breaks enemy rhythm.");
+                        SetCombatLog(styleD
+                            ? "<color=#E4DFD1><b>[TACTICAL ADVICE | TORSO]</b></color> Center of mass. Highest accuracy. Reliable stagger that drains stamina and breaks enemy rhythm."
+                            : "<color=#38BDF8><b>[TACTICAL ADVICE // TORSO]</b></color> Center of mass. Highest accuracy. Reliable stagger that drains stamina and breaks enemy rhythm.");
                         break;
                     case LimbType.LeftArm:
                     case LimbType.RightArm:
-                        SetCombatLog("<color=#F59E0B><b>[TACTICAL ADVICE // ARMS]</b></color> Severing arms strips claw swipes, prevents lethal grapple grabs, and reduces enemy DMG by up to 65%.");
+                        SetCombatLog(styleD
+                            ? "<color=#E0A43A><b>[TACTICAL ADVICE | ARMS]</b></color> Severing arms strips claw swipes, prevents lethal grapple grabs, and reduces enemy DMG by up to 65%."
+                            : "<color=#F59E0B><b>[TACTICAL ADVICE // ARMS]</b></color> Severing arms strips claw swipes, prevents lethal grapple grabs, and reduces enemy DMG by up to 65%.");
                         break;
                     case LimbType.LeftLeg:
                     case LimbType.RightLeg:
-                        SetCombatLog("<color=#10B981><b>[TACTICAL ADVICE // LEGS]</b></color> High accuracy. Severing both legs drops the enemy into a slow CRAWLER (0% evasion, 95% headshot accuracy)!");
+                        SetCombatLog(styleD
+                            ? "<color=#6EE7B7><b>[TACTICAL ADVICE | LEGS]</b></color> High accuracy. Severing both legs drops the enemy into a slow CRAWLER (0% evasion, 95% headshot accuracy)!"
+                            : "<color=#10B981><b>[TACTICAL ADVICE // LEGS]</b></color> High accuracy. Severing both legs drops the enemy into a slow CRAWLER (0% evasion, 95% headshot accuracy)!");
                         break;
                 }
             }
             else if (menuState == SubMenuState.TargetLimbs)
             {
-                SetCombatLog("<color=#F87171>[TACTICAL TARGETING]</color> Hover over a limb to preview tactical impact, or click to strike!");
+                SetCombatLog(styleD
+                    ? "<color=#D95829>[TACTICAL TARGETING]</color> Hover over a limb to preview tactical impact, or click to strike!"
+                    : "<color=#F87171>[TACTICAL TARGETING]</color> Hover over a limb to preview tactical impact, or click to strike!");
             }
         }
 
@@ -2824,50 +3497,78 @@ namespace SundayLastBreath.UI
                 : new GameObject("SubCell", typeof(RectTransform), typeof(Image), typeof(Button), typeof(Outline));
             cellObj.transform.SetParent(subMenuContentRect, false);
 
-            Image img = cellObj.GetComponent<Image>();
-            Color resolvedBg = _builtForHybridLayout
-                ? (!interactable ? ColSlotBg : ColCardBg)
-                : bgCol;
-            img.color = resolvedBg;
+            bool styleD = _builtForHybridLayout && IsStyleD;
+            bool useMetalSprite = styleD && HybridCockpitController.SharedStyleDButtonMetal != null;
 
-            if (_builtForHybridLayout)
+            Image img = cellObj.GetComponent<Image>();
+            Color resolvedBg = styleD
+                ? (!interactable ? new Color(0.11f, 0.115f, 0.13f, 0.85f) : ColStyleDMetalBtn)
+                : (_builtForHybridLayout
+                    ? (!interactable ? ColSlotBg : ColCardBg)
+                    : bgCol);
+
+            Color accent = styleD ? ColStyleDHairline : ColBorderSlate;
+            if (hoverLimb.HasValue)
             {
-                AddCrispBorder(cellObj.transform, interactable ? ColBorderSlate : new Color(0.14f, 0.18f, 0.24f, 0.5f), 1f);
-                Color accent = ColBorderSlate;
-                if (hoverLimb.HasValue)
+                switch (hoverLimb.Value)
                 {
-                    switch (hoverLimb.Value)
-                    {
-                        case LimbType.Head: accent = ColCrimson; break;
-                        case LimbType.Torso: accent = ColCyan; break;
-                        case LimbType.LeftArm:
-                        case LimbType.RightArm: accent = ColAmber; break;
-                        case LimbType.LeftLeg:
-                        case LimbType.RightLeg: accent = ColEmerald; break;
-                    }
+                    case LimbType.Head: accent = styleD ? ColStyleDRust : ColCrimson; break;
+                    case LimbType.Torso: accent = styleD ? ColStyleDBone : ColCyan; break;
+                    case LimbType.LeftArm:
+                    case LimbType.RightArm: accent = styleD ? ColStyleDAmber : ColAmber; break;
+                    case LimbType.LeftLeg:
+                    case LimbType.RightLeg: accent = styleD ? ColStyleDSage : ColEmerald; break;
                 }
-                else if (menuState == SubMenuState.SelectItem && interactable)
-                {
-                    accent = ColEmerald;
-                }
-                else if (!interactable)
-                {
-                    accent = hpBarFrac == 0f ? ColBorderCrimson : ColTextMuted;
-                }
-                AddLeftAccentBar(cellObj.transform, accent, 3.5f);
             }
-            else
+            else if (menuState == SubMenuState.SelectItem && interactable)
             {
-                Outline outl = cellObj.GetComponent<Outline>();
-                outl.effectColor = interactable ? new Color(0.38f, 0.50f, 0.66f, 0.9f) : new Color(0.2f, 0.2f, 0.25f, 0.5f);
-                outl.effectDistance = new Vector2(1.5f, -1.5f);
+                accent = styleD ? ColStyleDSage : ColEmerald;
+            }
+            else if (!interactable)
+            {
+                accent = hpBarFrac == 0f
+                    ? (styleD ? ColStyleDRust : ColBorderCrimson)
+                    : (styleD ? ColStyleDMuted : ColTextMuted);
             }
 
             Button btn = cellObj.GetComponent<Button>();
             btn.targetGraphic = img;
             btn.interactable = interactable;
-            if (_builtForHybridLayout)
+
+            if (styleD)
             {
+                if (useMetalSprite)
+                {
+                    ApplyStyleDButtonSprite(
+                        btn,
+                        img,
+                        HybridCockpitController.SharedStyleDButtonMetal,
+                        2.8f,
+                        resolvedBg,
+                        interactable ? ColStyleDMetalHover : resolvedBg,
+                        ColStyleDMetalBtn * 0.72f,
+                        new Color(0.11f, 0.115f, 0.13f, 0.85f)
+                    );
+                }
+                else
+                {
+                    img.color = resolvedBg;
+                    ColorBlock cb = btn.colors;
+                    cb.normalColor = resolvedBg;
+                    cb.highlightedColor = interactable ? ColStyleDMetalHover : resolvedBg;
+                    cb.pressedColor = ColStyleDMetalBtn * 0.72f;
+                    cb.selectedColor = resolvedBg;
+                    cb.disabledColor = resolvedBg;
+                    btn.colors = cb;
+                }
+                AddLeftAccentBar(cellObj.transform, accent, 3.5f);
+            }
+            else if (_builtForHybridLayout)
+            {
+                img.color = resolvedBg;
+                AddCrispBorder(cellObj.transform, ColBorderSubtle, 1f);
+                AddLeftAccentBar(cellObj.transform, accent, 3.5f);
+
                 ColorBlock cb = btn.colors;
                 cb.normalColor = resolvedBg;
                 cb.highlightedColor = interactable ? new Color(0.11f, 0.145f, 0.21f, 1f) : resolvedBg;
@@ -2876,18 +3577,46 @@ namespace SundayLastBreath.UI
                 cb.disabledColor = resolvedBg;
                 btn.colors = cb;
             }
+            else
+            {
+                img.color = resolvedBg;
+                Outline outl = cellObj.GetComponent<Outline>();
+                outl.effectColor = ColBorderSubtle;
+                outl.effectDistance = new Vector2(1.5f, -1.5f);
+            }
+
             if (onClick != null) btn.onClick.AddListener(() => onClick.Invoke());
 
-            if (hoverLimb.HasValue && interactable)
+            if (interactable && (hoverLimb.HasValue || menuState == SubMenuState.SelectItem))
             {
-                LimbType capturedLimb = hoverLimb.Value;
+                Color hoverBorderColor = new Color(accent.r, accent.g, accent.b, 1.0f);
                 EventTrigger et = cellObj.AddComponent<EventTrigger>();
                 var enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-                enterEntry.callback.AddListener(_ => SetHoveredLimb(capturedLimb));
+                enterEntry.callback.AddListener(_ =>
+                {
+                    if (hoverLimb.HasValue) SetHoveredLimb(hoverLimb.Value);
+                    if (styleD) return;
+                    if (_builtForHybridLayout) SetCrispBorderColor(cellObj.transform, hoverBorderColor);
+                    else
+                    {
+                        Outline outl = cellObj.GetComponent<Outline>();
+                        if (outl != null) outl.effectColor = hoverBorderColor;
+                    }
+                });
                 et.triggers.Add(enterEntry);
 
                 var exitEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-                exitEntry.callback.AddListener(_ => SetHoveredLimb(null));
+                exitEntry.callback.AddListener(_ =>
+                {
+                    if (hoverLimb.HasValue) SetHoveredLimb(null);
+                    if (styleD) return;
+                    if (_builtForHybridLayout) SetCrispBorderColor(cellObj.transform, ColBorderSubtle);
+                    else
+                    {
+                        Outline outl = cellObj.GetComponent<Outline>();
+                        if (outl != null) outl.effectColor = ColBorderSubtle;
+                    }
+                });
                 et.triggers.Add(exitEntry);
             }
 
@@ -2895,7 +3624,7 @@ namespace SundayLastBreath.UI
                 cellObj.transform,
                 "Txt",
                 richText,
-                _builtForHybridLayout ? 12.5f : 14f,
+                styleD ? 12f : (_builtForHybridLayout ? 12.5f : 14f),
                 FontStyles.Normal,
                 TextAlignmentOptions.TopLeft,
                 _builtForHybridLayout ? FontRole.Body : FontRole.Mono
@@ -2904,6 +3633,7 @@ namespace SundayLastBreath.UI
             {
                 txt.textWrappingMode = TextWrappingModes.Normal;
                 txt.lineSpacing = 2f;
+                if (styleD) txt.color = ColStyleDBone;
             }
             RectTransform tRt = txt.GetComponent<RectTransform>();
             tRt.anchorMin = Vector2.zero;
@@ -2924,7 +3654,9 @@ namespace SundayLastBreath.UI
                 bbRt.pivot = new Vector2(0.5f, 0f);
                 bbRt.sizeDelta = new Vector2(_builtForHybridLayout ? -24f : -28f, _builtForHybridLayout ? 5f : 7f);
                 bbRt.anchoredPosition = new Vector2(0f, 8f);
-                barBg.GetComponent<Image>().color = new Color(0.03f, 0.04f, 0.06f, 0.9f);
+                barBg.GetComponent<Image>().color = styleD
+                    ? new Color(0.05f, 0.055f, 0.06f, 0.92f)
+                    : new Color(0.03f, 0.04f, 0.06f, 0.9f);
 
                 GameObject barFill = new GameObject("LimbHpFill", typeof(RectTransform), typeof(Image));
                 barFill.transform.SetParent(barBg.transform, false);
@@ -2933,7 +3665,9 @@ namespace SundayLastBreath.UI
                 bfRt.anchorMax = new Vector2(Mathf.Clamp01(hpBarFrac), 1f);
                 bfRt.sizeDelta = Vector2.zero;
                 Image bfImg = barFill.GetComponent<Image>();
-                bfImg.color = hpBarFrac > 0.5f ? new Color(0.85f, 0.22f, 0.22f, 1f) : new Color(0.95f, 0.55f, 0.12f, 1f);
+                bfImg.color = styleD
+                    ? (hpBarFrac > 0.5f ? ColStyleDRust : ColStyleDAmber)
+                    : (hpBarFrac > 0.5f ? new Color(0.85f, 0.22f, 0.22f, 1f) : new Color(0.95f, 0.55f, 0.12f, 1f));
                 bfImg.raycastTarget = false;
             }
 
@@ -2976,32 +3710,47 @@ namespace SundayLastBreath.UI
             rt.sizeDelta = size;
             rt.anchoredPosition = anchoredPos;
 
+            bool styleD = useHybridStyle && IsStyleD;
+            bool useMetalSprite = styleD && HybridCockpitController.SharedStyleDButtonMetal != null;
+
             Image img = btnObj.GetComponent<Image>();
-            img.color = useHybridStyle ? ColCardBg : new Color(0.18f, 0.22f, 0.30f, 0.95f);
-            if (useHybridStyle)
+            Button btn = btnObj.GetComponent<Button>();
+            btn.targetGraphic = img;
+
+            if (useMetalSprite)
             {
-                AddCrispBorder(btnObj.transform, ColBorderSlate, 1f);
+                ApplyStyleDButtonSprite(
+                    btn,
+                    img,
+                    HybridCockpitController.SharedStyleDButtonMetal,
+                    3.2f,
+                    ColStyleDMetalBtn,
+                    ColStyleDMetalHover,
+                    ColStyleDMetalBtn * 0.72f,
+                    new Color(0.11f, 0.115f, 0.13f, 0.45f)
+                );
+            }
+            else if (useHybridStyle)
+            {
+                img.color = styleD ? ColStyleDMetalBtn : ColCardBg;
+                if (!styleD) AddCrispBorder(btnObj.transform, ColBorderSlate, 1f);
+
+                ColorBlock cb = btn.colors;
+                cb.normalColor = styleD ? ColStyleDMetalBtn : ColCardBg;
+                cb.highlightedColor = styleD ? ColStyleDMetalHover : new Color(0.11f, 0.145f, 0.21f, 1f);
+                cb.pressedColor = styleD ? ColStyleDMetalBtn * 0.72f : ColSlotBg;
+                cb.disabledColor = styleD ? new Color(0.11f, 0.115f, 0.13f, 0.45f) : new Color(0.05f, 0.06f, 0.09f, 0.45f);
+                btn.colors = cb;
             }
             else
             {
+                img.color = new Color(0.18f, 0.22f, 0.30f, 0.95f);
                 btnObj.GetComponent<Outline>().effectColor = new Color(0.4f, 0.5f, 0.65f, 0.8f);
-            }
-
-            Button btn = btnObj.GetComponent<Button>();
-            btn.targetGraphic = img;
-            if (useHybridStyle)
-            {
-                ColorBlock cb = btn.colors;
-                cb.normalColor = ColCardBg;
-                cb.highlightedColor = new Color(0.11f, 0.145f, 0.21f, 1f);
-                cb.pressedColor = ColSlotBg;
-                cb.disabledColor = new Color(0.05f, 0.06f, 0.09f, 0.45f);
-                btn.colors = cb;
             }
             btn.onClick.AddListener(() => onClick?.Invoke());
 
             TextMeshProUGUI txt = CreateText(btnObj.transform, "Lbl", label, useHybridStyle ? 10.5f : 12f, FontStyles.Bold, TextAlignmentOptions.Center, FontRole.Mono);
-            if (useHybridStyle) txt.color = ColCyan;
+            if (useHybridStyle) txt.color = styleD ? ColStyleDBone : ColCyan;
             RectTransform tRt = txt.GetComponent<RectTransform>();
             tRt.anchorMin = Vector2.zero;
             tRt.anchorMax = Vector2.one;

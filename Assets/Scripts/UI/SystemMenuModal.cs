@@ -156,6 +156,8 @@ if (sysSettingsPanel != null) sysSettingsPanel.SetActive(view == SystemMenuView.
 
 if (sysExitConfirmPanel != null) sysExitConfirmPanel.SetActive(view == SystemMenuView.ExitConfirm);
 
+bool styleD = StyleDThemeUtility.IsStyleDActive;
+
 switch (view)
 
 {
@@ -163,7 +165,9 @@ case SystemMenuView.Main:
 
 if (sysHeaderSubText != null)
 
-sysHeaderSubText.text = "SYSTEM // ARCHIVE, AUDIO CONFIGURATION & SESSION CONTROL";
+sysHeaderSubText.text = styleD
+    ? "SYSTEM MENU - ARCHIVE, AUDIO & SESSION"
+    : "SYSTEM // ARCHIVE, AUDIO CONFIGURATION & SESSION CONTROL";
 
 RefreshSystemMenuTelemetry();
 
@@ -173,7 +177,9 @@ case SystemMenuView.SaveSlots:
 
 if (sysHeaderSubText != null)
 
-sysHeaderSubText.text = "SAVE GAME // SELECT ARCHIVE SLOT TO RECORD PROGRESS";
+sysHeaderSubText.text = styleD
+    ? "SAVE GAME - SELECT ARCHIVE SLOT"
+    : "SAVE GAME // SELECT ARCHIVE SLOT TO RECORD PROGRESS";
 
 RefreshSystemSlotCards();
 
@@ -183,7 +189,9 @@ case SystemMenuView.LoadSlots:
 
 if (sysHeaderSubText != null)
 
-sysHeaderSubText.text = "LOAD GAME // SELECT ARCHIVED SLOT TO RESTORE";
+sysHeaderSubText.text = styleD
+    ? "LOAD GAME - SELECT ARCHIVE SLOT"
+    : "LOAD GAME // SELECT ARCHIVED SLOT TO RESTORE";
 
 RefreshSystemSlotCards();
 
@@ -193,7 +201,9 @@ case SystemMenuView.Settings:
 
 if (sysHeaderSubText != null)
 
-sysHeaderSubText.text = "SETTINGS // AUDIO MIXER & VOLUME CALIBRATION";
+sysHeaderSubText.text = styleD
+    ? "SETTINGS - AUDIO MIXER CALIBRATION"
+    : "SETTINGS // AUDIO MIXER & VOLUME CALIBRATION";
 
 SyncSettingsSlidersFromAudio();
 
@@ -203,7 +213,9 @@ case SystemMenuView.ExitConfirm:
 
 if (sysHeaderSubText != null)
 
-sysHeaderSubText.text = "WARNING // CONFIRM SESSION TERMINATION";
+sysHeaderSubText.text = styleD
+    ? "WARNING - CONFIRM SESSION EXIT"
+    : "WARNING // CONFIRM SESSION TERMINATION";
 
 UpdateExitWarningDetails();
 
@@ -214,6 +226,8 @@ break;
 private void RefreshSystemSlotCards()
 
 {
+bool styleD = StyleDThemeUtility.IsStyleDActive;
+
 for (int i = 0; i < SaveManager.TotalSlotCount; i++)
 
 {
@@ -228,46 +242,47 @@ if (s.exists)
 {
 string savedBadge = !string.IsNullOrEmpty(s.realSaveTime)
 
-? $"<color=#64748B>[{s.realSaveTime}]</color>"
+? (styleD ? $"<color=#8C9486>[{s.realSaveTime}]</color>" : $"<color=#64748B>[{s.realSaveTime}]</color>")
 
 : "";
 
 if (sysSlotTitles[slotIdx] != null)
 
 {
-string titleHex = slotIdx == 0 ? "#38BDF8" : "#F59E0B";
+string titleHex = styleD
+    ? (slotIdx == 0 ? "#E0A43A" : "#D95829")
+    : (slotIdx == 0 ? "#38BDF8" : "#F59E0B");
+string nameHex = styleD ? "#E4DFD1" : "#F8FAFC";
+string jobHex = styleD ? "#8C9486" : "#94A3B8";
 
 sysSlotTitles[slotIdx].text =
 
-$"<color={titleHex}><b>[{slotTitle}]</b></color>   <color=#F8FAFC><b>{s.characterName}</b></color> <color=#94A3B8>({s.job})</color>  {savedBadge}";
+$"<color={titleHex}><b>[{slotTitle}]</b></color>   <color={nameHex}><b>{s.characterName}</b></color> <color={jobHex}>({s.job})</color>  {savedBadge}";
+
+sysSlotTitles[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
 }
 
 if (sysSlotDetails[slotIdx] != null)
 
 {
-sysSlotDetails[slotIdx].text =
+string clockText = styleD && !string.IsNullOrEmpty(s.clockDisplay)
+    ? s.clockDisplay.Replace(" // ", " - ")
+    : s.clockDisplay;
 
-$"<color=#FBBF24>{s.roomDisplayName}</color>  |  <color=#E2E8F0>{s.clockDisplay}</color>  |  " +
-
-$"HP <color=#EF4444>{s.hp}/{s.hpMax}</color>  STM <color=#10B981>{s.stamina}/{s.staminaMax}</color>  HUM <color=#A78BFA>{s.humanity}%</color>";
+if (styleD)
+{
+    sysSlotDetails[slotIdx].text =
+        $"<color=#E0A43A>{s.roomDisplayName}</color>  |  <color=#E4DFD1>{clockText}</color>  |  " +
+        $"HP <color=#D95829>{s.hp}/{s.hpMax}</color>  STM <color=#6EE7B7>{s.stamina}/{s.staminaMax}</color>  HUM <color=#B4A7D6>{s.humanity}%</color>";
+}
+else
+{
+    sysSlotDetails[slotIdx].text =
+        $"<color=#FBBF24>{s.roomDisplayName}</color>  |  <color=#E2E8F0>{clockText}</color>  |  " +
+        $"HP <color=#EF4444>{s.hp}/{s.hpMax}</color>  STM <color=#10B981>{s.stamina}/{s.staminaMax}</color>  HUM <color=#A78BFA>{s.humanity}%</color>";
 }
 
-if (sysSlotActionBtns[slotIdx] != null)
-
-{
-sysSlotActionBtns[slotIdx].interactable = true;
-
-Image btnBg = sysSlotActionBtns[slotIdx].GetComponent<Image>();
-
-if (btnBg != null)
-
-{
-btnBg.color = isSlotPickerSaveMode
-
-? new Color(0.24f, 0.16f, 0.04f, 0.98f)
-
-: new Color(0.07f, 0.25f, 0.36f, 0.98f);
-}
+sysSlotDetails[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
 }
 
 if (sysSlotActionLabels[slotIdx] != null)
@@ -275,11 +290,38 @@ if (sysSlotActionLabels[slotIdx] != null)
 {
 sysSlotActionLabels[slotIdx].text = isSlotPickerSaveMode ? "<b>OVERWRITE</b>" : "<b>> LOAD</b>";
 
-sysSlotActionLabels[slotIdx].color = isSlotPickerSaveMode
+sysSlotActionLabels[slotIdx].color = styleD
+    ? StyleDThemeUtility.ColBone
+    : (isSlotPickerSaveMode ? new Color(0.98f, 0.78f, 0.28f) : new Color(0.38f, 0.85f, 0.98f));
+}
 
-? new Color(0.98f, 0.78f, 0.28f)
+if (sysSlotActionBtns[slotIdx] != null)
 
-: new Color(0.38f, 0.85f, 0.98f);
+{
+sysSlotActionBtns[slotIdx].interactable = true;
+
+if (styleD)
+{
+    Color tint = isSlotPickerSaveMode
+        ? StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColAmber, 0.55f)
+        : StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.55f);
+    Color hov = isSlotPickerSaveMode
+        ? StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColAmber, 0.78f)
+        : StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.78f);
+    StyleDThemeUtility.ApplyMetalButton(sysSlotActionBtns[slotIdx], tint, hov, 2.8f, StyleDThemeUtility.ColBone);
+}
+else
+{
+    Image btnBg = sysSlotActionBtns[slotIdx].GetComponent<Image>();
+
+    if (btnBg != null)
+
+    {
+        btnBg.color = isSlotPickerSaveMode
+            ? new Color(0.24f, 0.16f, 0.04f, 0.98f)
+            : new Color(0.07f, 0.25f, 0.36f, 0.98f);
+    }
+}
 }
 
 if (sysSlotDeleteBtns[slotIdx] != null)
@@ -291,10 +333,18 @@ sysSlotDeleteBtns[slotIdx].gameObject.SetActive(true);
 if (sysSlotCardBgs[slotIdx] != null)
 
 {
-sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
+if (styleD)
+{
+    StyleDThemeUtility.ApplySliced(sysSlotCardBgs[slotIdx], StyleDThemeUtility.WellRecessed, 3.2f, Color.white);
+    StyleDThemeUtility.AddLeftAccentBar(sysSlotCardBgs[slotIdx].transform, slotIdx == 0 ? StyleDThemeUtility.ColAmber : StyleDThemeUtility.ColRust, 4f);
+}
+else
+{
+    sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
+}
 }
 
-if (sysSlotCardOutlines[slotIdx] != null)
+if (!styleD && sysSlotCardOutlines[slotIdx] != null)
 
 {
 sysSlotCardOutlines[slotIdx].effectColor = slotIdx == 0
@@ -311,35 +361,21 @@ else
 if (sysSlotTitles[slotIdx] != null)
 
 {
-sysSlotTitles[slotIdx].text = $"<color=#64748B><b>[{slotTitle}]</b>   -   [ EMPTY ARCHIVE SLOT ]</color>";
+string emptyHex = styleD ? "#8C9486" : "#64748B";
+sysSlotTitles[slotIdx].text = $"<color={emptyHex}><b>[{slotTitle}]</b>   -   [ EMPTY ARCHIVE SLOT ]</color>";
+sysSlotTitles[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
 }
 
 if (sysSlotDetails[slotIdx] != null)
 
 {
+string hintHex = styleD ? "#8C9486" : (isSlotPickerSaveMode ? "#64748B" : "#475569");
 sysSlotDetails[slotIdx].text = isSlotPickerSaveMode
 
-? "<color=#64748B><i>Available slot — click SAVE HERE to record current progress.</i></color>"
+? $"<color={hintHex}><i>Available slot — click SAVE HERE to record current progress.</i></color>"
 
-: "<color=#475569><i>No survivor data recorded in this slot.</i></color>";
-}
-
-if (sysSlotActionBtns[slotIdx] != null)
-
-{
-sysSlotActionBtns[slotIdx].interactable = isSlotPickerSaveMode;
-
-Image btnBg = sysSlotActionBtns[slotIdx].GetComponent<Image>();
-
-if (btnBg != null)
-
-{
-btnBg.color = isSlotPickerSaveMode
-
-? new Color(0.06f, 0.24f, 0.14f, 0.98f)
-
-: new Color(0.06f, 0.08f, 0.11f, 0.75f);
-}
+: $"<color={hintHex}><i>No survivor data recorded in this slot.</i></color>";
+sysSlotDetails[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
 }
 
 if (sysSlotActionLabels[slotIdx] != null)
@@ -347,11 +383,38 @@ if (sysSlotActionLabels[slotIdx] != null)
 {
 sysSlotActionLabels[slotIdx].text = isSlotPickerSaveMode ? "<b>SAVE HERE</b>" : "EMPTY";
 
-sysSlotActionLabels[slotIdx].color = isSlotPickerSaveMode
+sysSlotActionLabels[slotIdx].color = styleD
+    ? (isSlotPickerSaveMode ? StyleDThemeUtility.ColBone : StyleDThemeUtility.ColMuted)
+    : (isSlotPickerSaveMode ? new Color(0.28f, 0.95f, 0.58f) : new Color(0.35f, 0.40f, 0.46f));
+}
 
-? new Color(0.28f, 0.95f, 0.58f)
+if (sysSlotActionBtns[slotIdx] != null)
 
-: new Color(0.35f, 0.40f, 0.46f);
+{
+sysSlotActionBtns[slotIdx].interactable = isSlotPickerSaveMode;
+
+if (styleD)
+{
+    Color tint = isSlotPickerSaveMode
+        ? StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.52f)
+        : StyleDThemeUtility.ColMetalDisabled;
+    Color hov = isSlotPickerSaveMode
+        ? StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.75f)
+        : StyleDThemeUtility.ColMetalDisabled;
+    StyleDThemeUtility.ApplyMetalButton(sysSlotActionBtns[slotIdx], tint, hov, 2.8f, isSlotPickerSaveMode ? StyleDThemeUtility.ColBone : StyleDThemeUtility.ColMuted);
+}
+else
+{
+    Image btnBg = sysSlotActionBtns[slotIdx].GetComponent<Image>();
+
+    if (btnBg != null)
+
+    {
+        btnBg.color = isSlotPickerSaveMode
+            ? new Color(0.06f, 0.24f, 0.14f, 0.98f)
+            : new Color(0.06f, 0.08f, 0.11f, 0.75f);
+    }
+}
 }
 
 if (sysSlotDeleteBtns[slotIdx] != null)
@@ -363,10 +426,18 @@ sysSlotDeleteBtns[slotIdx].gameObject.SetActive(false);
 if (sysSlotCardBgs[slotIdx] != null)
 
 {
-sysSlotCardBgs[slotIdx].color = new Color(0.04f, 0.05f, 0.08f, 0.88f);
+if (styleD)
+{
+    StyleDThemeUtility.ApplySliced(sysSlotCardBgs[slotIdx], StyleDThemeUtility.WellRecessed, 3.2f, new Color(0.72f, 0.72f, 0.74f, 0.90f));
+    StyleDThemeUtility.AddLeftAccentBar(sysSlotCardBgs[slotIdx].transform, isSlotPickerSaveMode ? StyleDThemeUtility.ColSage : StyleDThemeUtility.ColHairline, 4f);
+}
+else
+{
+    sysSlotCardBgs[slotIdx].color = new Color(0.04f, 0.05f, 0.08f, 0.88f);
+}
 }
 
-if (sysSlotCardOutlines[slotIdx] != null)
+if (!styleD && sysSlotCardOutlines[slotIdx] != null)
 
 {
 sysSlotCardOutlines[slotIdx].effectColor = new Color(0.18f, 0.22f, 0.28f, 0.5f);
@@ -476,14 +547,17 @@ if (sysLoadGameBtn != null)
 sysLoadGameBtn.interactable = true; // Always allow player to click LOAD GAME to inspect and restore slots!
 }
 
+bool styleD = StyleDThemeUtility.IsStyleDActive;
+
 if (sysLoadBtnLabel != null)
 
 {
+string subHex = styleD ? "#8C9486" : (hasSave ? "#94A3B8" : "#64748B");
 sysLoadBtnLabel.text = hasSave
 
-? "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Choose from 5 archive slots to restore</color></size>"
+? $"<b>[ 2 ]  LOAD GAME</b>   <size=11><color={subHex}>Choose from 5 archive slots to restore</color></size>"
 
-: "<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#64748B>[NO ARCHIVE SAVES DETECTED]</color></size>";
+: $"<b>[ 2 ]  LOAD GAME</b>   <size=11><color={subHex}>[NO ARCHIVE SAVES DETECTED]</color></size>";
 }
 
 if (sysTelemetryStatusText != null)
@@ -500,15 +574,23 @@ else if (hasSave && SaveManager.Instance != null)
 {
 var s = SaveManager.Instance.GetSaveSummary();
 
-sysTelemetryStatusText.text =
+string stamp = styleD && !string.IsNullOrEmpty(s.saveTimestamp)
+    ? s.saveTimestamp.Replace(" // ", " - ")
+    : s.saveTimestamp;
 
-$"<color=#38BDF8><b>LATEST ({s.slotTitle}):</b></color> {s.saveTimestamp}  |  <color=#F8FAFC>{s.characterName}</color>  |  <color=#F59E0B>{s.roomDisplayName}</color>";
+sysTelemetryStatusText.text = styleD
+
+? $"<color=#E0A43A><b>LATEST ({s.slotTitle}):</b></color> <color=#8C9486>{stamp}</color>  |  <color=#E4DFD1>{s.characterName}</color>  |  <color=#E0A43A>{s.roomDisplayName}</color>"
+
+: $"<color=#38BDF8><b>LATEST ({s.slotTitle}):</b></color> {stamp}  |  <color=#F8FAFC>{s.characterName}</color>  |  <color=#F59E0B>{s.roomDisplayName}</color>";
 }
 
 else
 
 {
-sysTelemetryStatusText.text = "<color=#EF4444><b>ARCHIVE STATUS:</b> All save slots are currently empty.</color>";
+sysTelemetryStatusText.text = styleD
+    ? "<color=#D95829><b>ARCHIVE STATUS:</b> All save slots are currently empty.</color>"
+    : "<color=#EF4444><b>ARCHIVE STATUS:</b> All save slots are currently empty.</color>";
 }
 }
 }
@@ -518,6 +600,7 @@ private void UpdateExitWarningDetails()
 {
 if (sysExitWarningDetailText == null) return;
 
+bool styleD = StyleDThemeUtility.IsStyleDActive;
 bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasAnySave();
 
 if (hasSave && SaveManager.Instance != null)
@@ -525,15 +608,22 @@ if (hasSave && SaveManager.Instance != null)
 {
 var s = SaveManager.Instance.GetSaveSummary();
 
-sysExitWarningDetailText.text =
-
-"Are you sure you want to exit the game?\n" +
-
-"Any unsaved progress since your last save will be lost.\n\n" +
-
-$"<color=#38BDF8><b>Latest Save ({s.slotTitle}):</b></color> {s.saveTimestamp}\n" +
-
-$"<color=#94A3B8>Citizen: {s.characterName}  |  Location: {s.roomDisplayName} ({s.clockDisplay})</color>";
+if (styleD)
+{
+    sysExitWarningDetailText.text =
+        "Are you sure you want to exit the game?\n" +
+        "Any unsaved progress since your last save will be lost.\n\n" +
+        $"<color=#E0A43A><b>Latest Save ({s.slotTitle}):</b></color> <color=#E4DFD1>{s.saveTimestamp}</color>\n" +
+        $"<color=#8C9486>Citizen: {s.characterName}  |  Location: {s.roomDisplayName} ({s.clockDisplay})</color>";
+}
+else
+{
+    sysExitWarningDetailText.text =
+        "Are you sure you want to exit the game?\n" +
+        "Any unsaved progress since your last save will be lost.\n\n" +
+        $"<color=#38BDF8><b>Latest Save ({s.slotTitle}):</b></color> {s.saveTimestamp}\n" +
+        $"<color=#94A3B8>Citizen: {s.characterName}  |  Location: {s.roomDisplayName} ({s.clockDisplay})</color>";
+}
 }
 
 else
@@ -543,7 +633,9 @@ sysExitWarningDetailText.text =
 
 "Are you sure you want to exit the game?\n" +
 
-"<color=#EF4444><b>You have not saved your game in any slot yet!</b></color> If you exit without saving, all current progress will be lost.";
+(styleD
+    ? "<color=#D95829><b>You have not saved your game in any slot yet!</b></color> If you exit without saving, all current progress will be lost."
+    : "<color=#EF4444><b>You have not saved your game in any slot yet!</b></color> If you exit without saving, all current progress will be lost.");
 }
 }
 
@@ -704,13 +796,15 @@ private void EnsureSystemMenuModalBuilt()
     if (isBuilt) return;
     isBuilt = true;
 
+    bool styleD = StyleDThemeUtility.IsStyleDActive;
+
     systemMenuModal = this.gameObject;
     if (stage != null && systemMenuModal.transform.parent != stage.transform)
     {
         systemMenuModal.transform.SetParent(stage.transform, false);
     }
 
-    TMP_FontAsset sharedFont = stage != null && stage.LocationText != null ? stage.LocationText.font : null;
+    TMP_FontAsset sharedFont = !styleD && stage != null && stage.LocationText != null ? stage.LocationText.font : null;
 
     RectTransform overlayRect = systemMenuModal.GetComponent<RectTransform>();
     if (overlayRect == null) overlayRect = systemMenuModal.AddComponent<RectTransform>();
@@ -723,7 +817,7 @@ private void EnsureSystemMenuModalBuilt()
     Image overlayImg = systemMenuModal.GetComponent<Image>();
     if (overlayImg == null) overlayImg = systemMenuModal.AddComponent<Image>();
 
-    overlayImg.color = new Color(0.01f, 0.02f, 0.04f, 0.88f);
+    overlayImg.color = styleD ? StyleDThemeUtility.ColBackdrop : new Color(0.01f, 0.02f, 0.04f, 0.88f);
     overlayImg.raycastTarget = true;
 
     // 2. Center Window Card (760 x 530)
@@ -737,11 +831,17 @@ private void EnsureSystemMenuModalBuilt()
     cardRect.sizeDelta = new Vector2(760f, 530f);
 
     Image cardBg = card.AddComponent<Image>();
-    cardBg.color = new Color(0.05f, 0.07f, 0.10f, 0.99f);
-
     Outline cardOutline = card.AddComponent<Outline>();
     cardOutline.effectColor = new Color(0.95f, 0.62f, 0.05f, 0.85f);
     cardOutline.effectDistance = new Vector2(1.5f, -1.5f);
+    if (styleD)
+    {
+        StyleDThemeUtility.ApplySliced(cardBg, StyleDThemeUtility.PanelChassis, 3.2f, Color.white, disableOutline: true);
+    }
+    else
+    {
+        cardBg.color = new Color(0.05f, 0.07f, 0.10f, 0.99f);
+    }
 
     // Top Header Bar
     GameObject headerBar = new GameObject("HeaderBar", typeof(RectTransform));
@@ -751,57 +851,98 @@ private void EnsureSystemMenuModalBuilt()
     hbRect.anchorMin = new Vector2(0f, 1f);
     hbRect.anchorMax = new Vector2(1f, 1f);
     hbRect.pivot = new Vector2(0.5f, 1f);
-    hbRect.anchoredPosition = Vector2.zero;
-    hbRect.sizeDelta = new Vector2(0f, 52f);
 
     Image hbImg = headerBar.AddComponent<Image>();
-    hbImg.color = new Color(0.09f, 0.12f, 0.17f, 1f);
+    if (styleD)
+    {
+        hbRect.offsetMin = new Vector2(18f, -62f);
+        hbRect.offsetMax = new Vector2(-18f, -18f);
+        hbImg.color = Color.clear;
+        StyleDThemeUtility.AddHeaderDivider(headerBar.transform);
+    }
+    else
+    {
+        hbRect.anchoredPosition = Vector2.zero;
+        hbRect.sizeDelta = new Vector2(0f, 52f);
+        hbImg.color = new Color(0.09f, 0.12f, 0.17f, 1f);
+    }
 
-    sysHeaderSubText = CreateSysTMP(headerBar.transform, "HeaderTitle",
-        "SYSTEM // ARCHIVE, AUDIO CONFIGURATION & SESSION CONTROL",
-        13.5f, FontStyles.Bold, new Color(0.96f, 0.65f, 0.14f), TextAlignmentOptions.MidlineLeft, sharedFont);
+    sysHeaderSubText = CreateSysTMP(
+        headerBar.transform,
+        "HeaderTitle",
+        styleD ? "SYSTEM MENU - ARCHIVE, AUDIO & SESSION" : "SYSTEM // ARCHIVE, AUDIO CONFIGURATION & SESSION CONTROL",
+        styleD ? 13.5f : 13.5f,
+        FontStyles.Bold,
+        styleD ? StyleDThemeUtility.ColBone : new Color(0.96f, 0.65f, 0.14f),
+        TextAlignmentOptions.MidlineLeft,
+        sharedFont,
+        FontRole.Display);
 
     RectTransform hTitleRect = sysHeaderSubText.rectTransform;
     hTitleRect.anchorMin = Vector2.zero;
     hTitleRect.anchorMax = Vector2.one;
-    hTitleRect.offsetMin = new Vector2(20f, 0f);
+    hTitleRect.offsetMin = new Vector2(styleD ? 8f : 20f, 0f);
     hTitleRect.offsetMax = new Vector2(-100f, 0f);
 
     // Close [X] Button in Header
     Button closeTopBtn = CreateSysActionButton(headerBar.transform, "CloseTopBtn", "[ ESC ]",
-        new Color(0.16f, 0.19f, 0.24f, 1f), new Color(0.85f, 0.88f, 0.92f), sharedFont, out _);
+        new Color(0.16f, 0.19f, 0.24f, 1f), new Color(0.85f, 0.88f, 0.92f), sharedFont, out TextMeshProUGUI closeTopLbl, styleD);
 
     RectTransform ctbRect = closeTopBtn.GetComponent<RectTransform>();
     ctbRect.anchorMin = new Vector2(1f, 0.5f);
     ctbRect.anchorMax = new Vector2(1f, 0.5f);
     ctbRect.pivot = new Vector2(1f, 0.5f);
-    ctbRect.anchoredPosition = new Vector2(-14f, 0f);
-    ctbRect.sizeDelta = new Vector2(72f, 30f);
+    ctbRect.anchoredPosition = new Vector2(styleD ? -4f : -14f, 0f);
+    ctbRect.sizeDelta = new Vector2(72f, styleD ? 28f : 30f);
+    if (styleD && closeTopLbl != null)
+    {
+        closeTopLbl.alignment = TextAlignmentOptions.Center;
+        closeTopLbl.rectTransform.offsetMin = Vector2.zero;
+        closeTopLbl.rectTransform.offsetMax = Vector2.zero;
+    }
 
     closeTopBtn.onClick.AddListener(Close);
 
     // Telemetry Strip under Header
-    GameObject teleStrip = new GameObject("TelemetryStrip", typeof(RectTransform));
+    GameObject teleStrip = new GameObject("TelemetryStrip", typeof(RectTransform), typeof(RectMask2D));
     teleStrip.transform.SetParent(card.transform, false);
 
     RectTransform tsRect = teleStrip.GetComponent<RectTransform>();
     tsRect.anchorMin = new Vector2(0f, 1f);
     tsRect.anchorMax = new Vector2(1f, 1f);
     tsRect.pivot = new Vector2(0.5f, 1f);
-    tsRect.anchoredPosition = new Vector2(0f, -52f);
-    tsRect.sizeDelta = new Vector2(0f, 34f);
 
     Image tsImg = teleStrip.AddComponent<Image>();
-    tsImg.color = new Color(0.03f, 0.05f, 0.08f, 1f);
+    if (styleD)
+    {
+        tsRect.offsetMin = new Vector2(18f, -96f);
+        tsRect.offsetMax = new Vector2(-18f, -66f);
+        StyleDThemeUtility.ApplySliced(tsImg, StyleDThemeUtility.WellRecessed, 3.2f, Color.white);
+    }
+    else
+    {
+        tsRect.anchoredPosition = new Vector2(0f, -52f);
+        tsRect.sizeDelta = new Vector2(0f, 34f);
+        tsImg.color = new Color(0.03f, 0.05f, 0.08f, 1f);
+    }
 
     sysTelemetryStatusText = CreateSysTMP(teleStrip.transform, "TelemetryText",
-        "ARCHIVE STATUS: READY", 11.5f, FontStyles.Normal, new Color(0.82f, 0.86f, 0.92f), TextAlignmentOptions.MidlineLeft, sharedFont);
+        "ARCHIVE STATUS: READY", 11.5f, FontStyles.Normal,
+        styleD ? StyleDThemeUtility.ColMuted : new Color(0.82f, 0.86f, 0.92f),
+        TextAlignmentOptions.MidlineLeft, sharedFont, FontRole.Mono);
+    if (styleD)
+    {
+        sysTelemetryStatusText.enableAutoSizing = true;
+        sysTelemetryStatusText.fontSizeMin = 8.5f;
+        sysTelemetryStatusText.fontSizeMax = 11.5f;
+        sysTelemetryStatusText.overflowMode = TextOverflowModes.Ellipsis;
+    }
 
     RectTransform ttRect = sysTelemetryStatusText.rectTransform;
     ttRect.anchorMin = Vector2.zero;
     ttRect.anchorMax = Vector2.one;
-    ttRect.offsetMin = new Vector2(20f, 0f);
-    ttRect.offsetMax = new Vector2(-20f, 0f);
+    ttRect.offsetMin = new Vector2(styleD ? 12f : 20f, 0f);
+    ttRect.offsetMax = new Vector2(styleD ? -12f : -20f, 0f);
 
 // =========================================================================
 
@@ -809,17 +950,19 @@ private void EnsureSystemMenuModalBuilt()
 
 // =========================================================================
 
-sysMainPanel = CreateSubPanelRoot(card.transform, "MainPanel");
+sysMainPanel = CreateSubPanelRoot(card.transform, "MainPanel", styleD);
+
+string subHex = styleD ? "#8C9486" : "#94A3B8";
 
 // 1. SAVE GAME
 
 Button saveBtn = CreateSysActionButton(sysMainPanel.transform, "BtnSaveGame",
 
-"<b>[ 1 ]  SAVE GAME</b>   <size=11><color=#94A3B8>Choose from 4 archive slots to save progress</color></size>",
+$"<b>[ 1 ]  SAVE GAME</b>   <size=11><color={subHex}>Choose from 4 archive slots to save progress</color></size>",
 
-new Color(0.06f, 0.22f, 0.14f, 0.98f), new Color(0.25f, 0.95f, 0.58f), sharedFont, out sysSaveBtnLabel);
+new Color(0.06f, 0.22f, 0.14f, 0.98f), new Color(0.25f, 0.95f, 0.58f), sharedFont, out sysSaveBtnLabel, styleD, StyleDThemeUtility.ColSage);
 
-PositionMenuRow(saveBtn.GetComponent<RectTransform>(), 0);
+PositionMenuRow(saveBtn.GetComponent<RectTransform>(), 0, styleD);
 
 saveBtn.onClick.AddListener(OnSystemMenuSaveClicked);
 
@@ -827,11 +970,11 @@ saveBtn.onClick.AddListener(OnSystemMenuSaveClicked);
 
 sysLoadGameBtn = CreateSysActionButton(sysMainPanel.transform, "BtnLoadGame",
 
-"<b>[ 2 ]  LOAD GAME</b>   <size=11><color=#94A3B8>Choose from 4 archive slots to restore</color></size>",
+$"<b>[ 2 ]  LOAD GAME</b>   <size=11><color={subHex}>Choose from 4 archive slots to restore</color></size>",
 
-new Color(0.07f, 0.17f, 0.26f, 0.98f), new Color(0.35f, 0.78f, 0.98f), sharedFont, out sysLoadBtnLabel);
+new Color(0.07f, 0.17f, 0.26f, 0.98f), new Color(0.35f, 0.78f, 0.98f), sharedFont, out sysLoadBtnLabel, styleD, StyleDThemeUtility.ColAmber);
 
-PositionMenuRow(sysLoadGameBtn.GetComponent<RectTransform>(), 1);
+PositionMenuRow(sysLoadGameBtn.GetComponent<RectTransform>(), 1, styleD);
 
 sysLoadGameBtn.onClick.AddListener(OnSystemMenuLoadClicked);
 
@@ -839,23 +982,24 @@ sysLoadGameBtn.onClick.AddListener(OnSystemMenuLoadClicked);
 
 Button settingsBtn = CreateSysActionButton(sysMainPanel.transform, "BtnSettings",
 
-"<b>[ 3 ]  SETTINGS</b>   <size=11><color=#94A3B8>Configure Master, BGM & SFX audio levels</color></size>",
+$"<b>[ 3 ]  SETTINGS</b>   <size=11><color={subHex}>Configure Master, BGM & SFX audio levels</color></size>",
 
-new Color(0.14f, 0.15f, 0.20f, 0.98f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _);
+new Color(0.14f, 0.15f, 0.20f, 0.98f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _, styleD, StyleDThemeUtility.ColBone);
 
-PositionMenuRow(settingsBtn.GetComponent<RectTransform>(), 2);
+PositionMenuRow(settingsBtn.GetComponent<RectTransform>(), 2, styleD);
 
 settingsBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Settings));
 
 // 4. EXIT GAME (Opens Unsaved Progress Confirmation Window)
 
+string exitSubHex = styleD ? "#D95829" : "#FCA5A5";
 Button exitBtn = CreateSysActionButton(sysMainPanel.transform, "BtnExitGame",
 
-"<b>[ 4 ]  EXIT GAME</b>   <size=11><color=#FCA5A5>Return to Main Menu / Quit session</color></size>",
+$"<b>[ 4 ]  EXIT GAME</b>   <size=11><color={exitSubHex}>Return to Main Menu / Quit session</color></size>",
 
-new Color(0.25f, 0.07f, 0.08f, 0.98f), new Color(0.98f, 0.42f, 0.42f), sharedFont, out _);
+new Color(0.25f, 0.07f, 0.08f, 0.98f), new Color(0.98f, 0.42f, 0.42f), sharedFont, out _, styleD, StyleDThemeUtility.ColRust);
 
-PositionMenuRow(exitBtn.GetComponent<RectTransform>(), 3);
+PositionMenuRow(exitBtn.GetComponent<RectTransform>(), 3, styleD);
 
 exitBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.ExitConfirm));
 
@@ -865,7 +1009,7 @@ Button resumeBtn = CreateSysActionButton(sysMainPanel.transform, "BtnResume",
 
 "<b>[ RESUME GAME ]</b>",
 
-new Color(0.10f, 0.12f, 0.16f, 1f), new Color(0.82f, 0.86f, 0.92f), sharedFont, out _);
+new Color(0.10f, 0.12f, 0.16f, 1f), new Color(0.82f, 0.86f, 0.92f), sharedFont, out TextMeshProUGUI resLbl, styleD);
 
 RectTransform resRect = resumeBtn.GetComponent<RectTransform>();
 
@@ -877,7 +1021,13 @@ resRect.pivot = new Vector2(0.5f, 0f);
 
 resRect.anchoredPosition = new Vector2(0f, 14f);
 
-resRect.sizeDelta = new Vector2(710f, 40f);
+resRect.sizeDelta = new Vector2(styleD ? 696f : 710f, 40f);
+if (styleD && resLbl != null)
+{
+    resLbl.alignment = TextAlignmentOptions.Center;
+    resLbl.rectTransform.offsetMin = Vector2.zero;
+    resLbl.rectTransform.offsetMax = Vector2.zero;
+}
 
 resumeBtn.onClick.AddListener(Close);
 
@@ -887,7 +1037,7 @@ resumeBtn.onClick.AddListener(Close);
 
 // =========================================================================
 
-sysSlotsPanel = CreateSubPanelRoot(card.transform, "SlotsPickerPanel");
+sysSlotsPanel = CreateSubPanelRoot(card.transform, "SlotsPickerPanel", styleD);
 
 for (int i = 0; i < SaveManager.TotalSlotCount; i++)
 
@@ -900,14 +1050,21 @@ for (int i = 0; i < SaveManager.TotalSlotCount; i++)
             scRect.anchorMin = new Vector2(0.5f, 1f);
             scRect.anchorMax = new Vector2(0.5f, 1f);
             scRect.pivot = new Vector2(0.5f, 1f);
-            scRect.anchoredPosition = new Vector2(0f, -8f - (slotIdx * 74f));
-            scRect.sizeDelta = new Vector2(710f, 68f);
+            scRect.anchoredPosition = styleD ? new Vector2(0f, -6f - (slotIdx * 70f)) : new Vector2(0f, -8f - (slotIdx * 74f));
+            scRect.sizeDelta = styleD ? new Vector2(696f, 64f) : new Vector2(710f, 68f);
 
             sysSlotCardBgs[slotIdx] = sCard.AddComponent<Image>();
-            sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
-
             sysSlotCardOutlines[slotIdx] = sCard.AddComponent<Outline>();
             sysSlotCardOutlines[slotIdx].effectColor = new Color(0.25f, 0.32f, 0.42f, 0.65f);
+            if (styleD)
+            {
+                StyleDThemeUtility.ApplySliced(sysSlotCardBgs[slotIdx], StyleDThemeUtility.WellRecessed, 3.2f, Color.white, disableOutline: true);
+                StyleDThemeUtility.AddLeftAccentBar(sCard.transform, slotIdx == 0 ? StyleDThemeUtility.ColAmber : StyleDThemeUtility.ColRust, 4f);
+            }
+            else
+            {
+                sysSlotCardBgs[slotIdx].color = new Color(0.07f, 0.10f, 0.15f, 0.96f);
+            }
 
             // Dedicated Text Container with RectMask2D to prevent overlaying into buttons
             GameObject textContainer = new GameObject("TextContainer", typeof(RectTransform));
@@ -920,9 +1077,10 @@ for (int i = 0; i < SaveManager.TotalSlotCount; i++)
             tcRect.offsetMax = new Vector2(-188f, -4f);
             textContainer.AddComponent<RectMask2D>();
 
-sysSlotTitles[slotIdx] = CreateSysTMP(textContainer.transform, "SlotTitle", "SLOT", 13f, FontStyles.Normal, Color.white, TextAlignmentOptions.MidlineLeft, sharedFont);
+sysSlotTitles[slotIdx] = CreateSysTMP(textContainer.transform, "SlotTitle", "SLOT", 13f, FontStyles.Normal, Color.white, TextAlignmentOptions.MidlineLeft, sharedFont, FontRole.Body);
 
-sysSlotTitles[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
+sysSlotTitles[slotIdx].overflowMode = styleD ? TextOverflowModes.Overflow : TextOverflowModes.Ellipsis;
+if (styleD) sysSlotTitles[slotIdx].gameObject.AddComponent<HorizontalMarqueeText>();
 
 RectTransform stRect = sysSlotTitles[slotIdx].rectTransform;
 
@@ -934,9 +1092,10 @@ stRect.offsetMin = new Vector2(0f, 2f);
 
 stRect.offsetMax = new Vector2(0f, -2f);
 
-sysSlotDetails[slotIdx] = CreateSysTMP(textContainer.transform, "SlotDetails", "Details", 11.5f, FontStyles.Normal, new Color(0.78f, 0.82f, 0.88f), TextAlignmentOptions.MidlineLeft, sharedFont);
+sysSlotDetails[slotIdx] = CreateSysTMP(textContainer.transform, "SlotDetails", "Details", 11.5f, FontStyles.Normal, styleD ? StyleDThemeUtility.ColBone : new Color(0.78f, 0.82f, 0.88f), TextAlignmentOptions.MidlineLeft, sharedFont, FontRole.Body);
 
-sysSlotDetails[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
+sysSlotDetails[slotIdx].overflowMode = styleD ? TextOverflowModes.Overflow : TextOverflowModes.Ellipsis;
+if (styleD) sysSlotDetails[slotIdx].gameObject.AddComponent<HorizontalMarqueeText>();
 
 RectTransform sdRect = sysSlotDetails[slotIdx].rectTransform;
 
@@ -952,9 +1111,9 @@ sdRect.offsetMax = new Vector2(0f, -2f);
 
 Button actBtn = CreateSysActionButton(sCard.transform, "BtnSlotAction", "<b>SAVE HERE</b>",
 
-new Color(0.06f, 0.24f, 0.14f, 0.98f), new Color(0.28f, 0.95f, 0.58f), sharedFont, out sysSlotActionLabels[slotIdx]);
+new Color(0.06f, 0.24f, 0.14f, 0.98f), new Color(0.28f, 0.95f, 0.58f), sharedFont, out sysSlotActionLabels[slotIdx], styleD);
 
-actBtn.transition = Selectable.Transition.None;
+if (!styleD) actBtn.transition = Selectable.Transition.None;
 
 sysSlotActionLabels[slotIdx].alignment = TextAlignmentOptions.Center;
 
@@ -984,9 +1143,18 @@ sysSlotActionBtns[slotIdx] = actBtn;
 
 Button delBtn = CreateSysActionButton(sCard.transform, "BtnSlotDelete", "<b>X</b>",
 
-new Color(0.26f, 0.07f, 0.08f, 0.95f), new Color(0.98f, 0.45f, 0.45f), sharedFont, out TextMeshProUGUI delLbl);
+new Color(0.26f, 0.07f, 0.08f, 0.95f), new Color(0.98f, 0.45f, 0.45f), sharedFont, out TextMeshProUGUI delLbl, styleD);
 
-delBtn.transition = Selectable.Transition.None;
+if (!styleD) delBtn.transition = Selectable.Transition.None;
+if (styleD)
+{
+    StyleDThemeUtility.ApplyMetalButton(
+        delBtn,
+        StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColRust, 0.65f),
+        StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColRust, 0.88f),
+        2.8f,
+        StyleDThemeUtility.ColBone);
+}
 
 delLbl.alignment = TextAlignmentOptions.Center;
 
@@ -1017,7 +1185,7 @@ Button slotsBackBtn = CreateSysActionButton(sysSlotsPanel.transform, "BtnSlotsBa
 
 "<b>[ < BACK TO SYSTEM MENU ]</b>",
 
-new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _);
+new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out TextMeshProUGUI slotsBackLbl, styleD);
 
 RectTransform slbRect = slotsBackBtn.GetComponent<RectTransform>();
 
@@ -1027,9 +1195,15 @@ slbRect.anchorMax = new Vector2(0.5f, 0f);
 
 slbRect.pivot = new Vector2(0.5f, 0f);
 
-slbRect.anchoredPosition = new Vector2(0f, 14f);
+slbRect.anchoredPosition = new Vector2(0f, styleD ? 8f : 14f);
 
-slbRect.sizeDelta = new Vector2(710f, 38f);
+slbRect.sizeDelta = new Vector2(styleD ? 696f : 710f, 38f);
+if (styleD && slotsBackLbl != null)
+{
+    slotsBackLbl.alignment = TextAlignmentOptions.Center;
+    slotsBackLbl.rectTransform.offsetMin = Vector2.zero;
+    slotsBackLbl.rectTransform.offsetMax = Vector2.zero;
+}
 
 slotsBackBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main));
 
@@ -1039,23 +1213,23 @@ slotsBackBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main)
 
 // =========================================================================
 
-sysSettingsPanel = CreateSubPanelRoot(card.transform, "SettingsPanel");
+sysSettingsPanel = CreateSubPanelRoot(card.transform, "SettingsPanel", styleD);
 
 sysMasterVolSlider = CreateVolumeSliderRow(sysSettingsPanel.transform, "MasterVolumeRow",
 
-"MASTER VOLUME", "Global output level for all game audio", -18f, sharedFont, out sysMasterVolValueText);
+"MASTER VOLUME", "Global output level for all game audio", -18f, sharedFont, out sysMasterVolValueText, styleD);
 
 sysMasterVolSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
 
 sysBgmVolSlider = CreateVolumeSliderRow(sysSettingsPanel.transform, "BgmVolumeRow",
 
-"BGM & AMBIENCE", "Background music & apartment atmospheric drone", -96f, sharedFont, out sysBgmVolValueText);
+"BGM & AMBIENCE", "Background music & apartment atmospheric drone", -96f, sharedFont, out sysBgmVolValueText, styleD);
 
 sysBgmVolSlider.onValueChanged.AddListener(OnBgmVolumeChanged);
 
 sysSfxVolSlider = CreateVolumeSliderRow(sysSettingsPanel.transform, "SfxVolumeRow",
 
-"SFX & BROADCASTS", "UI clicks, emergency broadcasts, radio & alarms", -174f, sharedFont, out sysSfxVolValueText);
+"SFX & BROADCASTS", "UI clicks, emergency broadcasts, radio & alarms", -174f, sharedFont, out sysSfxVolValueText, styleD);
 
 sysSfxVolSlider.onValueChanged.AddListener(OnSfxVolumeChanged);
 
@@ -1063,7 +1237,7 @@ Button settingsBackBtn = CreateSysActionButton(sysSettingsPanel.transform, "BtnS
 
 "<b>[ < BACK TO SYSTEM MENU ]</b>",
 
-new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out _);
+new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.95f, 0.75f, 0.28f), sharedFont, out TextMeshProUGUI setBackLbl, styleD);
 
 RectTransform sbRect = settingsBackBtn.GetComponent<RectTransform>();
 
@@ -1073,9 +1247,15 @@ sbRect.anchorMax = new Vector2(0.5f, 0f);
 
 sbRect.pivot = new Vector2(0.5f, 0f);
 
-sbRect.anchoredPosition = new Vector2(0f, 16f);
+sbRect.anchoredPosition = new Vector2(0f, 14f);
 
-sbRect.sizeDelta = new Vector2(512f, 42f);
+sbRect.sizeDelta = new Vector2(styleD ? 696f : 512f, 40f);
+if (styleD && setBackLbl != null)
+{
+    setBackLbl.alignment = TextAlignmentOptions.Center;
+    setBackLbl.rectTransform.offsetMin = Vector2.zero;
+    setBackLbl.rectTransform.offsetMax = Vector2.zero;
+}
 
 settingsBackBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main));
 
@@ -1085,7 +1265,7 @@ settingsBackBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Ma
 
 // =========================================================================
 
-sysExitConfirmPanel = CreateSubPanelRoot(card.transform, "ExitConfirmPanel");
+sysExitConfirmPanel = CreateSubPanelRoot(card.transform, "ExitConfirmPanel", styleD);
 
 GameObject warnBox = new GameObject("WarningBox", typeof(RectTransform));
 warnBox.transform.SetParent(sysExitConfirmPanel.transform, false);
@@ -1094,20 +1274,27 @@ RectTransform wbRect = warnBox.GetComponent<RectTransform>();
 wbRect.anchorMin = new Vector2(0f, 1f);
 wbRect.anchorMax = new Vector2(1f, 1f);
 wbRect.pivot = new Vector2(0.5f, 1f);
-wbRect.anchoredPosition = new Vector2(0f, -14f);
-wbRect.sizeDelta = new Vector2(-48f, 132f);
+wbRect.anchoredPosition = new Vector2(0f, styleD ? -12f : -14f);
+wbRect.sizeDelta = new Vector2(styleD ? -28f : -48f, styleD ? 128f : 132f);
 
 Image wbBg = warnBox.AddComponent<Image>();
-wbBg.color = new Color(0.16f, 0.05f, 0.06f, 0.95f);
-
 Outline wbOl = warnBox.AddComponent<Outline>();
 wbOl.effectColor = new Color(0.85f, 0.22f, 0.22f, 0.75f);
+if (styleD)
+{
+    StyleDThemeUtility.ApplySliced(wbBg, StyleDThemeUtility.WellRecessed, 3.2f, Color.white, disableOutline: true);
+    StyleDThemeUtility.AddLeftAccentBar(warnBox.transform, StyleDThemeUtility.ColRust, 4f);
+}
+else
+{
+    wbBg.color = new Color(0.16f, 0.05f, 0.06f, 0.95f);
+}
 
 TextMeshProUGUI warnHeader = CreateSysTMP(warnBox.transform, "WarnHeader",
 
 "[!] UNSAVED PROGRESS WARNING — CONFIRM EXIT",
 
-13.5f, FontStyles.Bold, new Color(0.98f, 0.42f, 0.42f), TextAlignmentOptions.TopLeft, sharedFont);
+13.5f, FontStyles.Bold, styleD ? StyleDThemeUtility.ColRust : new Color(0.98f, 0.42f, 0.42f), TextAlignmentOptions.TopLeft, sharedFont, FontRole.Display);
 
 RectTransform whRect = warnHeader.rectTransform;
 
@@ -1123,7 +1310,7 @@ sysExitWarningDetailText = CreateSysTMP(warnBox.transform, "WarnDetails",
 
 "Are you sure you want to exit? Any unsaved progress will be lost.",
 
-12f, FontStyles.Normal, new Color(0.90f, 0.92f, 0.95f), TextAlignmentOptions.TopLeft, sharedFont);
+12f, FontStyles.Normal, styleD ? StyleDThemeUtility.ColBone : new Color(0.90f, 0.92f, 0.95f), TextAlignmentOptions.TopLeft, sharedFont, FontRole.Body);
 
 sysExitWarningDetailText.textWrappingMode = TextWrappingModes.Normal;
 
@@ -1139,11 +1326,12 @@ wdRect.offsetMax = new Vector2(-16f, -38f);
 
 // Option A: SAVE & EXIT TO MAIN MENU
 
+string saveExitSub = styleD ? "#6EE7B7" : "#A7F3D0";
 Button saveAndExitBtn = CreateSysActionButton(sysExitConfirmPanel.transform, "BtnSaveAndExit",
 
-"<b>[ SAVE & EXIT TO MAIN MENU ]</b>   <size=11><color=#A7F3D0>Save progress first, then exit</color></size>",
+$"<b>[ SAVE & EXIT TO MAIN MENU ]</b>   <size=11><color={saveExitSub}>Save progress first, then exit</color></size>",
 
-new Color(0.06f, 0.24f, 0.15f, 0.98f), new Color(0.28f, 0.95f, 0.60f), sharedFont, out _);
+new Color(0.06f, 0.24f, 0.15f, 0.98f), new Color(0.28f, 0.95f, 0.60f), sharedFont, out _, styleD, StyleDThemeUtility.ColSage);
 
 RectTransform saeRect = saveAndExitBtn.GetComponent<RectTransform>();
 
@@ -1153,19 +1341,20 @@ saeRect.anchorMax = new Vector2(0.5f, 1f);
 
 saeRect.pivot = new Vector2(0.5f, 1f);
 
-saeRect.anchoredPosition = new Vector2(0f, -160f);
+saeRect.anchoredPosition = new Vector2(0f, styleD ? -154f : -160f);
 
-saeRect.sizeDelta = new Vector2(512f, 48f);
+saeRect.sizeDelta = new Vector2(styleD ? 696f : 512f, 46f);
 
 saveAndExitBtn.onClick.AddListener(OnSystemMenuSaveAndExitClicked);
 
 // Option B: EXIT WITHOUT SAVING
 
+string exitNoSub = styleD ? "#D95829" : "#FECACA";
 Button exitNoSaveBtn = CreateSysActionButton(sysExitConfirmPanel.transform, "BtnExitWithoutSaving",
 
-"<b>[ EXIT WITHOUT SAVING ]</b>   <size=11><color=#FECACA>Discard unsaved changes & return to Title</color></size>",
+$"<b>[ EXIT WITHOUT SAVING ]</b>   <size=11><color={exitNoSub}>Discard unsaved changes & return to Title</color></size>",
 
-new Color(0.28f, 0.07f, 0.08f, 0.98f), new Color(0.98f, 0.45f, 0.45f), sharedFont, out _);
+new Color(0.28f, 0.07f, 0.08f, 0.98f), new Color(0.98f, 0.45f, 0.45f), sharedFont, out _, styleD, StyleDThemeUtility.ColRust);
 
 RectTransform ensRect = exitNoSaveBtn.GetComponent<RectTransform>();
 
@@ -1175,9 +1364,9 @@ ensRect.anchorMax = new Vector2(0.5f, 1f);
 
 ensRect.pivot = new Vector2(0.5f, 1f);
 
-ensRect.anchoredPosition = new Vector2(0f, -218f);
+ensRect.anchoredPosition = new Vector2(0f, styleD ? -210f : -218f);
 
-ensRect.sizeDelta = new Vector2(512f, 48f);
+ensRect.sizeDelta = new Vector2(styleD ? 696f : 512f, 46f);
 
 exitNoSaveBtn.onClick.AddListener(OnSystemMenuExitWithoutSavingClicked);
 
@@ -1187,7 +1376,7 @@ Button cancelExitBtn = CreateSysActionButton(sysExitConfirmPanel.transform, "Btn
 
 "<b>[ CANCEL — RETURN TO GAME ]</b>",
 
-new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.85f, 0.88f, 0.92f), sharedFont, out _);
+new Color(0.12f, 0.15f, 0.20f, 1f), new Color(0.85f, 0.88f, 0.92f), sharedFont, out TextMeshProUGUI cancelLbl, styleD);
 
 RectTransform ceRect = cancelExitBtn.GetComponent<RectTransform>();
 
@@ -1197,56 +1386,87 @@ ceRect.anchorMax = new Vector2(0.5f, 0f);
 
 ceRect.pivot = new Vector2(0.5f, 0f);
 
-ceRect.anchoredPosition = new Vector2(0f, 16f);
+ceRect.anchoredPosition = new Vector2(0f, 14f);
 
-ceRect.sizeDelta = new Vector2(512f, 42f);
+ceRect.sizeDelta = new Vector2(styleD ? 696f : 512f, 42f);
+if (styleD && cancelLbl != null)
+{
+    cancelLbl.alignment = TextAlignmentOptions.Center;
+    cancelLbl.rectTransform.offsetMin = Vector2.zero;
+    cancelLbl.rectTransform.offsetMax = Vector2.zero;
+}
 
 cancelExitBtn.onClick.AddListener(() => SwitchSystemMenuView(SystemMenuView.Main));
 }
 
-private GameObject CreateSubPanelRoot(Transform parent, string name)
+private GameObject CreateSubPanelRoot(Transform parent, string name, bool styleD = false)
 {
     GameObject panel = new GameObject(name, typeof(RectTransform));
     panel.transform.SetParent(parent, false);
     RectTransform rt = panel.GetComponent<RectTransform>();
     rt.anchorMin = Vector2.zero;
     rt.anchorMax = Vector2.one;
-    rt.offsetMin = new Vector2(0f, 0f);
-    rt.offsetMax = new Vector2(0f, -86f);
+    rt.offsetMin = styleD ? new Vector2(18f, 18f) : new Vector2(0f, 0f);
+    rt.offsetMax = styleD ? new Vector2(-18f, -100f) : new Vector2(0f, -86f);
     return panel;
 }
 
-private void PositionMenuRow(RectTransform rt, int index)
+private void PositionMenuRow(RectTransform rt, int index, bool styleD = false)
 {
     rt.anchorMin = new Vector2(0.5f, 1f);
     rt.anchorMax = new Vector2(0.5f, 1f);
     rt.pivot = new Vector2(0.5f, 1f);
-    rt.anchoredPosition = new Vector2(0f, -18f - (index * 72f));
-    rt.sizeDelta = new Vector2(710f, 60f);
+    rt.anchoredPosition = styleD
+        ? new Vector2(0f, -12f - (index * 68f))
+        : new Vector2(0f, -18f - (index * 72f));
+    rt.sizeDelta = styleD ? new Vector2(696f, 58f) : new Vector2(710f, 60f);
 }
 
-private Button CreateSysActionButton(Transform parent, string name, string labelText, Color bgColor, Color borderAndTextColor, TMP_FontAsset font, out TextMeshProUGUI labelOut)
+private Button CreateSysActionButton(Transform parent, string name, string labelText, Color bgColor, Color borderAndTextColor, TMP_FontAsset font, out TextMeshProUGUI labelOut, bool styleD = false, Color? styleDAccent = null)
 {
     GameObject btnObj = new GameObject(name, typeof(RectTransform));
     btnObj.transform.SetParent(parent, false);
     Image bg = btnObj.AddComponent<Image>();
-    bg.color = bgColor;
     Outline ol = btnObj.AddComponent<Outline>();
     ol.effectColor = new Color(borderAndTextColor.r, borderAndTextColor.g, borderAndTextColor.b, 0.65f);
     ol.effectDistance = new Vector2(1f, -1f);
     Button btn = btnObj.AddComponent<Button>();
     btn.targetGraphic = bg;
-    labelOut = CreateSysTMP(btnObj.transform, "Label", labelText, 13.5f, FontStyles.Normal, borderAndTextColor, TextAlignmentOptions.MidlineLeft, font);
+
+    labelOut = CreateSysTMP(
+        btnObj.transform,
+        "Label",
+        labelText,
+        13.5f,
+        FontStyles.Normal,
+        styleD ? StyleDThemeUtility.ColBone : borderAndTextColor,
+        TextAlignmentOptions.MidlineLeft,
+        font,
+        FontRole.Mono);
     labelOut.raycastTarget = false;
     RectTransform lr = labelOut.rectTransform;
     lr.anchorMin = Vector2.zero;
     lr.anchorMax = Vector2.one;
     lr.offsetMin = new Vector2(18f, 0f);
     lr.offsetMax = new Vector2(-18f, 0f);
+
+    if (styleD)
+    {
+        StyleDThemeUtility.ApplyMetalButton(btn, StyleDThemeUtility.ColMetalBtn, StyleDThemeUtility.ColMetalHover, 2.8f, StyleDThemeUtility.ColBone);
+        if (styleDAccent.HasValue)
+        {
+            StyleDThemeUtility.AddLeftAccentBar(btnObj.transform, styleDAccent.Value, 4f);
+        }
+    }
+    else
+    {
+        bg.color = bgColor;
+    }
+
     return btn;
 }
 
-private Slider CreateVolumeSliderRow(Transform parent, string name, string title, string subtitle, float topOffset, TMP_FontAsset font, out TextMeshProUGUI pctLabel)
+private Slider CreateVolumeSliderRow(Transform parent, string name, string title, string subtitle, float topOffset, TMP_FontAsset font, out TextMeshProUGUI pctLabel, bool styleD = false)
 {
     GameObject row = new GameObject(name, typeof(RectTransform));
     row.transform.SetParent(parent, false);
@@ -1255,21 +1475,31 @@ private Slider CreateVolumeSliderRow(Transform parent, string name, string title
     rr.anchorMax = new Vector2(0.5f, 1f);
     rr.pivot = new Vector2(0.5f, 1f);
     rr.anchoredPosition = new Vector2(0f, topOffset);
-    rr.sizeDelta = new Vector2(512f, 68f);
+    rr.sizeDelta = new Vector2(styleD ? 696f : 512f, 68f);
+
     Image rowBg = row.AddComponent<Image>();
-    rowBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
     Outline rowOl = row.AddComponent<Outline>();
     rowOl.effectColor = new Color(0.22f, 0.28f, 0.36f, 0.7f);
+    if (styleD)
+    {
+        StyleDThemeUtility.ApplySliced(rowBg, StyleDThemeUtility.WellRecessed, 3.2f, Color.white, disableOutline: true);
+    }
+    else
+    {
+        rowBg.color = new Color(0.08f, 0.10f, 0.14f, 0.95f);
+    }
 
-    TextMeshProUGUI titleTmp = CreateSysTMP(row.transform, "Title", $"<b>{title}</b>  <size=10.5><color=#64748B>{subtitle}</color></size>",
-        12.5f, FontStyles.Normal, new Color(0.92f, 0.95f, 0.98f), TextAlignmentOptions.MidlineLeft, font);
+    string subHex = styleD ? "#8C9486" : "#64748B";
+    TextMeshProUGUI titleTmp = CreateSysTMP(row.transform, "Title", $"<b>{title}</b>  <size=10.5><color={subHex}>{subtitle}</color></size>",
+        12.5f, FontStyles.Normal, styleD ? StyleDThemeUtility.ColBone : new Color(0.92f, 0.95f, 0.98f), TextAlignmentOptions.MidlineLeft, font, FontRole.Body);
     RectTransform tr = titleTmp.rectTransform;
     tr.anchorMin = new Vector2(0f, 0.5f);
     tr.anchorMax = new Vector2(1f, 1f);
     tr.offsetMin = new Vector2(14f, 2f);
     tr.offsetMax = new Vector2(-70f, -4f);
 
-    pctLabel = CreateSysTMP(row.transform, "PctValue", "100%", 13f, FontStyles.Bold, new Color(0.22f, 0.74f, 0.97f), TextAlignmentOptions.MidlineRight, font);
+    pctLabel = CreateSysTMP(row.transform, "PctValue", "100%", 13f, FontStyles.Bold,
+        styleD ? StyleDThemeUtility.ColAmber : new Color(0.22f, 0.74f, 0.97f), TextAlignmentOptions.MidlineRight, font, FontRole.Mono);
     RectTransform pr = pctLabel.rectTransform;
     pr.anchorMin = new Vector2(1f, 0.5f);
     pr.anchorMax = new Vector2(1f, 1f);
@@ -1294,7 +1524,7 @@ private Slider CreateVolumeSliderRow(Transform parent, string name, string title
     bgr.offsetMin = Vector2.zero;
     bgr.offsetMax = Vector2.zero;
     Image bgImg = bgTrack.AddComponent<Image>();
-    bgImg.color = new Color(0.03f, 0.04f, 0.06f, 1f);
+    bgImg.color = styleD ? new Color(0.05f, 0.055f, 0.06f, 1f) : new Color(0.03f, 0.04f, 0.06f, 1f);
 
     GameObject fillArea = new GameObject("Fill Area", typeof(RectTransform));
     fillArea.transform.SetParent(sliderObj.transform, false);
@@ -1312,7 +1542,7 @@ private Slider CreateVolumeSliderRow(Transform parent, string name, string title
     fr.offsetMin = Vector2.zero;
     fr.offsetMax = Vector2.zero;
     Image fillImg = fill.AddComponent<Image>();
-    fillImg.color = new Color(0.95f, 0.62f, 0.08f, 0.95f);
+    fillImg.color = styleD ? StyleDThemeUtility.ColAmber : new Color(0.95f, 0.62f, 0.08f, 0.95f);
 
     GameObject handleArea = new GameObject("Handle Slide Area", typeof(RectTransform));
     handleArea.transform.SetParent(sliderObj.transform, false);
@@ -1327,7 +1557,7 @@ private Slider CreateVolumeSliderRow(Transform parent, string name, string title
     RectTransform hr = handle.GetComponent<RectTransform>();
     hr.sizeDelta = new Vector2(14f, 20f);
     Image handleImg = handle.AddComponent<Image>();
-    handleImg.color = new Color(0.98f, 0.98f, 1f, 1f);
+    handleImg.color = styleD ? StyleDThemeUtility.ColBone : new Color(0.98f, 0.98f, 1f, 1f);
 
     Slider slider = sliderObj.AddComponent<Slider>();
     slider.minValue = 0f;
@@ -1340,12 +1570,13 @@ private Slider CreateVolumeSliderRow(Transform parent, string name, string title
     return slider;
 }
 
-private TextMeshProUGUI CreateSysTMP(Transform parent, string name, string text, float size, FontStyles style, Color color, TextAlignmentOptions align, TMP_FontAsset font)
+private TextMeshProUGUI CreateSysTMP(Transform parent, string name, string text, float size, FontStyles style, Color color, TextAlignmentOptions align, TMP_FontAsset font, FontRole fallbackRole = FontRole.Body)
 {
     GameObject obj = new GameObject(name, typeof(RectTransform));
     obj.transform.SetParent(parent, false);
     TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
     if (font != null) tmp.font = font;
+    else SundayTypography.ApplyFont(tmp, fallbackRole);
     tmp.text = text;
     tmp.fontSize = size;
     tmp.fontStyle = style;

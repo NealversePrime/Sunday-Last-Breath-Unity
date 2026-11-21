@@ -70,6 +70,7 @@ namespace SundayLastBreath.UI
         private int currentStep = 0;
         private bool isTyping = false;
         private bool isTransitioning = false;
+        private bool _styleDApplied = false;
         private string currentFullText = "";
         private Coroutine typeRoutine;
         private Coroutine screenShakeRoutine;
@@ -123,6 +124,8 @@ namespace SundayLastBreath.UI
                 focusReflectionButton.onClick.AddListener(OnFocusReflectionClicked);
                 focusReflectionButton.gameObject.SetActive(false);
             }
+
+            ApplyStyleDThemeIfActive();
         }
 
         private void InitializeAudioSources()
@@ -176,6 +179,8 @@ namespace SundayLastBreath.UI
 
         public void StartPrologueSequence()
         {
+            ApplyStyleDThemeIfActive();
+
             if (prologuePassage == null)
             {
                 prologuePassage = Resources.Load<SundayLastBreath.Data.StoryPassageData>("StoryPassages/Act1/Passage_Prologue_WakeUp");
@@ -318,11 +323,17 @@ namespace SundayLastBreath.UI
 
         private void ApplyBeatEffects(int step)
         {
+            bool styleD = StyleDThemeUtility.IsStyleDActive;
             switch (step)
             {
                 case 1:
                     // Beat 1: Quiet peaceful night -> TV NORMAL (Bag.gif)
-                    if (speakerLabel != null) speakerLabel.text = "<color=#94A3B8>[ SATURDAY NIGHT 23:45 ]</color>";
+                    if (speakerLabel != null)
+                    {
+                        speakerLabel.text = styleD
+                            ? "<color=#8C9486>[ SATURDAY NIGHT 23:45 ]</color>"
+                            : "<color=#94A3B8>[ SATURDAY NIGHT 23:45 ]</color>";
+                    }
                     if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
                     if (tvStaticAnimPlayer != null) tvStaticAnimPlayer.Stop();
                     if (staticSource != null && staticSource.isPlaying) staticSource.Stop();
@@ -341,7 +352,12 @@ namespace SundayLastBreath.UI
 
                 case 2:
                     // Beat 2: Broadcast dies -> TV STATIC SCREEN! (Ruangan ditutup, layar penuh TV static)
-                    if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ TRANSMISSION LOSS ]</color>";
+                    if (speakerLabel != null)
+                    {
+                        speakerLabel.text = styleD
+                            ? "<color=#D95829>[ TRANSMISSION LOSS ]</color>"
+                            : "<color=#EF4444>[ TRANSMISSION LOSS ]</color>";
+                    }
                     if (staticClip != null && staticSource != null)
                     {
                         staticSource.clip = staticClip;
@@ -376,7 +392,12 @@ namespace SundayLastBreath.UI
 
                 case 3:
                     // Beat 3: Shock / Waking up -> TV STATIC CONTINUES ("hingga beat 3")
-                    if (speakerLabel != null) speakerLabel.text = "<color=#F59E0B>[ WAKING UP ]</color>";
+                    if (speakerLabel != null)
+                    {
+                        speakerLabel.text = styleD
+                            ? "<color=#E0A43A>[ WAKING UP ]</color>"
+                            : "<color=#F59E0B>[ WAKING UP ]</color>";
+                    }
                     if (roomBackdropImage != null)
                     {
                         roomBackdropImage.gameObject.SetActive(false);
@@ -397,7 +418,12 @@ namespace SundayLastBreath.UI
 
                 case 4:
                     // Beat 4: Beyond the glass -> LIVING ROOM TV MERAH (Bag (1).gif) + DISTANT SIRENS!
-                    if (speakerLabel != null) speakerLabel.text = "<color=#94A3B8>[ THE NIGHT AIR ]</color>";
+                    if (speakerLabel != null)
+                    {
+                        speakerLabel.text = styleD
+                            ? "<color=#8C9486>[ THE NIGHT AIR ]</color>"
+                            : "<color=#94A3B8>[ THE NIGHT AIR ]</color>";
+                    }
 
                     // TV static shuts off
                     if (tvStaticImage != null) tvStaticImage.gameObject.SetActive(false);
@@ -431,7 +457,12 @@ namespace SundayLastBreath.UI
 
                 case 5:
                     // Beat 5: Screams in the dark -> SUARA TERIAKAN!
-                    if (speakerLabel != null) speakerLabel.text = "<color=#EF4444>[ ECHOES IN THE DARK ]</color>";
+                    if (speakerLabel != null)
+                    {
+                        speakerLabel.text = styleD
+                            ? "<color=#D95829>[ ECHOES IN THE DARK ]</color>"
+                            : "<color=#EF4444>[ ECHOES IN THE DARK ]</color>";
+                    }
                     if (roomBackdropImage != null && !roomBackdropImage.gameObject.activeSelf)
                     {
                         roomBackdropImage.gameObject.SetActive(true);
@@ -444,8 +475,246 @@ namespace SundayLastBreath.UI
 
                 case 6:
                     // Beat 6: Stumble to balcony, window reflection -> Character Creation prompt
-                    if (speakerLabel != null) speakerLabel.text = "<color=#38BDF8>[ WINDOW REFLECTION ]</color>";
+                    if (speakerLabel != null)
+                    {
+                        speakerLabel.text = styleD
+                            ? "<color=#E0A43A>[ WINDOW REFLECTION ]</color>"
+                            : "<color=#38BDF8>[ WINDOW REFLECTION ]</color>";
+                    }
                     break;
+            }
+        }
+
+        private void ApplyStyleDThemeIfActive()
+        {
+            if (_styleDApplied || !StyleDThemeUtility.IsStyleDActive) return;
+            _styleDApplied = true;
+
+            Transform darkBackdrop = transform.Find("DarkBackdrop");
+            if (darkBackdrop != null && darkBackdrop.GetComponent<Image>() is Image bdImg)
+            {
+                bdImg.color = new Color(0.035f, 0.039f, 0.047f, 1f);
+            }
+
+            Transform seamRail = transform.Find("SeamDividerRail");
+            if (seamRail != null) seamRail.gameObject.SetActive(false);
+
+            Transform topStage = transform.Find("TopVisualStage");
+            if (topStage != null)
+            {
+                if (topStage is RectTransform topRt)
+                {
+                    topRt.anchorMin = new Vector2(0.14f, 0.37f);
+                    topRt.anchorMax = new Vector2(0.86f, 0.97f);
+                    topRt.offsetMin = Vector2.zero;
+                    topRt.offsetMax = Vector2.zero;
+                }
+                if (topStage.GetComponent<Image>() is Image topBg) topBg.color = Color.clear;
+
+                Transform vp = topStage.Find("StageViewport");
+                if (vp != null)
+                {
+                    if (vp is RectTransform vpRt)
+                    {
+                        vpRt.anchorMin = Vector2.zero;
+                        vpRt.anchorMax = Vector2.one;
+                        vpRt.offsetMin = new Vector2(24f, 22f);
+                        vpRt.offsetMax = new Vector2(-24f, -22f);
+                    }
+                    if (vp.GetComponent<RectMask2D>() == null) vp.gameObject.AddComponent<RectMask2D>();
+
+                    if (roomBackdropImage != null) roomBackdropImage.preserveAspect = false;
+
+                    Transform crtFlat = vp.Find("CRTScanlineOverlay");
+                    if (crtFlat != null && crtFlat.GetComponent<Image>() is Image crtImg)
+                    {
+                        crtImg.color = new Color(0f, 0f, 0f, 0.12f);
+                    }
+
+                    if (vp.Find("StyleD_PrologueScanlines") == null)
+                    {
+                        GameObject scanObj = new GameObject("StyleD_PrologueScanlines", typeof(RectTransform), typeof(RawImage));
+                        scanObj.transform.SetParent(vp, false);
+                        RectTransform sRt = scanObj.GetComponent<RectTransform>();
+                        sRt.anchorMin = Vector2.zero;
+                        sRt.anchorMax = Vector2.one;
+                        sRt.offsetMin = Vector2.zero;
+                        sRt.offsetMax = Vector2.zero;
+                        RawImage sRaw = scanObj.GetComponent<RawImage>();
+                        sRaw.texture = StyleDThemeUtility.GetCrtScanlineTexture();
+                        sRaw.uvRect = new Rect(0f, 0f, 1f, 160f);
+                        sRaw.color = new Color(1f, 1f, 1f, 0.22f);
+                        sRaw.raycastTarget = false;
+                        scanObj.transform.SetAsLastSibling();
+                    }
+                }
+
+                if (StyleDThemeUtility.CrtBezel != null && topStage.Find("StyleD_CRTBezelOverlay") == null)
+                {
+                    GameObject bezelObj = new GameObject("StyleD_CRTBezelOverlay", typeof(RectTransform), typeof(Image));
+                    bezelObj.transform.SetParent(topStage, false);
+                    RectTransform bRt = bezelObj.GetComponent<RectTransform>();
+                    bRt.anchorMin = Vector2.zero;
+                    bRt.anchorMax = Vector2.one;
+                    bRt.offsetMin = Vector2.zero;
+                    bRt.offsetMax = Vector2.zero;
+                    Image bImg = bezelObj.GetComponent<Image>();
+                    bImg.sprite = StyleDThemeUtility.CrtBezel;
+                    bImg.type = Image.Type.Simple;
+                    bImg.preserveAspect = false;
+                    bImg.color = Color.white;
+                    bImg.raycastTarget = false;
+                }
+
+                Transform statusRail = topStage.Find("TopStatusRail");
+                if (statusRail != null)
+                {
+                    if (statusRail is RectTransform srRt)
+                    {
+                        srRt.anchorMin = new Vector2(0f, 1f);
+                        srRt.anchorMax = new Vector2(1f, 1f);
+                        srRt.pivot = new Vector2(0.5f, 1f);
+                        srRt.offsetMin = new Vector2(118f, -76f);
+                        srRt.offsetMax = new Vector2(-118f, -46f);
+                    }
+                    if (statusRail.GetComponent<Image>() is Image srBg) srBg.color = Color.clear;
+
+                    if (statusRail.Find("Title")?.GetComponent<TextMeshProUGUI>() is TextMeshProUGUI osdTitle)
+                    {
+                        osdTitle.text = "UNIT 407 - LIVING ROOM";
+                        osdTitle.fontSize = 12f;
+                        osdTitle.fontStyle = FontStyles.Normal;
+                        osdTitle.color = StyleDThemeUtility.ColBone;
+                        osdTitle.rectTransform.offsetMin = Vector2.zero;
+                        osdTitle.rectTransform.offsetMax = Vector2.zero;
+                        SundayTypography.ApplyFont(osdTitle, FontRole.VcrOsd);
+                        StyleDThemeUtility.AttachCrtOsdChromatic(osdTitle);
+                    }
+
+                    if (statusRail.Find("Status")?.GetComponent<TextMeshProUGUI>() is TextMeshProUGUI osdStatus)
+                    {
+                        osdStatus.text = "<color=#E0A43A>23:45</color>  |  SATURDAY NIGHT";
+                        osdStatus.fontSize = 12f;
+                        osdStatus.fontStyle = FontStyles.Normal;
+                        osdStatus.color = StyleDThemeUtility.ColBone;
+                        osdStatus.rectTransform.offsetMin = Vector2.zero;
+                        osdStatus.rectTransform.offsetMax = Vector2.zero;
+                        SundayTypography.ApplyFont(osdStatus, FontRole.VcrOsd);
+                        StyleDThemeUtility.AttachCrtOsdChromatic(osdStatus);
+                    }
+
+                    statusRail.SetAsLastSibling();
+                }
+
+                Transform bezelTr = topStage.Find("StyleD_CRTBezelOverlay");
+                if (bezelTr != null) bezelTr.SetAsLastSibling();
+            }
+
+            Transform botDock = transform.Find("BottomNarrativeDock");
+            if (botDock != null)
+            {
+                if (botDock is RectTransform botRt)
+                {
+                    botRt.anchorMin = new Vector2(0.14f, 0.03f);
+                    botRt.anchorMax = new Vector2(0.86f, 0.35f);
+                    botRt.offsetMin = Vector2.zero;
+                    botRt.offsetMax = Vector2.zero;
+                }
+                if (botDock.GetComponent<Image>() is Image botBg)
+                {
+                    StyleDThemeUtility.ApplySliced(botBg, StyleDThemeUtility.PanelChassis, 3.2f, Color.white);
+                }
+
+                Transform hdr = botDock.Find("HeaderBar");
+                if (hdr != null)
+                {
+                    if (hdr is RectTransform hRt)
+                    {
+                        hRt.anchorMin = new Vector2(0f, 1f);
+                        hRt.anchorMax = new Vector2(1f, 1f);
+                        hRt.pivot = new Vector2(0.5f, 1f);
+                        hRt.offsetMin = new Vector2(18f, -52f);
+                        hRt.offsetMax = new Vector2(-18f, -18f);
+                    }
+                    if (hdr.GetComponent<Image>() is Image hBg) hBg.color = Color.clear;
+                    StyleDThemeUtility.AddHeaderDivider(hdr);
+                }
+
+                if (speakerLabel != null)
+                {
+                    SundayTypography.ApplyFont(speakerLabel, FontRole.Display);
+                    speakerLabel.fontSize = 13f;
+                    speakerLabel.color = StyleDThemeUtility.ColBone;
+                    speakerLabel.rectTransform.offsetMin = new Vector2(12f, 0f);
+                }
+
+                if (botDock.Find("StyleD_NarrativeWell") == null)
+                {
+                    GameObject wellObj = new GameObject("StyleD_NarrativeWell", typeof(RectTransform), typeof(Image));
+                    wellObj.transform.SetParent(botDock, false);
+                    RectTransform wRt = wellObj.GetComponent<RectTransform>();
+                    wRt.anchorMin = Vector2.zero;
+                    wRt.anchorMax = Vector2.one;
+                    wRt.offsetMin = new Vector2(18f, 18f);
+                    wRt.offsetMax = new Vector2(-18f, -56f);
+                    Image wImg = wellObj.GetComponent<Image>();
+                    wImg.raycastTarget = false;
+                    StyleDThemeUtility.ApplySliced(wImg, StyleDThemeUtility.WellRecessed, 3.2f, Color.white);
+                    StyleDThemeUtility.AddLeftAccentBar(wellObj.transform, StyleDThemeUtility.ColRust, 3f);
+
+                    if (narrativeBodyText != null)
+                    {
+                        wellObj.transform.SetSiblingIndex(narrativeBodyText.transform.GetSiblingIndex());
+                    }
+                }
+
+                if (narrativeBodyText != null)
+                {
+                    SundayTypography.ApplyFont(narrativeBodyText, FontRole.Narrative);
+                    narrativeBodyText.fontSize = 20.5f;
+                    narrativeBodyText.lineSpacing = 10f;
+                    narrativeBodyText.color = StyleDThemeUtility.ColBone;
+                    narrativeBodyText.rectTransform.offsetMin = new Vector2(42f, 60f);
+                    narrativeBodyText.rectTransform.offsetMax = new Vector2(-42f, -72f);
+                }
+
+                if (continuePrompt != null)
+                {
+                    RectTransform prRt = continuePrompt.GetComponent<RectTransform>();
+                    prRt.anchoredPosition = new Vector2(-32f, 28f);
+                    if (continuePrompt.GetComponent<TextMeshProUGUI>() is TextMeshProUGUI prTmp)
+                    {
+                        SundayTypography.ApplyFont(prTmp, FontRole.Mono);
+                        prTmp.fontSize = 11.5f;
+                        prTmp.text = "<color=#E0A43A>CLICK ANYWHERE OR PRESS SPACE</color> <color=#E4DFD1>>></color>";
+                    }
+                }
+            }
+
+            if (focusReflectionButton != null)
+            {
+                RectTransform fRt = focusReflectionButton.GetComponent<RectTransform>();
+                fRt.anchorMin = new Vector2(0.5f, 0f);
+                fRt.anchorMax = new Vector2(0.5f, 0f);
+                fRt.pivot = new Vector2(0.5f, 0f);
+                fRt.sizeDelta = new Vector2(420f, 44f);
+                fRt.anchoredPosition = new Vector2(0f, 66f);
+
+                StyleDThemeUtility.ApplyMetalButton(
+                    focusReflectionButton,
+                    StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColRust, 0.78f),
+                    StyleDThemeUtility.ColRust,
+                    2.8f,
+                    StyleDThemeUtility.ColBone);
+
+                TextMeshProUGUI fLbl = focusReflectionButton.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (fLbl != null)
+                {
+                    SundayTypography.ApplyFont(fLbl, FontRole.Display);
+                    fLbl.fontSize = 14f;
+                }
+
+                focusReflectionButton.transform.SetAsLastSibling();
             }
         }
 

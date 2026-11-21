@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -175,6 +176,25 @@ namespace SundayLastBreath.UI
         [SerializeField] private Button utilWaitBtn;
         [SerializeField] private Button utilSysBtn;
 
+        [Header("Style D Hardware Theme (Revamped StageScreen)")]
+        [SerializeField] private bool useStyleDHardwareTheme = false;
+        [SerializeField] private Sprite styleDPanelChassisSprite;
+        [SerializeField] private Sprite styleDCrtBezelSprite;
+        [SerializeField] private Sprite styleDWellRecessedSprite;
+        [SerializeField] private Sprite styleDSlotRecessedSprite;
+        [SerializeField] private Sprite styleDStatCardSprite;
+        [SerializeField] private Sprite styleDButtonMetalSprite;
+        [SerializeField] private Sprite styleDMapPaperSprite;
+        [SerializeField] private Sprite styleDPinnedNoteSprite;
+        [SerializeField] private Sprite styleDRedPushpinSprite;
+        public bool IsStyleDHardwareTheme => useStyleDHardwareTheme;
+
+        private EcgWaveformGraphic _styleDEcg;
+        private TextMeshProUGUI _styleDConditionText;
+        private readonly Dictionary<string, TextMeshProUGUI> _styleDMortalValueTexts = new Dictionary<string, TextMeshProUGUI>(StringComparer.OrdinalIgnoreCase);
+        private GameObject _styleDMortalGridObj;
+        private GameObject _styleDCrtOverlayObj;
+
         private ReaderTab _activeTab = ReaderTab.Situation;
         private SurvivorSubTab _activeSurvivorTab = SurvivorSubTab.Mortal;
         private string _selectedItemId = "";
@@ -183,17 +203,60 @@ namespace SundayLastBreath.UI
         private int _avatarFrameIndex;
         private float _avatarTimer;
 
+        // Option A: Visual Hierarchy & Passive Panel Dimming State
+        private CanvasGroup _cgInventory;
+        private CanvasGroup _cgSurvivor;
+        private CanvasGroup _cgSurvivorTabs;
+        private CanvasGroup _cgMap;
+        private bool _hoverInventory;
+        private bool _hoverSurvivor;
+        private bool _hoverMap;
+
+        // Option B: Story Reader Font Scale & Story Log Scroll Lock
+        private Button _fontDecBtn;
+        private Button _fontIncBtn;
+        private Button _fontResetBtn;
+        private TextMeshProUGUI _fontScaleLabel;
+        private Button _jumpToLatestLogBtn;
+        private TextMeshProUGUI _jumpToLatestLogLabel;
+        private int _lastRenderedStoryLogCount = -1;
+        private float _lastRenderedFontScale = -1f;
+        private bool _hasUnreadLogWhileScrolled;
+        private bool _storyLogScrolledBack;
+
         // Palette constants matching blueprint_v4_hybrid_1_and_3.png
         private static readonly Color ColBgOuter = new Color(0.03f, 0.04f, 0.06f, 1f);
         private static readonly Color ColPanelBg = new Color(0.063f, 0.082f, 0.118f, 0.98f);
         private static readonly Color ColHeaderBg = new Color(0.094f, 0.125f, 0.173f, 1f);
         private static readonly Color ColBorderSlate = new Color(0.18f, 0.23f, 0.305f, 0.95f);
+        private static readonly Color ColBorderActive = new Color(0.22f, 0.34f, 0.48f, 0.88f);
+        private static readonly Color ColBorderPassive = new Color(0.12f, 0.16f, 0.22f, 0.38f);
+        private static readonly Color ColBorderSubtle = new Color(0.13f, 0.17f, 0.23f, 0.25f);
+        private static readonly Color ColHeaderTitlePassive = new Color(0.62f, 0.54f, 0.38f, 0.80f);
         private static readonly Color ColSlotBg = new Color(0.055f, 0.075f, 0.105f, 0.96f);
         private static readonly Color ColCardBg = new Color(0.075f, 0.10f, 0.145f, 0.96f);
         private static readonly Color ColAmber = new Color(0.96f, 0.62f, 0.043f, 1f);
         private static readonly Color ColCyan = new Color(0.22f, 0.74f, 0.97f, 1f);
         private static readonly Color ColTextMain = new Color(0.90f, 0.925f, 0.96f, 1f);
         private static readonly Color ColTextMuted = new Color(0.55f, 0.62f, 0.72f, 1f);
+
+        // Style D Palette: 90s Gritty Gunmetal Hardware & Aged Paper
+        private static readonly Color ColStyleDBgOuter = new Color(0.035f, 0.039f, 0.047f, 1f);
+        private static readonly Color ColStyleDHeaderBg = new Color(0.055f, 0.062f, 0.072f, 0.55f);
+        private static readonly Color ColStyleDHeaderLine = new Color(0.17f, 0.19f, 0.21f, 0.90f);
+        private static readonly Color ColStyleDBoneText = new Color(0.894f, 0.871f, 0.788f, 1f);
+        private static readonly Color ColStyleDMutedStone = new Color(0.604f, 0.584f, 0.541f, 1f);
+        private static readonly Color ColStyleDTitlePassive = new Color(0.659f, 0.635f, 0.584f, 0.92f);
+        private static readonly Color ColStyleDTitleActive = new Color(0.941f, 0.918f, 0.878f, 1f);
+        private static readonly Color ColStyleDRust = new Color(0.68f, 0.29f, 0.19f, 1f);
+        private static readonly Color ColStyleDRustBright = new Color(0.788f, 0.290f, 0.161f, 1f);
+        private static readonly Color ColStyleDAmber = new Color(0.812f, 0.573f, 0.196f, 1f);
+        private static readonly Color ColStyleDEquipBtn = new Color(0.34f, 0.44f, 0.37f, 1f);
+        private static readonly Color ColStyleDDropBtn = new Color(0.68f, 0.27f, 0.24f, 1f);
+        private static readonly Color ColStyleDTabInactive = new Color(0.24f, 0.26f, 0.29f, 1f);
+        private static readonly Color ColStyleDMetalBtn = new Color(0.32f, 0.35f, 0.39f, 1f);
+        private static readonly Color ColStyleDPaperInk = new Color(0.08f, 0.07f, 0.06f, 1f);
+        private static readonly Color ColStyleDPaperHeader = new Color(0.478f, 0.141f, 0.102f, 1f);
 
         public static void SetPixelBox(RectTransform rt, float x1, float y1, float x2, float y2)
         {
@@ -229,11 +292,267 @@ namespace SundayLastBreath.UI
             }
 
             ReparentAndReframeExistingUI();
+            QuietInnerPanelBorders();
+            EnsureReaderFontControlsAndScrollLockUI();
             HookInteractions();
+            if (useStyleDHardwareTheme)
+            {
+                ApplyStyleDHardwareTheme();
+            }
             OnConsoleModeChanged(GameStageScreen.ConsoleMode.Narrative);
             SelectReaderTab(_activeTab, force: true);
             SelectSurvivorTab(_activeSurvivorTab, force: true);
             RefreshAll();
+            ApplyCockpitVisualHierarchy(immediate: true);
+        }
+
+        private void OnDestroy()
+        {
+            if (useStyleDHardwareTheme)
+            {
+                TacticalChoiceButton.StyleDEnabled = false;
+                TacticalMapViewController.StyleDThemeEnabled = false;
+            }
+        }
+
+        public void RefreshNarrativeTypography()
+        {
+            UpdateFontControlUI();
+            RefreshReaderTabsContent();
+            if (hubScreen != null && hubScreen.AwakeningContainer != null && hubScreen.AwakeningContainer.activeSelf)
+            {
+                AdjustAwakeningLayout(hubScreen.AwakeningContainer);
+            }
+        }
+
+        private void EnsureReaderFontControlsAndScrollLockUI()
+        {
+            if (bottomCenterReaderPanel != null)
+            {
+                Transform tabBar = bottomCenterReaderPanel.Find("TabBar") ?? bottomCenterReaderPanel.Find("Body/TabBar");
+                if (tabBar != null)
+                {
+                    HorizontalLayoutGroup hlg = tabBar.GetComponent<HorizontalLayoutGroup>();
+                    if (hlg != null)
+                    {
+                        hlg.padding = new RectOffset(hlg.padding.left, 114, hlg.padding.top, hlg.padding.bottom);
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(tabBar as RectTransform);
+                    }
+
+                    Transform groupTr = tabBar.Find("FontSizeControlGroup");
+                    if (groupTr == null)
+                    {
+                        GameObject groupGo = new GameObject("FontSizeControlGroup", typeof(RectTransform), typeof(LayoutElement));
+                        groupGo.transform.SetParent(tabBar, false);
+                        groupTr = groupGo.transform;
+
+                        LayoutElement le = groupGo.GetComponent<LayoutElement>();
+                        le.ignoreLayout = true;
+
+                        RectTransform gRt = groupGo.GetComponent<RectTransform>();
+                        gRt.anchorMin = new Vector2(1f, 0.5f);
+                        gRt.anchorMax = new Vector2(1f, 0.5f);
+                        gRt.pivot = new Vector2(1f, 0.5f);
+                        gRt.sizeDelta = new Vector2(102f, 26f);
+                        gRt.anchoredPosition = new Vector2(-6f, 0f);
+
+                        _fontDecBtn = CreateReaderFontControlPill(groupTr, "Btn_FontDec", "A-", 0f, 26f, ColTextMain);
+                        _fontResetBtn = CreateReaderFontControlPill(groupTr, "Btn_FontReset", "100%", 28f, 46f, ColAmber);
+                        _fontIncBtn = CreateReaderFontControlPill(groupTr, "Btn_FontInc", "A+", 76f, 26f, ColTextMain);
+                    }
+                    else
+                    {
+                        _fontDecBtn = groupTr.Find("Btn_FontDec")?.GetComponent<Button>();
+                        _fontResetBtn = groupTr.Find("Btn_FontReset")?.GetComponent<Button>();
+                        _fontIncBtn = groupTr.Find("Btn_FontInc")?.GetComponent<Button>();
+                    }
+
+                    if (_fontResetBtn != null)
+                    {
+                        _fontScaleLabel = _fontResetBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+                    }
+
+                    if (_fontDecBtn != null)
+                    {
+                        _fontDecBtn.onClick.RemoveAllListeners();
+                        _fontDecBtn.onClick.AddListener(() =>
+                        {
+                            AudioManager.Instance?.PlayButtonClick();
+                            SundayTypography.StepNarrativeFontScale(-1);
+                        });
+                    }
+                    if (_fontResetBtn != null)
+                    {
+                        _fontResetBtn.onClick.RemoveAllListeners();
+                        _fontResetBtn.onClick.AddListener(() =>
+                        {
+                            AudioManager.Instance?.PlayButtonClick();
+                            SundayTypography.CycleNarrativeFontScale();
+                        });
+                    }
+                    if (_fontIncBtn != null)
+                    {
+                        _fontIncBtn.onClick.RemoveAllListeners();
+                        _fontIncBtn.onClick.AddListener(() =>
+                        {
+                            AudioManager.Instance?.PlayButtonClick();
+                            SundayTypography.StepNarrativeFontScale(1);
+                        });
+                    }
+                }
+            }
+
+            Transform storyLogViewTr = readerTabStoryLogView != null
+                ? readerTabStoryLogView.transform
+                : (bottomCenterReaderPanel != null ? bottomCenterReaderPanel.Find("ReaderBody/View_StoryLog") : null);
+            if (storyLogViewTr != null)
+            {
+                Transform jumpTr = storyLogViewTr.Find("Btn_JumpToLatestLog");
+                if (jumpTr == null)
+                {
+                    _jumpToLatestLogBtn = CreateActionPill(
+                        storyLogViewTr,
+                        "Btn_JumpToLatestLog",
+                        "[DN] JUMP TO LATEST ENTRY",
+                        new Color(0.08f, 0.11f, 0.17f, 0.96f),
+                        ColAmber,
+                        out _jumpToLatestLogLabel,
+                        9.5f);
+                    RectTransform jRt = _jumpToLatestLogBtn.GetComponent<RectTransform>();
+                    jRt.anchorMin = new Vector2(1f, 0f);
+                    jRt.anchorMax = new Vector2(1f, 0f);
+                    jRt.pivot = new Vector2(1f, 0f);
+                    jRt.anchoredPosition = new Vector2(-14f, 10f);
+                    jRt.sizeDelta = new Vector2(210f, 26f);
+                    if (_jumpToLatestLogLabel != null)
+                    {
+                        _jumpToLatestLogLabel.color = ColAmber;
+                        SundayTypography.ApplyFont(_jumpToLatestLogLabel, FontRole.Mono);
+                    }
+                    _jumpToLatestLogBtn.gameObject.SetActive(false);
+                }
+                else
+                {
+                    _jumpToLatestLogBtn = jumpTr.GetComponent<Button>();
+                    _jumpToLatestLogLabel = jumpTr.GetComponentInChildren<TextMeshProUGUI>(true);
+                }
+
+                if (_jumpToLatestLogBtn != null)
+                {
+                    _jumpToLatestLogBtn.transform.SetAsLastSibling();
+                    _jumpToLatestLogBtn.onClick.RemoveAllListeners();
+                    _jumpToLatestLogBtn.onClick.AddListener(JumpToLatestStoryLog);
+                }
+            }
+
+            if (inlineStoryLogScroll != null)
+            {
+                if (inlineStoryLogScroll.content != null)
+                {
+                    var vlg = inlineStoryLogScroll.content.GetComponent<VerticalLayoutGroup>();
+                    if (vlg != null && vlg.padding.bottom < 36)
+                    {
+                        vlg.padding = new RectOffset(vlg.padding.left, vlg.padding.right, vlg.padding.top, 36);
+                    }
+                }
+                inlineStoryLogScroll.onValueChanged.RemoveListener(OnStoryLogScrollValueChanged);
+                inlineStoryLogScroll.onValueChanged.AddListener(OnStoryLogScrollValueChanged);
+            }
+
+            UpdateFontControlUI();
+            UpdateStoryLogScrollLockState();
+        }
+
+        private static Button CreateReaderFontControlPill(Transform parent, string name, string label, float leftX, float width, Color textColor)
+        {
+            Button btn = CreateActionPill(parent, name, label, ColSlotBg, ColBorderPassive, out TextMeshProUGUI lbl, 9.5f);
+            RectTransform rt = btn.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 0.5f);
+            rt.anchorMax = new Vector2(0f, 0.5f);
+            rt.pivot = new Vector2(0f, 0.5f);
+            rt.anchoredPosition = new Vector2(leftX, 0f);
+            rt.sizeDelta = new Vector2(width, 24f);
+            if (lbl != null)
+            {
+                lbl.color = textColor;
+                SundayTypography.ApplyFont(lbl, FontRole.Mono);
+            }
+            return btn;
+        }
+
+        private void UpdateFontControlUI()
+        {
+            if (_fontScaleLabel != null)
+            {
+                _fontScaleLabel.text = $"{SundayTypography.NarrativeFontScalePercent}%";
+                if (useStyleDHardwareTheme)
+                {
+                    _fontScaleLabel.color = Mathf.Approximately(SundayTypography.NarrativeFontScale, 1.0f) ? ColStyleDAmber : ColStyleDBoneText;
+                }
+                else
+                {
+                    _fontScaleLabel.color = Mathf.Approximately(SundayTypography.NarrativeFontScale, 1.0f) ? ColAmber : ColCyan;
+                }
+            }
+            if (_fontDecBtn != null)
+            {
+                _fontDecBtn.interactable = SundayTypography.NarrativeFontScale > 0.91f;
+            }
+            if (_fontIncBtn != null)
+            {
+                _fontIncBtn.interactable = SundayTypography.NarrativeFontScale < 1.29f;
+            }
+        }
+
+        private void OnStoryLogScrollValueChanged(Vector2 _)
+        {
+            UpdateStoryLogScrollLockState();
+        }
+
+        private void UpdateStoryLogScrollLockState()
+        {
+            if (inlineStoryLogScroll == null)
+            {
+                _storyLogScrolledBack = false;
+                _hasUnreadLogWhileScrolled = false;
+                if (_jumpToLatestLogBtn != null) _jumpToLatestLogBtn.gameObject.SetActive(false);
+                return;
+            }
+
+            RectTransform contentRt = inlineStoryLogScroll.content;
+            RectTransform vpRt = inlineStoryLogScroll.viewport;
+            bool scrollable = contentRt != null && vpRt != null && contentRt.rect.height > vpRt.rect.height + 8f;
+            bool scrolledBack = scrollable && inlineStoryLogScroll.verticalNormalizedPosition > 0.05f;
+
+            _storyLogScrolledBack = scrolledBack;
+            if (!scrolledBack)
+            {
+                _hasUnreadLogWhileScrolled = false;
+            }
+
+            if (_jumpToLatestLogBtn != null)
+            {
+                _jumpToLatestLogBtn.gameObject.SetActive(scrolledBack);
+                if (scrolledBack && _jumpToLatestLogLabel != null)
+                {
+                    _jumpToLatestLogLabel.text = SundayTypography.SanitizeText(
+                        _hasUnreadLogWhileScrolled ? "[DN] NEW ENTRY // JUMP TO LATEST" : "[DN] JUMP TO LATEST ENTRY");
+                }
+            }
+        }
+
+        public void JumpToLatestStoryLog()
+        {
+            AudioManager.Instance?.PlayButtonClick();
+            _hasUnreadLogWhileScrolled = false;
+            _storyLogScrolledBack = false;
+            if (inlineStoryLogScroll != null)
+            {
+                Canvas.ForceUpdateCanvases();
+                inlineStoryLogScroll.velocity = Vector2.zero;
+                inlineStoryLogScroll.verticalNormalizedPosition = 0f;
+            }
+            UpdateStoryLogScrollLockState();
         }
 
         public void OnHubMenuSanitized()
@@ -247,7 +566,7 @@ namespace SundayLastBreath.UI
         {
             if (hubScreen == null) return;
 
-            bool overlayOpen = mode == GameStageScreen.ConsoleMode.PDA || mode == GameStageScreen.ConsoleMode.Gear;
+            bool overlayOpen = mode == GameStageScreen.ConsoleMode.PDA;
             Transform botConsole = transform.Find("BottomScreen_TouchConsole");
             if (botConsole != null)
             {
@@ -276,9 +595,7 @@ namespace SundayLastBreath.UI
 
             if (hubScreen.DockContainerGear != null)
             {
-                bool activeGear = mode == GameStageScreen.ConsoleMode.Gear;
-                hubScreen.DockContainerGear.SetActive(activeGear);
-                if (activeGear) StyleOverlayDockPanel(hubScreen.DockContainerGear);
+                hubScreen.DockContainerGear.SetActive(false);
             }
 
             EnsureModalZOrder();
@@ -294,11 +611,18 @@ namespace SundayLastBreath.UI
             RefreshMapAndPinnedNote();
             RefreshReaderTabsContent();
             UpdateReaderAndActionDeckState();
+            ApplyCockpitVisualHierarchy(immediate: true);
         }
 
         private void Awake()
         {
             if (hubScreen == null) hubScreen = GetComponent<GameStageScreen>();
+            SundayTypography.StyleDThemeEnabled = useStyleDHardwareTheme;
+            if (useStyleDHardwareTheme)
+            {
+                TacticalChoiceButton.StyleDEnabled = true;
+                TacticalMapViewController.StyleDThemeEnabled = true;
+            }
         }
 
         private void OnEnable()
@@ -328,11 +652,168 @@ namespace SundayLastBreath.UI
 
             UpdatePortraitAnimation();
             UpdateReaderAndActionDeckState();
+            ApplyCockpitVisualHierarchy(immediate: false);
 
             if (Application.isPlaying)
             {
                 HandleHybridHotkeys();
             }
+        }
+
+        private static CanvasGroup EnsureCanvasGroup(Transform t)
+        {
+            if (t == null) return null;
+            CanvasGroup cg = t.GetComponent<CanvasGroup>();
+            if (cg == null) cg = t.gameObject.AddComponent<CanvasGroup>();
+            return cg;
+        }
+
+        private static void SetOutlineColor(Transform t, Color c)
+        {
+            if (t == null) return;
+            Outline ol = t.GetComponent<Outline>();
+            if (ol != null) ol.effectColor = c;
+        }
+
+        private static void ApplyAlpha(CanvasGroup cg, float target, bool immediate)
+        {
+            if (cg == null) return;
+            cg.alpha = immediate ? target : Mathf.MoveTowards(cg.alpha, target, Time.unscaledDeltaTime * 6.5f);
+        }
+
+        private static void StylePassivePanelChrome(RectTransform panel, bool hovered, bool styleD = false)
+        {
+            if (panel == null) return;
+            Color borderColor = hovered ? ColBorderActive : ColBorderPassive;
+            Color titleColor = styleD
+                ? (hovered ? ColStyleDTitleActive : ColStyleDTitlePassive)
+                : (hovered ? ColAmber : ColHeaderTitlePassive);
+
+            if (!styleD)
+            {
+                SetOutlineColor(panel, borderColor);
+            }
+
+            Transform bottomLine = panel.Find("Header/BottomLine");
+            if (bottomLine != null)
+            {
+                Image blImg = bottomLine.GetComponent<Image>();
+                if (blImg != null) blImg.color = styleD ? ColStyleDHeaderLine : borderColor;
+            }
+
+            Transform titleTr = panel.Find("Header/Title");
+            if (titleTr != null)
+            {
+                TextMeshProUGUI titleTmp = titleTr.GetComponent<TextMeshProUGUI>();
+                if (titleTmp != null) titleTmp.color = titleColor;
+            }
+        }
+
+        public void ApplyCockpitVisualHierarchy(bool immediate = false)
+        {
+            if (topLeftInventoryPanel != null && _cgInventory == null)
+                _cgInventory = EnsureCanvasGroup(topLeftInventoryPanel);
+
+            if (topRightSurvivorPanel != null)
+            {
+                if (_cgSurvivor == null) _cgSurvivor = EnsureCanvasGroup(topRightSurvivorPanel);
+                if (_cgSurvivorTabs == null)
+                    _cgSurvivorTabs = EnsureCanvasGroup(topRightSurvivorPanel.Find("Body/SurvivorTabsContainer"));
+            }
+
+            if (bottomLeftMapPanel != null && _cgMap == null)
+                _cgMap = EnsureCanvasGroup(bottomLeftMapPanel);
+
+            bool inCombat = hubScreen != null && hubScreen.IsCombatModalOpen;
+
+            // Keep primary focal panels at 100% alpha and active border brightness (hide bottom StageScreen reader/deck cleanly behind combat panels)
+            Transform topStage = transform.Find("TopScreen_VisualStage");
+            if (topStage != null)
+            {
+                CanvasGroup tsCg = topStage.GetComponent<CanvasGroup>();
+                if (tsCg != null) tsCg.alpha = 1f;
+                if (!useStyleDHardwareTheme) SetOutlineColor(topStage, ColBorderActive);
+            }
+            if (bottomCenterReaderPanel != null)
+            {
+                CanvasGroup bcCg = EnsureCanvasGroup(bottomCenterReaderPanel);
+                bcCg.alpha = inCombat ? 0f : 1f;
+                bcCg.interactable = !inCombat;
+                bcCg.blocksRaycasts = !inCombat;
+                if (!useStyleDHardwareTheme) SetOutlineColor(bottomCenterReaderPanel, ColBorderActive);
+            }
+            if (bottomRightActionPanel != null)
+            {
+                CanvasGroup brCg = EnsureCanvasGroup(bottomRightActionPanel);
+                brCg.alpha = inCombat ? 0f : 1f;
+                brCg.interactable = !inCombat;
+                brCg.blocksRaycasts = !inCombat;
+                if (!useStyleDHardwareTheme) SetOutlineColor(bottomRightActionPanel, ColBorderActive);
+            }
+
+            float baseInv = useStyleDHardwareTheme ? 0.78f : 0.62f;
+            float baseSurv = useStyleDHardwareTheme ? 0.80f : 0.65f;
+            float baseSurvTabs = useStyleDHardwareTheme ? 0.85f : 0.72f;
+            float baseMap = useStyleDHardwareTheme ? 0.78f : 0.60f;
+
+            float invAlpha = inCombat ? (_hoverInventory ? 1.0f : 0.38f) : (_hoverInventory ? 1.0f : baseInv);
+            float survAlpha = inCombat ? (_hoverSurvivor ? 1.0f : 0.52f) : (_hoverSurvivor ? 1.0f : baseSurv);
+            float survTabsAlpha = inCombat ? (_hoverSurvivor ? 1.0f : 0.35f) : (_hoverSurvivor ? 1.0f : baseSurvTabs);
+            float mapAlpha = inCombat ? (_hoverMap ? 0.95f : 0.28f) : (_hoverMap ? 1.0f : baseMap);
+
+            ApplyAlpha(_cgInventory, invAlpha, immediate);
+            ApplyAlpha(_cgSurvivor, survAlpha, immediate);
+            ApplyAlpha(_cgSurvivorTabs, survTabsAlpha, immediate);
+            ApplyAlpha(_cgMap, mapAlpha, immediate);
+
+            StylePassivePanelChrome(topLeftInventoryPanel, _hoverInventory, useStyleDHardwareTheme);
+            StylePassivePanelChrome(topRightSurvivorPanel, _hoverSurvivor, useStyleDHardwareTheme);
+            StylePassivePanelChrome(bottomLeftMapPanel, _hoverMap, useStyleDHardwareTheme);
+        }
+
+        private void QuietInnerPanelBorders()
+        {
+            if (topLeftInventoryPanel != null)
+            {
+                Transform micro = topLeftInventoryPanel.Find("Body/MicroInspector");
+                SetOutlineColor(micro, ColBorderSubtle);
+                if (micro != null) SetOutlineColor(micro.Find("IconFrame"), ColBorderSubtle);
+            }
+
+            if (topRightSurvivorPanel != null)
+            {
+                Transform idCard = topRightSurvivorPanel.Find("Body/IdentityCard");
+                SetOutlineColor(idCard, ColBorderSubtle);
+                if (idCard != null)
+                {
+                    SetOutlineColor(idCard.Find("PortraitFrame"), new Color(0.18f, 0.52f, 0.68f, 0.45f));
+                }
+
+                Transform tabs = topRightSurvivorPanel.Find("Body/SurvivorTabsContainer");
+                SetOutlineColor(tabs, ColBorderSubtle);
+                if (tabs != null)
+                {
+                    foreach (var ol in tabs.GetComponentsInChildren<Outline>(true))
+                    {
+                        if (ol == null) continue;
+                        string objName = ol.gameObject.name;
+                        if (objName.StartsWith("StatRow_", StringComparison.Ordinal) || objName == "PartyGroupCard")
+                        {
+                            ol.effectColor = ColBorderSubtle;
+                        }
+                    }
+                }
+            }
+
+            if (bottomLeftMapPanel != null)
+            {
+                SetOutlineColor(bottomLeftMapPanel.Find("Body/MiniMapCanvas"), ColBorderSubtle);
+                SetOutlineColor(bottomLeftMapPanel.Find("Body/PinnedNoteCard"), new Color(0.38f, 0.28f, 0.12f, 0.40f));
+            }
+
+            SetOutlineColor(transform.Find("TopScreen_VisualStage"), ColBorderActive);
+            SetOutlineColor(bottomCenterReaderPanel, ColBorderActive);
+            SetOutlineColor(bottomRightActionPanel, ColBorderActive);
         }
 
         private void HandleHybridHotkeys()
@@ -459,6 +940,7 @@ namespace SundayLastBreath.UI
             BuildBottomCenterReaderPanel();
             BuildBottomRightActionPanel();
             BuildDockOverlayBackdrop();
+            QuietInnerPanelBorders();
 
             isBuilt = true;
         }
@@ -699,8 +1181,9 @@ namespace SundayLastBreath.UI
             ueRt.anchoredPosition = new Vector2(70f, 5f);
             ueRt.sizeDelta = new Vector2(118f, 22f);
 
-            inspectorOpenGearBtn = CreateActionPill(inspGo.transform, "Btn_OpenFullGear", "FULL GEAR [I]",
-                new Color(0.10f, 0.14f, 0.21f, 1f), ColBorderSlate, out _, 10f);
+            inspectorOpenGearBtn = CreateActionPill(inspGo.transform, "Btn_OpenFullGear", "DROP",
+                new Color(0.22f, 0.11f, 0.11f, 1f), new Color(0.72f, 0.26f, 0.24f, 0.9f), out TextMeshProUGUI dropBtnLbl, 10f);
+            if (dropBtnLbl != null) dropBtnLbl.color = new Color(0.96f, 0.78f, 0.76f, 1f);
             RectTransform ogRt = inspectorOpenGearBtn.GetComponent<RectTransform>();
             ogRt.anchorMin = new Vector2(1f, 0f);
             ogRt.anchorMax = new Vector2(1f, 0f);
@@ -1410,7 +1893,10 @@ namespace SundayLastBreath.UI
             int traitCount = p != null && p.traits != null ? p.traits.Count : 0;
             if (traitsCountHeaderText != null)
             {
-                traitsCountHeaderText.text = $"// PERKS & DRAWBACKS ({traitCount})";
+                traitsCountHeaderText.text = useStyleDHardwareTheme
+                    ? $"PERKS & DRAWBACKS ({traitCount})"
+                    : $"// PERKS & DRAWBACKS ({traitCount})";
+                if (useStyleDHardwareTheme) traitsCountHeaderText.color = ColStyleDMutedStone;
             }
             if (survivorTabLabels.Count > (int)SurvivorSubTab.Traits && survivorTabLabels[(int)SurvivorSubTab.Traits] != null)
             {
@@ -1456,6 +1942,15 @@ namespace SundayLastBreath.UI
                 rOl.effectColor = isDrawback
                     ? new Color(0.58f, 0.16f, 0.18f, 0.90f)
                     : new Color(0.16f, 0.48f, 0.22f, 0.90f);
+
+                if (useStyleDHardwareTheme && styleDStatCardSprite != null)
+                {
+                    Color cardTint = isDrawback
+                        ? new Color(0.95f, 0.72f, 0.70f, 1f)
+                        : new Color(0.76f, 0.92f, 0.80f, 1f);
+                    ApplySlicedSprite(rBg, styleDStatCardSprite, 3.2f, cardTint, disableOutline: false);
+                    rOl.enabled = false;
+                }
 
                 // Trait Icon on Left (40x40)
                 GameObject icGo = new GameObject("Icon", typeof(RectTransform));
@@ -1713,6 +2208,8 @@ namespace SundayLastBreath.UI
                 "Nothing loose on the floor in this area right now.", 12f, ColTextMuted,
                 TextAlignmentOptions.Center, FontStyles.Italic, FontRole.Body, wrap: true);
             StretchFull(inlineFloorEmptyText.rectTransform, 16f, 16f, 16f, 44f);
+
+            EnsureReaderFontControlsAndScrollLockUI();
         }
 
         private void BuildBottomRightActionPanel()
@@ -1825,7 +2322,7 @@ namespace SundayLastBreath.UI
                 tsBg.sprite = GetWhiteSprite();
                 tsBg.color = ColPanelBg;
                 Outline tsOl = topStage.GetComponent<Outline>() ?? topStage.gameObject.AddComponent<Outline>();
-                tsOl.effectColor = ColBorderSlate;
+                tsOl.effectColor = ColBorderActive;
                 tsOl.effectDistance = new Vector2(1.5f, -1.5f);
 
                 Transform framedStage = topStage.Find("FramedStage");
@@ -1948,8 +2445,8 @@ namespace SundayLastBreath.UI
                                 var apTmp = ap.GetComponent<TextMeshProUGUI>();
                                 if (apTmp != null)
                                 {
-                                    apTmp.alignment = TextAlignmentOptions.MidlineLeft;
-                                    apTmp.fontSize = 8.5f;
+                                    apTmp.alignment = useStyleDHardwareTheme ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft;
+                                    apTmp.fontSize = useStyleDHardwareTheme ? 8.2f : 8.5f;
                                     apTmp.textWrappingMode = TextWrappingModes.NoWrap;
                                     apTmp.overflowMode = TextOverflowModes.Ellipsis;
                                 }
@@ -1969,7 +2466,8 @@ namespace SundayLastBreath.UI
             // Always enforce horizontal mini-map rotation + base scale (even when BlueprintViewport was already reparented)
             if (hubScreen.TacticalMap != null)
             {
-                hubScreen.TacticalMap.SetHorizontalMiniMapMode(true, 1.08f);
+                float miniScale = useStyleDHardwareTheme ? 0.88f : MiniMapBaseScale;
+                hubScreen.TacticalMap.SetHorizontalMiniMapMode(true, miniScale);
             }
 
             // Enforce clean simplified legend on the blueprint mini-map
@@ -1979,7 +2477,9 @@ namespace SundayLastBreath.UI
                 var lTmp = bpLegend.GetComponent<TextMeshProUGUI>();
                 if (lTmp != null)
                 {
-                    lTmp.text = "<color=#00c7f2>■</color> CURRENT  <color=#94a3b8>■</color> VISITED  <color=#0a0f16>■</color> UNVISITED  <color=#ea2e38>■</color> LOCKED  <color=#f59e0b>■</color> BLOCKED";
+                    lTmp.text = useStyleDHardwareTheme
+                        ? "<color=#D95829>■</color> CURRENT  <color=#8C8578>■</color> VISITED  <color=#2B2823>■</color> UNVISITED  <color=#C94A29>■</color> LOCKED  <color=#CF9232>■</color> BLOCKED"
+                        : "<color=#00c7f2>■</color> CURRENT  <color=#94a3b8>■</color> VISITED  <color=#0a0f16>■</color> UNVISITED  <color=#ea2e38>■</color> LOCKED  <color=#f59e0b>■</color> BLOCKED";
                     lTmp.fontSize = 6.8f;
                     lTmp.textWrappingMode = TextWrappingModes.NoWrap;
                 }
@@ -2080,14 +2580,31 @@ namespace SundayLastBreath.UI
 
             if (inspectorOpenGearBtn == null && topLeftInventoryPanel != null)
             {
-                Transform tr = topLeftInventoryPanel.Find("Body/Inspector/Btn_OpenFullGear");
+                Transform tr = topLeftInventoryPanel.Find("Body/MicroInspector/Btn_OpenFullGear") ??
+                               topLeftInventoryPanel.Find("Body/Inspector/Btn_OpenFullGear");
                 if (tr != null) inspectorOpenGearBtn = tr.GetComponent<Button>();
             }
 
             if (inspectorOpenGearBtn != null)
             {
+                Color dropBg = new Color(0.22f, 0.11f, 0.11f, 1f);
+                Color dropHover = new Color(0.32f, 0.15f, 0.15f, 1f);
+                Image dropImg = inspectorOpenGearBtn.GetComponent<Image>();
+                if (dropImg != null) dropImg.color = dropBg;
+                ConfigureButtonColors(inspectorOpenGearBtn, dropBg, dropHover);
+
+                Outline dropOl = inspectorOpenGearBtn.GetComponent<Outline>();
+                if (dropOl != null) dropOl.effectColor = new Color(0.72f, 0.26f, 0.24f, 0.9f);
+
+                TextMeshProUGUI dropLbl = inspectorOpenGearBtn.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (dropLbl != null)
+                {
+                    dropLbl.text = "DROP";
+                    dropLbl.color = new Color(0.96f, 0.78f, 0.76f, 1f);
+                }
+
                 inspectorOpenGearBtn.onClick.RemoveAllListeners();
-                inspectorOpenGearBtn.onClick.AddListener(() => hubScreen.SwitchConsoleMode(GameStageScreen.ConsoleMode.Gear));
+                inspectorOpenGearBtn.onClick.AddListener(OnInspectorDropClicked);
             }
 
             if (survivorTabButtons.Count == 0 && topRightSurvivorPanel != null)
@@ -2254,6 +2771,26 @@ namespace SundayLastBreath.UI
 
             HookCloseButtonOnDock(hubScreen.DockContainerPDA);
             HookCloseButtonOnDock(hubScreen.DockContainerGear);
+
+            BindPanelHoverTrigger(topLeftInventoryPanel, h => _hoverInventory = h);
+            BindPanelHoverTrigger(topRightSurvivorPanel, h => _hoverSurvivor = h);
+            BindPanelHoverTrigger(bottomLeftMapPanel, h => _hoverMap = h);
+        }
+
+        private static void BindPanelHoverTrigger(RectTransform panel, Action<bool> onHoverChanged)
+        {
+            if (panel == null || onHoverChanged == null) return;
+            EventTrigger et = panel.GetComponent<EventTrigger>();
+            if (et == null) et = panel.gameObject.AddComponent<EventTrigger>();
+            et.triggers.Clear();
+
+            var enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener(_ => onHoverChanged(true));
+            et.triggers.Add(enterEntry);
+
+            var exitEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+            exitEntry.callback.AddListener(_ => onHoverChanged(false));
+            et.triggers.Add(exitEntry);
         }
 
         private void HookCloseButtonOnDock(GameObject dockObj)
@@ -2292,13 +2829,16 @@ namespace SundayLastBreath.UI
 
         private void BuildMapViewer()
         {
+            bool styleD = useStyleDHardwareTheme;
+            if (styleD) EnsureStyleDSpritesLoaded();
+
             mapViewerRoot = new GameObject("Hybrid_MapViewer", typeof(RectTransform));
             mapViewerRoot.transform.SetParent(transform, false);
             StretchFull(mapViewerRoot.GetComponent<RectTransform>());
 
             Image dim = mapViewerRoot.AddComponent<Image>();
             dim.sprite = GetWhiteSprite();
-            dim.color = new Color(0f, 0f, 0f, 0.86f);
+            dim.color = styleD ? StyleDThemeUtility.ColBackdrop : new Color(0f, 0f, 0f, 0.86f);
             Button dimBtn = mapViewerRoot.AddComponent<Button>();
             dimBtn.transition = Selectable.Transition.None;
             dimBtn.onClick.AddListener(CloseMapViewer);
@@ -2311,35 +2851,87 @@ namespace SundayLastBreath.UI
             pRt.offsetMin = Vector2.zero;
             pRt.offsetMax = Vector2.zero;
             Image pImg = panel.AddComponent<Image>();
-            pImg.sprite = GetWhiteSprite();
-            pImg.color = ColPanelBg;
             Outline pOl = panel.AddComponent<Outline>();
             pOl.effectColor = ColBorderSlate;
             pOl.effectDistance = new Vector2(1.5f, -1.5f);
+            if (styleD && styleDPanelChassisSprite != null)
+            {
+                ApplySlicedSprite(pImg, styleDPanelChassisSprite, 3.2f, Color.white, disableOutline: true);
+            }
+            else
+            {
+                pImg.sprite = GetWhiteSprite();
+                pImg.color = ColPanelBg;
+            }
 
-            TextMeshProUGUI title = CreateText(panel.transform, "Title", "// FLOOR BLUEPRINT // TACTICAL MAP VIEWER", 16f,
-                ColAmber, TextAlignmentOptions.MidlineLeft, FontStyles.Bold, FontRole.Display, wrap: false);
+            TextMeshProUGUI title = CreateText(
+                panel.transform,
+                "Title",
+                styleD ? "FLOOR BLUEPRINT - TACTICAL MAP VIEWER" : "// FLOOR BLUEPRINT // TACTICAL MAP VIEWER",
+                styleD ? 13.5f : 16f,
+                styleD ? ColStyleDBoneText : ColAmber,
+                TextAlignmentOptions.MidlineLeft,
+                FontStyles.Bold,
+                FontRole.Display,
+                wrap: false);
             RectTransform tRt = title.rectTransform;
             tRt.anchorMin = new Vector2(0f, 1f);
             tRt.anchorMax = new Vector2(1f, 1f);
             tRt.pivot = new Vector2(0f, 1f);
-            tRt.offsetMin = new Vector2(16f, -44f);
-            tRt.offsetMax = new Vector2(-260f, -6f);
+            tRt.offsetMin = styleD ? new Vector2(22f, -52f) : new Vector2(16f, -44f);
+            tRt.offsetMax = styleD ? new Vector2(-260f, -16f) : new Vector2(-260f, -6f);
+
+            if (styleD)
+            {
+                GameObject hdrLine = new GameObject("HeaderDivider", typeof(RectTransform), typeof(Image));
+                hdrLine.transform.SetParent(panel.transform, false);
+                RectTransform hlRt = hdrLine.GetComponent<RectTransform>();
+                hlRt.anchorMin = new Vector2(0f, 1f);
+                hlRt.anchorMax = new Vector2(1f, 1f);
+                hlRt.pivot = new Vector2(0.5f, 1f);
+                hlRt.offsetMin = new Vector2(18f, -55f);
+                hlRt.offsetMax = new Vector2(-18f, -54f);
+                Image hlImg = hdrLine.GetComponent<Image>();
+                hlImg.color = ColStyleDHeaderLine;
+                hlImg.raycastTarget = false;
+            }
 
             Button closeBtn = CreateActionPill(panel.transform, "BtnCloseMap", "[ X ] CLOSE MAP  [M / ESC]",
-                new Color(0.30f, 0.07f, 0.07f, 1f), new Color(0.85f, 0.25f, 0.25f, 1f), out _, 12f);
+                new Color(0.30f, 0.07f, 0.07f, 1f), new Color(0.85f, 0.25f, 0.25f, 1f), out _, styleD ? 10.5f : 12f);
             RectTransform cRt = closeBtn.GetComponent<RectTransform>();
             cRt.anchorMin = new Vector2(1f, 1f);
             cRt.anchorMax = new Vector2(1f, 1f);
             cRt.pivot = new Vector2(1f, 1f);
-            cRt.anchoredPosition = new Vector2(-12f, -8f);
-            cRt.sizeDelta = new Vector2(230f, 32f);
+            cRt.anchoredPosition = styleD ? new Vector2(-18f, -16f) : new Vector2(-12f, -8f);
+            cRt.sizeDelta = styleD ? new Vector2(220f, 32f) : new Vector2(230f, 32f);
             closeBtn.onClick.AddListener(CloseMapViewer);
+            if (styleD)
+            {
+                ApplyButtonSprite(
+                    closeBtn,
+                    StyleDThemeUtility.WithRgbScale(ColStyleDRust, 0.75f),
+                    ColStyleDRust,
+                    2.8f,
+                    ColStyleDBoneText);
+            }
 
             GameObject host = new GameObject("MapHost", typeof(RectTransform), typeof(RectMask2D));
             host.transform.SetParent(panel.transform, false);
             mapViewerHost = host.GetComponent<RectTransform>();
-            StretchFull(mapViewerHost, 12f, 12f, 12f, 52f);
+            if (styleD)
+            {
+                StretchFull(mapViewerHost, 18f, 18f, 18f, 60f);
+                if (styleDWellRecessedSprite != null)
+                {
+                    Image hostWell = host.AddComponent<Image>();
+                    hostWell.raycastTarget = false;
+                    ApplySlicedSprite(hostWell, styleDWellRecessedSprite, 3.2f, Color.white);
+                }
+            }
+            else
+            {
+                StretchFull(mapViewerHost, 12f, 12f, 12f, 52f);
+            }
 
             mapViewerRoot.SetActive(false);
         }
@@ -2355,10 +2947,12 @@ namespace SundayLastBreath.UI
 
             if (mapViewerRoot != null)
             {
-                var titleTmp = mapViewerRoot.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                var titleTmp = mapViewerRoot.transform.Find("Panel/Title")?.GetComponent<TextMeshProUGUI>();
                 if (titleTmp != null && mapHeaderTitle != null && !string.IsNullOrEmpty(mapHeaderTitle.text))
                 {
-                    titleTmp.text = mapHeaderTitle.text;
+                    titleTmp.text = useStyleDHardwareTheme
+                        ? StripLeadingSlashes(mapHeaderTitle.text)
+                        : mapHeaderTitle.text;
                 }
             }
 
@@ -2427,8 +3021,8 @@ namespace SundayLastBreath.UI
                     var apTmp = apClose.GetComponent<TextMeshProUGUI>();
                     if (apTmp != null)
                     {
-                        apTmp.alignment = TextAlignmentOptions.MidlineLeft;
-                        apTmp.fontSize = 8.5f;
+                        apTmp.alignment = useStyleDHardwareTheme ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft;
+                        apTmp.fontSize = useStyleDHardwareTheme ? 8.2f : 8.5f;
                     }
                 }
 
@@ -2439,8 +3033,13 @@ namespace SundayLastBreath.UI
             mapViewerRoot.SetActive(false);
             if (hubScreen != null && hubScreen.TacticalMap != null)
             {
-                hubScreen.TacticalMap.SetHorizontalMiniMapMode(true, MiniMapBaseScale);
+                float miniScale = useStyleDHardwareTheme ? 0.88f : MiniMapBaseScale;
+                hubScreen.TacticalMap.SetHorizontalMiniMapMode(true, miniScale);
                 hubScreen.TacticalMap.RefreshAllNodes();
+            }
+            if (useStyleDHardwareTheme)
+            {
+                StyleStyleDMapAndNotePanel();
             }
         }
         #endregion
@@ -2458,18 +3057,38 @@ namespace SundayLastBreath.UI
             for (int i = 0; i < readerTabBgs.Count; i++)
             {
                 bool active = i == (int)tab;
-                if (readerTabBgs[i] != null)
-                    readerTabBgs[i].color = active ? new Color(0.16f, 0.21f, 0.30f, 1f) : ColSlotBg;
-                if (i < readerTabLabels.Count && readerTabLabels[i] != null)
-                    readerTabLabels[i].color = active ? ColAmber : ColTextMuted;
+                if (useStyleDHardwareTheme)
+                {
+                    Color tabCol = active ? ColStyleDRust : ColStyleDTabInactive;
+                    Color hovCol = active ? ColStyleDRust * 1.15f : ColStyleDMetalBtn * 1.25f;
+                    if (readerTabBgs[i] != null)
+                    {
+                        readerTabBgs[i].color = Color.white;
+                        if (readerTabBgs[i].canvasRenderer != null) readerTabBgs[i].canvasRenderer.SetColor(tabCol);
+                    }
+                    if (i < readerTabButtons.Count && readerTabButtons[i] != null)
+                    {
+                        ConfigureButtonColors(readerTabButtons[i], tabCol, hovCol);
+                    }
+                    if (i < readerTabLabels.Count && readerTabLabels[i] != null)
+                        readerTabLabels[i].color = active ? Color.white : ColStyleDBoneText;
+                }
+                else
+                {
+                    if (readerTabBgs[i] != null)
+                        readerTabBgs[i].color = active ? new Color(0.16f, 0.21f, 0.30f, 1f) : ColSlotBg;
+                    if (i < readerTabLabels.Count && readerTabLabels[i] != null)
+                        readerTabLabels[i].color = active ? ColAmber : ColTextMuted;
+                }
             }
 
             RefreshReaderTabsContent();
 
-            if (tab == ReaderTab.StoryLog && inlineStoryLogScroll != null)
+            if (tab == ReaderTab.StoryLog && inlineStoryLogScroll != null && !_storyLogScrolledBack)
             {
                 Canvas.ForceUpdateCanvases();
                 inlineStoryLogScroll.verticalNormalizedPosition = 0f;
+                UpdateStoryLogScrollLockState();
             }
         }
 
@@ -2486,10 +3105,29 @@ namespace SundayLastBreath.UI
             for (int i = 0; i < survivorTabBgs.Count; i++)
             {
                 bool active = i == (int)tab;
-                if (survivorTabBgs[i] != null)
-                    survivorTabBgs[i].color = active ? new Color(0.16f, 0.21f, 0.30f, 1f) : ColSlotBg;
-                if (i < survivorTabLabels.Count && survivorTabLabels[i] != null)
-                    survivorTabLabels[i].color = active ? ColAmber : ColTextMuted;
+                if (useStyleDHardwareTheme)
+                {
+                    Color tabCol = active ? ColStyleDRust : ColStyleDTabInactive;
+                    Color hovCol = active ? ColStyleDRust * 1.15f : ColStyleDMetalBtn * 1.25f;
+                    if (survivorTabBgs[i] != null)
+                    {
+                        survivorTabBgs[i].color = Color.white;
+                        if (survivorTabBgs[i].canvasRenderer != null) survivorTabBgs[i].canvasRenderer.SetColor(tabCol);
+                    }
+                    if (i < survivorTabButtons.Count && survivorTabButtons[i] != null)
+                    {
+                        ConfigureButtonColors(survivorTabButtons[i], tabCol, hovCol);
+                    }
+                    if (i < survivorTabLabels.Count && survivorTabLabels[i] != null)
+                        survivorTabLabels[i].color = active ? Color.white : ColStyleDBoneText;
+                }
+                else
+                {
+                    if (survivorTabBgs[i] != null)
+                        survivorTabBgs[i].color = active ? new Color(0.16f, 0.21f, 0.30f, 1f) : ColSlotBg;
+                    if (i < survivorTabLabels.Count && survivorTabLabels[i] != null)
+                        survivorTabLabels[i].color = active ? ColAmber : ColTextMuted;
+                }
             }
 
             if (tab == SurvivorSubTab.Traits && traitsScrollContent != null)
@@ -2504,6 +3142,11 @@ namespace SundayLastBreath.UI
         private void RefreshTopCenterHeader()
         {
             if (topCenterBadgeText == null || hubScreen == null) return;
+            if (useStyleDHardwareTheme)
+            {
+                topCenterBadgeText.text = "";
+                return;
+            }
             string room = hubScreen.CurrentInspectedRoom;
             if (!string.IsNullOrEmpty(room))
             {
@@ -2595,10 +3238,16 @@ namespace SundayLastBreath.UI
                 }
             }
 
-            BindCategorySlots("WPN", wpnList);
-            BindCategorySlots("APPAREL", appList);
-            BindCategorySlots("CONSUMABLE", conList);
-            BindCategorySlots("UTILITY", utlList);
+            ComputeCategorySlotAllocations(
+                p,
+                new[] { wpnList.Count, appList.Count, conList.Count, utlList.Count },
+                out int[] visiblePerCat,
+                out int[] perkSlotsPerCat);
+
+            BindCategorySlots("WPN", wpnList, visiblePerCat[0], perkSlotsPerCat[0]);
+            BindCategorySlots("APPAREL", appList, visiblePerCat[1], perkSlotsPerCat[1]);
+            BindCategorySlots("CONSUMABLE", conList, visiblePerCat[2], perkSlotsPerCat[2]);
+            BindCategorySlots("UTILITY", utlList, visiblePerCat[3], perkSlotsPerCat[3]);
 
             // Validate that the currently selected item actually exists in the character's gear or backpack
             if (!string.IsNullOrEmpty(_selectedItemId))
@@ -2633,23 +3282,141 @@ namespace SundayLastBreath.UI
             }
         }
 
+        private static void ComputeCategorySlotAllocations(
+            CharacterData p,
+            int[] entryCounts,
+            out int[] visiblePerCat,
+            out int[] perkSlotsPerCat)
+        {
+            // Order matches category indices: 0=WPN, 1=APPAREL, 2=CONSUMABLE, 3=UTILITY
+            int[] maxPerCat = { 5, 5, 10, 10 };
+            visiblePerCat = new[] { 3, 3, 3, 3 };
+            perkSlotsPerCat = new[] { 0, 0, 0, 0 };
+
+            int maxBagSlots = p != null ? Mathf.Max(6, p.bagLimit) : 12;
+            int[] expandPriority = { 2, 3, 0, 1 };
+            int[] shrinkPriority = { 3, 2, 1, 0 };
+
+            int remainingToAdd = Mathf.Max(0, maxBagSlots - 12);
+            while (remainingToAdd > 0)
+            {
+                bool added = false;
+                for (int i = 0; i < expandPriority.Length && remainingToAdd > 0; i++)
+                {
+                    int catIdx = expandPriority[i];
+                    if (visiblePerCat[catIdx] < maxPerCat[catIdx])
+                    {
+                        visiblePerCat[catIdx]++;
+                        remainingToAdd--;
+                        added = true;
+                    }
+                }
+                if (!added) break;
+            }
+
+            int remainingToRemove = Mathf.Max(0, 12 - maxBagSlots);
+            while (remainingToRemove > 0)
+            {
+                bool removed = false;
+                for (int i = 0; i < shrinkPriority.Length && remainingToRemove > 0; i++)
+                {
+                    int catIdx = shrinkPriority[i];
+                    if (visiblePerCat[catIdx] > 1)
+                    {
+                        visiblePerCat[catIdx]--;
+                        remainingToRemove--;
+                        removed = true;
+                    }
+                }
+                if (!removed) break;
+            }
+
+            int perkBonusTotal = (p != null && p.HasTrait("HIKER")) ? 2 : Mathf.Max(0, maxBagSlots - 12);
+            int perkRemaining = perkBonusTotal;
+            while (perkRemaining > 0)
+            {
+                bool marked = false;
+                for (int i = 0; i < expandPriority.Length && perkRemaining > 0; i++)
+                {
+                    int catIdx = expandPriority[i];
+                    if (perkSlotsPerCat[catIdx] < visiblePerCat[catIdx])
+                    {
+                        perkSlotsPerCat[catIdx]++;
+                        perkRemaining--;
+                        marked = true;
+                    }
+                }
+                if (!marked) break;
+            }
+
+            // Rebalance empty slots across categories when a category holds more items than its base slots
+            // (e.g., equipped gear and key items take 0 bag slots yet still appear in category grids).
+            for (int c = 0; c < 4; c++)
+            {
+                int targetCount = Mathf.Min(maxPerCat[c], entryCounts[c]);
+                while (visiblePerCat[c] < targetCount)
+                {
+                    int donor = -1;
+                    // Prefer borrowing non-perk surplus slots first
+                    for (int d = 0; d < 4; d++)
+                    {
+                        if (d != c && visiblePerCat[d] - Mathf.Max(1, entryCounts[d]) > perkSlotsPerCat[d])
+                        {
+                            donor = d;
+                            break;
+                        }
+                    }
+                    if (donor < 0)
+                    {
+                        for (int d = 0; d < 4; d++)
+                        {
+                            if (d != c && visiblePerCat[d] > Mathf.Max(1, entryCounts[d]))
+                            {
+                                donor = d;
+                                break;
+                            }
+                        }
+                    }
+                    visiblePerCat[c]++;
+                    if (donor >= 0)
+                    {
+                        visiblePerCat[donor]--;
+                        perkSlotsPerCat[donor] = Mathf.Min(perkSlotsPerCat[donor], visiblePerCat[donor]);
+                    }
+                }
+            }
+        }
+
         private static void AddEquippedEntry(string itemId, List<DisplaySlotEntry> list)
         {
             if (string.IsNullOrEmpty(itemId) || itemId.Equals("none", StringComparison.OrdinalIgnoreCase)) return;
             list.Add(new DisplaySlotEntry { itemId = itemId, quantity = 1, isEquipped = true });
         }
 
-        private void BindCategorySlots(string categoryTag, List<DisplaySlotEntry> entries)
+        private void BindCategorySlots(string categoryTag, List<DisplaySlotEntry> entries, int visibleSlots, int perkBonusSlots)
         {
-            int idx = 0;
+            int entryIdx = 0;
+            int catSlotIdx = 0;
             for (int i = 0; i < inventorySlots.Count; i++)
             {
                 SlotUI slot = inventorySlots[i];
                 if (slot.categoryTag != categoryTag) continue;
 
-                if (idx < entries.Count)
+                if (catSlotIdx >= visibleSlots)
                 {
-                    var e = entries[idx++];
+                    if (slot.root != null && slot.root.activeSelf) slot.root.SetActive(false);
+                    slot.boundItemId = "";
+                    slot.isEquipped = false;
+                    catSlotIdx++;
+                    continue;
+                }
+
+                if (slot.root != null && !slot.root.activeSelf) slot.root.SetActive(true);
+                bool isPerkSlot = perkBonusSlots > 0 && catSlotIdx >= (visibleSlots - perkBonusSlots);
+
+                if (entryIdx < entries.Count)
+                {
+                    var e = entries[entryIdx++];
                     slot.boundItemId = e.itemId;
                     slot.isEquipped = e.isEquipped;
 
@@ -2673,14 +3440,45 @@ namespace SundayLastBreath.UI
                                       string.Equals(_selectedItemId, e.itemId, StringComparison.OrdinalIgnoreCase) &&
                                       _selectedIsEquipped == e.isEquipped;
                     var def = ItemDatabase.GetDefinition(e.itemId);
-                    if (slot.outline != null)
+                    if (useStyleDHardwareTheme)
                     {
-                        slot.outline.effectColor = isSelected ? ColAmber : ItemDatabase.GetCategoryBorderColor(def.category);
+                        if (slot.outline != null)
+                        {
+                            slot.outline.enabled = isSelected;
+                            if (isSelected)
+                            {
+                                slot.outline.effectColor = ColStyleDAmber;
+                                slot.outline.effectDistance = new Vector2(1.6f, -1.6f);
+                            }
+                        }
+                        if (slot.bgImage != null)
+                        {
+                            slot.bgImage.color = isSelected
+                                ? new Color(1.0f, 0.90f, 0.72f, 1f)
+                                : new Color(0.95f, 0.95f, 0.95f, 1f);
+                        }
                     }
-                    if (slot.bgImage != null)
+                    else
                     {
-                        slot.bgImage.color = isSelected ? new Color(0.16f, 0.14f, 0.08f, 1f) : new Color(0.08f, 0.105f, 0.15f, 1f);
+                        if (slot.outline != null)
+                        {
+                            if (isSelected)
+                            {
+                                slot.outline.effectColor = ColAmber;
+                            }
+                            else
+                            {
+                                Color catCol = ItemDatabase.GetCategoryBorderColor(def.category);
+                                catCol.a *= 0.55f;
+                                slot.outline.effectColor = catCol;
+                            }
+                        }
+                        if (slot.bgImage != null)
+                        {
+                            slot.bgImage.color = isSelected ? new Color(0.16f, 0.14f, 0.08f, 1f) : new Color(0.08f, 0.105f, 0.15f, 1f);
+                        }
                     }
+                    ApplyPerkSlotHue(slot, isPerkSlot, isSelected);
                 }
                 else
                 {
@@ -2689,9 +3487,77 @@ namespace SundayLastBreath.UI
                     if (slot.iconImage != null) { slot.iconImage.sprite = null; slot.iconImage.enabled = false; }
                     if (slot.eqpBadge != null) slot.eqpBadge.text = "";
                     if (slot.countLabel != null) slot.countLabel.text = "";
-                    if (slot.outline != null) slot.outline.effectColor = ColBorderSlate;
-                    if (slot.bgImage != null) slot.bgImage.color = ColSlotBg;
+                    if (useStyleDHardwareTheme)
+                    {
+                        if (slot.outline != null) slot.outline.enabled = false;
+                        if (slot.bgImage != null) slot.bgImage.color = Color.white;
+                    }
+                    else
+                    {
+                        if (slot.outline != null) slot.outline.effectColor = ColBorderSubtle;
+                        if (slot.bgImage != null) slot.bgImage.color = ColSlotBg;
+                    }
+                    ApplyPerkSlotHue(slot, isPerkSlot, isSelected: false);
                 }
+
+                catSlotIdx++;
+            }
+        }
+
+        private void ApplyPerkSlotHue(SlotUI slot, bool isPerkSlot, bool isSelected)
+        {
+            if (slot == null || slot.root == null) return;
+
+            Transform overlayTr = slot.root.transform.Find("PerkHueOverlay");
+            if (!isPerkSlot)
+            {
+                if (overlayTr != null && overlayTr.gameObject.activeSelf)
+                    overlayTr.gameObject.SetActive(false);
+                return;
+            }
+
+            Image overlayImg;
+            if (overlayTr == null)
+            {
+                GameObject overlayGo = new GameObject("PerkHueOverlay", typeof(RectTransform));
+                overlayGo.transform.SetParent(slot.root.transform, false);
+                overlayGo.transform.SetSiblingIndex(0);
+                RectTransform oRt = overlayGo.GetComponent<RectTransform>();
+                oRt.anchorMin = Vector2.zero;
+                oRt.anchorMax = Vector2.one;
+                oRt.offsetMin = new Vector2(4f, 4f);
+                oRt.offsetMax = new Vector2(-4f, -4f);
+                overlayImg = overlayGo.AddComponent<Image>();
+                overlayImg.sprite = GetWhiteSprite();
+                overlayImg.raycastTarget = false;
+            }
+            else
+            {
+                if (!overlayTr.gameObject.activeSelf)
+                    overlayTr.gameObject.SetActive(true);
+                overlayTr.SetSiblingIndex(0);
+                overlayImg = overlayTr.GetComponent<Image>();
+            }
+
+            if (overlayImg != null)
+            {
+                overlayImg.color = isSelected
+                    ? new Color(0.22f, 0.85f, 0.45f, 0.065f)
+                    : new Color(0.14f, 0.72f, 0.36f, 0.035f);
+            }
+
+            if (slot.bgImage != null)
+            {
+                slot.bgImage.color = isSelected
+                    ? new Color(0.88f, 1.0f, 0.84f, 1f)
+                    : new Color(0.80f, 1.0f, 0.86f, 1f);
+            }
+
+            if (slot.outline != null && !isSelected)
+            {
+                slot.outline.enabled = true;
+                slot.outline.effectColor = new Color(0.24f, 0.68f, 0.38f, 0.32f);
+                slot.outline.effectDistance = new Vector2(1.0f, -1.0f);
             }
         }
 
@@ -2735,6 +3601,7 @@ namespace SundayLastBreath.UI
                 if (inspectorStats != null) inspectorStats.text = "Select an inventory slot above";
                 if (inspectorDesc != null) inspectorDesc.text = "Weapons, clothing, meds, and key items sync automatically.";
                 if (inspectorUseEquipBtn != null) inspectorUseEquipBtn.gameObject.SetActive(false);
+                if (inspectorOpenGearBtn != null) inspectorOpenGearBtn.gameObject.SetActive(false);
                 return;
             }
 
@@ -2793,6 +3660,12 @@ namespace SundayLastBreath.UI
                     inspectorUseEquipBtn.gameObject.SetActive(false);
                 }
             }
+
+            if (inspectorOpenGearBtn != null)
+            {
+                bool canDrop = !ItemDatabase.IsKeyItem(_selectedItemId);
+                inspectorOpenGearBtn.gameObject.SetActive(canDrop);
+            }
         }
 
         private void OnInspectorUseOrEquipClicked()
@@ -2827,6 +3700,50 @@ namespace SundayLastBreath.UI
             hubScreen.RefreshFromHybridCockpit();
         }
 
+        private void OnInspectorDropClicked()
+        {
+            if (hubScreen == null || hubScreen.CurrentPlayer == null || string.IsNullOrEmpty(_selectedItemId)) return;
+            if (ItemDatabase.IsKeyItem(_selectedItemId)) return;
+
+            CharacterData p = hubScreen.CurrentPlayer;
+            var def = ItemDatabase.GetDefinition(_selectedItemId);
+            string droppedItemId = "";
+
+            if (_selectedIsEquipped && def != null && !string.IsNullOrEmpty(def.EquipSlot))
+            {
+                droppedItemId = p.DropEquipped(def.EquipSlot);
+                if (!string.IsNullOrEmpty(droppedItemId))
+                {
+                    _selectedIsEquipped = false;
+                }
+            }
+            else if (p.RemoveItem(_selectedItemId, 1))
+            {
+                droppedItemId = _selectedItemId;
+            }
+
+            if (string.IsNullOrEmpty(droppedItemId)) return;
+
+            var stash = hubScreen.GetCurrentFloorStashPublic();
+            if (stash != null)
+            {
+                var existing = stash.Find(f => string.Equals(f.itemId, droppedItemId, StringComparison.OrdinalIgnoreCase));
+                if (existing != null) existing.quantity += 1;
+                else stash.Add(new InventoryEntry(droppedItemId, 1));
+            }
+
+            AudioManager.Instance?.PlayButtonClick();
+            string displayName = def != null && !string.IsNullOrEmpty(def.displayName) ? def.displayName : droppedItemId;
+            if (!p.HasItem(droppedItemId))
+            {
+                _selectedItemId = "";
+                _selectedIsEquipped = false;
+            }
+
+            hubScreen.SetSituationNarration($"<color=#F59E0B>[ITEM DROPPED]</color> Dropped {displayName} onto the floor (see FLOOR tab).");
+            hubScreen.RefreshFromHybridCockpit();
+        }
+
         private void RefreshSurvivorPanel()
         {
             CharacterData p = hubScreen != null ? hubScreen.CurrentPlayer : null;
@@ -2834,23 +3751,23 @@ namespace SundayLastBreath.UI
 
             if (p == null)
             {
-                if (survivorLvlDayText != null) survivorLvlDayText.text = $"LVL 1 // DAY {dayCount}";
+                if (survivorLvlDayText != null) survivorLvlDayText.text = useStyleDHardwareTheme ? $"LVL 1 | DAY {dayCount}" : $"LVL 1 // DAY {dayCount}";
                 return;
             }
 
-            if (survivorLvlDayText != null) survivorLvlDayText.text = $"LVL {p.level} // DAY {dayCount}";
+            if (survivorLvlDayText != null) survivorLvlDayText.text = useStyleDHardwareTheme ? $"LVL {p.level} | DAY {dayCount}" : $"LVL {p.level} // DAY {dayCount}";
             if (survivorNameText != null) survivorNameText.text = p.FullName.ToUpperInvariant();
-            if (survivorJobText != null) survivorJobText.text = $"{p.job.ToUpperInvariant()} // {p.gender.ToUpperInvariant()}";
+            if (survivorJobText != null) survivorJobText.text = useStyleDHardwareTheme ? $"{p.job.ToUpperInvariant()} | {p.gender.ToUpperInvariant()}" : $"{p.job.ToUpperInvariant()} // {p.gender.ToUpperInvariant()}";
 
             if (hungerValueText != null)
             {
-                Color hCol = p.hunger <= 25 ? ColAmber : ColTextMain;
+                Color hCol = p.hunger <= 25 ? (useStyleDHardwareTheme ? ColStyleDAmber : ColAmber) : (useStyleDHardwareTheme ? ColStyleDBoneText : ColTextMain);
                 hungerValueText.text = $"<color=#{ColorUtility.ToHtmlStringRGB(hCol)}>HUNGER {p.hunger}%</color>";
             }
 
             if (thirstValueText != null)
             {
-                Color tCol = p.thirst <= 25 ? ColAmber : ColTextMain;
+                Color tCol = p.thirst <= 25 ? (useStyleDHardwareTheme ? ColStyleDAmber : ColAmber) : (useStyleDHardwareTheme ? ColStyleDBoneText : ColTextMain);
                 thirstValueText.text = $"<color=#{ColorUtility.ToHtmlStringRGB(tCol)}>THIRST {p.thirst}%</color>";
             }
 
@@ -2861,6 +3778,29 @@ namespace SundayLastBreath.UI
             SetVitalBar(0, p.hp, p.hpMax);
             SetVitalBar(1, p.stamina, p.staminaMax);
             SetVitalBar(2, p.humanity, 100);
+
+            if (useStyleDHardwareTheme)
+            {
+                float hp01 = (float)p.hp / Mathf.Max(1, p.hpMax);
+                if (_styleDEcg != null) _styleDEcg.SetHealthNormalized(hp01);
+
+                SetStyleDMortalValue("MGT", p.Might);
+                SetStyleDMortalValue("OBS", p.Observation);
+                SetStyleDMortalValue("RFL", p.Reflex);
+                SetStyleDMortalValue("TAC", p.Tactics);
+                SetStyleDMortalValue("AUS", p.Auspice);
+                SetStyleDMortalValue("LDR", p.Leadership);
+
+                if (_styleDConditionText != null)
+                {
+                    if (hp01 < 0.30f)
+                        _styleDConditionText.text = "CONDITION: <color=#E04242>CRITICAL</color>";
+                    else if (hp01 < 0.60f || p.stamina < Mathf.RoundToInt(p.staminaMax * 0.35f) || p.hunger <= 25 || p.thirst <= 25)
+                        _styleDConditionText.text = "CONDITION: <color=#E09C2B>CAUTION</color>";
+                    else
+                        _styleDConditionText.text = "CONDITION: <color=#3AD679>STABLE</color>";
+                }
+            }
 
             // Core M.O.R.T.A.L. Attributes (6 bars, scale 1-10)
             SetStatBarRowValue("MGT", p.Might, 10, showFraction: false, mortalRows);
@@ -2944,23 +3884,40 @@ namespace SundayLastBreath.UI
                 }
 
                 bool selected = hasItem && _selectedIsEquipped && string.Equals(_selectedItemId, eqId, StringComparison.OrdinalIgnoreCase);
-                if (slot.outline != null)
+                if (useStyleDHardwareTheme)
                 {
-                    slot.outline.effectColor = selected ? ColAmber : (hasItem ? ColCyan : ColBorderSlate);
+                    if (slot.outline != null)
+                    {
+                        slot.outline.enabled = selected;
+                        if (selected) slot.outline.effectColor = ColStyleDAmber;
+                    }
+                    if (slot.bgImage != null)
+                    {
+                        slot.bgImage.color = selected ? new Color(0.95f, 0.86f, 0.68f, 1f) : Color.white;
+                    }
                 }
-                if (slot.bgImage != null)
+                else
                 {
-                    slot.bgImage.color = selected ? new Color(0.14f, 0.17f, 0.24f, 1f) : ColSlotBg;
+                    if (slot.outline != null)
+                    {
+                        slot.outline.effectColor = selected ? ColAmber : (hasItem ? ColCyan : ColBorderSlate);
+                    }
+                    if (slot.bgImage != null)
+                    {
+                        slot.bgImage.color = selected ? new Color(0.14f, 0.17f, 0.24f, 1f) : ColSlotBg;
+                    }
                 }
             }
 
             if (partyHeaderText != null)
             {
-                partyHeaderText.text = "// SURVIVOR GROUP // PARTY (1 / 4)";
+                partyHeaderText.text = useStyleDHardwareTheme ? "SURVIVOR GROUP (1 / 4)" : "// SURVIVOR GROUP // PARTY (1 / 4)";
             }
             if (partyLeaderNameText != null)
             {
-                partyLeaderNameText.text = $"[1] LEADER // {p.FullName.ToUpperInvariant()}";
+                partyLeaderNameText.text = useStyleDHardwareTheme
+                    ? $"[1] LEADER - {p.FullName.ToUpperInvariant()}"
+                    : $"[1] LEADER // {p.FullName.ToUpperInvariant()}";
             }
             if (partyLeaderMetaText != null)
             {
@@ -3009,7 +3966,7 @@ namespace SundayLastBreath.UI
                 floorTag = "2F";
             }
 
-            if (mapHeaderTitle != null) mapHeaderTitle.text = $"// FLOOR BLUEPRINT // {floorTag}";
+            if (mapHeaderTitle != null) mapHeaderTitle.text = useStyleDHardwareTheme ? $"{floorTag} MAP" : $"// FLOOR BLUEPRINT // {floorTag}";
 
             if (mapSubHeaderPosText != null)
             {
@@ -3025,9 +3982,11 @@ namespace SundayLastBreath.UI
                 else if (locId == "c_room") displayLoc = "LOBBY ROTUNDA";
                 else if (locId == "lobby_exit") displayLoc = "FRONT BARRICADE";
                 else if (hubScreen.IsInHallway && string.IsNullOrEmpty(hubScreen.CurrentInspectedRoom))
-                    displayLoc = $"CORRIDOR // SEC {hubScreen.HallwaySection}";
+                    displayLoc = useStyleDHardwareTheme ? $"CORRIDOR | SEC {hubScreen.HallwaySection}" : $"CORRIDOR // SEC {hubScreen.HallwaySection}";
 
-                mapSubHeaderPosText.text = $"<color=#00e5ff><b>POS:</b> {displayLoc}</color>";
+                mapSubHeaderPosText.text = useStyleDHardwareTheme
+                    ? $"<color=#CF9232><b>POS:</b></color> <color=#E4DEC9>{displayLoc}</color>"
+                    : $"<color=#00e5ff><b>POS:</b> {displayLoc}</color>";
             }
 
             if (hubScreen.TacticalMap != null)
@@ -3067,50 +4026,95 @@ namespace SundayLastBreath.UI
 
             if (readerTabLabels.Count >= 4)
             {
+                string badgeHex = useStyleDHardwareTheme ? "#CF9232" : "#F59E0B";
                 readerTabLabels[0].text = "SITUATION";
                 readerTabLabels[1].text = $"STORY LOG ({logCount})";
                 readerTabLabels[2].text = $"NOTES ({notesCount})";
                 readerTabLabels[3].text = floorCount > 0 && _activeTab != ReaderTab.Floor
-                    ? $"FLOOR <color=#F59E0B><b>({floorCount})</b></color>"
+                    ? $"FLOOR <color={badgeHex}><b>({floorCount})</b></color>"
                     : $"FLOOR ({floorCount})";
             }
 
+            float scale = SundayTypography.NarrativeFontScale;
+            UpdateFontControlUI();
+
             if (inlineStoryLogText != null && hubScreen.StoryLogs != null)
             {
-                inlineStoryLogText.text = string.Join("\n\n<color=#334155>----------------------------------------------------</color>\n\n", hubScreen.StoryLogs);
-                if (inlineStoryLogText.transform.parent is RectTransform slRt)
+                inlineStoryLogText.fontSize = Mathf.Round(13.5f * scale * 2f) * 0.5f;
+                inlineStoryLogText.lineSpacing = 8f;
+
+                bool countChanged = logCount != _lastRenderedStoryLogCount;
+                bool scaleChanged = !Mathf.Approximately(scale, _lastRenderedFontScale);
+
+                RectTransform slRt = inlineStoryLogText.transform.parent as RectTransform;
+                RectTransform vpRt = inlineStoryLogScroll != null ? inlineStoryLogScroll.viewport : null;
+                bool isScrollable = slRt != null && vpRt != null && slRt.rect.height > vpRt.rect.height + 5f;
+                bool wasScrolledBack = isScrollable && inlineStoryLogScroll.verticalNormalizedPosition > 0.04f;
+                float savedTopOffset = slRt != null ? slRt.anchoredPosition.y : 0f;
+
+                string sepHex = useStyleDHardwareTheme ? "#3F3B34" : "#334155";
+                inlineStoryLogText.text = string.Join($"\n\n<color={sepHex}>----------------------------------------------------</color>\n\n", hubScreen.StoryLogs);
+                if (slRt != null)
                 {
                     inlineStoryLogText.ForceMeshUpdate();
                     LayoutRebuilder.ForceRebuildLayoutImmediate(slRt);
+                    Canvas.ForceUpdateCanvases();
+
+                    if (wasScrolledBack)
+                    {
+                        float maxScrollY = vpRt != null ? Mathf.Max(0f, slRt.rect.height - vpRt.rect.height) : savedTopOffset;
+                        float clampedY = Mathf.Clamp(savedTopOffset, 0f, maxScrollY);
+                        slRt.anchoredPosition = new Vector2(slRt.anchoredPosition.x, clampedY);
+                        if (inlineStoryLogScroll != null) inlineStoryLogScroll.velocity = Vector2.zero;
+                        if (countChanged && logCount > _lastRenderedStoryLogCount && _lastRenderedStoryLogCount >= 0)
+                        {
+                            _hasUnreadLogWhileScrolled = true;
+                        }
+                    }
+                    else if ((countChanged || scaleChanged) && inlineStoryLogScroll != null)
+                    {
+                        inlineStoryLogScroll.verticalNormalizedPosition = 0f;
+                    }
                 }
+
+                _lastRenderedStoryLogCount = logCount;
+                _lastRenderedFontScale = scale;
+                UpdateStoryLogScrollLockState();
             }
 
             if (inlineNotesText != null)
             {
+                inlineNotesText.fontSize = Mathf.Round(13.5f * scale * 2f) * 0.5f;
+                inlineNotesText.lineSpacing = 7f;
+                string hHex = useStyleDHardwareTheme ? "#CF9232" : "#F59E0B";
+                string tHex = useStyleDHardwareTheme ? "#E4DEC9" : "#38BDF8";
+                string doneHex = useStyleDHardwareTheme ? "#3AD679" : "#22C55E";
+                string mutHex = useStyleDHardwareTheme ? "#9A958A" : "#64748B";
+                string pfx = useStyleDHardwareTheme ? "" : "// ";
                 var lines = new List<string>();
                 if (hubScreen.Objectives != null && hubScreen.Objectives.Objectives != null)
                 {
-                    lines.Add("<b><color=#F59E0B>// ACTIVE OBJECTIVES</color></b>");
+                    lines.Add($"<b><color={hHex}>{pfx}ACTIVE OBJECTIVES</color></b>");
                     foreach (var obj in hubScreen.Objectives.Objectives)
                     {
                         if (obj.status == ObjectiveStatus.Locked) continue;
-                        string mark = obj.status == ObjectiveStatus.Completed ? "<color=#22C55E>[DONE]</color>" : "<color=#38BDF8>[ACTIVE]</color>";
+                        string mark = obj.status == ObjectiveStatus.Completed ? $"<color={doneHex}>[DONE]</color>" : $"<color={tHex}>[ACTIVE]</color>";
                         lines.Add($"{mark} {obj.description}");
                     }
                     lines.Add("");
                 }
 
-                lines.Add("<b><color=#F59E0B>// RECORDED NOTES & INTEL</color></b>");
+                lines.Add($"<b><color={hHex}>{pfx}RECORDED NOTES & INTEL</color></b>");
                 if (hubScreen.Lore != null && hubScreen.Lore.Entries != null && hubScreen.Lore.Entries.Count > 0)
                 {
                     foreach (var entry in hubScreen.Lore.Entries)
                     {
-                        lines.Add($"<b><color=#38BDF8>[{entry.timestamp}] {entry.title}</color></b>\n{entry.content}");
+                        lines.Add($"<b><color={tHex}>[{entry.timestamp}] {entry.title}</color></b>\n{entry.content}");
                     }
                 }
                 else
                 {
-                    lines.Add("<color=#64748B>No field notes recorded yet. Check your phone, radio, and apartment logs.</color>");
+                    lines.Add($"<color={mutHex}>No field notes recorded yet. Check your phone, radio, and apartment logs.</color>");
                 }
                 inlineNotesText.text = string.Join("\n\n", lines);
                 if (inlineNotesText.transform.parent is RectTransform ntRt)
@@ -3160,6 +4164,11 @@ namespace SundayLastBreath.UI
                 rBg.color = ColCardBg;
                 Outline rOl = row.AddComponent<Outline>();
                 rOl.effectColor = ColBorderSlate;
+                if (useStyleDHardwareTheme && styleDStatCardSprite != null)
+                {
+                    ApplySlicedSprite(rBg, styleDStatCardSprite, 3.2f, Color.white, disableOutline: false);
+                    rOl.enabled = false;
+                }
 
                 GameObject icGo = new GameObject("Icon", typeof(RectTransform));
                 icGo.transform.SetParent(row.transform, false);
@@ -3175,7 +4184,7 @@ namespace SundayLastBreath.UI
 
                 TextMeshProUGUI lbl = CreateText(row.transform, "Name",
                     entry.quantity > 1 ? $"{entry.itemId} (x{entry.quantity})" : entry.itemId,
-                    11.5f, ColTextMain, TextAlignmentOptions.MidlineLeft, FontStyles.Bold, FontRole.Body, wrap: false);
+                    11.5f, useStyleDHardwareTheme ? ColStyleDBoneText : ColTextMain, TextAlignmentOptions.MidlineLeft, FontStyles.Bold, FontRole.Body, wrap: false);
                 lbl.rectTransform.anchorMin = Vector2.zero;
                 lbl.rectTransform.anchorMax = Vector2.one;
                 lbl.rectTransform.offsetMin = new Vector2(44f, 0f);
@@ -3184,6 +4193,10 @@ namespace SundayLastBreath.UI
                 string capId = entry.itemId;
                 Button pickBtn = CreateActionPill(row.transform, "Btn_Take", "TAKE",
                     new Color(0.11f, 0.24f, 0.19f, 1f), new Color(0.16f, 0.72f, 0.45f, 1f), out _, 10f);
+                if (useStyleDHardwareTheme && styleDButtonMetalSprite != null)
+                {
+                    ApplyButtonSprite(pickBtn, ColStyleDEquipBtn, ColStyleDEquipBtn * 1.25f, 2.4f, ColStyleDBoneText);
+                }
                 RectTransform pRt = pickBtn.GetComponent<RectTransform>();
                 pRt.anchorMin = new Vector2(1f, 0.5f);
                 pRt.anchorMax = new Vector2(1f, 0.5f);
@@ -3216,6 +4229,7 @@ namespace SundayLastBreath.UI
             if (isAwakening) AdjustAwakeningLayout(hubScreen.AwakeningContainer);
 
             UpdateNarrativeActionPrompt(isAwakening);
+            EnsureStyleDChoiceDeckSpacing();
         }
 
         private void UpdateNarrativeActionPrompt(bool isAwakening)
@@ -3308,8 +4322,32 @@ namespace SundayLastBreath.UI
                 if (img != null)
                 {
                     img.raycastTarget = true;
+                    if (useStyleDHardwareTheme && styleDStatCardSprite != null)
+                    {
+                        ApplySlicedSprite(img, styleDStatCardSprite, 2.4f, Color.white, disableOutline: true);
+                        ConfigureButtonColors(narrativePromptBtn, Color.white, new Color(1.06f, 1.03f, 0.96f, 1f));
+                    }
+                    else
+                    {
+                        ConfigureButtonColors(narrativePromptBtn, img.color, new Color(0.08f, 0.14f, 0.22f, 1f));
+                    }
                     narrativePromptBtn.targetGraphic = img;
-                    ConfigureButtonColors(narrativePromptBtn, img.color, new Color(0.08f, 0.14f, 0.22f, 1f));
+                }
+
+                if (useStyleDHardwareTheme)
+                {
+                    var hdrTmp = narrativePromptCard.transform.Find("PromptHeader")?.GetComponent<TextMeshProUGUI>();
+                    if (hdrTmp != null)
+                    {
+                        hdrTmp.text = "<b>INCOMING EMERGENCY TRANSMISSION</b>";
+                        hdrTmp.color = ColStyleDAmber;
+                    }
+                    var subTmp = narrativePromptCard.transform.Find("PromptSub")?.GetComponent<TextMeshProUGUI>();
+                    if (subTmp != null)
+                    {
+                        subTmp.text = "Follow the live broadcast and telemetry readout in the narrative display.";
+                        subTmp.color = ColStyleDMutedStone;
+                    }
                 }
 
                 narrativePromptBtn.onClick.RemoveAllListeners();
@@ -3326,7 +4364,19 @@ namespace SundayLastBreath.UI
                     if (acImg != null) acImg.raycastTarget = true;
                     Button acBtn = actionCallout.GetComponent<Button>();
                     if (acBtn == null) acBtn = actionCallout.gameObject.AddComponent<Button>();
-                    if (acImg != null) acBtn.targetGraphic = acImg;
+                    if (useStyleDHardwareTheme && styleDButtonMetalSprite != null)
+                    {
+                        ApplyButtonSprite(acBtn, ColStyleDMetalBtn, ColStyleDRust, 2.2f, ColStyleDBoneText);
+                        var actTmp = actionCallout.Find("ActionText")?.GetComponent<TextMeshProUGUI>();
+                        if (actTmp != null)
+                        {
+                            actTmp.text = "<color=#CF9232><b>[ SPACE / ENTER ]</b></color>  <color=#9A958A>OR</color>  <color=#E4DEC9><b>CLICK TO ADVANCE >></b></color>";
+                        }
+                    }
+                    else if (acImg != null)
+                    {
+                        acBtn.targetGraphic = acImg;
+                    }
                     acBtn.onClick.RemoveAllListeners();
                     acBtn.onClick.AddListener(() =>
                     {
@@ -3342,6 +4392,7 @@ namespace SundayLastBreath.UI
         private void AdjustAwakeningLayout(GameObject awContainer)
         {
             if (awContainer == null) return;
+            float scale = SundayTypography.NarrativeFontScale;
 
             // ContinuePrompt
             Transform prTr = awContainer.transform.Find("ContinuePrompt");
@@ -3351,8 +4402,8 @@ namespace SundayLastBreath.UI
                 prRt.anchorMin = new Vector2(1f, 0f);
                 prRt.anchorMax = new Vector2(1f, 0f);
                 prRt.pivot = new Vector2(1f, 0f);
-                prRt.anchoredPosition = new Vector2(-10f, 6f);
-                prRt.sizeDelta = new Vector2(220f, 22f);
+                prRt.anchoredPosition = new Vector2(-10f, 4f);
+                prRt.sizeDelta = new Vector2(220f, 20f);
                 var prTmp = prTr.GetComponent<TextMeshProUGUI>();
                 if (prTmp != null) prTmp.fontSize = 11.5f;
             }
@@ -3373,8 +4424,8 @@ namespace SundayLastBreath.UI
                     var b1Tmp = b1TextTr.GetComponent<TextMeshProUGUI>();
                     if (b1Tmp != null)
                     {
-                        b1Tmp.fontSize = 12.5f;
-                        b1Tmp.lineSpacing = 1.5f;
+                        b1Tmp.fontSize = Mathf.Round(13f * scale * 2f) * 0.5f;
+                        b1Tmp.lineSpacing = 5f;
                     }
                 }
 
@@ -3427,8 +4478,8 @@ namespace SundayLastBreath.UI
                         var etTmp = etTr.GetComponent<TextMeshProUGUI>();
                         if (etTmp != null)
                         {
-                            etTmp.fontSize = 11.5f;
-                            etTmp.lineSpacing = 1.5f;
+                            etTmp.fontSize = Mathf.Round(12f * scale * 2f) * 0.5f;
+                            etTmp.lineSpacing = 5f;
                         }
                     }
 
@@ -3457,7 +4508,7 @@ namespace SundayLastBreath.UI
                     b2tRt.anchoredPosition = new Vector2(8f, -4f);
                     b2tRt.sizeDelta = new Vector2(-16f, 26f);
                     var b2Tmp = b2tTr.GetComponent<TextMeshProUGUI>();
-                    if (b2Tmp != null) b2Tmp.fontSize = 12.5f;
+                    if (b2Tmp != null) b2Tmp.fontSize = Mathf.Round(13f * scale * 2f) * 0.5f;
                 }
 
                 Transform monoTr = b2Tr.Find("MonologueBox");
@@ -3482,8 +4533,8 @@ namespace SundayLastBreath.UI
                         var stTmp = speechTr.GetComponent<TextMeshProUGUI>();
                         if (stTmp != null)
                         {
-                            stTmp.fontSize = 12f;
-                            stTmp.lineSpacing = 2.5f;
+                            stTmp.fontSize = Mathf.Round(12.5f * scale * 2f) * 0.5f;
+                            stTmp.lineSpacing = 6f;
                         }
                     }
 
@@ -3509,8 +4560,8 @@ namespace SundayLastBreath.UI
                     var b2fTmp = b2fTr.GetComponent<TextMeshProUGUI>();
                     if (b2fTmp != null)
                     {
-                        b2fTmp.fontSize = 12f;
-                        b2fTmp.lineSpacing = 2.5f;
+                        b2fTmp.fontSize = Mathf.Round(12.5f * scale * 2f) * 0.5f;
+                        b2fTmp.lineSpacing = 5.5f;
                     }
                 }
             }
@@ -3537,13 +4588,13 @@ namespace SundayLastBreath.UI
                     b3tRt.anchorMin = new Vector2(0f, 1f);
                     b3tRt.anchorMax = new Vector2(1f, 1f);
                     b3tRt.pivot = new Vector2(0f, 1f);
-                    b3tRt.anchoredPosition = new Vector2(8f, -28f);
-                    b3tRt.sizeDelta = new Vector2(-16f, 126f);
+                    b3tRt.anchoredPosition = new Vector2(8f, -26f);
+                    b3tRt.sizeDelta = new Vector2(-16f, 94f);
                     var b3Tmp = b3tTr.GetComponent<TextMeshProUGUI>();
                     if (b3Tmp != null)
                     {
-                        b3Tmp.fontSize = 12f;
-                        b3Tmp.lineSpacing = 2f;
+                        b3Tmp.fontSize = Mathf.Round(11.5f * scale * 2f) * 0.5f;
+                        b3Tmp.lineSpacing = 2.5f;
                     }
                 }
 
@@ -3554,8 +4605,17 @@ namespace SundayLastBreath.UI
                     sRt.anchorMin = new Vector2(0f, 0f);
                     sRt.anchorMax = new Vector2(1f, 0f);
                     sRt.pivot = new Vector2(0.5f, 0f);
-                    sRt.anchoredPosition = new Vector2(0f, 6f);
-                    sRt.sizeDelta = new Vector2(-12f, 155f);
+                    sRt.anchoredPosition = new Vector2(0f, 28f);
+                    sRt.sizeDelta = new Vector2(-12f, 122f);
+
+                    Button stashBtn = stashTr.GetComponent<Button>();
+                    if (stashBtn == null) stashBtn = stashTr.gameObject.AddComponent<Button>();
+                    stashBtn.onClick.RemoveAllListeners();
+                    stashBtn.onClick.AddListener(() =>
+                    {
+                        AudioManager.Instance?.PlayButtonClick();
+                        hubScreen?.TriggerAdvanceAwakening();
+                    });
                 }
             }
         }
@@ -3577,6 +4637,1451 @@ namespace SundayLastBreath.UI
                 _avatarTimer = 0f;
                 _avatarFrameIndex = (_avatarFrameIndex + 1) % _avatarFrames.Count;
                 survivorPortraitImg.sprite = _avatarFrames[_avatarFrameIndex];
+            }
+        }
+        #endregion
+
+        #region Style D Hardware Theme
+        public static Sprite SharedStyleDPanelChassis { get; private set; }
+        public static Sprite SharedStyleDCrtBezel { get; private set; }
+        public static Sprite SharedStyleDWellRecessed { get; private set; }
+        public static Sprite SharedStyleDSlotRecessed { get; private set; }
+        public static Sprite SharedStyleDButtonMetal { get; private set; }
+        public static Sprite SharedStyleDStatCard { get; private set; }
+        public static Texture2D GetSharedStyleDCrtScanlineTexture() => GetStyleDCrtScanlineTexture();
+
+        private void EnsureStyleDSpritesLoaded()
+        {
+            if (styleDPanelChassisSprite == null) styleDPanelChassisSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_panel_chassis_9slice.png");
+            if (styleDCrtBezelSprite == null) styleDCrtBezelSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_crt_bezel_frame.png");
+            if (styleDWellRecessedSprite == null) styleDWellRecessedSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_well_recessed_9slice.png");
+            if (styleDSlotRecessedSprite == null) styleDSlotRecessedSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_slot_recessed_9slice.png");
+            if (styleDStatCardSprite == null) styleDStatCardSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_stat_card_9slice.png");
+            if (styleDButtonMetalSprite == null) styleDButtonMetalSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_button_metal_9slice.png");
+            if (styleDMapPaperSprite == null) styleDMapPaperSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_map_paper_sheet.png");
+            if (styleDPinnedNoteSprite == null) styleDPinnedNoteSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_pinned_note_card.png");
+            if (styleDRedPushpinSprite == null) styleDRedPushpinSprite = LoadSpriteFallback("Assets/Sprites/UI/HardwareTheme/ui_red_pushpin.png");
+
+            SharedStyleDPanelChassis = styleDPanelChassisSprite;
+            SharedStyleDCrtBezel = styleDCrtBezelSprite;
+            SharedStyleDWellRecessed = styleDWellRecessedSprite;
+            SharedStyleDSlotRecessed = styleDSlotRecessedSprite;
+            SharedStyleDButtonMetal = styleDButtonMetalSprite;
+            SharedStyleDStatCard = styleDStatCardSprite;
+        }
+
+        private static void SetOutlineEnabled(Transform tr, bool enabled)
+        {
+            if (tr == null) return;
+            Outline ol = tr.GetComponent<Outline>();
+            if (ol != null) ol.enabled = enabled;
+        }
+
+        private static void ApplySlicedSprite(Image img, Sprite sp, float ppuMult, Color tint, bool disableOutline = true)
+        {
+            if (img == null || sp == null) return;
+            img.sprite = sp;
+            img.type = Image.Type.Sliced;
+            img.pixelsPerUnitMultiplier = ppuMult;
+            img.color = tint;
+            if (disableOutline) SetOutlineEnabled(img.transform, false);
+        }
+
+        private void ApplyButtonSprite(Button btn, Color normalTint, Color hoverTint, float ppuMult = 2.2f, Color? textCol = null, bool disableOutline = true)
+        {
+            if (btn == null) return;
+            Image bg = btn.targetGraphic as Image ?? btn.GetComponent<Image>();
+            if (bg != null && styleDButtonMetalSprite != null)
+            {
+                // Keep Image.color white so Selectable ColorTint applies normalTint once without squaring/darkening
+                ApplySlicedSprite(bg, styleDButtonMetalSprite, ppuMult, Color.white, disableOutline);
+                if (bg.canvasRenderer != null) bg.canvasRenderer.SetColor(normalTint);
+            }
+            ConfigureButtonColors(btn, normalTint, hoverTint);
+            if (textCol.HasValue)
+            {
+                var tmp = btn.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (tmp != null) tmp.color = textCol.Value;
+            }
+        }
+
+        private static string StripLeadingSlashes(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return s;
+            return s.TrimStart('/', ' ');
+        }
+
+        private void StyleOuterPanelChassis(RectTransform panel, string cleanTitle, bool hasBody = true)
+        {
+            if (panel == null) return;
+            // ppuMult = 3.2f yields a crisp ~14px riveted frame; inset Header and Body >= 18px (>= 16px top) for >= 4px dark clearance
+            ApplySlicedSprite(panel.GetComponent<Image>(), styleDPanelChassisSprite, 3.2f, Color.white);
+
+            Transform hdr = panel.Find("Header");
+            if (hdr != null)
+            {
+                RectTransform hRt = hdr as RectTransform;
+                hRt.anchorMin = new Vector2(0f, 1f);
+                hRt.anchorMax = new Vector2(1f, 1f);
+                hRt.pivot = new Vector2(0.5f, 1f);
+                hRt.offsetMin = new Vector2(18f, -42f);
+                hRt.offsetMax = new Vector2(-18f, -16f);
+
+                Image hBg = hdr.GetComponent<Image>();
+                if (hBg != null) hBg.color = ColStyleDHeaderBg;
+
+                Transform bl = hdr.Find("BottomLine");
+                if (bl != null && bl.GetComponent<Image>() is Image blImg)
+                {
+                    blImg.color = ColStyleDHeaderLine;
+                }
+
+                Transform titleTr = hdr.Find("Title");
+                if (titleTr != null && titleTr.GetComponent<TextMeshProUGUI>() is TextMeshProUGUI titleTmp)
+                {
+                    titleTmp.text = cleanTitle;
+                    titleTmp.color = ColStyleDBoneText;
+                    titleTmp.fontSize = 11f;
+                    titleTmp.rectTransform.offsetMin = new Vector2(6f, 0f);
+                }
+
+                Transform rbBtnTr = hdr.Find("RightBadgeButton");
+                if (rbBtnTr != null && rbBtnTr.GetComponent<Button>() is Button rbBtn)
+                {
+                    var rbLbl = rbBtnTr.GetComponentInChildren<TextMeshProUGUI>(true);
+                    bool isWide = rbLbl != null && !string.IsNullOrEmpty(rbLbl.text) && rbLbl.text.Length > 8;
+                    if (rbBtnTr is RectTransform rbRt)
+                    {
+                        rbRt.anchoredPosition = new Vector2(-4f, 0f);
+                        rbRt.sizeDelta = new Vector2(isWide ? 112f : 86f, 20f);
+                    }
+                    if (rbLbl != null)
+                    {
+                        rbLbl.fontSize = 9.5f;
+                        StretchFull(rbLbl.rectTransform, 6f, 0f, 6f, 0f);
+                    }
+                    ApplyButtonSprite(rbBtn, ColStyleDMetalBtn, ColStyleDMetalBtn * 1.25f, 3.2f, ColStyleDBoneText);
+                }
+
+                Transform rbTr = hdr.Find("RightBadge");
+                if (rbTr != null && rbTr.GetComponent<TextMeshProUGUI>() is TextMeshProUGUI rbTmp)
+                {
+                    rbTmp.color = ColStyleDMutedStone;
+                    rbTmp.rectTransform.offsetMax = new Vector2(-6f, 0f);
+                }
+            }
+
+            if (hasBody)
+            {
+                Transform bodyTr = panel.Find("Body");
+                if (bodyTr is RectTransform bodyRt)
+                {
+                    bodyRt.anchorMin = Vector2.zero;
+                    bodyRt.anchorMax = Vector2.one;
+                    bodyRt.offsetMin = new Vector2(18f, 18f);
+                    bodyRt.offsetMax = new Vector2(-18f, -46f);
+                }
+            }
+        }
+
+        public void ApplyStyleDHardwareTheme()
+        {
+            if (!useStyleDHardwareTheme) return;
+
+            SundayTypography.StyleDThemeEnabled = true;
+            EnsureStyleDSpritesLoaded();
+            if (hubScreen == null) hubScreen = GetComponent<GameStageScreen>();
+
+            TacticalChoiceButton.StyleDEnabled = true;
+            TacticalChoiceButton.StyleDButtonSprite = styleDButtonMetalSprite;
+            TacticalMapViewController.StyleDThemeEnabled = true;
+
+            var rootImg = GetComponent<Image>();
+            if (rootImg != null) rootImg.color = ColStyleDBgOuter;
+
+            ApplyStyleDTypographyRemap();
+            StyleStyleDCrtViewport();
+            StyleStyleDInventoryPanel();
+            StyleStyleDSurvivorPanel();
+            StyleStyleDMapAndNotePanel();
+            StyleStyleDReaderAndDeck();
+            StyleStyleDAwakeningBoxes();
+            UpdateFontControlUI();
+        }
+
+        private void ApplyStyleDTypographyRemap()
+        {
+            foreach (var tmp in GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                if (tmp == null) continue;
+                string fName = tmp.font != null ? tmp.font.name : "";
+                if (fName.StartsWith("VCR_OSD", StringComparison.OrdinalIgnoreCase) ||
+                    fName.StartsWith("SpecialElite", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (fName.StartsWith("Oswald", StringComparison.OrdinalIgnoreCase) ||
+                    fName.StartsWith("ChakraPetch", StringComparison.OrdinalIgnoreCase))
+                {
+                    SundayTypography.ApplyFont(tmp, FontRole.Display);
+                }
+                else if (fName.StartsWith("Merriweather", StringComparison.OrdinalIgnoreCase) ||
+                         fName.StartsWith("Spectral", StringComparison.OrdinalIgnoreCase))
+                {
+                    SundayTypography.ApplyFont(tmp, FontRole.Narrative);
+                }
+                else
+                {
+                    SundayTypography.ApplyFont(tmp, FontRole.Mono);
+                }
+            }
+        }
+
+        private void StyleStyleDCrtViewport()
+        {
+            Transform topStage = transform.Find("TopScreen_VisualStage");
+            if (topStage != null)
+            {
+                SetOutlineEnabled(topStage, false);
+                var tsImg = topStage.GetComponent<Image>();
+                if (tsImg != null) tsImg.color = ColStyleDBgOuter;
+
+                Transform framedStage = topStage.Find("FramedStage");
+                if (framedStage is RectTransform fsRt)
+                {
+                    fsRt.anchorMin = new Vector2(0.018f, 0.024f);
+                    fsRt.anchorMax = new Vector2(0.982f, 0.976f);
+                    fsRt.pivot = new Vector2(0.5f, 0.5f);
+                    fsRt.offsetMin = Vector2.zero;
+                    fsRt.offsetMax = Vector2.zero;
+                    fsRt.anchoredPosition = Vector2.zero;
+                }
+
+                Transform bezelTr = topStage.Find("StyleD_CRTBezelOverlay");
+                GameObject bezelGo;
+                if (bezelTr != null)
+                {
+                    bezelGo = bezelTr.gameObject;
+                }
+                else
+                {
+                    bezelGo = new GameObject("StyleD_CRTBezelOverlay", typeof(RectTransform), typeof(Image));
+                    bezelGo.transform.SetParent(topStage, false);
+                }
+                _styleDCrtOverlayObj = bezelGo;
+
+                RectTransform bzRt = bezelGo.GetComponent<RectTransform>();
+                bzRt.anchorMin = Vector2.zero;
+                bzRt.anchorMax = Vector2.one;
+                bzRt.pivot = new Vector2(0.5f, 0.5f);
+                bzRt.offsetMin = Vector2.zero;
+                bzRt.offsetMax = Vector2.zero;
+
+                Image bzImg = bezelGo.GetComponent<Image>();
+                bzImg.sprite = styleDCrtBezelSprite;
+                bzImg.type = Image.Type.Simple;
+                bzImg.preserveAspect = false;
+                bzImg.color = Color.white;
+                bzImg.raycastTarget = false;
+
+                if (framedStage != null)
+                {
+                    bezelGo.transform.SetSiblingIndex(framedStage.GetSiblingIndex() + 1);
+                }
+            }
+
+            Transform topHud = transform.Find("TopHUD");
+            if (topHud != null)
+            {
+                if (topHud is RectTransform thRt)
+                {
+                    SetPixelBox(thRt, 486f, 68f, 1434f, 102f);
+                }
+
+                if (topStage != null && topHud.GetSiblingIndex() < topStage.GetSiblingIndex())
+                {
+                    topHud.SetSiblingIndex(topStage.GetSiblingIndex() + 1);
+                }
+
+                var thImg = topHud.GetComponent<Image>();
+                if (thImg != null)
+                {
+                    thImg.sprite = null;
+                    thImg.type = Image.Type.Simple;
+                    thImg.color = Color.clear;
+                    thImg.raycastTarget = false;
+                }
+                SetOutlineEnabled(topHud, false);
+
+                Transform bbTr = topHud.Find("BottomBorder");
+                if (bbTr != null) bbTr.gameObject.SetActive(false);
+
+                var locTmp = topHud.Find("LocationBadge")?.GetComponent<TextMeshProUGUI>();
+                if (locTmp != null)
+                {
+                    SundayTypography.ApplyFont(locTmp, FontRole.VcrOsd);
+                    locTmp.fontStyle = FontStyles.Normal;
+                    locTmp.color = new Color(0.90f, 0.88f, 0.82f, 0.82f);
+                    locTmp.fontSize = 13.5f;
+                    locTmp.characterSpacing = 1f;
+                    locTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                    locTmp.raycastTarget = false;
+                    locTmp.rectTransform.anchorMin = new Vector2(0f, 0.5f);
+                    locTmp.rectTransform.anchorMax = new Vector2(0f, 0.5f);
+                    locTmp.rectTransform.pivot = new Vector2(0f, 0.5f);
+                    locTmp.rectTransform.anchoredPosition = new Vector2(4f, 2f);
+                    locTmp.rectTransform.sizeDelta = new Vector2(520f, 28f);
+                    if (!string.IsNullOrEmpty(locTmp.text))
+                    {
+                        locTmp.text = StripLeadingSlashes(locTmp.text).Replace(" // ", " - ");
+                    }
+                    ApplyStyleDCrtOsdLegibility(locTmp);
+                    EnsureCrtOsdChromatic(locTmp);
+                }
+
+                Transform clkBlock = topHud.Find("ClockBlock");
+                if (clkBlock is RectTransform cbRt)
+                {
+                    cbRt.anchorMin = new Vector2(1f, 0.5f);
+                    cbRt.anchorMax = new Vector2(1f, 0.5f);
+                    cbRt.pivot = new Vector2(1f, 0.5f);
+                    cbRt.anchoredPosition = new Vector2(-4f, 0f);
+                    cbRt.sizeDelta = new Vector2(132f, 34f);
+                }
+                var ctTmp = (clkBlock != null ? clkBlock.Find("ClockTime")?.GetComponent<TextMeshProUGUI>() : null)
+                            ?? topHud.Find("ClockTime")?.GetComponent<TextMeshProUGUI>()
+                            ?? hubScreen?.ClockTimeText;
+                if (ctTmp != null)
+                {
+                    SundayTypography.ApplyFont(ctTmp, FontRole.VcrOsd);
+                    ctTmp.fontStyle = FontStyles.Normal;
+                    ctTmp.color = new Color(0.95f, 0.72f, 0.28f, 0.86f);
+                    ctTmp.fontSize = 16.5f;
+                    ctTmp.characterSpacing = 0.5f;
+                    ctTmp.alignment = TextAlignmentOptions.Right;
+                    ctTmp.raycastTarget = false;
+                    ctTmp.rectTransform.anchorMin = new Vector2(0f, 0.38f);
+                    ctTmp.rectTransform.anchorMax = Vector2.one;
+                    ctTmp.rectTransform.offsetMin = Vector2.zero;
+                    ctTmp.rectTransform.offsetMax = Vector2.zero;
+                    ApplyStyleDCrtOsdLegibility(ctTmp);
+                    EnsureCrtOsdChromatic(ctTmp);
+                }
+
+                var cdTmp = (clkBlock != null ? clkBlock.Find("ClockDay")?.GetComponent<TextMeshProUGUI>() : null)
+                            ?? topHud.Find("ClockDay")?.GetComponent<TextMeshProUGUI>()
+                            ?? hubScreen?.ClockDayText;
+                if (cdTmp != null)
+                {
+                    SundayTypography.ApplyFont(cdTmp, FontRole.VcrOsd);
+                    cdTmp.fontStyle = FontStyles.Normal;
+                    cdTmp.color = new Color(0.84f, 0.82f, 0.76f, 0.78f);
+                    cdTmp.fontSize = 10.5f;
+                    cdTmp.characterSpacing = 1f;
+                    cdTmp.alignment = TextAlignmentOptions.Right;
+                    cdTmp.raycastTarget = false;
+                    cdTmp.rectTransform.anchorMin = Vector2.zero;
+                    cdTmp.rectTransform.anchorMax = new Vector2(1f, 0.40f);
+                    cdTmp.rectTransform.offsetMin = Vector2.zero;
+                    cdTmp.rectTransform.offsetMax = Vector2.zero;
+                    ApplyStyleDCrtOsdLegibility(cdTmp);
+                    EnsureCrtOsdChromatic(cdTmp);
+                }
+
+                var centerTmp = topCenterBadgeText ?? topHud.Find("HybridCenterBadge")?.GetComponent<TextMeshProUGUI>();
+                if (centerTmp != null)
+                {
+                    SundayTypography.ApplyFont(centerTmp, FontRole.VcrOsd);
+                    centerTmp.fontStyle = FontStyles.Normal;
+                    centerTmp.color = new Color(0.84f, 0.82f, 0.76f, 0.76f);
+                    centerTmp.fontSize = 12f;
+                    centerTmp.characterSpacing = 1f;
+                    centerTmp.raycastTarget = false;
+                    ApplyStyleDCrtOsdLegibility(centerTmp);
+                    EnsureCrtOsdChromatic(centerTmp);
+                }
+
+                EnsureStyleDCrtOsdScanlines(topHud);
+            }
+        }
+
+        private static Texture2D _styleDCrtScanlineTex;
+
+        private static Texture2D GetStyleDCrtScanlineTexture()
+        {
+            if (_styleDCrtScanlineTex != null) return _styleDCrtScanlineTex;
+
+            var tex = new Texture2D(1, 4, TextureFormat.RGBA32, mipChain: false)
+            {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Repeat,
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            tex.SetPixel(0, 0, new Color(0f, 0f, 0f, 0f));
+            tex.SetPixel(0, 1, new Color(0f, 0f, 0f, 0f));
+            tex.SetPixel(0, 2, new Color(0f, 0f, 0f, 0.42f));
+            tex.SetPixel(0, 3, new Color(0f, 0f, 0f, 0.16f));
+            tex.Apply(updateMipmaps: false, makeNoLongerReadable: true);
+            _styleDCrtScanlineTex = tex;
+            return _styleDCrtScanlineTex;
+        }
+
+        private static void EnsureCrtOsdChromatic(TextMeshProUGUI tmp)
+        {
+            if (tmp == null) return;
+            var fx = tmp.GetComponent<CrtOsdChromaticEffect>() ?? tmp.gameObject.AddComponent<CrtOsdChromaticEffect>();
+            fx.SyncNow();
+        }
+
+        private static void EnsureStyleDCrtOsdScanlines(Transform topHud)
+        {
+            if (topHud == null) return;
+            Transform scanTr = topHud.Find("StyleD_CrtOsdScanlines");
+            GameObject scanGo = scanTr != null
+                ? scanTr.gameObject
+                : new GameObject("StyleD_CrtOsdScanlines", typeof(RectTransform), typeof(RawImage));
+            if (scanTr == null) scanGo.transform.SetParent(topHud, false);
+
+            StretchFull(scanGo.GetComponent<RectTransform>());
+            var rawImg = scanGo.GetComponent<RawImage>();
+            rawImg.texture = GetStyleDCrtScanlineTexture();
+            rawImg.color = Color.white;
+            rawImg.uvRect = new Rect(0f, 0f, 1f, 34f / 4f);
+            rawImg.raycastTarget = false;
+            scanGo.transform.SetAsLastSibling();
+        }
+
+        private static void ApplyStyleDCrtOsdLegibility(Graphic graphic)
+        {
+            if (graphic == null) return;
+
+            var outline = graphic.GetComponent<Outline>();
+            if (outline == null) outline = graphic.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(0f, 0f, 0f, 0.72f);
+            outline.effectDistance = new Vector2(1f, -1f);
+            outline.enabled = true;
+
+            Shadow dropShadow = null;
+            var shadows = graphic.GetComponents<Shadow>();
+            for (int i = 0; i < shadows.Length; i++)
+            {
+                if (shadows[i] != null && shadows[i].GetType() == typeof(Shadow))
+                {
+                    dropShadow = shadows[i];
+                    break;
+                }
+            }
+            if (dropShadow == null) dropShadow = graphic.gameObject.AddComponent<Shadow>();
+            dropShadow.effectColor = new Color(0f, 0f, 0f, 0.92f);
+            dropShadow.effectDistance = new Vector2(1.5f, -1.5f);
+            dropShadow.enabled = true;
+        }
+
+        private void StyleStyleDInventoryPanel()
+        {
+            if (topLeftInventoryPanel == null) return;
+            StyleOuterPanelChassis(topLeftInventoryPanel, "INVENTORY");
+
+            Transform body = topLeftInventoryPanel.Find("Body");
+            if (body != null)
+            {
+                (string tag, int rows)[] sections =
+                {
+                    ("WPN", 1),
+                    ("APPAREL", 1),
+                    ("CONSUMABLE", 2),
+                    ("UTILITY", 2)
+                };
+                foreach (var secInfo in sections)
+                {
+                    Transform secTr = body.Find($"Section_{secInfo.tag}");
+                    if (secTr == null) continue;
+
+                    float secH = 16f + secInfo.rows * 48f + Mathf.Max(0, secInfo.rows - 1) * 4f;
+                    var secLe = secTr.GetComponent<LayoutElement>();
+                    if (secLe != null)
+                    {
+                        secLe.preferredHeight = secH;
+                        secLe.minHeight = secH;
+                    }
+
+                    var lbl = secTr.Find("Label")?.GetComponent<TextMeshProUGUI>();
+                    if (lbl != null)
+                    {
+                        lbl.color = ColStyleDMutedStone;
+                        lbl.rectTransform.offsetMin = new Vector2(7f, -15f);
+                    }
+
+                    var glg = secTr.Find("Grid")?.GetComponent<GridLayoutGroup>();
+                    if (glg != null)
+                    {
+                        glg.cellSize = new Vector2(62f, 48f);
+                        glg.spacing = new Vector2(5f, 4f);
+                        glg.padding = new RectOffset(7, 0, 0, 0);
+                        glg.childAlignment = TextAnchor.UpperLeft;
+                    }
+                }
+            }
+
+            for (int i = 0; i < inventorySlots.Count; i++)
+            {
+                var slot = inventorySlots[i];
+                if (slot == null) continue;
+                if (slot.bgImage != null && styleDSlotRecessedSprite != null)
+                {
+                    ApplySlicedSprite(slot.bgImage, styleDSlotRecessedSprite, 2.2f, Color.white, disableOutline: false);
+                }
+                if (slot.outline != null) slot.outline.enabled = false;
+                if (slot.countLabel != null) slot.countLabel.color = ColStyleDBoneText;
+            }
+
+            Transform micro = body != null ? body.Find("MicroInspector") : null;
+            if (micro != null)
+            {
+                ApplySlicedSprite(micro.GetComponent<Image>(), styleDWellRecessedSprite, 3.2f, Color.white);
+                Transform icFrame = micro.Find("IconFrame");
+                if (icFrame is RectTransform ifRt)
+                {
+                    ifRt.anchoredPosition = new Vector2(12f, -12f);
+                    ifRt.sizeDelta = new Vector2(54f, 54f);
+                    ApplySlicedSprite(icFrame.GetComponent<Image>(), styleDSlotRecessedSprite, 2.2f, Color.white);
+                }
+                if (micro.Find("Title") is RectTransform tRt)
+                {
+                    tRt.offsetMin = new Vector2(74f, -29f);
+                    tRt.offsetMax = new Vector2(-12f, -11f);
+                }
+                if (micro.Find("Stats") is RectTransform sRt)
+                {
+                    sRt.offsetMin = new Vector2(74f, -45f);
+                    sRt.offsetMax = new Vector2(-12f, -29f);
+                }
+                if (micro.Find("Desc") is RectTransform dRt)
+                {
+                    dRt.offsetMin = new Vector2(74f, 38f);
+                    dRt.offsetMax = new Vector2(-12f, -46f);
+                }
+                if (micro.Find("Btn_QuickAction") is RectTransform qaRt)
+                {
+                    qaRt.anchoredPosition = new Vector2(74f, 11f);
+                    qaRt.sizeDelta = new Vector2(120f, 22f);
+                }
+                if (micro.Find("Btn_OpenFullGear") is RectTransform fgRt)
+                {
+                    fgRt.anchoredPosition = new Vector2(-12f, 11f);
+                    fgRt.sizeDelta = new Vector2(104f, 22f);
+                }
+            }
+
+            if (inspectorTitle != null) inspectorTitle.color = ColStyleDBoneText;
+            if (inspectorStats != null) inspectorStats.color = ColStyleDAmber;
+            if (inspectorDesc != null) inspectorDesc.color = ColStyleDMutedStone;
+
+            if (inspectorUseEquipBtn != null)
+            {
+                ApplyButtonSprite(inspectorUseEquipBtn, ColStyleDEquipBtn, ColStyleDEquipBtn * 1.25f, 3.0f, ColStyleDBoneText);
+            }
+            if (inspectorOpenGearBtn != null)
+            {
+                ApplyButtonSprite(inspectorOpenGearBtn, ColStyleDDropBtn, ColStyleDDropBtn * 1.25f, 3.0f, new Color(0.96f, 0.80f, 0.78f, 1f));
+            }
+        }
+
+        private static void RepositionAndStyleVitalRow(Transform idCard, string rowName, float topY, float height, Color barColor)
+        {
+            Transform row = idCard.Find(rowName);
+            if (row == null) return;
+            RectTransform rt = row as RectTransform;
+            rt.anchorMin = new Vector2(0f, 1f);
+            rt.anchorMax = new Vector2(1f, 1f);
+            rt.pivot = new Vector2(0f, 1f);
+            rt.offsetMin = new Vector2(112f, topY - height);
+            rt.offsetMax = new Vector2(-12f, topY);
+
+            var nameTmp = row.Find("Name")?.GetComponent<TextMeshProUGUI>();
+            if (nameTmp != null) nameTmp.color = ColStyleDBoneText;
+
+            var valTmp = row.Find("Value")?.GetComponent<TextMeshProUGUI>();
+            if (valTmp != null) valTmp.color = ColStyleDBoneText;
+
+            var trImg = row.Find("Track")?.GetComponent<Image>();
+            if (trImg != null) trImg.color = new Color(0.035f, 0.042f, 0.050f, 1f);
+
+            var fillImg = row.Find("Track/Fill")?.GetComponent<Image>();
+            if (fillImg != null) fillImg.color = barColor;
+        }
+
+        private static void StyleSurvivalChipMatte(Transform chipTr, float xMin, float xMax)
+        {
+            if (chipTr == null) return;
+            if (chipTr is RectTransform cRt)
+            {
+                cRt.offsetMin = new Vector2(xMin, -146f);
+                cRt.offsetMax = new Vector2(xMax, -125f);
+            }
+            var cImg = chipTr.GetComponent<Image>();
+            if (cImg != null)
+            {
+                cImg.sprite = null;
+                cImg.type = Image.Type.Simple;
+                cImg.color = new Color(0.038f, 0.044f, 0.052f, 1f);
+            }
+            var cOl = chipTr.GetComponent<Outline>() ?? chipTr.gameObject.AddComponent<Outline>();
+            cOl.enabled = true;
+            cOl.effectColor = new Color(0.22f, 0.24f, 0.27f, 0.85f);
+            cOl.effectDistance = new Vector2(1f, -1f);
+
+            var valTmp = chipTr.Find("Value")?.GetComponent<TextMeshProUGUI>();
+            if (valTmp != null)
+            {
+                valTmp.fontSize = 8.5f;
+                valTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                valTmp.overflowMode = TextOverflowModes.Ellipsis;
+                valTmp.rectTransform.offsetMin = new Vector2(20f, 1f);
+                valTmp.rectTransform.offsetMax = new Vector2(-4f, -1f);
+            }
+        }
+
+        private void StyleStyleDSurvivorPanel()
+        {
+            if (topRightSurvivorPanel == null) return;
+            StyleOuterPanelChassis(topRightSurvivorPanel, "SURVIVOR");
+
+            Transform body = topRightSurvivorPanel.Find("Body");
+            if (body != null)
+            {
+                var bodyVlg = body.GetComponent<VerticalLayoutGroup>();
+                if (bodyVlg != null) bodyVlg.spacing = 6f;
+            }
+            Transform idCard = body != null ? body.Find("IdentityCard") : null;
+            if (idCard != null)
+            {
+                var idLe = idCard.GetComponent<LayoutElement>();
+                if (idLe != null)
+                {
+                    idLe.preferredHeight = 176f;
+                    idLe.minHeight = 176f;
+                }
+
+                ApplySlicedSprite(idCard.GetComponent<Image>(), styleDWellRecessedSprite, 3.2f, Color.white);
+                Transform pfTr = idCard.Find("PortraitFrame");
+                if (pfTr is RectTransform pfRt)
+                {
+                    pfRt.anchoredPosition = new Vector2(12f, 0f);
+                    pfRt.sizeDelta = new Vector2(90f, 146f);
+                    SetOutlineEnabled(pfTr, false);
+
+                    var pfImg = pfTr.GetComponent<Image>();
+                    if (pfImg != null)
+                    {
+                        pfImg.sprite = null;
+                        pfImg.type = Image.Type.Simple;
+                        pfImg.color = new Color(0.02f, 0.024f, 0.03f, 1f);
+                        pfImg.raycastTarget = false;
+                    }
+                    if (pfTr.GetComponent<RectMask2D>() == null)
+                    {
+                        pfTr.gameObject.AddComponent<RectMask2D>();
+                    }
+
+                    Transform avTr = pfTr.Find("Avatar") ?? survivorPortraitImg?.transform;
+                    if (avTr != null)
+                    {
+                        if (avTr is RectTransform avRt)
+                        {
+                            StretchFull(avRt, 5f, 5f, 5f, 5f);
+                        }
+                        var avImg = avTr.GetComponent<Image>() ?? survivorPortraitImg;
+                        if (avImg != null)
+                        {
+                            avImg.preserveAspect = false;
+                            avImg.raycastTarget = false;
+                        }
+                        avTr.SetSiblingIndex(0);
+                    }
+
+                    Transform borderTr = pfTr.Find("StyleD_PortraitBorderOverlay");
+                    GameObject borderGo = borderTr != null
+                        ? borderTr.gameObject
+                        : new GameObject("StyleD_PortraitBorderOverlay", typeof(RectTransform), typeof(Image));
+                    if (borderTr == null) borderGo.transform.SetParent(pfTr, false);
+                    StretchFull(borderGo.GetComponent<RectTransform>());
+                    Image borderImg = borderGo.GetComponent<Image>();
+                    borderImg.sprite = styleDSlotRecessedSprite;
+                    borderImg.type = Image.Type.Sliced;
+                    borderImg.fillCenter = false;
+                    borderImg.pixelsPerUnitMultiplier = 2.6f;
+                    borderImg.color = Color.white;
+                    borderImg.raycastTarget = false;
+                    borderGo.transform.SetAsLastSibling();
+                }
+
+                if (survivorNameText != null)
+                {
+                    survivorNameText.color = ColStyleDBoneText;
+                    survivorNameText.fontSize = 12.5f;
+                    survivorNameText.rectTransform.offsetMin = new Vector2(112f, -25f);
+                    survivorNameText.rectTransform.offsetMax = new Vector2(-12f, -9f);
+                }
+                if (survivorJobText != null)
+                {
+                    survivorJobText.color = ColStyleDAmber;
+                    survivorJobText.fontSize = 8.8f;
+                    survivorJobText.rectTransform.offsetMin = new Vector2(112f, -38f);
+                    survivorJobText.rectTransform.offsetMax = new Vector2(-12f, -25f);
+                }
+
+                RepositionAndStyleVitalRow(idCard, "Vital_HEALTH", -41f, 13f, new Color(0.72f, 0.20f, 0.20f, 1f));
+                RepositionAndStyleVitalRow(idCard, "Vital_STAMINA", -56f, 13f, new Color(0.78f, 0.56f, 0.16f, 1f));
+                RepositionAndStyleVitalRow(idCard, "Vital_HUMANITY", -71f, 13f, new Color(0.48f, 0.35f, 0.65f, 1f));
+
+                // Live ECG Bio-Monitor Well
+                Transform ecgWellTr = idCard.Find("StyleD_ECGWell");
+                GameObject ecgWell = ecgWellTr != null ? ecgWellTr.gameObject : new GameObject("StyleD_ECGWell", typeof(RectTransform), typeof(Image));
+                if (ecgWellTr == null) ecgWell.transform.SetParent(idCard, false);
+
+                RectTransform ewRt = ecgWell.GetComponent<RectTransform>();
+                ewRt.anchorMin = new Vector2(0f, 1f);
+                ewRt.anchorMax = new Vector2(1f, 1f);
+                ewRt.pivot = new Vector2(0f, 1f);
+                ewRt.offsetMin = new Vector2(112f, -120f);
+                ewRt.offsetMax = new Vector2(-12f, -88f);
+                ApplySlicedSprite(ecgWell.GetComponent<Image>(), styleDWellRecessedSprite, 3.2f, new Color(0.90f, 0.98f, 0.94f, 1f));
+
+                Transform ecgTr = ecgWell.transform.Find("EcgGraphic");
+                GameObject ecgGo = ecgTr != null ? ecgTr.gameObject : new GameObject("EcgGraphic", typeof(RectTransform), typeof(CanvasRenderer), typeof(EcgWaveformGraphic));
+                if (ecgTr == null) ecgGo.transform.SetParent(ecgWell.transform, false);
+                StretchFull(ecgGo.GetComponent<RectTransform>(), 4f, 4f, 4f, 4f);
+                _styleDEcg = ecgGo.GetComponent<EcgWaveformGraphic>();
+
+                // Clean matte dark inset Hunger & Thirst chips (zero 9-slice vertical clipping)
+                StyleSurvivalChipMatte(idCard.Find("Chip_Hunger"), 112f, 219f);
+                StyleSurvivalChipMatte(idCard.Find("Chip_Thirst"), 225f, 332f);
+
+                Transform xpTr = idCard.Find("XPBarTrack");
+                if (xpTr is RectTransform xRt)
+                {
+                    xRt.offsetMin = new Vector2(112f, -165f);
+                    xRt.offsetMax = new Vector2(-12f, -152f);
+                    var xtImg = xpTr.GetComponent<Image>();
+                    if (xtImg != null) xtImg.color = new Color(0.035f, 0.042f, 0.050f, 1f);
+                }
+                if (xpFillImg != null) xpFillImg.color = ColStyleDAmber;
+                if (xpValueText != null) xpValueText.color = ColStyleDBoneText;
+            }
+
+            Transform tabsCard = body != null ? body.Find("SurvivorTabsContainer") : null;
+            if (tabsCard != null)
+            {
+                // Move sunken well frame onto TabBody (matching Story Reader) so TabBar sits cleanly above the well
+                var tcImg = tabsCard.GetComponent<Image>();
+                if (tcImg != null)
+                {
+                    tcImg.sprite = null;
+                    tcImg.color = Color.clear;
+                }
+                SetOutlineEnabled(tabsCard, false);
+
+                Transform tabBar = tabsCard.Find("TabBar");
+                if (tabBar != null)
+                {
+                    if (tabBar is RectTransform tbRt)
+                    {
+                        tbRt.offsetMin = new Vector2(0f, -26f);
+                        tbRt.offsetMax = Vector2.zero;
+                    }
+                    var stBarImg = tabBar.GetComponent<Image>();
+                    if (stBarImg != null) stBarImg.color = Color.clear;
+                    var stHlg = tabBar.GetComponent<HorizontalLayoutGroup>();
+                    if (stHlg != null)
+                    {
+                        stHlg.padding = new RectOffset(0, 0, 0, 0);
+                        stHlg.spacing = 4f;
+                    }
+                }
+
+                for (int i = 0; i < survivorTabButtons.Count; i++)
+                {
+                    ApplyButtonSprite(survivorTabButtons[i], ColStyleDTabInactive, ColStyleDRust, 3.2f);
+                }
+
+                Transform tabBody = tabsCard.Find("TabBody");
+                if (tabBody != null)
+                {
+                    if (tabBody is RectTransform tbodyRt)
+                    {
+                        tbodyRt.offsetMin = Vector2.zero;
+                        tbodyRt.offsetMax = new Vector2(0f, -30f);
+                    }
+                    Image wellImg = tabBody.GetComponent<Image>() ?? tabBody.gameObject.AddComponent<Image>();
+                    wellImg.raycastTarget = false;
+                    ApplySlicedSprite(wellImg, styleDWellRecessedSprite, 3.2f, Color.white);
+
+                    foreach (string viewName in new[] { "View_Mortal", "View_Skills", "View_Traits", "View_TeamGear" })
+                    {
+                        Transform vTr = tabBody.Find(viewName);
+                        if (vTr is RectTransform vRt) StretchFull(vRt, 10f, 10f, 10f, 10f);
+                    }
+                }
+            }
+
+            if (survivorTabMortalView != null)
+            {
+                Transform mHdr = survivorTabMortalView.transform.Find("SubHeader");
+                if (mHdr != null) mHdr.gameObject.SetActive(false);
+                Transform mList = survivorTabMortalView.transform.Find("MortalList");
+                if (mList != null) mList.gameObject.SetActive(false);
+
+                BuildStyleDMortalGridAndCondition(survivorTabMortalView.transform);
+            }
+
+            StyleSkillsTraitsAndGearViews();
+        }
+
+        private void BuildStyleDMortalGridAndCondition(Transform viewMortal)
+        {
+            if (viewMortal == null) return;
+
+            Transform existingGrid = viewMortal.Find("StyleD_MortalGrid");
+            if (existingGrid != null)
+            {
+                _styleDMortalGridObj = existingGrid.gameObject;
+                for (int i = existingGrid.childCount - 1; i >= 0; i--)
+                {
+                    GameObject c = existingGrid.GetChild(i).gameObject;
+                    c.transform.SetParent(null, false);
+                    if (Application.isPlaying) Destroy(c);
+                    else DestroyImmediate(c);
+                }
+            }
+            else
+            {
+                _styleDMortalGridObj = new GameObject("StyleD_MortalGrid", typeof(RectTransform), typeof(GridLayoutGroup));
+                _styleDMortalGridObj.transform.SetParent(viewMortal, false);
+            }
+
+            RectTransform gridRt = _styleDMortalGridObj.GetComponent<RectTransform>();
+            gridRt.anchorMin = Vector2.zero;
+            gridRt.anchorMax = Vector2.one;
+            gridRt.offsetMin = new Vector2(4f, 38f);
+            gridRt.offsetMax = new Vector2(-4f, -4f);
+
+            GridLayoutGroup glg = _styleDMortalGridObj.GetComponent<GridLayoutGroup>();
+            glg.cellSize = new Vector2(96f, 134f);
+            glg.spacing = new Vector2(8f, 8f);
+            glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            glg.constraintCount = 3;
+            glg.childAlignment = TextAnchor.MiddleCenter;
+
+            _styleDMortalValueTexts.Clear();
+            (string code, string name)[] stats =
+            {
+                ("MGT", "MIGHT"),
+                ("OBS", "OBSERVE"),
+                ("RFL", "REFLEX"),
+                ("TAC", "TACTICS"),
+                ("AUS", "AUSPICE"),
+                ("LDR", "LEADER")
+            };
+
+            foreach (var st in stats)
+            {
+                GameObject tile = new GameObject($"StatTile_{st.code}", typeof(RectTransform), typeof(Image));
+                tile.transform.SetParent(_styleDMortalGridObj.transform, false);
+                ApplySlicedSprite(tile.GetComponent<Image>(), styleDStatCardSprite, 3.2f, Color.white);
+
+                TextMeshProUGUI codeTmp = CreateText(tile.transform, "Code", st.code, 12.5f, new Color(0.761f, 0.737f, 0.690f, 1f),
+                    TextAlignmentOptions.Top, FontStyles.Bold, FontRole.Display, wrap: false);
+                codeTmp.rectTransform.anchorMin = new Vector2(0f, 0.68f);
+                codeTmp.rectTransform.anchorMax = new Vector2(1f, 1f);
+                codeTmp.rectTransform.offsetMin = new Vector2(4f, 0f);
+                codeTmp.rectTransform.offsetMax = new Vector2(-4f, -11f);
+
+                TextMeshProUGUI valTmp = CreateText(tile.transform, "Value", "0", 34f, new Color(0.937f, 0.914f, 0.863f, 1f),
+                    TextAlignmentOptions.Center, FontStyles.Bold, FontRole.Display, wrap: false);
+                valTmp.rectTransform.anchorMin = new Vector2(0f, 0.22f);
+                valTmp.rectTransform.anchorMax = new Vector2(1f, 0.74f);
+                valTmp.rectTransform.offsetMin = Vector2.zero;
+                valTmp.rectTransform.offsetMax = Vector2.zero;
+                _styleDMortalValueTexts[st.code] = valTmp;
+
+                TextMeshProUGUI subTmp = CreateText(tile.transform, "Sub", st.name, 8.5f, new Color(0.490f, 0.471f, 0.431f, 1f),
+                    TextAlignmentOptions.Bottom, FontStyles.Bold, FontRole.Mono, wrap: false);
+                subTmp.rectTransform.anchorMin = new Vector2(0f, 0f);
+                subTmp.rectTransform.anchorMax = new Vector2(1f, 0.26f);
+                subTmp.rectTransform.offsetMin = new Vector2(4f, 10f);
+                subTmp.rectTransform.offsetMax = new Vector2(-4f, 0f);
+            }
+
+            Transform condTr = viewMortal.Find("StyleD_ConditionBar");
+            GameObject condGo = condTr != null ? condTr.gameObject : new GameObject("StyleD_ConditionBar", typeof(RectTransform), typeof(Image));
+            if (condTr == null) condGo.transform.SetParent(viewMortal, false);
+
+            RectTransform cRt = condGo.GetComponent<RectTransform>();
+            cRt.anchorMin = new Vector2(0f, 0f);
+            cRt.anchorMax = new Vector2(1f, 0f);
+            cRt.pivot = new Vector2(0.5f, 0f);
+            cRt.offsetMin = new Vector2(4f, 4f);
+            cRt.offsetMax = new Vector2(-4f, 32f);
+            ApplySlicedSprite(condGo.GetComponent<Image>(), styleDWellRecessedSprite, 3.2f, Color.white);
+
+            TextMeshProUGUI existingCondTmp = condGo.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (existingCondTmp != null)
+            {
+                _styleDConditionText = existingCondTmp;
+                _styleDConditionText.text = "CONDITION: <color=#3AD679>STABLE</color>";
+                _styleDConditionText.color = ColStyleDMutedStone;
+            }
+            else
+            {
+                _styleDConditionText = CreateText(condGo.transform, "Label", "CONDITION: <color=#3AD679>STABLE</color>", 10f,
+                    ColStyleDMutedStone, TextAlignmentOptions.Center, FontStyles.Bold, FontRole.Mono, wrap: false);
+                StretchFull(_styleDConditionText.rectTransform, 6f, 0f, 6f, 0f);
+            }
+        }
+
+        private void SetStyleDMortalValue(string key, int val)
+        {
+            if (_styleDMortalValueTexts.TryGetValue(key, out TextMeshProUGUI tmp) && tmp != null)
+            {
+                tmp.text = val.ToString();
+            }
+        }
+
+        private void StyleSkillsTraitsAndGearViews()
+        {
+            if (survivorTabSkillsView != null)
+            {
+                var skHdr = survivorTabSkillsView.transform.Find("SubHeader")?.GetComponent<TextMeshProUGUI>();
+                if (skHdr != null)
+                {
+                    skHdr.text = "SURVIVAL SKILLS (0 - 5)";
+                    skHdr.color = ColStyleDMutedStone;
+                }
+
+                Transform skList = survivorTabSkillsView.transform.Find("SkillsList");
+                if (skList != null)
+                {
+                    for (int i = 0; i < skList.childCount; i++)
+                    {
+                        Transform row = skList.GetChild(i);
+                        ApplySlicedSprite(row.GetComponent<Image>(), styleDStatCardSprite, 3.8f, Color.white);
+                        var t = row.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                        if (t != null) t.color = ColStyleDBoneText;
+                        var d = row.Find("Desc")?.GetComponent<TextMeshProUGUI>();
+                        if (d != null) d.color = ColStyleDMutedStone;
+                        var track = row.Find("Track")?.GetComponent<Image>();
+                        if (track != null) track.color = new Color(0.035f, 0.042f, 0.050f, 1f);
+                    }
+                }
+                for (int i = 0; i < skillRows.Count; i++)
+                {
+                    if (skillRows[i]?.fillImage != null) skillRows[i].fillImage.color = ColStyleDAmber;
+                    if (skillRows[i]?.valueText != null) skillRows[i].valueText.color = ColStyleDAmber;
+                }
+            }
+
+            if (traitsCountHeaderText != null)
+            {
+                traitsCountHeaderText.text = StripLeadingSlashes(traitsCountHeaderText.text);
+                traitsCountHeaderText.color = ColStyleDMutedStone;
+            }
+
+            if (survivorTabTeamGearView != null)
+            {
+                var tgVlg = survivorTabTeamGearView.GetComponent<VerticalLayoutGroup>();
+                if (tgVlg != null) tgVlg.spacing = 5f;
+
+                var gh = survivorTabTeamGearView.transform.Find("GearHeader")?.GetComponent<TextMeshProUGUI>();
+                if (gh != null)
+                {
+                    gh.text = "EQUIPPED LOADOUT";
+                    gh.color = ColStyleDMutedStone;
+                }
+
+                foreach (string rowName in new[] { "EquipSlot_WPN", "ArmorRow_Top", "ArmorRow_Bottom" })
+                {
+                    Transform arTr = survivorTabTeamGearView.transform.Find(rowName);
+                    if (arTr != null && arTr.GetComponent<LayoutElement>() is LayoutElement arLe)
+                    {
+                        arLe.preferredHeight = 48f;
+                        arLe.minHeight = 48f;
+                    }
+                }
+
+                for (int i = 0; i < equippedGearSlots.Count; i++)
+                {
+                    var eqSlot = equippedGearSlots[i];
+                    if (eqSlot == null) continue;
+                    if (eqSlot.bgImage != null && eqSlot.bgImage.GetComponent<LayoutElement>() is LayoutElement eqLe)
+                    {
+                        eqLe.preferredHeight = 48f;
+                        eqLe.minHeight = 48f;
+                    }
+                    ApplySlicedSprite(eqSlot.bgImage, styleDStatCardSprite, 3.8f, Color.white);
+                    if (eqSlot.button != null) ConfigureButtonColors(eqSlot.button, Color.white, new Color(1.12f, 1.08f, 1.0f, 1f));
+                    Transform slotTr = eqSlot.bgImage != null ? eqSlot.bgImage.transform : null;
+                    if (slotTr != null)
+                    {
+                        float iconSz = eqSlot.slotTag == "WPN" ? 32f : 28f;
+                        Transform icF = slotTr.Find("IconFrame");
+                        if (icF is RectTransform icRt)
+                        {
+                            icRt.anchoredPosition = new Vector2(8f, 0f);
+                            icRt.sizeDelta = new Vector2(iconSz, iconSz);
+                            ApplySlicedSprite(icF.GetComponent<Image>(), styleDSlotRecessedSprite, 2.2f, Color.white);
+                        }
+                        var tag = slotTr.Find("SlotTag")?.GetComponent<TextMeshProUGUI>();
+                        if (tag != null)
+                        {
+                            tag.text = tag.text.Replace(" // ", ": ");
+                            tag.color = ColStyleDAmber;
+                            tag.rectTransform.anchorMin = new Vector2(0f, 0.50f);
+                            tag.rectTransform.anchorMax = Vector2.one;
+                            tag.rectTransform.offsetMin = new Vector2(tag.rectTransform.offsetMin.x, 0f);
+                            tag.rectTransform.offsetMax = new Vector2(-8f, -7f);
+                        }
+                        if (eqSlot.itemNameText != null)
+                        {
+                            eqSlot.itemNameText.rectTransform.anchorMin = Vector2.zero;
+                            eqSlot.itemNameText.rectTransform.anchorMax = new Vector2(1f, 0.52f);
+                            eqSlot.itemNameText.rectTransform.offsetMin = new Vector2(eqSlot.itemNameText.rectTransform.offsetMin.x, 7f);
+                            eqSlot.itemNameText.rectTransform.offsetMax = new Vector2(-8f, 0f);
+                        }
+                    }
+                }
+
+                if (partyHeaderText != null)
+                {
+                    partyHeaderText.text = "SURVIVOR GROUP (1 / 4)";
+                    partyHeaderText.color = ColStyleDAmber;
+                    if (partyHeaderText.GetComponent<LayoutElement>() is LayoutElement phLe)
+                    {
+                        phLe.preferredHeight = 16f;
+                        phLe.minHeight = 16f;
+                    }
+                }
+
+                Transform pCard = survivorTabTeamGearView.transform.Find("PartyGroupCard");
+                if (pCard != null)
+                {
+                    ApplySlicedSprite(pCard.GetComponent<Image>(), styleDWellRecessedSprite, 3.4f, Color.white);
+                    var pVlg = pCard.GetComponent<VerticalLayoutGroup>();
+                    if (pVlg != null)
+                    {
+                        pVlg.padding = new RectOffset(6, 6, 6, 6);
+                        pVlg.spacing = 4f;
+                    }
+                    for (int i = 0; i < pCard.childCount; i++)
+                    {
+                        Transform pRow = pCard.GetChild(i);
+                        ApplySlicedSprite(pRow.GetComponent<Image>(), styleDStatCardSprite, 4.0f, i == 0 ? Color.white : new Color(0.88f, 0.88f, 0.88f, 0.90f));
+                        var nTmp = pRow.Find("Name")?.GetComponent<TextMeshProUGUI>();
+                        if (nTmp != null)
+                        {
+                            nTmp.text = nTmp.text.Replace(" // ", " - ");
+                            nTmp.color = i == 0 ? ColStyleDBoneText : ColStyleDMutedStone;
+                            nTmp.rectTransform.offsetMin = new Vector2(10f, 0f);
+                        }
+                        var mTmp = pRow.Find("Meta")?.GetComponent<TextMeshProUGUI>();
+                        if (mTmp != null)
+                        {
+                            mTmp.rectTransform.offsetMax = new Vector2(-10f, 0f);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void StyleStyleDMapAndNotePanel()
+        {
+            if (bottomLeftMapPanel == null) return;
+            StyleOuterPanelChassis(bottomLeftMapPanel, "4F MAP");
+
+            Transform body = bottomLeftMapPanel.Find("Body");
+            if (body == null) return;
+
+            Transform miniMap = body.Find("MiniMapCanvas");
+            if (miniMap != null)
+            {
+                if (miniMap is RectTransform mmRt)
+                {
+                    mmRt.offsetMin = new Vector2(0f, 84f);
+                    mmRt.offsetMax = Vector2.zero;
+                }
+                Image mmImg = miniMap.GetComponent<Image>();
+                if (mmImg != null && styleDMapPaperSprite != null)
+                {
+                    mmImg.sprite = styleDMapPaperSprite;
+                    mmImg.type = Image.Type.Simple;
+                    mmImg.color = Color.white;
+                }
+                SetOutlineEnabled(miniMap, false);
+
+                Transform bp = miniMap.Find("BlueprintViewport");
+                if (bp != null)
+                {
+                    Image bpImg = bp.GetComponent<Image>();
+                    if (bpImg != null) bpImg.color = Color.clear;
+
+                    Transform gridOverlay = bp.Find("BlueprintGridOverlay");
+                    if (gridOverlay != null) gridOverlay.gameObject.SetActive(false);
+
+                    Transform fpCont = bp.Find("FloorplanContainer");
+                    if (fpCont is RectTransform fcRt)
+                    {
+                        fcRt.offsetMin = new Vector2(14f, 22f);
+                        fcRt.offsetMax = new Vector2(-14f, -24f);
+                    }
+
+                    Transform subHdr = bp.Find("BlueprintSubHeader");
+                    if (subHdr != null)
+                    {
+                        Image shBg = subHdr.GetComponent<Image>() ?? subHdr.gameObject.AddComponent<Image>();
+                        shBg.color = new Color(0.05f, 0.055f, 0.065f, 0.92f);
+                        shBg.raycastTarget = false;
+                        if (subHdr is RectTransform shRt)
+                        {
+                            shRt.anchorMin = new Vector2(0f, 1f);
+                            shRt.anchorMax = new Vector2(1f, 1f);
+                            shRt.offsetMin = new Vector2(46f, -24f);
+                            shRt.offsetMax = new Vector2(-46f, -6f);
+                        }
+                        var apTmp = subHdr.Find("ActivePosBanner")?.GetComponent<TextMeshProUGUI>();
+                        if (apTmp != null)
+                        {
+                            apTmp.alignment = TextAlignmentOptions.Center;
+                            apTmp.fontSize = 8.2f;
+                            apTmp.rectTransform.offsetMin = new Vector2(6f, 1f);
+                            apTmp.rectTransform.offsetMax = new Vector2(-6f, -1f);
+                        }
+                    }
+
+                    Transform legBar = bp.Find("LegendBar");
+                    if (legBar != null)
+                    {
+                        Image lbBg = legBar.GetComponent<Image>() ?? legBar.gameObject.AddComponent<Image>();
+                        lbBg.color = new Color(0.05f, 0.058f, 0.068f, 0.98f);
+                        lbBg.raycastTarget = false;
+                        if (legBar is RectTransform lbRt)
+                        {
+                            lbRt.anchorMin = Vector2.zero;
+                            lbRt.anchorMax = new Vector2(1f, 0f);
+                            lbRt.offsetMin = Vector2.zero;
+                            lbRt.offsetMax = new Vector2(0f, 17f);
+                        }
+                        var lTmp = legBar.Find("LegendText")?.GetComponent<TextMeshProUGUI>();
+                        if (lTmp != null)
+                        {
+                            lTmp.text = "<color=#D95829>■</color> CURRENT  <color=#8C8578>■</color> VISITED  <color=#2B2823>■</color> UNVISITED  <color=#C94A29>■</color> LOCKED  <color=#CF9232>■</color> BLOCKED";
+                            lTmp.color = ColStyleDBoneText;
+                        }
+                    }
+                }
+            }
+
+            Transform noteTr = body.Find("PinnedNoteCard");
+            if (noteTr != null)
+            {
+                if (noteTr is RectTransform nRt)
+                {
+                    nRt.offsetMin = Vector2.zero;
+                    nRt.offsetMax = new Vector2(0f, 78f);
+                }
+                Image nImg = noteTr.GetComponent<Image>();
+                if (nImg != null && styleDPinnedNoteSprite != null)
+                {
+                    ApplySlicedSprite(nImg, styleDPinnedNoteSprite, 2.2f, Color.white);
+                    if (nImg.canvasRenderer != null) nImg.canvasRenderer.SetColor(Color.white);
+                }
+                SetOutlineEnabled(noteTr, false);
+                if (pinnedNoteBtn != null)
+                {
+                    ConfigureButtonColors(pinnedNoteBtn, Color.white, new Color(0.95f, 0.92f, 0.84f, 1f));
+                }
+
+                // Separate 1:1 Pushpin Image anchored onto top paper margin so it sits firmly on the card
+                if (styleDRedPushpinSprite != null)
+                {
+                    Transform pinTr = noteTr.Find("StyleD_RedPushpin");
+                    GameObject pinGo = pinTr != null ? pinTr.gameObject : new GameObject("StyleD_RedPushpin", typeof(RectTransform), typeof(Image));
+                    if (pinTr == null) pinGo.transform.SetParent(noteTr, false);
+                    RectTransform pinRt = pinGo.GetComponent<RectTransform>();
+                    pinRt.anchorMin = new Vector2(0.5f, 1f);
+                    pinRt.anchorMax = new Vector2(0.5f, 1f);
+                    pinRt.pivot = new Vector2(0.5f, 0.5f);
+                    pinRt.anchoredPosition = new Vector2(0f, -11f);
+                    pinRt.sizeDelta = new Vector2(18f, 18f);
+                    Image pinImg = pinGo.GetComponent<Image>();
+                    pinImg.sprite = styleDRedPushpinSprite;
+                    pinImg.type = Image.Type.Simple;
+                    pinImg.preserveAspect = true;
+                    pinImg.color = Color.white;
+                    pinImg.raycastTarget = false;
+                    pinGo.transform.SetAsLastSibling();
+                }
+
+                var tagTmp = noteTr.Find("Tag")?.GetComponent<TextMeshProUGUI>();
+                if (tagTmp != null)
+                {
+                    SundayTypography.ApplyFont(tagTmp, FontRole.Typewriter);
+                    tagTmp.text = "OBJECTIVE:";
+                    tagTmp.color = ColStyleDPaperHeader;
+                    tagTmp.fontStyle = FontStyles.Bold;
+                    tagTmp.fontSize = 10.8f;
+                    tagTmp.rectTransform.offsetMin = new Vector2(16f, -26f);
+                    tagTmp.rectTransform.offsetMax = new Vector2(-16f, -10f);
+                }
+
+                var bodyTmp = noteTr.Find("Body")?.GetComponent<TextMeshProUGUI>() ?? pinnedNoteText;
+                if (bodyTmp != null)
+                {
+                    SundayTypography.ApplyFont(bodyTmp, FontRole.Typewriter);
+                    bodyTmp.color = ColStyleDPaperInk;
+                    bodyTmp.fontStyle = FontStyles.Bold;
+                    bodyTmp.fontSize = 11f;
+                    bodyTmp.rectTransform.offsetMin = new Vector2(16f, 8f);
+                    bodyTmp.rectTransform.offsetMax = new Vector2(-16f, -27f);
+                }
+            }
+
+            if (hubScreen != null && hubScreen.TacticalMap != null)
+            {
+                hubScreen.TacticalMap.SetHorizontalMiniMapMode(true, 0.88f);
+                hubScreen.TacticalMap.RefreshAllNodes();
+            }
+        }
+
+        private void EnsureStyleDChoiceDeckSpacing()
+        {
+            if (!useStyleDHardwareTheme || hubScreen == null || hubScreen.HubMenuContainer == null) return;
+            Transform root = hubScreen.HubMenuContainer.transform;
+            var rootVlg = root.GetComponent<VerticalLayoutGroup>();
+            if (rootVlg != null && (rootVlg.padding.left != 10 || rootVlg.spacing != 6f))
+            {
+                rootVlg.padding = new RectOffset(10, 10, 10, 10);
+                rootVlg.spacing = 6f;
+            }
+            Transform contentTr = root.Find("ChoiceScrollView/Viewport/Content");
+            if (contentTr != null)
+            {
+                var cVlg = contentTr.GetComponent<VerticalLayoutGroup>();
+                if (cVlg != null && (cVlg.spacing != 6f || cVlg.padding.left != 4 || cVlg.padding.top != 4))
+                {
+                    cVlg.padding = new RectOffset(4, 6, 4, 4);
+                    cVlg.spacing = 6f;
+                    if (contentTr is RectTransform cRt) LayoutRebuilder.ForceRebuildLayoutImmediate(cRt);
+                }
+            }
+        }
+
+        private void StyleStyleDReaderAndDeck()
+        {
+            if (bottomCenterReaderPanel != null)
+            {
+                ApplySlicedSprite(bottomCenterReaderPanel.GetComponent<Image>(), styleDPanelChassisSprite, 3.2f, Color.white);
+
+                Transform tabBar = bottomCenterReaderPanel.Find("TabBar");
+                if (tabBar != null)
+                {
+                    if (tabBar is RectTransform tbRt)
+                    {
+                        tbRt.anchorMin = new Vector2(0f, 1f);
+                        tbRt.anchorMax = new Vector2(1f, 1f);
+                        tbRt.offsetMin = new Vector2(18f, -44f);
+                        tbRt.offsetMax = new Vector2(-18f, -18f);
+                    }
+                    Image tbImg = tabBar.GetComponent<Image>();
+                    if (tbImg != null) tbImg.color = new Color(0f, 0f, 0f, 0f);
+                    var hlg = tabBar.GetComponent<HorizontalLayoutGroup>();
+                    if (hlg != null)
+                    {
+                        hlg.padding = new RectOffset(0, 108, 0, 0);
+                        hlg.spacing = 5f;
+                    }
+                    Transform fgTr = tabBar.Find("FontSizeControlGroup");
+                    if (fgTr is RectTransform fgRt)
+                    {
+                        fgRt.anchoredPosition = Vector2.zero;
+                        fgRt.sizeDelta = new Vector2(102f, 26f);
+                    }
+
+                    for (int i = 0; i < readerTabButtons.Count; i++)
+                    {
+                        ApplyButtonSprite(readerTabButtons[i], ColStyleDTabInactive, ColStyleDRust, 3.2f);
+                    }
+
+                    ApplyButtonSprite(_fontDecBtn, ColStyleDMetalBtn, ColStyleDMetalBtn * 1.25f, 3.6f, ColStyleDBoneText);
+                    ApplyButtonSprite(_fontResetBtn, ColStyleDMetalBtn, ColStyleDMetalBtn * 1.25f, 3.6f, ColStyleDAmber);
+                    ApplyButtonSprite(_fontIncBtn, ColStyleDMetalBtn, ColStyleDMetalBtn * 1.25f, 3.6f, ColStyleDBoneText);
+                }
+
+                Transform readerBody = bottomCenterReaderPanel.Find("ReaderBody");
+                if (readerBody != null)
+                {
+                    if (readerBody is RectTransform rbRt)
+                    {
+                        rbRt.anchorMin = Vector2.zero;
+                        rbRt.anchorMax = Vector2.one;
+                        rbRt.offsetMin = new Vector2(18f, 18f);
+                        rbRt.offsetMax = new Vector2(-18f, -48f);
+                    }
+
+                    Image wellImg = readerBody.GetComponent<Image>() ?? readerBody.gameObject.AddComponent<Image>();
+                    wellImg.raycastTarget = false;
+                    ApplySlicedSprite(wellImg, styleDWellRecessedSprite, 3.2f, Color.white);
+
+                    foreach (string viewName in new[] { "View_Situation", "View_StoryLog", "View_Notes", "View_Floor" })
+                    {
+                        Transform vTr = readerBody.Find(viewName);
+                        if (vTr is RectTransform vRt) StretchFull(vRt, 10f, 10f, 10f, 10f);
+                    }
+
+                    if (inlineStoryLogScroll != null && inlineStoryLogScroll.content != null)
+                    {
+                        var slVlg = inlineStoryLogScroll.content.GetComponent<VerticalLayoutGroup>();
+                        if (slVlg != null) slVlg.padding = new RectOffset(10, 14, 10, 44);
+                    }
+                    Transform notesContent = readerBody.Find("View_Notes/NotesScroll/Viewport/Content");
+                    if (notesContent != null)
+                    {
+                        var nVlg = notesContent.GetComponent<VerticalLayoutGroup>();
+                        if (nVlg != null) nVlg.padding = new RectOffset(10, 14, 10, 10);
+                    }
+
+                    if (situationScrollContent != null)
+                    {
+                        var sVlg = situationScrollContent.GetComponent<VerticalLayoutGroup>();
+                        if (sVlg != null) sVlg.padding = new RectOffset(4, 8, 4, 4);
+
+                        Transform sbTr = situationScrollContent.Find("SituationBox");
+                        if (sbTr != null)
+                        {
+                            SetOutlineEnabled(sbTr, false);
+                            var sbImg = sbTr.GetComponent<Image>();
+                            if (sbImg != null) sbImg.color = Color.clear;
+                            var goldBar = sbTr.Find("GoldBar")?.GetComponent<Image>();
+                            if (goldBar != null) goldBar.color = ColStyleDRustBright;
+                            var logBtn = sbTr.Find("TopRow/Btn_OpenStoryLog")?.GetComponent<Button>();
+                            ApplyButtonSprite(logBtn, ColStyleDMetalBtn, ColStyleDRust, 3.0f, ColStyleDBoneText);
+                            var logTmp = logBtn != null ? logBtn.GetComponentInChildren<TextMeshProUGUI>(true) : null;
+                            if (logTmp != null)
+                            {
+                                logTmp.text = "<b>[ VIEW LOG ]</b>";
+                                logTmp.color = ColStyleDBoneText;
+                            }
+                            var sitBody = sbTr.Find("SituationBody")?.GetComponent<TextMeshProUGUI>();
+                            if (sitBody != null)
+                            {
+                                SundayTypography.ApplyFont(sitBody, FontRole.Narrative);
+                                sitBody.color = ColStyleDBoneText;
+                            }
+                        }
+                    }
+
+                    if (inlineStoryLogText != null)
+                    {
+                        SundayTypography.ApplyFont(inlineStoryLogText, FontRole.Narrative);
+                        inlineStoryLogText.color = ColStyleDBoneText;
+                    }
+                    if (inlineNotesText != null) inlineNotesText.color = ColStyleDBoneText;
+                    if (inlineTakeAllFloorBtn != null)
+                    {
+                        ApplyButtonSprite(inlineTakeAllFloorBtn, ColStyleDEquipBtn, ColStyleDEquipBtn * 1.25f, 3.0f, ColStyleDBoneText);
+                    }
+                    if (_jumpToLatestLogBtn != null)
+                    {
+                        ApplyButtonSprite(_jumpToLatestLogBtn, ColStyleDMetalBtn, ColStyleDRust, 3.0f, ColStyleDAmber);
+                    }
+                }
+            }
+
+            if (bottomRightActionPanel != null)
+            {
+                StyleOuterPanelChassis(bottomRightActionPanel, "ACTIONS");
+
+                if (choicesViewport != null)
+                {
+                    Image cvImg = choicesViewport.GetComponent<Image>() ?? choicesViewport.gameObject.AddComponent<Image>();
+                    cvImg.raycastTarget = false;
+                    ApplySlicedSprite(cvImg, styleDWellRecessedSprite, 3.2f, Color.white);
+
+                    if (hubScreen != null && hubScreen.HubMenuContainer != null)
+                    {
+                        EnsureStyleDChoiceDeckSpacing();
+                        foreach (var tcb in hubScreen.HubMenuContainer.GetComponentsInChildren<TacticalChoiceButton>(true))
+                        {
+                            tcb?.RefreshStyleDTheme();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void StyleStyleDAwakeningBoxes()
+        {
+            if (hubScreen == null || hubScreen.AwakeningContainer == null) return;
+            Transform aw = hubScreen.AwakeningContainer.transform;
+
+            Transform easTr = aw.Find("Beat1Container/EASAlertBox");
+            if (easTr != null)
+            {
+                ApplySlicedSprite(easTr.GetComponent<Image>(), styleDStatCardSprite, 2.4f, new Color(0.95f, 0.72f, 0.70f, 0.94f), disableOutline: false);
+                var ol = easTr.GetComponent<Outline>();
+                if (ol != null) ol.effectColor = ColStyleDRustBright;
+            }
+
+            Transform monoTr = aw.Find("Beat2Container/MonologueBox");
+            if (monoTr != null)
+            {
+                ApplySlicedSprite(monoTr.GetComponent<Image>(), styleDStatCardSprite, 2.4f, Color.white, disableOutline: true);
+                Transform pFrame = monoTr.Find("PortraitFrame") ?? monoTr.Find("SpeakerPortraitFrame");
+                if (pFrame != null)
+                {
+                    ApplySlicedSprite(pFrame.GetComponent<Image>(), styleDSlotRecessedSprite, 2.2f, Color.white, disableOutline: true);
+                }
+                foreach (var ol in monoTr.GetComponentsInChildren<Outline>(true))
+                {
+                    if (ol != null) ol.enabled = false;
+                }
+            }
+
+            Transform tableTr = aw.Find("Beat3Container/TableStashDisplay");
+            if (tableTr != null)
+            {
+                ApplySlicedSprite(tableTr.GetComponent<Image>(), styleDWellRecessedSprite, 2.4f, Color.white, disableOutline: true);
+
+                Transform gb = tableTr.Find("GoldBar");
+                if (gb != null) gb.gameObject.SetActive(false);
+
+                VerticalLayoutGroup sVlg = tableTr.GetComponent<VerticalLayoutGroup>();
+                if (sVlg != null)
+                {
+                    sVlg.padding = new RectOffset(14, 14, 8, 10);
+                    sVlg.spacing = 4f;
+                }
+
+                TextMeshProUGUI hdrTmp = tableTr.Find("Header")?.GetComponent<TextMeshProUGUI>();
+                if (hdrTmp != null)
+                {
+                    hdrTmp.text = "TABLE STASH - CURRENT WORK GEAR & WEAPONS";
+                    hdrTmp.fontSize = 11f;
+                    hdrTmp.color = ColStyleDAmber;
+                    hdrTmp.rectTransform.sizeDelta = new Vector2(0f, 18f);
+                }
+
+                Transform gridTr = tableTr.Find("Grid");
+                if (gridTr != null)
+                {
+                    if (gridTr is RectTransform gRt) gRt.sizeDelta = new Vector2(0f, 82f);
+                    var hlg = gridTr.GetComponent<HorizontalLayoutGroup>();
+                    if (hlg != null)
+                    {
+                        hlg.spacing = 8f;
+                        hlg.childAlignment = TextAnchor.MiddleLeft;
+                    }
+                }
             }
         }
         #endregion

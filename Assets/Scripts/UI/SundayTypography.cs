@@ -6,10 +6,12 @@ namespace SundayLastBreath.UI
 {
     public enum FontRole
     {
-        Display,    // Oswald-Bold: Headers, Titles, Alert Banners, Primary Buttons
-        Mono,       // JetBrainsMono: Tactical Stats, Dossier Codes, Badges, Terminal Readouts
-        Narrative,  // Merriweather: Atmospheric Quotes, Story Prose, Literary Monologues
-        Body        // Inter: Clean UI Descriptions, Input Fields, General Labels
+        Display,    // Oswald-Bold / Style D: ChakraPetch-Bold
+        Mono,       // JetBrainsMono / Style D: IBMPlexMono-Regular
+        Narrative,  // Merriweather / Style D: Spectral-Regular
+        Body,       // Inter / Style D: IBMPlexMono-Regular
+        VcrOsd,     // VCR_OSD_MONO_1.001: 90s CRT/VHS On-Screen Display (Location, Time, Day)
+        Typewriter  // SpecialElite-Regular: Pinned Physical Paper Note
     }
 
     /// <summary>
@@ -18,15 +20,123 @@ namespace SundayLastBreath.UI
     /// </summary>
     public static class SundayTypography
     {
+        private const string NarrativeScalePrefKey = "SLB_NarrativeFontScale";
+        private static readonly float[] NarrativeScaleSteps = { 0.90f, 1.00f, 1.15f, 1.30f };
+        private static float _narrativeFontScale = -1f;
+
+        public static event System.Action OnNarrativeScaleChanged;
+
+        public static float NarrativeFontScale
+        {
+            get
+            {
+                if (_narrativeFontScale < 0f)
+                {
+                    float saved = PlayerPrefs.GetFloat(NarrativeScalePrefKey, 1.0f);
+                    _narrativeFontScale = SnapToNearestScale(saved);
+                }
+                return _narrativeFontScale;
+            }
+            set
+            {
+                float snapped = SnapToNearestScale(value);
+                if (!Mathf.Approximately(_narrativeFontScale, snapped))
+                {
+                    _narrativeFontScale = snapped;
+                    PlayerPrefs.SetFloat(NarrativeScalePrefKey, _narrativeFontScale);
+                    PlayerPrefs.Save();
+                    OnNarrativeScaleChanged?.Invoke();
+                }
+            }
+        }
+
+        public static int NarrativeFontScalePercent => Mathf.RoundToInt(NarrativeFontScale * 100f);
+
+        private static int FindNearestScaleIndex(float scale)
+        {
+            float clamped = Mathf.Clamp(scale, NarrativeScaleSteps[0], NarrativeScaleSteps[NarrativeScaleSteps.Length - 1]);
+            int bestIdx = 1;
+            float bestDist = float.MaxValue;
+            for (int i = 0; i < NarrativeScaleSteps.Length; i++)
+            {
+                float d = Mathf.Abs(clamped - NarrativeScaleSteps[i]);
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestIdx = i;
+                }
+            }
+            return bestIdx;
+        }
+
+        private static float SnapToNearestScale(float scale)
+        {
+            return NarrativeScaleSteps[FindNearestScaleIndex(scale)];
+        }
+
+        public static void StepNarrativeFontScale(int delta)
+        {
+            int curIdx = FindNearestScaleIndex(NarrativeFontScale);
+            int nextIdx = Mathf.Clamp(curIdx + delta, 0, NarrativeScaleSteps.Length - 1);
+            NarrativeFontScale = NarrativeScaleSteps[nextIdx];
+        }
+
+        public static void CycleNarrativeFontScale()
+        {
+            int curIdx = FindNearestScaleIndex(NarrativeFontScale);
+            int nextIdx = (curIdx + 1) % NarrativeScaleSteps.Length;
+            NarrativeFontScale = NarrativeScaleSteps[nextIdx];
+        }
+
+        public static bool StyleDThemeEnabled = false;
+
         private static TMP_FontAsset _displayFont;
         private static TMP_FontAsset _monoFont;
         private static TMP_FontAsset _narrativeFont;
         private static TMP_FontAsset _bodyFont;
+        private static TMP_FontAsset _vcrOsdFont;
+        private static TMP_FontAsset _styleDDisplayFont;
+        private static TMP_FontAsset _styleDMonoFont;
+        private static TMP_FontAsset _styleDNarrativeFont;
+        private static TMP_FontAsset _typewriterFont;
 
-        public static TMP_FontAsset DisplayFont => GetOrCreateFont(ref _displayFont, "Fonts/Oswald-Bold", includeMonoFallback: true);
-        public static TMP_FontAsset MonoFont => GetOrCreateFont(ref _monoFont, "Fonts/JetBrainsMono-Regular", includeMonoFallback: false);
-        public static TMP_FontAsset NarrativeFont => GetOrCreateFont(ref _narrativeFont, "Fonts/Merriweather-Regular", includeMonoFallback: true);
-        public static TMP_FontAsset BodyFont => GetOrCreateFont(ref _bodyFont, "Fonts/Inter-Regular", includeMonoFallback: true);
+        public static TMP_FontAsset DisplayFont => StyleDThemeEnabled
+            ? GetOrCreateFont(ref _styleDDisplayFont, "Fonts/ChakraPetch-Bold", includeMonoFallback: true)
+            : GetOrCreateFont(ref _displayFont, "Fonts/Oswald-Bold", includeMonoFallback: true);
+
+        public static TMP_FontAsset MonoFont => StyleDThemeEnabled
+            ? GetOrCreateFont(ref _styleDMonoFont, "Fonts/IBMPlexMono-Regular", includeMonoFallback: false)
+            : GetOrCreateFont(ref _monoFont, "Fonts/JetBrainsMono-Regular", includeMonoFallback: false);
+
+        public static TMP_FontAsset NarrativeFont => StyleDThemeEnabled
+            ? GetOrCreateFont(ref _styleDNarrativeFont, "Fonts/Spectral-Regular", includeMonoFallback: true)
+            : GetOrCreateFont(ref _narrativeFont, "Fonts/Merriweather-Regular", includeMonoFallback: true);
+
+        public static TMP_FontAsset BodyFont => StyleDThemeEnabled
+            ? MonoFont
+            : GetOrCreateFont(ref _bodyFont, "Fonts/Inter-Regular", includeMonoFallback: true);
+
+        public static TMP_FontAsset VcrOsdFont
+        {
+            get
+            {
+                bool wasNull = _vcrOsdFont == null || _vcrOsdFont.material == null;
+                TMP_FontAsset font = GetOrCreateFont(ref _vcrOsdFont, "Fonts/VCR_OSD_MONO_1.001", includeMonoFallback: true);
+                if (font != null && font.material != null && (wasNull || !font.material.IsKeywordEnabled("UNDERLAY_ON")))
+                {
+                    Material mat = font.material;
+                    mat.EnableKeyword("UNDERLAY_ON");
+                    if (mat.HasProperty("_UnderlayColor")) mat.SetColor("_UnderlayColor", new Color(0f, 0f, 0f, 0.78f));
+                    if (mat.HasProperty("_UnderlayOffsetX")) mat.SetFloat("_UnderlayOffsetX", 0.55f);
+                    if (mat.HasProperty("_UnderlayOffsetY")) mat.SetFloat("_UnderlayOffsetY", -0.55f);
+                    if (mat.HasProperty("_UnderlayDilate")) mat.SetFloat("_UnderlayDilate", 0.25f);
+                    if (mat.HasProperty("_UnderlaySoftness")) mat.SetFloat("_UnderlaySoftness", 0.45f);
+                    if (mat.HasProperty("_OutlineSoftness")) mat.SetFloat("_OutlineSoftness", 0.14f);
+                }
+                return font;
+            }
+        }
+        public static TMP_FontAsset TypewriterFont => GetOrCreateFont(ref _typewriterFont, "Fonts/SpecialElite-Regular", includeMonoFallback: true);
 
         private static TMP_FontAsset GetOrCreateFont(ref TMP_FontAsset cached, string resourcePath, bool includeMonoFallback)
         {
@@ -86,6 +196,8 @@ namespace SundayLastBreath.UI
                 case FontRole.Display: return DisplayFont;
                 case FontRole.Mono: return MonoFont;
                 case FontRole.Narrative: return NarrativeFont;
+                case FontRole.VcrOsd: return VcrOsdFont;
+                case FontRole.Typewriter: return TypewriterFont;
                 case FontRole.Body:
                 default: return BodyFont;
             }

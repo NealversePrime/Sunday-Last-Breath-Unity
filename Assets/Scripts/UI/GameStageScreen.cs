@@ -348,6 +348,10 @@ private TextMeshProUGUI pdaNameJobText => pdaCharNameText;
             }
         }
         public bool IsCombatModalOpen => combatModal != null && combatModal.gameObject.activeInHierarchy;
+        public void SetCombatModal(TacticalCombatModal modal)
+        {
+            if (modal != null) combatModal = modal;
+        }
 
 [Header("Modular Story Zones (Actors)")]
         [SerializeField] private SundayLastBreath.Zones.Unit407ApartmentZone unit407Zone;
@@ -735,6 +739,7 @@ private GameObject radioOutroObj;
 private TextMeshProUGUI activeTypewriterTarget;
 
 private string activeFullText = "";
+private string _lastFormattedSituationText = "";
 
 // =================================================================================================
         // SECTION 1: STAGE STATE, RUNTIME SYSTEMS & INSPECTOR REFERENCES
@@ -988,6 +993,7 @@ public GameObject DockContainerNarrative => dockContainerNarrative;
 
 private HybridCockpitController _hybridCockpit;
         public bool IsHybridCockpitActive => _hybridCockpit != null && _hybridCockpit.enabled;
+        public void RefreshCockpitVisualHierarchy() => _hybridCockpit?.ApplyCockpitVisualHierarchy(immediate: true);
         public IReadOnlyList<string> StoryLogs => _storyLogs;
         public List<InventoryEntry> GetCurrentFloorStashPublic()
         {
@@ -1133,11 +1139,40 @@ if (emergencyStairwellZone == null)
 EnsureHubMenuSanitized();
 
 HookUIButtons();
+
+SundayTypography.OnNarrativeScaleChanged -= OnNarrativeTypographyScaleChanged;
+SundayTypography.OnNarrativeScaleChanged += OnNarrativeTypographyScaleChanged;
 }
 
 protected virtual void OnDestroy()
 {
+SundayTypography.OnNarrativeScaleChanged -= OnNarrativeTypographyScaleChanged;
 if (Instance == this) Instance = null;
+}
+
+private void OnNarrativeTypographyScaleChanged()
+{
+RefreshNarrativeTypography();
+}
+
+public void RefreshNarrativeTypography()
+{
+float scale = SundayTypography.NarrativeFontScale;
+if (!string.IsNullOrEmpty(_lastFormattedSituationText))
+{
+UpdateSituationBoxTextAndHeight(_lastFormattedSituationText, preserveScroll: true);
+}
+if (modularDialogueSpeakerText != null)
+{
+modularDialogueSpeakerText.fontSize = Mathf.Round(11.5f * scale * 2f) * 0.5f;
+}
+if (modularDialogueSpeechText != null)
+{
+modularDialogueSpeechText.fontSize = Mathf.Round(13.5f * scale * 2f) * 0.5f;
+modularDialogueSpeechText.lineSpacing = 6f;
+}
+RefreshStoryLogUI(isNewEntry: false);
+_hybridCockpit?.RefreshNarrativeTypography();
 }
 
 private void InitializeAudioSources()
@@ -4647,6 +4682,8 @@ private string currentPDATab = "STATUS";
 public void SwitchConsoleMode(ConsoleMode mode, bool playSound = true)
 
 {
+if (IsHybridCockpitActive && mode == ConsoleMode.Gear) mode = ConsoleMode.Narrative;
+
 currentConsoleMode = mode;
 
 if (dockContainerNarrative != null) dockContainerNarrative.SetActive(mode == ConsoleMode.Narrative);
@@ -4931,7 +4968,7 @@ if (Keyboard.current.tabKey.wasPressedThisFrame || Keyboard.current.pKey.wasPres
 SwitchConsoleMode(currentConsoleMode == ConsoleMode.PDA ? ConsoleMode.Narrative : ConsoleMode.PDA);
 }
 
-else if (Keyboard.current.iKey.wasPressedThisFrame || Keyboard.current.f3Key.wasPressedThisFrame)
+else if (!IsHybridCockpitActive && (Keyboard.current.iKey.wasPressedThisFrame || Keyboard.current.f3Key.wasPressedThisFrame))
 
 {
 SwitchConsoleMode(currentConsoleMode == ConsoleMode.Gear ? ConsoleMode.Narrative : ConsoleMode.Gear);
@@ -4980,7 +5017,7 @@ if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.P))
 SwitchConsoleMode(currentConsoleMode == ConsoleMode.PDA ? ConsoleMode.Narrative : ConsoleMode.PDA);
 }
 
-else if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.F3))
+else if (!IsHybridCockpitActive && (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.F3)))
 
 {
 SwitchConsoleMode(currentConsoleMode == ConsoleMode.Gear ? ConsoleMode.Narrative : ConsoleMode.Gear);
@@ -7178,7 +7215,9 @@ AddFloorItem(itemId, quantity);
 
 UpdateFloorItemsNotification();
 
-lastOverflowNotice += $"\n<color=#F59E0B>[BACKPACK FULL] {itemId} (x{quantity}) placed in room container. Press [I] to manage items.</color>";
+lastOverflowNotice += IsHybridCockpitActive
+    ? $"\n<color=#F59E0B>[BACKPACK FULL] {itemId} (x{quantity}) placed on the floor (see FLOOR tab).</color>"
+    : $"\n<color=#F59E0B>[BACKPACK FULL] {itemId} (x{quantity}) placed in room container. Press [I] to manage items.</color>";
 
 return false;
 }
@@ -9339,13 +9378,21 @@ string sector = !string.IsNullOrEmpty(subtitle) ? subtitle.ToUpper() : "TACTICAL
 
 string timeStr = gameClock != null ? $"{gameClock.GetTimeString()} DAY {gameClock.DayCount}" : "23:45 DAY 0";
 
-tmp.text = $"<b><color=#F5A623>// CURRENT SITUATION</color></b>  <color=#78909C>// {sector} ({timeStr})</color>";
+if (_hybridCockpit != null && _hybridCockpit.IsStyleDHardwareTheme)
+{
+    sector = sector.Replace(" // ", " - ");
+    tmp.text = $"<b><color=#CF9232>CURRENT SITUATION</color></b>  <color=#8E897E>{sector} ({timeStr})</color>";
+}
+else
+{
+    tmp.text = $"<b><color=#F5A623>// CURRENT SITUATION</color></b>  <color=#78909C>// {sector} ({timeStr})</color>";
+}
 }
 }
 }
 }
 
-public void UpdateSituationBoxTextAndHeight(string formattedText)
+public void UpdateSituationBoxTextAndHeight(string formattedText, bool preserveScroll = false)
 
 {
 if (situationBox == null) return;
@@ -9358,17 +9405,28 @@ situationBox.SetActive(false);
 return;
 }
 
+_lastFormattedSituationText = formattedText;
 situationBox.SetActive(true);
 
 if (situationBoxText != null)
 
 {
+ScrollRect parentScroll = preserveScroll ? situationBox.GetComponentInParent<ScrollRect>() : null;
+RectTransform scrollContentRt = parentScroll != null ? parentScroll.content : null;
+float savedScrollY = scrollContentRt != null ? scrollContentRt.anchoredPosition.y : 0f;
+
 situationBoxText.text = formattedText;
 
+float scale = SundayTypography.NarrativeFontScale;
 if (IsHybridCockpitActive)
                 {
-                    situationBoxText.fontSize = 14f;
-                    situationBoxText.lineSpacing = 4f;
+                    situationBoxText.fontSize = Mathf.Round(14.5f * scale * 2f) * 0.5f;
+                    situationBoxText.lineSpacing = 8f;
+                }
+else
+                {
+                    situationBoxText.fontSize = Mathf.Round(15f * scale * 2f) * 0.5f;
+                    situationBoxText.lineSpacing = 7f;
                 }
 
 RectTransform sbtRect = situationBoxText.rectTransform;
@@ -9389,7 +9447,7 @@ situationBoxText.ForceMeshUpdate();
 
 // Compute exact wrapped height for current box width with comfortable padding
 
-float boxWidth = 1140f;
+float boxWidth = IsHybridCockpitActive ? 660f : 1140f;
 
 RectTransform sbRt = situationBox.GetComponent<RectTransform>();
 
@@ -9412,7 +9470,7 @@ float bottomPadding = 16f;
 float extraBreathingRoom = 8f;
 
 float targetH = IsHybridCockpitActive
-                    ? Mathf.Max(250f, preferredTextH + topPadding + bottomPadding + 14f)
+                    ? Mathf.Max(250f, preferredTextH + topPadding + bottomPadding + 18f)
                     : Mathf.Clamp(preferredTextH + topPadding + bottomPadding + extraBreathingRoom, 64f, 150f);
 
 LayoutElement le = situationBox.GetComponent<LayoutElement>();
@@ -9455,6 +9513,12 @@ RectTransform parentRt = hubMenuContainer.transform.parent.GetComponent<RectTran
 
 if (parentRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(parentRt);
 }
+}
+
+if (preserveScroll && scrollContentRt != null)
+{
+Canvas.ForceUpdateCanvases();
+scrollContentRt.anchoredPosition = new Vector2(scrollContentRt.anchoredPosition.x, savedScrollY);
 }
 
 _hybridCockpit?.RefreshAll();
@@ -9587,7 +9651,7 @@ if (tmps.Length > 0)
 {
 modularDialogueSpeakerText = tmps[0];
 
-modularDialogueSpeakerText.fontSize = 11.5f;
+modularDialogueSpeakerText.fontSize = Mathf.Round(11.5f * SundayTypography.NarrativeFontScale * 2f) * 0.5f;
 }
 
 if (tmps.Length > 1)
@@ -9595,9 +9659,9 @@ if (tmps.Length > 1)
 {
 modularDialogueSpeechText = tmps[1];
 
-modularDialogueSpeechText.fontSize = 13.5f;
+modularDialogueSpeechText.fontSize = Mathf.Round(13.5f * SundayTypography.NarrativeFontScale * 2f) * 0.5f;
 
-modularDialogueSpeechText.lineSpacing = 3f;
+modularDialogueSpeechText.lineSpacing = 6f;
 }
 }
 
@@ -11221,32 +11285,33 @@ _hybridCockpit?.RefreshAll();
 public void UpdateLocationDisplay(string roomTitle, string sectorSubtitle = null)
 
 {
+bool isStyleD = _hybridCockpit != null && _hybridCockpit.IsStyleDHardwareTheme;
 string displayTitle = !string.IsNullOrEmpty(roomTitle) ? roomTitle.ToUpper() : "UNIT 407";
+string formattedTop;
 
-string formattedTop = $"// {displayTitle}";
-
+if (isStyleD)
+{
+formattedTop = FormatStyleDLocationHeader(ref displayTitle, sectorSubtitle);
+}
+else
+{
+formattedTop = $"// {displayTitle}";
 if (!string.IsNullOrEmpty(sectorSubtitle))
-
 {
 string sub = sectorSubtitle.ToUpper();
-
-if (sub.StartsWith(displayTitle + " // "))
-
+if (sub.StartsWith(displayTitle + " // ") || sub.StartsWith(displayTitle + " - "))
 {
 formattedTop = $"// {sub}";
 }
-
 else
-
 {
 formattedTop += $" // {sub}";
 }
 }
-
 else if (!displayTitle.Contains("ASCOTT"))
-
 {
 formattedTop += " // THE ASCOTT RESIDENCY [4TH FLOOR]";
+}
 }
 
 if (locationText != null)
@@ -11260,6 +11325,78 @@ if (dockHeaderLocation != null)
 {
 dockHeaderLocation.text = $"<color=#FFA726>[ {displayTitle} ]</color>";
 }
+}
+
+private static string FormatStyleDLocationHeader(ref string displayTitle, string sectorSubtitle)
+{
+string rawTitle = displayTitle.Replace("_", " ").Trim();
+string sub = !string.IsNullOrEmpty(sectorSubtitle)
+? sectorSubtitle.ToUpper().Replace(" // ", " - ").Replace("_", " ").Trim()
+: string.Empty;
+
+if (rawTitle.StartsWith("HALLWAY") || rawTitle.StartsWith("CORR-") || rawTitle.StartsWith("FOYER-"))
+{
+displayTitle = "4F HALLWAY";
+if (sub.StartsWith("UNIT ")) return sub;
+sub = StripPrefix(sub, "4F HALLWAY - ");
+sub = sub.Replace("UPPER HALLWAY", "UPPER")
+         .Replace("MID-HALLWAY", "MID")
+         .Replace("LOWER HALLWAY", "LOWER")
+         .Replace("HALLWAY END", "SOUTH END");
+}
+else if (rawTitle == "UTILITY" || rawTitle == "UTILITY BAY")
+{
+displayTitle = "4F UTILITY";
+if (string.IsNullOrEmpty(sub) || sub == "UTILITY ROOM") return "4F UTILITY ROOM";
+}
+else if (rawTitle == "F4 ENTRANCE" || rawTitle == "STAIRWELL" || rawTitle == "STAIRS")
+{
+displayTitle = "4F STAIRWELL";
+sub = StripPrefix(sub, "4TH FLOOR - ");
+sub = StripPrefix(sub, "STAIRWELL ");
+}
+else if (rawTitle == "F3 LANDING")
+{
+displayTitle = "3F STAIRWELL";
+sub = StripPrefix(sub, "3RD FLOOR LANDING - ");
+sub = StripPrefix(sub, "3RD FLOOR - ");
+}
+else if (rawTitle == "F2 ENTRANCE")
+{
+displayTitle = "2F STAIRWELL";
+sub = StripPrefix(sub, "STAIRWELL - ");
+sub = StripPrefix(sub, "2ND FLOOR - ");
+}
+else if (rawTitle.StartsWith("F2 HALL"))
+{
+displayTitle = "2F HALLWAY";
+sub = StripPrefix(sub, "2ND FLOOR - ");
+}
+else
+{
+displayTitle = rawTitle;
+}
+
+if (string.IsNullOrEmpty(sub))
+{
+return displayTitle.Contains("ASCOTT") ? displayTitle : $"{displayTitle} - THE ASCOTT RESIDENCY [4TH FLOOR]";
+}
+
+if (sub == displayTitle || sub.StartsWith(displayTitle + " - "))
+{
+return sub;
+}
+
+return $"{displayTitle} - {sub}";
+}
+
+private static string StripPrefix(string source, string prefix)
+{
+if (!string.IsNullOrEmpty(source) && source.StartsWith(prefix))
+{
+return source.Substring(prefix.Length).Trim();
+}
+return source;
 }
 
 #endregion
@@ -11423,13 +11560,27 @@ card.transform.SetParent(parent, false);
 
 RectTransform rt = card.AddComponent<RectTransform>();
 
-rt.sizeDelta = new Vector2(98f, 96f);
+var parentHlg = parent != null ? parent.GetComponent<HorizontalLayoutGroup>() : null;
+
+if (parentHlg != null) parentHlg.spacing = 8f;
+
+int count = Mathf.Max(1, tableStash != null ? tableStash.Count : 1);
+
+float maxRowWidth = 548f;
+
+float spacing = 8f;
+
+float cardW = Mathf.Clamp(Mathf.Floor((maxRowWidth - (count - 1) * spacing) / count), 62f, 84f);
+
+float cardH = 80f;
+
+rt.sizeDelta = new Vector2(cardW, cardH);
 
 LayoutElement le = card.AddComponent<LayoutElement>();
 
-le.preferredWidth = 98f;
+le.preferredWidth = cardW;
 
-le.preferredHeight = 96f;
+le.preferredHeight = cardH;
 
 Image cardBg = card.AddComponent<Image>();
 
@@ -11442,6 +11593,20 @@ Outline cardOl = card.AddComponent<Outline>();
 cardOl.effectColor = new Color(0.25f, 0.35f, 0.45f, 0.6f);
 
 cardOl.effectDistance = new Vector2(1f, -1f);
+
+if (SundayTypography.StyleDThemeEnabled && HybridCockpitController.SharedStyleDSlotRecessed != null)
+
+{
+cardBg.sprite = HybridCockpitController.SharedStyleDSlotRecessed;
+
+cardBg.type = Image.Type.Sliced;
+
+cardBg.pixelsPerUnitMultiplier = 2.2f;
+
+cardBg.color = Color.white;
+
+cardOl.enabled = false;
+}
 
 // Icon
 
@@ -11465,7 +11630,7 @@ ir.pivot = new Vector2(0.5f, 1f);
 
 ir.anchoredPosition = new Vector2(0f, -6f);
 
-ir.sizeDelta = new Vector2(46f, 46f);
+ir.sizeDelta = new Vector2(38f, 38f);
 
 Sprite iconSprite = ItemDatabase.GetItemIcon(itemId);
 
@@ -11491,7 +11656,9 @@ labelObj.transform.SetParent(card.transform, false);
 
 TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
 
-label.fontSize = 11.5f;
+label.fontSize = 9.5f;
+
+label.lineSpacing = -2f;
 
 label.fontStyle = FontStyles.Bold;
 
@@ -11499,9 +11666,19 @@ label.alignment = TextAlignmentOptions.Center;
 
 label.color = new Color(0.88f, 0.91f, 0.95f);
 
+if (SundayTypography.StyleDThemeEnabled)
+
+{
+label.color = new Color(0.89f, 0.87f, 0.81f, 1f);
+
+SundayTypography.ApplyFont(label, FontRole.Mono);
+}
+
 label.text = quantity > 1 ? $"{itemId} (x{quantity})" : itemId;
 
 label.textWrappingMode = TextWrappingModes.Normal;
+
+label.overflowMode = TextOverflowModes.Ellipsis;
 
 label.raycastTarget = false;
 
@@ -11513,7 +11690,7 @@ lr.anchorMax = new Vector2(1f, 0f);
 
 lr.pivot = new Vector2(0.5f, 0f);
 
-lr.sizeDelta = new Vector2(-6f, 36f);
+lr.sizeDelta = new Vector2(-8f, 28f);
 
 lr.anchoredPosition = new Vector2(0f, 4f);
 }
@@ -11626,7 +11803,7 @@ _storyLogs.Add(entry);
 
 lastAutoLoggedSituationText = trimmedContent;
 
-RefreshStoryLogUI();
+RefreshStoryLogUI(isNewEntry: true);
 }
 
 private void EnsureStoryLogScrollSetup()
@@ -11702,18 +11879,38 @@ scroll.verticalScrollbar = sb;
             }
         }
 
-private void RefreshStoryLogUI()
+private void RefreshStoryLogUI(bool isNewEntry = false)
         {
             EnsureStoryLogScrollSetup();
 
 if (storyLogContentText != null)
             {
+                storyLogContentText.fontSize = Mathf.Round(15f * SundayTypography.NarrativeFontScale * 2f) * 0.5f;
+                storyLogContentText.lineSpacing = 8f;
+
+                bool modalActive = storyLogModal != null && storyLogModal.activeInHierarchy;
+                ScrollRect scroll = modalActive ? storyLogModal.GetComponentInChildren<ScrollRect>(true) : null;
+                var contentRt = storyLogContentText.transform.parent as RectTransform;
+                bool wasScrolledBack = scroll != null && contentRt != null && scroll.viewport != null &&
+                                       contentRt.rect.height > scroll.viewport.rect.height + 5f &&
+                                       scroll.verticalNormalizedPosition > 0.04f;
+                float savedAnchoredY = contentRt != null ? contentRt.anchoredPosition.y : 0f;
+
                 storyLogContentText.text = string.Join("\n\n<color=#2C3E50>--------------------------------------------------------------------------</color>\n\n", _storyLogs);
-                if (storyLogModal != null && storyLogModal.activeInHierarchy)
+                if (modalActive)
                 {
                     storyLogContentText.ForceMeshUpdate();
-                    var contentRt = storyLogContentText.transform.parent as RectTransform;
                     if (contentRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(contentRt);
+                    Canvas.ForceUpdateCanvases();
+                    if (wasScrolledBack)
+                    {
+                        contentRt.anchoredPosition = new Vector2(contentRt.anchoredPosition.x, savedAnchoredY);
+                        scroll.velocity = Vector2.zero;
+                    }
+                    else if (isNewEntry && scroll != null)
+                    {
+                        scroll.verticalNormalizedPosition = 0f;
+                    }
                 }
             }
 

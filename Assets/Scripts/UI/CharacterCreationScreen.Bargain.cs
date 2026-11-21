@@ -889,6 +889,11 @@ namespace SundayLastBreath.UI
                     if (_bargainProceedButtonText != null) _bargainProceedButtonText.text = $"<b>ALLOCATE {unallocated} PTS TO CONTINUE</b>";
                 }
             }
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDBargainTheme(drawbacksCount, unallocated);
+            }
         }
 
         private void UpdateMortalRowUI(Transform row, int totalVal, int allocVal, int unallocated)
@@ -930,6 +935,130 @@ namespace SundayLastBreath.UI
                 case MortalStatType.Auspice:     return new Color(1.00f, 0.84f, 0.31f); // #FFD54F Gold
                 case MortalStatType.Leadership:  return new Color(0.67f, 0.28f, 0.74f); // #AB47BC Purple
                 default:                         return Color.white;
+            }
+        }
+
+        private void ApplyStyleDBargainTheme(int drawbacksCount, int unallocated)
+        {
+            if (bargainPanel == null) return;
+            ApplyStyleDRootBackdrop();
+
+            Image panelBg = bargainPanel.GetComponent<Image>();
+            if (panelBg != null) panelBg.color = new Color(0.035f, 0.04f, 0.05f, 0.98f);
+
+            Transform hdr = bargainPanel.transform.Find("Header");
+            if (hdr != null)
+            {
+                TextMeshProUGUI badgeHdr = hdr.Find("Badge")?.GetComponent<TextMeshProUGUI>();
+                if (badgeHdr != null) badgeHdr.text = "<b><color=#D95829>[ STEP 04 - PROTOCOL: SURVIVAL BARGAIN ]</color></b>";
+                TextMeshProUGUI titleTmp = hdr.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (titleTmp != null) titleTmp.color = StyleDThemeUtility.ColAmber;
+                TextMeshProUGUI subTmp = hdr.Find("Subtitle")?.GetComponent<TextMeshProUGUI>();
+                if (subTmp != null) subTmp.color = StyleDThemeUtility.ColMuted;
+            }
+
+            TextMeshProUGUI drawHdr = bargainPanel.transform.Find("SplitContainer/Col_Drawbacks/ColHeader")?.GetComponent<TextMeshProUGUI>();
+            if (drawHdr != null)
+                drawHdr.text = "<b><color=#D95829>AVAILABLE SURVIVAL DRAWBACKS</color></b>  <color=#9A9488>(MAX 2)</color>";
+
+            TextMeshProUGUI allocHdr = bargainPanel.transform.Find("SplitContainer/Col_Allocator/ColHeader")?.GetComponent<TextMeshProUGUI>();
+            if (allocHdr != null)
+                allocHdr.text = "<b><color=#E0A43A>M.O.R.T.A.L. ATTRIBUTES ALLOCATION</color></b>";
+
+            Transform banner = bargainPanel.transform.Find("BargainBanner");
+            if (banner != null)
+            {
+                StyleDThemeUtility.ApplySliced(banner.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+            }
+
+            if (_drawbackCardsContainer != null)
+            {
+                for (int i = 0; i < _drawbackCardsContainer.childCount; i++)
+                {
+                    Transform card = _drawbackCardsContainer.GetChild(i);
+                    string id = card.name.Replace("Drawback_", "");
+                    bool isSelected = selectedDrawbackIds.Contains(id);
+                    bool canSelect = drawbacksCount < 2;
+
+                    Color cardTint = isSelected
+                        ? new Color(1f, 0.80f, 0.76f, 1f)
+                        : (canSelect ? Color.white : new Color(0.62f, 0.62f, 0.65f, 0.72f));
+                    StyleDThemeUtility.ApplySliced(card.GetComponent<Image>(), StyleDThemeUtility.CcModuleTray, 2.0f, cardTint, disableOutline: true);
+
+                    Transform iconBox = card.Find("IconBox");
+                    if (iconBox is RectTransform ibRt)
+                    {
+                        ibRt.sizeDelta = new Vector2(72f, 72f);
+                        ibRt.anchoredPosition = new Vector2(18f, -8f);
+                        StyleDThemeUtility.ApplySliced(iconBox.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.7f, Color.white, disableOutline: true);
+                    }
+
+                    Transform titleTr = card.Find("TitleLine");
+                    if (titleTr is RectTransform tRt)
+                    {
+                        tRt.anchorMin = new Vector2(0f, 1f);
+                        tRt.anchorMax = new Vector2(1f, 1f);
+                        tRt.offsetMin = new Vector2(104f, -52f);
+                        tRt.offsetMax = new Vector2(-126f, -22f);
+                    }
+
+                    Transform penTr = card.Find("PenaltyText");
+                    if (penTr is RectTransform pRt)
+                    {
+                        pRt.anchorMin = new Vector2(0f, 0f);
+                        pRt.anchorMax = new Vector2(1f, 1f);
+                        pRt.offsetMin = new Vector2(104f, 8f);
+                        pRt.offsetMax = new Vector2(-126f, -54f);
+                    }
+
+                    Transform badge = card.Find("SelectBadge");
+                    if (badge != null)
+                    {
+                        if (badge is RectTransform bRt)
+                            bRt.anchoredPosition = new Vector2(-16f, -8f);
+                        Color badgeTint = isSelected
+                            ? new Color(0.68f, 0.22f, 0.18f, 1f)
+                            : (canSelect ? new Color(0.24f, 0.27f, 0.31f, 1f) : new Color(0.14f, 0.16f, 0.18f, 0.65f));
+                        StyleDThemeUtility.ApplySliced(badge.GetComponent<Image>(), StyleDThemeUtility.CcChipButton, 1.65f, badgeTint, disableOutline: true);
+                    }
+                }
+            }
+
+            if (_mortalRowsContainer != null)
+            {
+                for (int i = 0; i < _mortalRowsContainer.childCount; i++)
+                {
+                    Transform row = _mortalRowsContainer.GetChild(i);
+                    StyleDThemeUtility.ApplySliced(row.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.5f, Color.white, disableOutline: true);
+
+                    Transform letBox = row.Find("LetterBox");
+                    if (letBox != null && System.Enum.TryParse(row.name.Replace("Row_", ""), out MortalStatType statType))
+                    {
+                        Color accent = GetMortalStatColor(statType);
+                        StyleDThemeUtility.ApplySliced(letBox.GetComponent<Image>(), StyleDThemeUtility.CcChipButton, 1.7f, Color.Lerp(new Color(0.22f, 0.24f, 0.27f, 1f), accent, 0.42f), disableOutline: true);
+                    }
+
+                    Button minusBtn = row.Find("Controls/Btn_Minus")?.GetComponent<Button>();
+                    if (minusBtn != null)
+                        StyleDThemeUtility.ApplyChipButton(minusBtn, new Color(0.26f, 0.29f, 0.34f, 1f), new Color(0.38f, 0.42f, 0.48f, 1f), 1.7f, StyleDThemeUtility.ColBone);
+
+                    Button plusBtn = row.Find("Controls/Btn_Plus")?.GetComponent<Button>();
+                    if (plusBtn != null)
+                        StyleDThemeUtility.ApplyChipButton(plusBtn, new Color(0.26f, 0.29f, 0.34f, 1f), new Color(0.38f, 0.42f, 0.48f, 1f), 1.7f, StyleDThemeUtility.ColBone);
+                }
+            }
+
+            Button backBtn = bargainPanel.transform.Find("Footer/Btn_BackToHobbies")?.GetComponent<Button>();
+            if (backBtn != null)
+                StyleDThemeUtility.ApplyChipButton(backBtn, new Color(0.24f, 0.27f, 0.31f, 1f), new Color(0.34f, 0.38f, 0.44f, 1f), 1.5f, StyleDThemeUtility.ColBone);
+
+            if (_bargainProceedButton != null)
+            {
+                bool canProceed = unallocated == 0;
+                Color norm = canProceed ? new Color(0.68f, 0.31f, 0.14f, 1f) : new Color(0.18f, 0.20f, 0.23f, 0.72f);
+                Color hov = canProceed ? new Color(0.84f, 0.39f, 0.18f, 1f) : norm;
+                Color txtCol = canProceed ? new Color(0.96f, 0.94f, 0.89f, 1f) : StyleDThemeUtility.ColMuted;
+                StyleDThemeUtility.ApplyChipButton(_bargainProceedButton, norm, hov, 1.5f, txtCol);
             }
         }
     }

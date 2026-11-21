@@ -20,6 +20,8 @@ namespace SundayLastBreath.UI
     /// </summary>
     public class TacticalMapViewController : MonoBehaviour
     {
+        public static bool StyleDThemeEnabled { get; set; }
+
         [System.Serializable]
         public class NodeModel
         {
@@ -820,17 +822,19 @@ namespace SundayLastBreath.UI
                     if (d.isGlowing)
                     {
                         if (d.rootObj != null && !d.rootObj.activeSelf) d.rootObj.SetActive(true);
-                        if (d.lineImg != null) d.lineImg.color = new Color(0.0f, 0.95f, 1.0f, 1.0f);
+                        if (d.lineImg != null) d.lineImg.color = StyleDThemeEnabled ? new Color(0.95f, 0.56f, 0.22f, 1f) : new Color(0.0f, 0.95f, 1.0f, 1.0f);
                         if (d.glowImg != null)
                         {
                             if (!d.glowImg.gameObject.activeSelf) d.glowImg.gameObject.SetActive(true);
-                            d.glowImg.color = new Color(0.0f, 0.90f, 1.0f, pulse * 0.45f);
+                            d.glowImg.color = StyleDThemeEnabled
+                                ? new Color(0.90f, 0.44f, 0.16f, pulse * 0.45f)
+                                : new Color(0.0f, 0.90f, 1.0f, pulse * 0.45f);
                         }
                     }
                     else if (showStaticDoors)
                     {
                         if (d.rootObj != null && !d.rootObj.activeSelf) d.rootObj.SetActive(true);
-                        if (d.lineImg != null) d.lineImg.color = new Color(0.29f, 0.40f, 0.52f, 0.90f);
+                        if (d.lineImg != null) d.lineImg.color = StyleDThemeEnabled ? new Color(0.45f, 0.40f, 0.34f, 0.90f) : new Color(0.29f, 0.40f, 0.52f, 0.90f);
                         if (d.glowImg != null && d.glowImg.gameObject.activeSelf) d.glowImg.gameObject.SetActive(false);
                     }
                     else
@@ -979,6 +983,13 @@ namespace SundayLastBreath.UI
                 && string.Equals(currentFloorData.floorId, "ascott_lobby", StringComparison.OrdinalIgnoreCase);
         }
 
+        private bool IsStairwellMap()
+        {
+            return currentFloorData != null
+                && (string.Equals(currentFloorData.floorId, "stairwell_4f", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(currentFloorData.floorId, "stairwell_2f", StringComparison.OrdinalIgnoreCase));
+        }
+
         private bool ShouldRotateFloorplanForMiniMap()
         {
             if (!isHorizontalMiniMap) return false;
@@ -991,7 +1002,12 @@ namespace SundayLastBreath.UI
             if (floorplanCanvasRect == null) return;
 
             bool rotate90 = ShouldRotateFloorplanForMiniMap();
-            float floorFit = (isHorizontalMiniMap && IsLobbyMap()) ? 0.68f : 1.0f;
+            float floorFit = 1.0f;
+            if (isHorizontalMiniMap)
+            {
+                if (IsLobbyMap()) floorFit = 0.68f;
+                else if (IsStairwellMap()) floorFit = 0.66f;
+            }
             float effectiveScale = (isHorizontalMiniMap ? miniMapBaseScale * floorFit : 1.0f) * currentZoom;
             floorplanCanvasRect.localScale = Vector3.one * effectiveScale;
             floorplanCanvasRect.localRotation = rotate90 ? Quaternion.Euler(0f, 0f, 90f) : Quaternion.identity;
@@ -1276,6 +1292,7 @@ namespace SundayLastBreath.UI
             UpdateVectorMapDisplay();
             RefreshAllNodes();
             SelectNode(currentLocationId);
+            ApplyZoomAndPan();
         }
 
         public void SyncRoomHitboxes()
@@ -2152,25 +2169,29 @@ namespace SundayLastBreath.UI
 
             if (blueprintFooterLocationTmp != null)
             {
+                string posHex = StyleDThemeEnabled ? "#CF9232" : "#00e5ff";
+                string valHex = StyleDThemeEnabled ? "#E4DEC9" : "#00e5ff";
+                string pipeHex = StyleDThemeEnabled ? "#7A746A" : "#475569";
+
                 if (!string.IsNullOrEmpty(currentThresholdRoomId) && nodeRegistry.TryGetValue(currentThresholdRoomId, out NodeModel thresholdNode))
                 {
                     string hallName = nodeRegistry.TryGetValue(currentLocationId, out NodeModel hNode) ? hNode.roomCode : currentLocationId.ToUpper();
                     blueprintFooterLocationTmp.text = isHorizontalMiniMap
-                        ? $"<color=#00e5ff><b>POS:</b> {hallName} ({thresholdNode.roomCode})</color>"
-                        : $"<color=#00e5ff><b>PLAYER POS:</b> {hallName} (THRESHOLD // {thresholdNode.roomCode})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                        ? $"<color={posHex}><b>POS:</b></color> <color={valHex}>{hallName} ({thresholdNode.roomCode})</color>"
+                        : $"<color={posHex}><b>PLAYER POS:</b></color> <color={valHex}>{hallName} (THRESHOLD // {thresholdNode.roomCode})</color>   <color={pipeHex}>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
                 }
                 else if (nodeRegistry.TryGetValue(currentLocationId, out NodeModel playerNode))
                 {
                     if (isHorizontalMiniMap)
                     {
                         blueprintFooterLocationTmp.text = isPhysicallyInside
-                            ? $"<color=#00e5ff><b>POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>"
-                            : $"<color=#00e5ff><b>POS:</b> {playerNode.roomCode}</color> <color=#475569>|</color> <color=#f39c12><b>VIEW:</b> {model.roomCode}</color>";
+                            ? $"<color={posHex}><b>POS:</b></color> <color={valHex}>{playerNode.roomCode} ({playerNode.shortSub})</color>"
+                            : $"<color={posHex}><b>POS:</b></color> <color={valHex}>{playerNode.roomCode}</color> <color={pipeHex}>|</color> <color=#f39c12><b>VIEW:</b> {model.roomCode}</color>";
                     }
                     else
                     {
                         blueprintFooterLocationTmp.text =
-                            $"<color=#00e5ff><b>PLAYER POS:</b> {playerNode.roomCode} ({playerNode.shortSub})</color>   <color=#475569>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
+                            $"<color={posHex}><b>PLAYER POS:</b></color> <color={valHex}>{playerNode.roomCode} ({playerNode.shortSub})</color>   <color={pipeHex}>|</color>   <color=#f39c12><b>INSPECTING:</b> {model.roomCode}</color>";
                     }
                 }
             }
@@ -2555,13 +2576,26 @@ namespace SundayLastBreath.UI
                         lblTmp.fontStyle = FontStyles.Bold;
                         lblTmp.alignment = TextAlignmentOptions.Center;
                         lblTmp.textWrappingMode = TextWrappingModes.NoWrap;
-                        lblTmp.color = isPlayerInside
-                            ? new Color(0.01f, 0.05f, 0.09f, 1f)
-                            : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : (hasStripe ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
-                        Outline lblOutline = lblTmp.GetComponent<Outline>() ?? lblTmp.gameObject.AddComponent<Outline>();
-                        lblOutline.enabled = !isPlayerInside && !isRoomVisited;
-                        lblOutline.effectColor = new Color(0f, 0f, 0f, 0.9f);
-                        lblOutline.effectDistance = new Vector2(1f, -1f);
+                        if (StyleDThemeEnabled)
+                        {
+                            lblTmp.color = isPlayerInside
+                                ? new Color(0.99f, 0.96f, 0.91f, 1f)
+                                : (isRoomVisited ? new Color(0.96f, 0.93f, 0.87f, 1f) : (hasStripe ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.76f, 0.72f, 0.66f, 1f)));
+                            Outline lblOutline = lblTmp.GetComponent<Outline>() ?? lblTmp.gameObject.AddComponent<Outline>();
+                            lblOutline.enabled = !isPlayerInside;
+                            lblOutline.effectColor = new Color(0f, 0f, 0f, 0.9f);
+                            lblOutline.effectDistance = new Vector2(1f, -1f);
+                        }
+                        else
+                        {
+                            lblTmp.color = isPlayerInside
+                                ? new Color(0.01f, 0.05f, 0.09f, 1f)
+                                : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : (hasStripe ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
+                            Outline lblOutline = lblTmp.GetComponent<Outline>() ?? lblTmp.gameObject.AddComponent<Outline>();
+                            lblOutline.enabled = !isPlayerInside && !isRoomVisited;
+                            lblOutline.effectColor = new Color(0f, 0f, 0f, 0.9f);
+                            lblOutline.effectDistance = new Vector2(1f, -1f);
+                        }
                         lblTmp.raycastTarget = false;
                     }
                 }
@@ -2584,10 +2618,10 @@ namespace SundayLastBreath.UI
                 && string.Equals(holder.model.id, currentThresholdRoomId, StringComparison.OrdinalIgnoreCase);
             bool isDiscovered = holder.model.isDiscovered || isPlayerPhysicallyInside || isThresholdInspected;
 
-            // Player Radar Halo (Illuminates soft pulsing aura around current sector)
+            // Player Radar Halo (Legacy sci-fi cyan outline + PulsingBadge; hidden in Style D so warm burnt-vermilion tile renders cleanly)
             if (holder.beaconObj != null)
             {
-                holder.beaconObj.SetActive(isCurrent);
+                holder.beaconObj.SetActive(isCurrent && !StyleDThemeEnabled);
             }
 
             // Hallways: Clean architectural connectors (like Twine)
@@ -2596,7 +2630,9 @@ namespace SundayLastBreath.UI
                 if (holder.roomCodeTmp != null)
                 {
                     holder.roomCodeTmp.text = isCurrent ? "▲ YOU" : "";
-                    holder.roomCodeTmp.color = new Color(0.0f, 0.95f, 1.0f, 1.0f);
+                    holder.roomCodeTmp.color = StyleDThemeEnabled
+                        ? new Color(0.98f, 0.82f, 0.56f, 1f)
+                        : new Color(0.0f, 0.95f, 1.0f, 1f);
                     holder.roomCodeTmp.fontSize = isHorizontalMiniMap ? 9f : 11f;
                     holder.roomCodeTmp.alignment = TextAlignmentOptions.Center;
                     holder.roomCodeTmp.gameObject.SetActive(true);
@@ -2609,17 +2645,19 @@ namespace SundayLastBreath.UI
                 bool isHallwayVisited = holder.model.isVisited || isPlayerPhysicallyInside;
                 if (isCurrent)
                 {
-                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.04f, 0.22f, 0.32f, 1f);
+                    if (holder.bgImage != null) holder.bgImage.color = StyleDThemeEnabled ? new Color(0.55f, 0.22f, 0.12f, 1f) : new Color(0.04f, 0.22f, 0.32f, 1f);
                     if (holder.outline != null)
                     {
                         holder.outline.enabled = true;
-                        holder.outline.effectColor = new Color(0.0f, 0.92f, 1.0f, 1.0f);
+                        holder.outline.effectColor = StyleDThemeEnabled ? new Color(0.90f, 0.45f, 0.25f, 1f) : new Color(0.0f, 0.92f, 1.0f, 1.0f);
                         holder.outline.effectDistance = new Vector2(1.5f, -1.5f);
                     }
                 }
                 else if (isSelected)
                 {
-                    if (holder.bgImage != null) holder.bgImage.color = isHallwayVisited ? new Color(0.24f, 0.28f, 0.36f, 1f) : new Color(0.04f, 0.05f, 0.07f, 1f);
+                    if (holder.bgImage != null) holder.bgImage.color = isHallwayVisited
+                        ? (StyleDThemeEnabled ? new Color(0.43f, 0.40f, 0.35f, 1f) : new Color(0.24f, 0.28f, 0.36f, 1f))
+                        : (StyleDThemeEnabled ? new Color(0.16f, 0.15f, 0.13f, 1f) : new Color(0.04f, 0.05f, 0.07f, 1f));
                     if (holder.outline != null)
                     {
                         holder.outline.enabled = true;
@@ -2629,21 +2667,21 @@ namespace SundayLastBreath.UI
                 }
                 else if (isHallwayVisited)
                 {
-                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.22f, 0.26f, 0.33f, 1f);
+                    if (holder.bgImage != null) holder.bgImage.color = StyleDThemeEnabled ? new Color(0.43f, 0.40f, 0.35f, 1f) : new Color(0.22f, 0.26f, 0.33f, 1f);
                     if (holder.outline != null)
                     {
                         holder.outline.enabled = true;
-                        holder.outline.effectColor = new Color(0.40f, 0.48f, 0.58f, 0.85f);
+                        holder.outline.effectColor = StyleDThemeEnabled ? new Color(0.58f, 0.54f, 0.48f, 0.85f) : new Color(0.40f, 0.48f, 0.58f, 0.85f);
                         holder.outline.effectDistance = new Vector2(1f, -1f);
                     }
                 }
                 else
                 {
-                    if (holder.bgImage != null) holder.bgImage.color = new Color(0.025f, 0.035f, 0.05f, 1f);
+                    if (holder.bgImage != null) holder.bgImage.color = StyleDThemeEnabled ? new Color(0.16f, 0.15f, 0.13f, 1f) : new Color(0.025f, 0.035f, 0.05f, 1f);
                     if (holder.outline != null)
                     {
                         holder.outline.enabled = true;
-                        holder.outline.effectColor = new Color(0.12f, 0.18f, 0.26f, 0.60f);
+                        holder.outline.effectColor = StyleDThemeEnabled ? new Color(0.28f, 0.26f, 0.23f, 0.75f) : new Color(0.12f, 0.18f, 0.26f, 0.60f);
                         holder.outline.effectDistance = new Vector2(1f, -1f);
                     }
                 }
@@ -2663,11 +2701,17 @@ namespace SundayLastBreath.UI
             bool showYellowStripe = !isLobbyAlert && !isCurrent && !isRoomVisited && isRoomChecked && (!m.isAccessible || m.isBlocked);
             bool showRedStripe = !isLobby && !isCurrent && !isRoomVisited && isRoomChecked && (m.isAccessible && !m.isBlocked && m.isLocked);
 
-            Color fill = isCurrent ? new Color(0.0f, 0.82f, 0.98f, 1f)
-                       : (isStairsExit ? new Color(0.01f, 0.015f, 0.025f, 1f)
-                       : (isLobbyAlert ? new Color(0.01f, 0.015f, 0.025f, 1f)
-                       : (isRoomVisited ? new Color(0.58f, 0.64f, 0.72f, 1f)
-                       : new Color(0.01f, 0.015f, 0.025f, 1f))));
+            Color fill = StyleDThemeEnabled
+                ? (isCurrent ? new Color(0.85f, 0.34f, 0.16f, 1f)
+                  : (isStairsExit ? new Color(0.169f, 0.157f, 0.137f, 1f)
+                  : (isLobbyAlert ? new Color(0.169f, 0.157f, 0.137f, 1f)
+                  : (isRoomVisited ? new Color(0.431f, 0.408f, 0.361f, 1f)
+                  : new Color(0.169f, 0.157f, 0.137f, 1f)))))
+                : (isCurrent ? new Color(0.0f, 0.82f, 0.98f, 1f)
+                  : (isStairsExit ? new Color(0.01f, 0.015f, 0.025f, 1f)
+                  : (isLobbyAlert ? new Color(0.01f, 0.015f, 0.025f, 1f)
+                  : (isRoomVisited ? new Color(0.58f, 0.64f, 0.72f, 1f)
+                  : new Color(0.01f, 0.015f, 0.025f, 1f)))));
             if (holder.bgImage != null) holder.bgImage.color = fill;
 
             if (holder.outline != null)
@@ -2676,7 +2720,7 @@ namespace SundayLastBreath.UI
                 holder.outline.enabled = isCurrent || isSelected || showStaticOutline || isLobbyAlert;
                 if (isCurrent)
                 {
-                    holder.outline.effectColor = new Color(0.75f, 0.98f, 1.0f, 1f);
+                    holder.outline.effectColor = StyleDThemeEnabled ? new Color(0.94f, 0.77f, 0.61f, 1f) : new Color(0.75f, 0.98f, 1.0f, 1f);
                     holder.outline.effectDistance = new Vector2(2f, -2f);
                 }
                 else if (isSelected)
@@ -2691,9 +2735,9 @@ namespace SundayLastBreath.UI
                 }
                 else if (showStaticOutline)
                 {
-                    holder.outline.effectColor = isLobby
-                        ? new Color(0.28f, 0.40f, 0.54f, 0.90f)
-                        : new Color(0.18f, 0.28f, 0.38f, 0.85f);
+                    holder.outline.effectColor = StyleDThemeEnabled
+                        ? new Color(0.32f, 0.29f, 0.25f, 0.85f)
+                        : (isLobby ? new Color(0.28f, 0.40f, 0.54f, 0.90f) : new Color(0.18f, 0.28f, 0.38f, 0.85f));
                     holder.outline.effectDistance = new Vector2(1.3f, -1.3f);
                 }
             }
@@ -2748,12 +2792,23 @@ namespace SundayLastBreath.UI
                     else
                     {
                         holder.roomCodeTmp.fontSize = (shortLabel.Length > 4) ? 9f : 12f;
-                        holder.roomCodeTmp.color = isCurrent
-                            ? new Color(0.01f, 0.05f, 0.09f, 1f) // Dark navy contrast on bright cyan fill
-                            : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : ((showYellowStripe || showRedStripe) ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
+                        if (StyleDThemeEnabled)
+                        {
+                            holder.roomCodeTmp.color = isCurrent
+                                ? new Color(0.99f, 0.96f, 0.91f, 1f)
+                                : (isRoomVisited ? new Color(0.96f, 0.93f, 0.87f, 1f) : ((showYellowStripe || showRedStripe) ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.76f, 0.72f, 0.66f, 1f)));
+                        }
+                        else
+                        {
+                            holder.roomCodeTmp.color = isCurrent
+                                ? new Color(0.01f, 0.05f, 0.09f, 1f) // Dark navy contrast on bright cyan fill
+                                : (isRoomVisited ? new Color(0.03f, 0.05f, 0.08f, 1f) : ((showYellowStripe || showRedStripe) ? new Color(0.95f, 0.97f, 1.0f, 1f) : new Color(0.62f, 0.70f, 0.78f, 1f)));
+                        }
                     }
                     Outline codeOutline = holder.roomCodeTmp.GetComponent<Outline>() ?? holder.roomCodeTmp.gameObject.AddComponent<Outline>();
-                    codeOutline.enabled = !isCurrent && !isRoomVisited && !isLobbyAlert;
+                    codeOutline.enabled = StyleDThemeEnabled
+                        ? (!isCurrent && !isLobbyAlert)
+                        : (!isCurrent && !isRoomVisited && !isLobbyAlert);
                     codeOutline.effectColor = new Color(0f, 0f, 0f, 0.9f);
                     codeOutline.effectDistance = new Vector2(1f, -1f);
                     if (holder.patternOverlay != null && holder.roomCodeTmp.transform.parent == holder.patternOverlay.transform.parent)

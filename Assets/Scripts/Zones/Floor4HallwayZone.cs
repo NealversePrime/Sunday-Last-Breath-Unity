@@ -200,7 +200,7 @@ namespace SundayLastBreath.Zones
             switch (hallwaySection)
             {
                 case 1:
-                    stage.SetLocation("hallway_1", "CORRIDOR N // UPPER HALLWAY (SEC 1)");
+                    stage.SetLocation("hallway_1", "UPPER HALLWAY (406 / 407)");
                     stage.PlayStageAnimation("Hall406_407_Anim", "hall_406_407", 8f);
 
                     stage.ShowLocationAnchor(
@@ -223,7 +223,7 @@ namespace SundayLastBreath.Zones
                     break;
 
                 case 2:
-                    stage.SetLocation("hallway_2", "CORRIDOR M // MID-HALLWAY (SEC 2)");
+                    stage.SetLocation("hallway_2", "MID-HALLWAY (404 / 405)");
                     stage.PlayStageAnimation("Hall404_405_Anim", "hall_404_405", 8f);
 
                     string midHallAudio = spoke_to_mrs_gable
@@ -260,7 +260,7 @@ namespace SundayLastBreath.Zones
                     break;
 
                 case 3:
-                    stage.SetLocation("hallway_3", "CORRIDOR S // LOWER HALLWAY (SEC 3)");
+                    stage.SetLocation("hallway_3", "LOWER HALLWAY (402 / 403)");
                     stage.PlayStageAnimation("Hall402_403_Anim", "hall_402_403", 8f);
 
                     stage.ShowLocationAnchor(
@@ -289,7 +289,7 @@ namespace SundayLastBreath.Zones
                     break;
 
                 case 4:
-                    stage.SetLocation("hallway_4", "CORRIDOR E // HALLWAY END (SEC 4)");
+                    stage.SetLocation("hallway_4", "HALLWAY END (401 / UTILITY)");
                     stage.PlayStageAnimation("HallEnd_Anim", "hall_end", 8f);
 
                     string hall4NoiseText = turned_off_music

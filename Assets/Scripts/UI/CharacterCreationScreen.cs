@@ -171,6 +171,11 @@ namespace SundayLastBreath.UI
                 clockTickSource.spatialBlend = 0f;
             }
 
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDRootBackdrop();
+            }
+
             EnsureIdentityConsoleBuilt();
             EnsureJobBackButton();
             EnsureHobbyTopBar();
@@ -364,6 +369,11 @@ namespace SundayLastBreath.UI
                     clockTickSource.volume = 0.25f;
                     clockTickSource.Play();
                 }
+            }
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDRootBackdrop();
             }
 
             EnsureIdentityConsoleBuilt();
@@ -567,6 +577,10 @@ namespace SundayLastBreath.UI
             HideAllPanels();
             EnsureIdentityConsoleBuilt();
             if (genderPanel != null) genderPanel.SetActive(true);
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDIdentityConsoleTheme();
+            }
             RefreshIdentityConsoleUI(rebuildFirstNameChips: true);
         }
 
@@ -722,6 +736,7 @@ namespace SundayLastBreath.UI
             if (existingFrame != null && existingFrame.Find("V3_AvatarMarker") != null)
             {
                 BindIdentityConsoleReferences(existingFrame);
+                if (StyleDThemeUtility.IsStyleDActive) ApplyStyleDIdentityConsoleTheme();
                 return;
             }
 
@@ -1187,6 +1202,7 @@ namespace SundayLastBreath.UI
 
             BindIdentityConsoleReferences(frameObj.transform);
             SundayTypography.ApplyHierarchy(genderPanel.transform);
+            if (StyleDThemeUtility.IsStyleDActive) ApplyStyleDIdentityConsoleTheme();
         }
 
         private void BindIdentityConsoleReferences(Transform frame)
@@ -1360,22 +1376,27 @@ namespace SundayLastBreath.UI
 
             // 5. Compute unified biometric data (shared 100% with Final Summary Dossier)
             GetCitizenBiometrics(out string docNo, out string dob, out string blood, out string sector, out string clearance, out string mrzLine1, out string mrzLine2);
+            bool isStyleD = StyleDThemeUtility.IsStyleDActive;
 
             if (topBannerCaseIdText != null)
             {
-                topBannerCaseIdText.text = $"CASE FILE: <color=#FFE082><b>{docNo}</b></color>   |   <color=#EF5350><b>[ STATUS: CIVIL DANGER WARNING // LEVEL 4 ]</b></color>";
+                topBannerCaseIdText.text = isStyleD
+                    ? $"CASE FILE: <color=#E0A43A><b>{docNo}</b></color>   |   <color=#D95829><b>[STATUS: CIVIL DANGER LEVEL 4]</b></color>"
+                    : $"CASE FILE: <color=#FFE082><b>{docNo}</b></color>   |   <color=#EF5350><b>[ STATUS: CIVIL DANGER WARNING // LEVEL 4 ]</b></color>";
             }
 
             if (idCardLastNameText != null) idCardLastNameText.text = ln.ToUpperInvariant();
             if (idCardFirstNameText != null) idCardFirstNameText.text = fn.ToUpperInvariant();
 
-            Color profileTint = isMale
-                ? new Color(0.45f, 0.82f, 0.98f, 0.95f)
-                : (isFemale ? new Color(0.98f, 0.58f, 0.75f, 0.95f) : new Color(0.75f, 0.60f, 1.0f, 0.95f));
+            Color profileTint = isStyleD
+                ? StyleDThemeUtility.ColAmber
+                : (isMale
+                    ? new Color(0.45f, 0.82f, 0.98f, 0.95f)
+                    : (isFemale ? new Color(0.98f, 0.58f, 0.75f, 0.95f) : new Color(0.75f, 0.60f, 1.0f, 0.95f)));
 
             if (idCardSilhouetteImg != null)
             {
-                idCardSilhouetteImg.color = Color.white;
+                idCardSilhouetteImg.color = isStyleD ? new Color(0.68f, 1.0f, 0.84f, 0.96f) : Color.white;
             }
             if (idCardEmblemText != null)
             {
@@ -1386,10 +1407,20 @@ namespace SundayLastBreath.UI
 
             if (idCardMetaText != null)
             {
-                idCardMetaText.text =
-                    $"<color=#78909C>SEX / ID:</color> <color=#FFE082><b>{g.ToUpperInvariant()}</b></color><pos=52%><color=#78909C>BLOOD:</color> <color=#EF5350><b>{blood}</b></color>\n" +
-                    $"<color=#78909C>DOB:</color>      <color=#FFFFFF>{dob}</color><pos=52%><color=#78909C>ZONE:</color>  <color=#80CBC4>SECTOR-04</color>\n" +
-                    $"<color=#78909C>CASE ID:</color>  <color=#4FC3F7>{docNo}</color>";
+                if (isStyleD)
+                {
+                    idCardMetaText.text =
+                        $"<color=#9A9488>SEX / ID:</color> <color=#E0A43A><b>{g.ToUpperInvariant()}</b></color><pos=52%><color=#9A9488>BLOOD:</color> <color=#D95829><b>{blood}</b></color>\n" +
+                        $"<color=#9A9488>DOB:</color>      <color=#E4DFD1>{dob}</color><pos=52%><color=#9A9488>ZONE:</color>  <color=#6EE7B7>SECTOR-04</color>\n" +
+                        $"<color=#9A9488>CASE ID:</color>  <color=#E0A43A>{docNo}</color>";
+                }
+                else
+                {
+                    idCardMetaText.text =
+                        $"<color=#78909C>SEX / ID:</color> <color=#FFE082><b>{g.ToUpperInvariant()}</b></color><pos=52%><color=#78909C>BLOOD:</color> <color=#EF5350><b>{blood}</b></color>\n" +
+                        $"<color=#78909C>DOB:</color>      <color=#FFFFFF>{dob}</color><pos=52%><color=#78909C>ZONE:</color>  <color=#80CBC4>SECTOR-04</color>\n" +
+                        $"<color=#78909C>CASE ID:</color>  <color=#4FC3F7>{docNo}</color>";
+                }
             }
 
             if (idCardMrzText != null)
@@ -1415,7 +1446,9 @@ namespace SundayLastBreath.UI
 
             if (idCardActiveRecordText != null)
             {
-                idCardActiveRecordText.text = $"<b>CITIZEN:</b> <color=#FFFFFF>{fn.ToUpperInvariant()} {ln.ToUpperInvariant()}</color>  <color=#78909C>|</color>  <b>CASE:</b> <color=#4FC3F7>{docNo}</color>";
+                idCardActiveRecordText.text = isStyleD
+                    ? $"<color=#9A9488><b>CITIZEN:</b></color> <color=#E4DFD1><b>{fn.ToUpperInvariant()} {ln.ToUpperInvariant()}</b></color>  <color=#6E6A62>|</color>  <color=#9A9488><b>CASE:</b></color> <color=#E0A43A>{docNo}</color>"
+                    : $"<b>CITIZEN:</b> <color=#FFFFFF>{fn.ToUpperInvariant()} {ln.ToUpperInvariant()}</color>  <color=#78909C>|</color>  <b>CASE:</b> <color=#4FC3F7>{docNo}</color>";
             }
         }
 
@@ -1425,7 +1458,27 @@ namespace SundayLastBreath.UI
             Image bg = btn.GetComponent<Image>();
             Outline ol = btn.GetComponent<Outline>();
             TextMeshProUGUI titleTmp = btn.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI subTmp = btn.transform.Find("Sub")?.GetComponent<TextMeshProUGUI>();
             Image dotImg = btn.transform.Find("LeftStrip")?.GetComponent<Image>();
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                Color norm = isSelected ? new Color(0.72f, 0.34f, 0.14f, 1f) : new Color(0.23f, 0.26f, 0.30f, 1f);
+                Color hov = isSelected ? new Color(0.84f, 0.42f, 0.18f, 1f) : new Color(0.32f, 0.36f, 0.42f, 1f);
+                StyleDThemeUtility.ApplyChipButton(btn, norm, hov, 1.5f);
+                if (dotImg != null)
+                    dotImg.color = isSelected ? new Color(0.96f, 0.72f, 0.26f, 1f) : new Color(0.14f, 0.16f, 0.18f, 0.75f);
+                if (titleTmp != null)
+                {
+                    titleTmp.text = isSelected ? $"● {baseTitle}" : baseTitle;
+                    titleTmp.color = isSelected ? new Color(1f, 0.95f, 0.84f, 1f) : StyleDThemeUtility.ColBone;
+                }
+                if (subTmp != null)
+                {
+                    subTmp.color = isSelected ? new Color(0.92f, 0.89f, 0.82f, 1f) : StyleDThemeUtility.ColMuted;
+                }
+                return;
+            }
 
             if (bg != null)
                 bg.color = isSelected ? new Color(0.24f, 0.13f, 0.04f, 0.98f) : new Color(0.06f, 0.09f, 0.14f, 0.95f);
@@ -1443,6 +1496,7 @@ namespace SundayLastBreath.UI
         private void HighlightChipContainer(Transform container, string activeValue)
         {
             if (container == null) return;
+            bool isStyleD = StyleDThemeUtility.IsStyleDActive;
             for (int i = 0; i < container.childCount; i++)
             {
                 Transform chip = container.GetChild(i);
@@ -1452,6 +1506,24 @@ namespace SundayLastBreath.UI
                 Image bg = chip.GetComponent<Image>();
                 Outline ol = chip.GetComponent<Outline>();
                 TextMeshProUGUI txt = chip.GetComponentInChildren<TextMeshProUGUI>();
+                Button btn = chip.GetComponent<Button>();
+
+                if (isStyleD)
+                {
+                    if (btn != null)
+                    {
+                        Color norm = active ? new Color(0.78f, 0.37f, 0.15f, 1f) : new Color(0.23f, 0.26f, 0.30f, 1f);
+                        Color hov = active ? new Color(0.88f, 0.44f, 0.19f, 1f) : new Color(0.32f, 0.36f, 0.42f, 1f);
+                        StyleDThemeUtility.ApplyChipButton(btn, norm, hov, 1.65f);
+                    }
+                    if (txt != null)
+                    {
+                        SundayTypography.ApplyFont(txt, FontRole.Mono);
+                        txt.text = active ? $"<b>● {chipVal.ToUpperInvariant()}</b>" : chipVal.ToUpperInvariant();
+                        txt.color = active ? new Color(1f, 0.96f, 0.85f, 1f) : new Color(0.84f, 0.82f, 0.77f, 1f);
+                    }
+                    continue;
+                }
 
                 if (bg != null)
                     bg.color = active ? new Color(0.24f, 0.13f, 0.04f, 0.98f) : new Color(0.06f, 0.09f, 0.14f, 0.92f);
@@ -1621,6 +1693,11 @@ namespace SundayLastBreath.UI
             {
                 jobAdapter.UpdateLayout();
             }
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDJobPanelTheme();
+            }
         }
 
         public void SelectJob(string jobId)
@@ -1659,7 +1736,11 @@ namespace SundayLastBreath.UI
             if (studentTrainingPanel != null)
             {
                 studentTrainingPanel.SetActive(true);
-                EnsureStudentPanelSPAICOrder();
+                EnsureStudentPanelMortalOrder();
+                if (StyleDThemeUtility.IsStyleDActive)
+                {
+                    ApplyStyleDStudentTrainingTheme();
+                }
             }
             inspectLockTimer = 0f;
             currentlyHoveredStat = null;
@@ -1668,7 +1749,7 @@ namespace SundayLastBreath.UI
             UpdateStudentTrainingUI();
         }
 
-        private void EnsureStudentPanelSPAICOrder()
+        private void EnsureStudentPanelMortalOrder()
         {
             if (studentTrainingPanel == null) return;
             var allTransforms = studentTrainingPanel.GetComponentsInChildren<Transform>(true);
@@ -1678,7 +1759,19 @@ namespace SundayLastBreath.UI
                 if (t.name == "AllocTitle")
                 {
                     TextMeshProUGUI titleTmp = t.GetComponent<TextMeshProUGUI>();
-                    if (titleTmp != null) titleTmp.text = "S.P.A.I.C. APTITUDE ALLOCATION";
+                    if (titleTmp != null)
+                    {
+                        titleTmp.text = "M.O.R.T.A.L. ATTRIBUTES ALLOCATION";
+                        SundayTypography.ApplyFont(titleTmp, FontRole.Display);
+                    }
+                }
+                else if (t.name == "AllocSubtitle")
+                {
+                    TextMeshProUGUI subTmp = t.GetComponent<TextMeshProUGUI>();
+                    if (subTmp != null)
+                    {
+                        subTmp.text = "\"Distribute 5 AP points across your M.O.R.T.A.L. profile.\"";
+                    }
                 }
                 else if (t.name == "AttributesRows")
                 {
@@ -1688,11 +1781,11 @@ namespace SundayLastBreath.UI
 
             if (rows != null)
             {
-                // Order rows as S.P.A.I.C.: STRENGTH, PERCEPTION, AGILITY, INTELLIGENCE, CHARISMA
-                string[] spaicRowOrder = { "Row_STRENGTH", "Row_PERCEPTION", "Row_AGILITY", "Row_INTELLIGENCE", "Row_CHARISMA" };
-                for (int i = 0; i < spaicRowOrder.Length; i++)
+                // Order rows as M.O.R.T.A.L.: STRENGTH (MIGHT), PERCEPTION (OBSERVATION), AGILITY (REFLEX), INTELLIGENCE (TACTICS), CHARISMA (LEADERSHIP)
+                string[] mortalRowOrder = { "Row_STRENGTH", "Row_PERCEPTION", "Row_AGILITY", "Row_INTELLIGENCE", "Row_CHARISMA" };
+                for (int i = 0; i < mortalRowOrder.Length; i++)
                 {
-                    Transform r = rows.Find(spaicRowOrder[i]);
+                    Transform r = rows.Find(mortalRowOrder[i]);
                     if (r != null) r.SetSiblingIndex(i);
                 }
             }
@@ -1821,60 +1914,60 @@ namespace SundayLastBreath.UI
             switch (currentInspectedStat.ToLower())
             {
                 case "str":
-                    inspectorStatTitle.text = "STRENGTH (PHYSICAL POWER)";
-                    inspectorStatTitle.color = new Color(0.91f, 0.30f, 0.24f);
+                    inspectorStatTitle.text = "[M] MIGHT (PHYSICAL POWER)";
+                    inspectorStatTitle.color = new Color(0.93f, 0.33f, 0.31f);
                     if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Muscles conditioned from athletics, manual labor, and gym drills.\"";
                     if (inspectorStatDesc != null) inspectorStatDesc.text = "Determines raw physical power, encumbrance limit, and brute force survival actions in combat and exploration.";
                     if (inspectorStatImpact != null) inspectorStatImpact.text = 
-                        "<color=#E74C3C><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "<color=#EF5350><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
                         "• <color=#FFFFFF><b>Melee Combat:</b></color> +15% damage with blunt and edged weapons\n" +
                         "• <color=#FFFFFF><b>Carrying Capacity:</b></color> +8 kg maximum inventory encumbrance\n" +
                         "• <color=#FFFFFF><b>Breaching:</b></color> Force open jammed doors and barricades without tools";
                     break;
 
                 case "int":
-                    inspectorStatTitle.text = "INTELLIGENCE (ANALYTICAL MIND)";
-                    inspectorStatTitle.color = new Color(0.20f, 0.60f, 0.86f);
+                    inspectorStatTitle.text = "[T] TACTICS (ANALYTICAL MIND)";
+                    inspectorStatTitle.color = new Color(0.26f, 0.65f, 0.96f);
                     if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Late-night academic research, problem solving, and technical curiosity.\"";
                     if (inspectorStatDesc != null) inspectorStatDesc.text = "Governs scientific knowledge, electronic engineering, and the efficiency of medical supplies under pressure.";
                     if (inspectorStatImpact != null) inspectorStatImpact.text = 
-                        "<color=#3498DB><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "<color=#42A5F5><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
                         "• <color=#FFFFFF><b>Electronics & Tech:</b></color> +20% success when bypassing security and hotwiring\n" +
                         "• <color=#FFFFFF><b>Field Medicine:</b></color> Bandages, antibiotics & medkits restore +25% extra HP\n" +
                         "• <color=#FFFFFF><b>Crafting Efficiency:</b></color> Unlock advanced survival blueprints with less scrap";
                     break;
 
                 case "agi":
-                    inspectorStatTitle.text = "AGILITY (REFLEXES & MOBILITY)";
-                    inspectorStatTitle.color = new Color(0.18f, 0.80f, 0.44f);
+                    inspectorStatTitle.text = "[R] REFLEX (MOBILITY & EVASION)";
+                    inspectorStatTitle.color = new Color(0.40f, 0.73f, 0.42f);
                     if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Quick reflexes, track sprinting, and agile body coordination.\"";
                     if (inspectorStatDesc != null) inspectorStatDesc.text = "Determines movement swiftness, noise generation while sneaking, and reactive evasion when ambushed.";
                     if (inspectorStatImpact != null) inspectorStatImpact.text = 
-                        "<color=#2ECC71><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "<color=#66BB6A><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
                         "• <color=#FFFFFF><b>Sprint Stamina:</b></color> -10% stamina drain while sprinting away from hazards\n" +
                         "• <color=#FFFFFF><b>Stealth Evasion:</b></color> Sound footprint reduced by 15% across all surfaces\n" +
                         "• <color=#FFFFFF><b>Dodge Chance:</b></color> +12% chance to evade enemy lunges and grab attacks";
                     break;
 
                 case "cha":
-                    inspectorStatTitle.text = "CHARISMA (FORCE OF PERSONALITY)";
-                    inspectorStatTitle.color = new Color(0.61f, 0.35f, 0.71f);
+                    inspectorStatTitle.text = "[L] LEADERSHIP (FORCE OF PERSONALITY)";
+                    inspectorStatTitle.color = new Color(0.67f, 0.28f, 0.74f);
                     if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Campus diplomacy, debate leadership, and unwavering social poise.\"";
                     if (inspectorStatDesc != null) inspectorStatDesc.text = "Governs interpersonal influence, trade negotiations with survivors, and psychological resilience.";
                     if (inspectorStatImpact != null) inspectorStatImpact.text = 
-                        "<color=#9B59B6><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "<color=#AB47BC><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
                         "• <color=#FFFFFF><b>Dialogue Checks:</b></color> Significant persuasion and de-escalation advantages\n" +
                         "• <color=#FFFFFF><b>Barter Economy:</b></color> 10% discount when trading goods with neutral survivors\n" +
                         "• <color=#FFFFFF><b>Morale & Composure:</b></color> High resistance to psychological panic checks";
                     break;
 
                 case "per":
-                    inspectorStatTitle.text = "PERCEPTION (SITUATIONAL ALERTNESS)";
-                    inspectorStatTitle.color = new Color(0.95f, 0.77f, 0.06f);
+                    inspectorStatTitle.text = "[O] OBSERVATION (SITUATIONAL ALERTNESS)";
+                    inspectorStatTitle.color = new Color(1.00f, 0.65f, 0.15f);
                     if (inspectorStatQuote != null) inspectorStatQuote.text = "\"Keen senses—noticing subtle sounds, shadows, and concealed hazards.\"";
                     if (inspectorStatDesc != null) inspectorStatDesc.text = "Governs sensory alertness, firearm accuracy at range, and the ability to scavenge hidden supplies.";
                     if (inspectorStatImpact != null) inspectorStatImpact.text = 
-                        "<color=#F1C40F><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
+                        "<color=#FFA726><b>SURVIVAL IMPACT ANALYSIS:</b></color>\n" +
                         "• <color=#FFFFFF><b>Firearms & Aiming:</b></color> +10% ranged critical hit chance and recoil control\n" +
                         "• <color=#FFFFFF><b>Loot Detection:</b></color> Spot hidden supplies and secret caches from +3m distance\n" +
                         "• <color=#FFFFFF><b>Ambush Warning:</b></color> Early audio-visual cues before walking into dangerous traps";
@@ -1896,6 +1989,10 @@ namespace SundayLastBreath.UI
             {
                 studentMajorPanel.SetActive(true);
                 WireAcademicCards(studentMajorPanel, isMajor: true);
+                if (StyleDThemeUtility.IsStyleDActive)
+                {
+                    ApplyStyleDAcademicHeaderTheme(studentMajorPanel);
+                }
             }
         }
 
@@ -2003,6 +2100,11 @@ namespace SundayLastBreath.UI
                     bool isMajor = !string.IsNullOrEmpty(chosenMajorSkill) && card.skillId.Equals(chosenMajorSkill, System.StringComparison.OrdinalIgnoreCase);
                     card.gameObject.SetActive(!isMajor);
                 }
+
+                if (StyleDThemeUtility.IsStyleDActive)
+                {
+                    ApplyStyleDAcademicHeaderTheme(studentMinorPanel);
+                }
             }
         }
 
@@ -2068,6 +2170,11 @@ namespace SundayLastBreath.UI
             }
 
             UpdateHobbyTopBarStatus();
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDHobbyPanelTheme();
+            }
 
             // Enable the 2-Tab Thematic Category Bar on ALL 3 steps (Primary Hobby, Secondary Hobby, and Weakness!)
             if (weaknessTabBar != null)
@@ -2217,6 +2324,45 @@ namespace SundayLastBreath.UI
         private void UpdateWeaknessTabVisuals()
         {
             bool isTab0 = activeWeaknessTab == 0;
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                Color inactiveBg = new Color(0.22f, 0.25f, 0.29f, 1f);
+                Color inactiveHov = new Color(0.32f, 0.36f, 0.42f, 1f);
+                Color activeBg = hobbyStep < 3
+                    ? new Color(0.68f, 0.31f, 0.14f, 1f)
+                    : new Color(0.64f, 0.20f, 0.16f, 1f);
+                Color activeHov = hobbyStep < 3
+                    ? new Color(0.80f, 0.38f, 0.18f, 1f)
+                    : new Color(0.78f, 0.25f, 0.20f, 1f);
+
+                StyleDThemeUtility.ApplyChipButton(physicalTabButton, isTab0 ? activeBg : inactiveBg, isTab0 ? activeHov : inactiveHov, 1.5f);
+                StyleDThemeUtility.ApplyChipButton(mentalTabButton, !isTab0 ? activeBg : inactiveBg, !isTab0 ? activeHov : inactiveHov, 1.5f);
+
+                if (hobbyStep < 3)
+                {
+                    if (physicalTabText != null)
+                        physicalTabText.text = isTab0
+                            ? "<b><color=#FFF5DF>● COMBAT, FIELD & STEALTH (8)</color></b>"
+                            : "<b><color=#9A9488>○ COMBAT, FIELD & STEALTH (8)</color></b>";
+                    if (mentalTabText != null)
+                        mentalTabText.text = !isTab0
+                            ? "<b><color=#FFF5DF>● MIND, TECH & SUPPORT (8)</color></b>"
+                            : "<b><color=#9A9488>○ MIND, TECH & SUPPORT (8)</color></b>";
+                }
+                else
+                {
+                    if (physicalTabText != null)
+                        physicalTabText.text = isTab0
+                            ? "<b><color=#FFF5DF>● PHYSICAL FLAWS (10)</color></b>"
+                            : "<b><color=#9A9488>○ PHYSICAL FLAWS (10)</color></b>";
+                    if (mentalTabText != null)
+                        mentalTabText.text = !isTab0
+                            ? "<b><color=#FFF5DF>● MENTAL & SOCIAL (10)</color></b>"
+                            : "<b><color=#9A9488>○ MENTAL & SOCIAL (10)</color></b>";
+                }
+                return;
+            }
 
             if (hobbyStep < 3)
             {
@@ -2526,6 +2672,23 @@ namespace SundayLastBreath.UI
                 }
                 summaryInventoryText.text = sb.Length == 0 ? "Empty" : sb.ToString().TrimEnd();
             }
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDSummaryDossierTheme();
+            }
+
+            Canvas.ForceUpdateCanvases();
+            Transform colsTr = summaryDossierPanel.transform.Find("FederalDossierFrame/ColumnsContainer");
+            if (colsTr is RectTransform colsRebuildRt)
+            {
+                for (int i = 0; i < colsRebuildRt.childCount; i++)
+                {
+                    if (colsRebuildRt.GetChild(i) is RectTransform colChildRt)
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(colChildRt);
+                }
+                LayoutRebuilder.ForceRebuildLayoutImmediate(colsRebuildRt);
+            }
         }
 
         private static string FormatStatPips(int val, int max = 10)
@@ -2651,13 +2814,19 @@ namespace SundayLastBreath.UI
                         RectTransform abRect = advBox.GetComponent<RectTransform>();
                         if (abRect != null)
                         {
-                            abRect.sizeDelta = new Vector2(0, 138);
+                            abRect.sizeDelta = new Vector2(0f, 156f);
                         }
+                        LayoutElement abLe = advBox.GetComponent<LayoutElement>() ?? advBox.gameObject.AddComponent<LayoutElement>();
+                        abLe.minHeight = 156f;
+                        abLe.preferredHeight = 156f;
+
                         TextMeshProUGUI abTmp = advBox.GetComponentInChildren<TextMeshProUGUI>();
                         if (abTmp != null)
                         {
-                            abTmp.fontSize = 11.5f;
-                            abTmp.lineSpacing = 2.5f;
+                            abTmp.fontSize = 11f;
+                            abTmp.lineSpacing = 1.8f;
+                            abTmp.rectTransform.offsetMin = new Vector2(14f, 12f);
+                            abTmp.rectTransform.offsetMax = new Vector2(-14f, -12f);
                         }
                     }
                 }
@@ -2667,8 +2836,16 @@ namespace SundayLastBreath.UI
                 {
                     if (summaryTraitsText != null)
                     {
+                        summaryTraitsText.fontSize = 11f;
+                        summaryTraitsText.lineSpacing = 1.5f;
                         summaryTraitsText.textWrappingMode = TextWrappingModes.Normal;
                         summaryTraitsText.overflowMode = TextOverflowModes.Overflow;
+                    }
+
+                    if (summaryInventoryText != null)
+                    {
+                        summaryInventoryText.fontSize = 11.5f;
+                        summaryInventoryText.lineSpacing = 1.5f;
                     }
 
                     Transform edictBox = col3.Find("EdictBox");
@@ -2677,13 +2854,19 @@ namespace SundayLastBreath.UI
                         RectTransform ebRect = edictBox.GetComponent<RectTransform>();
                         if (ebRect != null)
                         {
-                            ebRect.sizeDelta = new Vector2(0, 128);
+                            ebRect.sizeDelta = new Vector2(0f, 144f);
                         }
+                        LayoutElement ebLe = edictBox.GetComponent<LayoutElement>() ?? edictBox.gameObject.AddComponent<LayoutElement>();
+                        ebLe.minHeight = 144f;
+                        ebLe.preferredHeight = 144f;
+
                         TextMeshProUGUI ebTmp = edictBox.GetComponentInChildren<TextMeshProUGUI>();
                         if (ebTmp != null)
                         {
-                            ebTmp.fontSize = 11.5f;
-                            ebTmp.lineSpacing = 2.5f;
+                            ebTmp.fontSize = 10.5f;
+                            ebTmp.lineSpacing = 1.5f;
+                            ebTmp.rectTransform.offsetMin = new Vector2(14f, 12f);
+                            ebTmp.rectTransform.offsetMax = new Vector2(-14f, -12f);
                         }
                     }
                 }
@@ -2796,6 +2979,23 @@ namespace SundayLastBreath.UI
                         restartCreationButton = rBtn;
                     }
                 }
+            }
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                ApplyStyleDSummaryDossierTheme();
+            }
+
+            Canvas.ForceUpdateCanvases();
+            Transform colsTr = summaryDossierPanel.transform.Find("FederalDossierFrame/ColumnsContainer");
+            if (colsTr is RectTransform colsRebuildRt)
+            {
+                for (int i = 0; i < colsRebuildRt.childCount; i++)
+                {
+                    if (colsRebuildRt.GetChild(i) is RectTransform colChildRt)
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(colChildRt);
+                }
+                LayoutRebuilder.ForceRebuildLayoutImmediate(colsRebuildRt);
             }
         }
 
@@ -3162,5 +3362,1019 @@ namespace SundayLastBreath.UI
                 AudioManager.Instance.PlayButtonClick();
             }
         }
+
+        #region Style D Hardware Theme
+        private void ApplyStyleDRootBackdrop()
+        {
+            Image rootImg = GetComponent<Image>();
+            if (rootImg != null)
+            {
+                rootImg.color = new Color(0.03f, 0.035f, 0.042f, 1f);
+            }
+        }
+
+        private static string StripSlashesAndPrefix(string raw)
+        {
+            if (string.IsNullOrEmpty(raw)) return raw;
+            return raw.Replace("■", "").Replace("//", "-").Trim();
+        }
+
+        private void ApplyStyleDIdentityConsoleTheme()
+        {
+            if (genderPanel == null) return;
+            ApplyStyleDRootBackdrop();
+
+            Transform outerHdr = genderPanel.transform.Find("Header");
+            if (outerHdr != null) outerHdr.gameObject.SetActive(false);
+
+            Transform frame = genderPanel.transform.Find("IdentityConsoleFrame");
+            if (frame == null) return;
+
+            RectTransform fRect = frame as RectTransform;
+            if (fRect != null)
+            {
+                fRect.sizeDelta = new Vector2(1520f, 830f);
+                fRect.anchoredPosition = Vector2.zero;
+            }
+            StyleDThemeUtility.ApplySliced(frame.GetComponent<Image>(), StyleDThemeUtility.CcConsoleChassis, 2.4f, Color.white, disableOutline: true);
+
+            // Top Banner inset inside chassis rail
+            Transform topBanner = frame.Find("TopBanner");
+            if (topBanner is RectTransform tbRt)
+            {
+                tbRt.anchorMin = new Vector2(0f, 1f);
+                tbRt.anchorMax = new Vector2(1f, 1f);
+                tbRt.pivot = new Vector2(0.5f, 1f);
+                tbRt.offsetMin = new Vector2(24f, -62f);
+                tbRt.offsetMax = new Vector2(-24f, -18f);
+
+                Image tbImg = topBanner.GetComponent<Image>();
+                if (tbImg != null) tbImg.color = Color.clear;
+
+                Transform gDiv = topBanner.Find("GoldDivider");
+                if (gDiv != null && gDiv.GetComponent<Image>() is Image gImg)
+                    gImg.color = new Color(0.55f, 0.38f, 0.18f, 0.72f);
+
+                TextMeshProUGUI bLeft = topBanner.Find("BannerLeft")?.GetComponent<TextMeshProUGUI>();
+                if (bLeft != null)
+                {
+                    bLeft.text = "<b>FEMA BIO-REGISTRY - STEP 01: CITIZEN INTAKE</b>";
+                    bLeft.fontSize = 18f;
+                    bLeft.color = StyleDThemeUtility.ColBone;
+                    SundayTypography.ApplyFont(bLeft, FontRole.Display);
+                    bLeft.rectTransform.anchorMax = new Vector2(0.56f, 1f);
+                    bLeft.rectTransform.offsetMin = new Vector2(14f, 0f);
+                }
+
+                TextMeshProUGUI bRight = topBanner.Find("BannerRight")?.GetComponent<TextMeshProUGUI>();
+                if (bRight != null)
+                {
+                    bRight.fontSize = 12f;
+                    bRight.color = StyleDThemeUtility.ColMuted;
+                    SundayTypography.ApplyFont(bRight, FontRole.Mono);
+                    bRight.rectTransform.anchorMin = new Vector2(0.56f, 0f);
+                    bRight.rectTransform.offsetMax = new Vector2(-14f, 0f);
+                }
+            }
+
+            // Remove StepTabsBar if present so Step 1 matches the rest of the wizard
+            Transform existingTabs = frame.Find("StyleD_StepTabsBar");
+            if (existingTabs != null) existingTabs.gameObject.SetActive(false);
+
+            // Body layout - full height between top banner and footer
+            Transform body = frame.Find("ConsoleBody");
+            if (body is RectTransform bodyRt)
+            {
+                bodyRt.anchorMin = Vector2.zero;
+                bodyRt.anchorMax = Vector2.one;
+                bodyRt.offsetMin = new Vector2(26f, 76f);
+                bodyRt.offsetMax = new Vector2(-26f, -70f);
+            }
+
+            Transform leftCol = frame.Find("ConsoleBody/LeftCol_CitizenCard");
+            if (leftCol is RectTransform lcRt) lcRt.sizeDelta = new Vector2(530f, 0f);
+
+            Transform rightCol = frame.Find("ConsoleBody/RightCol_Controls");
+            if (rightCol is RectTransform rcRt) rcRt.sizeDelta = new Vector2(916f, 0f);
+
+            // Left Column: Citizen ID Pass CRT
+            Transform idCard = leftCol?.Find("USCitizenIDCard");
+            if (idCard is RectTransform idRt)
+            {
+                idRt.sizeDelta = new Vector2(0f, 360f);
+                idRt.anchoredPosition = new Vector2(0f, 0f);
+                StyleDThemeUtility.ApplySliced(idCard.GetComponent<Image>(), StyleDThemeUtility.CcIdCrtHousing, 1.35f, Color.white, disableOutline: true);
+
+                Transform idHdr = idCard.Find("IDHeader");
+                if (idHdr is RectTransform idhRt)
+                {
+                    idhRt.sizeDelta = new Vector2(0f, 26f);
+                    idhRt.anchoredPosition = new Vector2(0f, -17f);
+                    Image hBg = idHdr.GetComponent<Image>();
+                    if (hBg != null) hBg.color = Color.clear;
+
+                    Transform gTop = idHdr.Find("GoldTopLine");
+                    if (gTop != null) gTop.gameObject.SetActive(false);
+
+                    TextMeshProUGUI hl = idHdr.Find("IDHeaderLeft")?.GetComponent<TextMeshProUGUI>();
+                    if (hl != null)
+                    {
+                        hl.text = "<b>FEMA - CDC JOINT BIO-REGISTRY // CITIZEN ID PASS</b>";
+                        hl.fontSize = 11f;
+                        hl.color = StyleDThemeUtility.ColBone;
+                        hl.rectTransform.offsetMin = new Vector2(24f, 0f);
+                    }
+                    TextMeshProUGUI hr = idHdr.Find("IDHeaderRight")?.GetComponent<TextMeshProUGUI>();
+                    if (hr != null)
+                    {
+                        hr.fontSize = 10.5f;
+                        hr.color = StyleDThemeUtility.ColAmber;
+                        hr.rectTransform.offsetMax = new Vector2(-24f, 0f);
+                    }
+                }
+
+                Transform pb = idCard.Find("PortraitBox");
+                if (pb is RectTransform pbRt)
+                {
+                    pbRt.anchoredPosition = new Vector2(24f, -46f);
+                    pbRt.sizeDelta = new Vector2(132f, 174f);
+                    StyleDThemeUtility.ApplySliced(pb.GetComponent<Image>(), StyleDThemeUtility.CcBiometricGridWell, 1.45f, Color.white, disableOutline: true);
+
+                    TextMeshProUGUI rtTop = pb.Find("ReticleTop")?.GetComponent<TextMeshProUGUI>();
+                    if (rtTop != null)
+                    {
+                        rtTop.text = "[BIO-SCAN]";
+                        rtTop.color = StyleDThemeUtility.ColSage;
+                        rtTop.rectTransform.offsetMin = new Vector2(4f, -22f);
+                        rtTop.rectTransform.offsetMax = new Vector2(-4f, -6f);
+                    }
+
+                    Transform sil = pb.Find("SilhouetteGraphic");
+                    if (sil is RectTransform silRt)
+                    {
+                        silRt.sizeDelta = new Vector2(102f, 102f);
+                        silRt.anchoredPosition = new Vector2(0f, 8f);
+                    }
+
+                    TextMeshProUGUI emb = pb.Find("EmblemSymbol")?.GetComponent<TextMeshProUGUI>();
+                    if (emb != null)
+                    {
+                        emb.rectTransform.offsetMin = new Vector2(4f, 22f);
+                        emb.rectTransform.offsetMax = new Vector2(-4f, 38f);
+                    }
+
+                    Transform pill = pb.Find("BioScanPill");
+                    if (pill is RectTransform pillRt)
+                    {
+                        pillRt.anchoredPosition = new Vector2(0f, 6f);
+                        pillRt.sizeDelta = new Vector2(-38f, 14f);
+                        Image pillBg = pill.GetComponent<Image>();
+                        if (pillBg != null) pillBg.color = Color.clear;
+                        TextMeshProUGUI scanTxt = pill.Find("ScanText")?.GetComponent<TextMeshProUGUI>();
+                        if (scanTxt != null)
+                        {
+                            scanTxt.text = "<b>[OK] TIER-1 CLEAR</b>";
+                            scanTxt.fontSize = 8f;
+                            scanTxt.overflowMode = TextOverflowModes.Overflow;
+                            scanTxt.color = StyleDThemeUtility.ColSage;
+                        }
+                    }
+                }
+
+                Transform lf = idCard.Find("LiveFields");
+                if (lf is RectTransform lfRt)
+                {
+                    lfRt.offsetMin = new Vector2(174f, -220f);
+                    lfRt.offsetMax = new Vector2(-24f, -46f);
+
+                    TextMeshProUGUI lblS = lf.Find("LblSurname")?.GetComponent<TextMeshProUGUI>();
+                    if (lblS != null)
+                    {
+                        lblS.text = "01 - FAMILY SURNAME";
+                        lblS.color = StyleDThemeUtility.ColMuted;
+                        SundayTypography.ApplyFont(lblS, FontRole.Mono);
+                    }
+
+                    TextMeshProUGUI valS = lf.Find("ValSurname")?.GetComponent<TextMeshProUGUI>();
+                    if (valS != null)
+                    {
+                        valS.color = StyleDThemeUtility.ColBone;
+                        valS.fontSize = 21f;
+                        valS.overflowMode = TextOverflowModes.Overflow;
+                    }
+
+                    TextMeshProUGUI lblG = lf.Find("LblGiven")?.GetComponent<TextMeshProUGUI>();
+                    if (lblG != null)
+                    {
+                        lblG.text = "02 - GIVEN FIRST NAME";
+                        lblG.color = StyleDThemeUtility.ColMuted;
+                        SundayTypography.ApplyFont(lblG, FontRole.Mono);
+                    }
+
+                    TextMeshProUGUI valG = lf.Find("ValGiven")?.GetComponent<TextMeshProUGUI>();
+                    if (valG != null)
+                    {
+                        valG.color = StyleDThemeUtility.ColAmber;
+                        valG.fontSize = 19f;
+                        valG.overflowMode = TextOverflowModes.Overflow;
+                    }
+
+                    Transform div = lf.Find("FieldDivider");
+                    if (div != null && div.GetComponent<Image>() is Image divImg)
+                        divImg.color = new Color(0.22f, 0.36f, 0.30f, 0.65f);
+                }
+
+                Transform mrz = idCard.Find("MRZStrip");
+                if (mrz is RectTransform mrzRt)
+                {
+                    mrzRt.anchorMin = Vector2.zero;
+                    mrzRt.anchorMax = new Vector2(1f, 0f);
+                    mrzRt.pivot = new Vector2(0.5f, 0f);
+                    mrzRt.sizeDelta = new Vector2(-48f, 76f);
+                    mrzRt.anchoredPosition = new Vector2(0f, 22f);
+                    StyleDThemeUtility.ApplySliced(mrz.GetComponent<Image>(), StyleDThemeUtility.CcMrzPaperStrip, 1.45f, Color.white, disableOutline: true);
+
+                    Transform mrzLine = mrz.Find("TopLine");
+                    if (mrzLine != null) mrzLine.gameObject.SetActive(false);
+
+                    TextMeshProUGUI bars = mrz.Find("BarcodeBars")?.GetComponent<TextMeshProUGUI>();
+                    if (bars != null)
+                    {
+                        bars.color = new Color(0.09f, 0.10f, 0.12f, 0.92f);
+                        bars.fontSize = 10.5f;
+                        bars.textWrappingMode = TextWrappingModes.NoWrap;
+                        bars.overflowMode = TextOverflowModes.Truncate;
+                        bars.rectTransform.offsetMin = new Vector2(22f, -28f);
+                        bars.rectTransform.offsetMax = new Vector2(-22f, -7f);
+                    }
+                    TextMeshProUGUI mrzCode = mrz.Find("ValMrzCode")?.GetComponent<TextMeshProUGUI>();
+                    if (mrzCode != null)
+                    {
+                        mrzCode.color = new Color(0.11f, 0.13f, 0.15f, 0.96f);
+                        mrzCode.fontSize = 10.5f;
+                        mrzCode.rectTransform.offsetMin = new Vector2(22f, 8f);
+                        mrzCode.rectTransform.offsetMax = new Vector2(-22f, -30f);
+                    }
+                }
+            }
+
+            // Left Column: Mirror Profile Tray
+            Transform mirror = leftCol?.Find("MirrorProfileBox");
+            if (mirror is RectTransform mbRt)
+            {
+                mbRt.sizeDelta = new Vector2(0f, 304f);
+                mbRt.anchoredPosition = new Vector2(0f, 0f);
+                StyleDThemeUtility.ApplySliced(mirror.GetComponent<Image>(), StyleDThemeUtility.CcModuleTray, 1.55f, Color.white, disableOutline: true);
+                StyleDModuleTrayHeader(mirror, "MIRROR REFLECTION & CITIZEN PROFILE");
+
+                Transform barTr = mirror.Find("StyleD_MirrorAccentBar");
+                GameObject barObj = barTr != null ? barTr.gameObject : new GameObject("StyleD_MirrorAccentBar", typeof(RectTransform), typeof(Image));
+                if (barTr == null) barObj.transform.SetParent(mirror, false);
+                RectTransform brt = barObj.GetComponent<RectTransform>();
+                brt.anchorMin = Vector2.zero;
+                brt.anchorMax = new Vector2(0f, 1f);
+                brt.offsetMin = new Vector2(20f, 114f);
+                brt.offsetMax = new Vector2(24f, -38f);
+                Image bImg = barObj.GetComponent<Image>();
+                bImg.color = StyleDThemeUtility.ColRust;
+                bImg.raycastTarget = false;
+
+                TextMeshProUGUI qTmp = mirror.Find("ValMirrorQuote")?.GetComponent<TextMeshProUGUI>();
+                if (qTmp != null)
+                {
+                    qTmp.color = new Color(0.87f, 0.85f, 0.79f, 1f);
+                    qTmp.fontSize = 13.5f;
+                    qTmp.rectTransform.offsetMin = new Vector2(34f, 112f);
+                    qTmp.rectTransform.offsetMax = new Vector2(-20f, -38f);
+                    SundayTypography.ApplyFont(qTmp, FontRole.Narrative);
+                }
+
+                Transform pill = mirror.Find("ActiveRecordPill");
+                if (pill is RectTransform pillRt)
+                {
+                    pillRt.anchoredPosition = new Vector2(0f, 68f);
+                    pillRt.sizeDelta = new Vector2(-36f, 34f);
+                    StyleDThemeUtility.ApplySliced(pill.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.6f, Color.white, disableOutline: true);
+                }
+
+                Button rNameBtn = mirror.Find("Btn_RandomName")?.GetComponent<Button>();
+                if (rNameBtn != null)
+                {
+                    if (rNameBtn.transform is RectTransform rnRt)
+                    {
+                        rnRt.anchoredPosition = new Vector2(18f, 16f);
+                        rnRt.sizeDelta = new Vector2(240f, 42f);
+                    }
+                    StyleDThemeUtility.ApplyChipButton(rNameBtn, new Color(0.28f, 0.31f, 0.36f, 1f), new Color(0.38f, 0.42f, 0.48f, 1f), 1.55f, StyleDThemeUtility.ColBone);
+                }
+
+                Button rAllBtn = mirror.Find("Btn_RandomAll")?.GetComponent<Button>();
+                if (rAllBtn != null)
+                {
+                    if (rAllBtn.transform is RectTransform raRt)
+                    {
+                        raRt.anchoredPosition = new Vector2(-18f, 16f);
+                        raRt.sizeDelta = new Vector2(240f, 42f);
+                    }
+                    StyleDThemeUtility.ApplyChipButton(rAllBtn, new Color(0.56f, 0.26f, 0.14f, 1f), new Color(0.72f, 0.34f, 0.18f, 1f), 1.55f, new Color(0.96f, 0.94f, 0.89f, 1f));
+                }
+            }
+
+            // Right Column: 3 Module Trays
+            Transform modGender = rightCol?.Find("Module01_Gender");
+            if (modGender is RectTransform mgRt)
+            {
+                mgRt.anchoredPosition = new Vector2(0f, 0f);
+                mgRt.sizeDelta = new Vector2(0f, 156f);
+                StyleDThemeUtility.ApplySliced(modGender.GetComponent<Image>(), StyleDThemeUtility.CcModuleTray, 1.55f, Color.white, disableOutline: true);
+                StyleDModuleTrayHeader(modGender, "01 - BIOLOGICAL SEX & GENDER IDENTITY");
+                PositionStyleDGenderCard(modGender.Find("Btn_Gender_Male"), 20f);
+                PositionStyleDGenderCard(modGender.Find("Btn_Gender_Female"), 317f);
+                PositionStyleDGenderCard(modGender.Find("Btn_Gender_NonBinary"), 614f);
+                StyleDInlineCustomRow(modGender.Find("CustomGenderRow"), -106f);
+            }
+
+            Transform modFirst = rightCol?.Find("Module02_FirstName");
+            if (modFirst is RectTransform mfRt)
+            {
+                mfRt.anchoredPosition = new Vector2(0f, -168f);
+                mfRt.sizeDelta = new Vector2(0f, 240f);
+                StyleDThemeUtility.ApplySliced(modFirst.GetComponent<Image>(), StyleDThemeUtility.CcModuleTray, 1.55f, Color.white, disableOutline: true);
+                StyleDModuleTrayHeader(modFirst, "02 - GIVEN NAME (FIRST NAME)");
+                StyleDChipGrid(modFirst.Find("FirstNameChipsGrid"));
+                StyleDInlineCustomRow(modFirst.Find("CustomFirstNameRow"), -190f);
+            }
+
+            Transform modLast = rightCol?.Find("Module03_LastName");
+            if (modLast is RectTransform mlRt)
+            {
+                mlRt.anchoredPosition = new Vector2(0f, -420f);
+                mlRt.sizeDelta = new Vector2(0f, 240f);
+                StyleDThemeUtility.ApplySliced(modLast.GetComponent<Image>(), StyleDThemeUtility.CcModuleTray, 1.55f, Color.white, disableOutline: true);
+                StyleDModuleTrayHeader(modLast, "03 - FAMILY SURNAME (LAST NAME)");
+                StyleDChipGrid(modLast.Find("LastNameChipsGrid"));
+                StyleDInlineCustomRow(modLast.Find("CustomLastNameRow"), -188f);
+            }
+
+            // Bottom Footer Bar
+            Transform footer = frame.Find("IdentityFooterBar");
+            if (footer is RectTransform footRt)
+            {
+                footRt.anchorMin = new Vector2(0f, 0f);
+                footRt.anchorMax = new Vector2(1f, 0f);
+                footRt.pivot = new Vector2(0.5f, 0f);
+                footRt.offsetMin = new Vector2(26f, 16f);
+                footRt.offsetMax = new Vector2(-26f, 70f);
+                Image footImg = footer.GetComponent<Image>();
+                if (footImg != null) footImg.color = Color.clear;
+
+                Transform fLine = footer.Find("TopDivider");
+                if (fLine != null && fLine.GetComponent<Image>() is Image flImg)
+                    flImg.color = new Color(0.55f, 0.38f, 0.18f, 0.55f);
+
+                TextMeshProUGUI notice = footer.Find("FooterNotice")?.GetComponent<TextMeshProUGUI>();
+                if (notice != null)
+                {
+                    notice.text = "<color=#E0A43A><b>[!] OFFICIAL NOTICE:</b></color> <color=#9A9488>IDENTITY RECORD ABOVE WILL BE SEALED INTO YOUR FINAL FEDERAL BIO-EMERGENCY DOSSIER.</color>";
+                    notice.rectTransform.offsetMin = new Vector2(12f, 0f);
+                }
+
+                Button procBtn = footer.Find("Btn_ConfirmIdentityProceed")?.GetComponent<Button>();
+                if (procBtn != null)
+                {
+                    if (procBtn.transform is RectTransform prRt)
+                    {
+                        prRt.anchoredPosition = new Vector2(-12f, 0f);
+                        prRt.sizeDelta = new Vector2(400f, 44f);
+                    }
+                    StyleDThemeUtility.ApplyChipButton(procBtn, new Color(0.68f, 0.24f, 0.15f, 1f), new Color(0.84f, 0.31f, 0.19f, 1f), 1.45f, new Color(0.96f, 0.94f, 0.89f, 1f));
+                }
+            }
+        }
+
+        private void EnsureStyleDStepTabsBar(Transform frame)
+        {
+            Transform barTr = frame.Find("StyleD_StepTabsBar");
+            GameObject barObj;
+            if (barTr == null)
+            {
+                barObj = new GameObject("StyleD_StepTabsBar", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+                barObj.transform.SetParent(frame, false);
+                RectTransform rt = barObj.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 1f);
+                rt.anchorMax = new Vector2(1f, 1f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.offsetMin = new Vector2(26f, -104f);
+                rt.offsetMax = new Vector2(-26f, -68f);
+
+                HorizontalLayoutGroup hlg = barObj.GetComponent<HorizontalLayoutGroup>();
+                hlg.spacing = 12f;
+                hlg.childControlWidth = true;
+                hlg.childControlHeight = true;
+                hlg.childForceExpandWidth = true;
+                hlg.childForceExpandHeight = true;
+
+                string[] labels = { "[01 IDENTITY]", "[02 VOCATION]", "[03 TRAITS & HOBBIES]", "[04 BARGAIN & M.O.R.T.A.L.]" };
+                for (int i = 0; i < labels.Length; i++)
+                {
+                    bool active = i == 0;
+                    GameObject tab = new GameObject("StepTab_" + i, typeof(RectTransform), typeof(Image));
+                    tab.transform.SetParent(barObj.transform, false);
+                    Image img = tab.GetComponent<Image>();
+                    img.raycastTarget = false;
+                    Color tint = active ? new Color(0.68f, 0.31f, 0.14f, 1f) : new Color(0.20f, 0.22f, 0.26f, 0.92f);
+                    StyleDThemeUtility.ApplySliced(img, StyleDThemeUtility.CcChipButton, 1.5f, tint, disableOutline: true);
+
+                    TextMeshProUGUI txt = CreateUIText(tab.transform, "Label", labels[i], 13f, TextAlignmentOptions.Center,
+                        active ? new Color(0.96f, 0.94f, 0.89f, 1f) : StyleDThemeUtility.ColMuted,
+                        FontRole.Display, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+                    txt.fontStyle = FontStyles.Bold;
+                }
+            }
+            else
+            {
+                barTr.gameObject.SetActive(true);
+            }
+        }
+
+        private static void StyleDModuleTrayHeader(Transform moduleTr, string cleanTitle)
+        {
+            if (moduleTr == null) return;
+            Transform hdr = moduleTr.Find("ModuleHeader");
+            if (hdr is RectTransform hRt)
+            {
+                hRt.sizeDelta = new Vector2(0f, 26f);
+                hRt.anchoredPosition = Vector2.zero;
+                Image hBg = hdr.GetComponent<Image>();
+                if (hBg != null) hBg.color = Color.clear;
+
+                TextMeshProUGUI tTmp = hdr.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (tTmp != null)
+                {
+                    tTmp.text = $"<b>{cleanTitle}</b>";
+                    tTmp.color = StyleDThemeUtility.ColBone;
+                    tTmp.fontSize = 11.5f;
+                    SundayTypography.ApplyFont(tTmp, FontRole.Display);
+                    tTmp.rectTransform.offsetMin = new Vector2(18f, 0f);
+                }
+            }
+        }
+
+        private static void PositionStyleDGenderCard(Transform card, float posX)
+        {
+            if (card is RectTransform rt)
+            {
+                rt.anchoredPosition = new Vector2(posX, -36f);
+                rt.sizeDelta = new Vector2(282f, 54f);
+            }
+            if (card != null && card.Find("LeftStrip") is RectTransform stripRt)
+            {
+                stripRt.anchorMin = new Vector2(0f, 0.18f);
+                stripRt.anchorMax = new Vector2(0f, 0.82f);
+                stripRt.pivot = new Vector2(0.5f, 0.5f);
+                stripRt.anchoredPosition = new Vector2(11.5f, 0f);
+                stripRt.sizeDelta = new Vector2(3.5f, 0f);
+            }
+            if (card != null && card.Find("Title") is RectTransform tRt) tRt.offsetMin = new Vector2(18f, 0f);
+            if (card != null && card.Find("Sub") is RectTransform sRt) sRt.offsetMin = new Vector2(18f, 4f);
+        }
+
+        private static void StyleDChipGrid(Transform gridTr)
+        {
+            if (gridTr is RectTransform gRt)
+            {
+                gRt.anchoredPosition = new Vector2(0f, -36f);
+                gRt.sizeDelta = new Vector2(-40f, 134f);
+                GridLayoutGroup glg = gridTr.GetComponent<GridLayoutGroup>();
+                if (glg != null)
+                {
+                    glg.cellSize = new Vector2(208f, 38f);
+                    glg.spacing = new Vector2(14f, 8f);
+                }
+            }
+        }
+
+        private static void StyleDInlineCustomRow(Transform row, float posY)
+        {
+            if (row == null) return;
+            if (row is RectTransform rRt)
+            {
+                rRt.anchoredPosition = new Vector2(0f, posY);
+                rRt.sizeDelta = new Vector2(-40f, 34f);
+            }
+
+            TextMeshProUGUI lbl = row.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            if (lbl != null) lbl.color = new Color(0.66f, 0.63f, 0.58f, 1f);
+
+            Transform inp = row.Find("InputField");
+            if (inp != null)
+            {
+                StyleDThemeUtility.ApplySliced(inp.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+                TextMeshProUGUI val = inp.Find("Text Area/Text")?.GetComponent<TextMeshProUGUI>();
+                if (val != null) val.color = StyleDThemeUtility.ColBone;
+                TextMeshProUGUI ph = inp.Find("Text Area/Placeholder")?.GetComponent<TextMeshProUGUI>();
+                if (ph != null) ph.color = new Color(0.45f, 0.43f, 0.40f, 0.85f);
+            }
+
+            Button actBtn = row.Find("ActionBtn")?.GetComponent<Button>();
+            if (actBtn != null)
+            {
+                StyleDThemeUtility.ApplyChipButton(actBtn, new Color(0.28f, 0.31f, 0.36f, 1f), new Color(0.38f, 0.42f, 0.48f, 1f), 1.6f, StyleDThemeUtility.ColBone);
+            }
+        }
+
+        private void ApplyStyleDScreenHeaderAndBadge(GameObject panel, string badgeName, string backBtnName)
+        {
+            if (panel == null) return;
+            ApplyStyleDRootBackdrop();
+
+            Transform header = panel.transform.Find("Header");
+            if (header != null)
+            {
+                TextMeshProUGUI tTmp = header.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (tTmp != null)
+                {
+                    tTmp.color = StyleDThemeUtility.ColBone;
+                    SundayTypography.ApplyFont(tTmp, FontRole.Display);
+                }
+                TextMeshProUGUI sTmp = header.Find("Subtitle")?.GetComponent<TextMeshProUGUI>();
+                if (sTmp != null)
+                {
+                    sTmp.color = StyleDThemeUtility.ColMuted;
+                    SundayTypography.ApplyFont(sTmp, FontRole.Narrative);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(backBtnName))
+            {
+                Button backBtn = panel.transform.Find(backBtnName)?.GetComponent<Button>();
+                if (backBtn != null)
+                {
+                    StyleDThemeUtility.ApplyChipButton(backBtn, new Color(0.24f, 0.27f, 0.31f, 1f), new Color(0.34f, 0.38f, 0.44f, 1f), 1.55f, StyleDThemeUtility.ColBone);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(badgeName))
+            {
+                Transform badge = panel.transform.Find(badgeName);
+                if (badge != null)
+                {
+                    StyleDThemeUtility.ApplySliced(badge.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+                }
+            }
+        }
+
+        private void ApplyStyleDJobPanelTheme()
+        {
+            if (jobSelectionPanel == null) return;
+            ApplyStyleDScreenHeaderAndBadge(jobSelectionPanel, "JobStepBadge", "Btn_BackToIdentity");
+
+            TextMeshProUGUI tTmp = jobSelectionPanel.transform.Find("Header/Title")?.GetComponent<TextMeshProUGUI>();
+            if (tTmp != null)
+                tTmp.text = "PRE-OUTBREAK VOCATION <size=75%><color=#E0A43A>[SERVICE RECORD]</color></size>";
+
+            Transform legend = jobSelectionPanel.transform.Find("SPAICLegendBar");
+            if (legend != null)
+            {
+                StyleDThemeUtility.ApplySliced(legend.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+                TextMeshProUGUI lTmp = legend.Find("LegendText")?.GetComponent<TextMeshProUGUI>();
+                if (lTmp != null && !string.IsNullOrEmpty(lTmp.text))
+                    lTmp.text = lTmp.text.Replace("// ", "").Replace("//", "");
+            }
+
+            TextMeshProUGUI badgeTmp = jobSelectionPanel.transform.Find("JobStepBadge/StatusText")?.GetComponent<TextMeshProUGUI>();
+            if (badgeTmp != null && !string.IsNullOrEmpty(badgeTmp.text))
+                badgeTmp.text = badgeTmp.text.Replace("//", "-");
+        }
+
+        private void ApplyStyleDAcademicHeaderTheme(GameObject panel)
+        {
+            ApplyStyleDScreenHeaderAndBadge(panel, null, null);
+            if (panel != null)
+            {
+                Transform container = panel.transform.Find("AcademicContainer");
+                if (container is RectTransform cRt)
+                {
+                    cRt.anchoredPosition = new Vector2(0f, -55f);
+                }
+            }
+        }
+
+        private void ApplyStyleDHobbyPanelTheme()
+        {
+            ApplyStyleDScreenHeaderAndBadge(hobbySelectionPanel, "HobbyLoadoutBadge", "Btn_HobbyPreviousStep");
+            if (hobbySelectionPanel != null && hobbySelectionPanel.transform.Find("HobbyLoadoutBadge") is RectTransform hRt)
+            {
+                hRt.sizeDelta = new Vector2(460f, 48f);
+                hRt.anchoredPosition = new Vector2(-170f, -44f);
+            }
+            UpdateWeaknessTabVisuals();
+        }
+
+        private void ApplyStyleDStudentTrainingTheme()
+        {
+            if (studentTrainingPanel == null) return;
+            ApplyStyleDScreenHeaderAndBadge(studentTrainingPanel, null, null);
+
+            Transform dossier = studentTrainingPanel.transform.Find("DossierBox");
+            if (dossier == null) return;
+            StyleDThemeUtility.ApplySliced(dossier.GetComponent<Image>(), StyleDThemeUtility.CcConsoleChassis, 2.4f, Color.white, disableOutline: true);
+
+            if (dossier is RectTransform dRt)
+            {
+                dRt.sizeDelta = new Vector2(1380f, 660f);
+                dRt.anchoredPosition = new Vector2(0f, -40f);
+            }
+
+            Transform inner = dossier.Find("Inner");
+            if (inner == null) return;
+            if (inner is RectTransform inRt)
+            {
+                inRt.offsetMin = new Vector2(34f, 34f);
+                inRt.offsetMax = new Vector2(-34f, -34f);
+            }
+            Image inImg = inner.GetComponent<Image>();
+            if (inImg != null) inImg.color = Color.clear;
+
+            Transform topStripe = inner.Find("TopStripe");
+            if (topStripe != null) topStripe.gameObject.SetActive(false);
+
+            Transform leftCol = inner.Find("LeftColumn");
+            if (leftCol is RectTransform lcRt)
+            {
+                lcRt.anchorMin = new Vector2(0f, 0f);
+                lcRt.anchorMax = new Vector2(0f, 1f);
+                lcRt.pivot = new Vector2(0f, 0.5f);
+                lcRt.anchoredPosition = new Vector2(6f, 0f);
+                lcRt.sizeDelta = new Vector2(640f, 0f);
+            }
+
+            Transform rightCol = inner.Find("RightColumn");
+            if (rightCol is RectTransform rcRt)
+            {
+                rcRt.anchorMin = new Vector2(1f, 0f);
+                rcRt.anchorMax = new Vector2(1f, 1f);
+                rcRt.pivot = new Vector2(1f, 0.5f);
+                rcRt.anchoredPosition = new Vector2(-6f, 0f);
+                rcRt.sizeDelta = new Vector2(640f, 0f);
+            }
+
+            Transform alloc = inner.Find("LeftColumn/AllocatorPanel");
+            if (alloc != null)
+            {
+                if (alloc is RectTransform alRt)
+                {
+                    alRt.offsetMin = Vector2.zero;
+                    alRt.offsetMax = Vector2.zero;
+                }
+                StyleDThemeUtility.ApplySliced(alloc.GetComponent<Image>(), StyleDThemeUtility.CcModuleTray, 1.35f, Color.white, disableOutline: true);
+
+                Transform allocTitle = alloc.Find("AllocTitle");
+                if (allocTitle is RectTransform atRt)
+                {
+                    atRt.anchoredPosition = new Vector2(0f, -4f);
+                    atRt.sizeDelta = new Vector2(-36f, 24f);
+                }
+                if (allocTitle?.GetComponent<TextMeshProUGUI>() is TextMeshProUGUI atTmp)
+                    atTmp.fontSize = 15f;
+
+                Transform allocSub = alloc.Find("AllocSubtitle");
+                if (allocSub is RectTransform asRt)
+                {
+                    asRt.anchoredPosition = new Vector2(0f, -38f);
+                    asRt.sizeDelta = new Vector2(-36f, 20f);
+                }
+
+                Transform div = alloc.Find("LeftDivider");
+                if (div != null) div.gameObject.SetActive(false);
+
+                Transform pb = alloc.Find("PointsBadge");
+                if (pb != null)
+                {
+                    if (pb is RectTransform pbRt)
+                    {
+                        pbRt.anchoredPosition = new Vector2(0f, -68f);
+                        pbRt.sizeDelta = new Vector2(576f, 36f);
+                    }
+                    StyleDThemeUtility.ApplySliced(pb.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+                }
+
+                Transform rows = alloc.Find("AttributesRows");
+                if (rows != null)
+                {
+                    if (rows is RectTransform rowsRt)
+                    {
+                        rowsRt.anchoredPosition = new Vector2(0f, -116f);
+                        rowsRt.sizeDelta = new Vector2(576f, 270f);
+                    }
+
+                    for (int i = 0; i < rows.childCount; i++)
+                    {
+                        Transform row = rows.GetChild(i);
+                        if (row is RectTransform rRt)
+                        {
+                            rRt.sizeDelta = new Vector2(576f, 48f);
+                        }
+                        StyleDThemeUtility.ApplySliced(row.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.5f, Color.white, disableOutline: true);
+
+                        Transform pip = row.Find("StatPip");
+                        if (pip is RectTransform pipRt)
+                        {
+                            pipRt.anchorMin = new Vector2(0f, 0.18f);
+                            pipRt.anchorMax = new Vector2(0f, 0.82f);
+                            pipRt.pivot = new Vector2(0.5f, 0.5f);
+                            pipRt.anchoredPosition = new Vector2(10f, 0f);
+                            pipRt.sizeDelta = new Vector2(3.5f, 0f);
+                        }
+
+                        Transform lblTr = row.Find("NameLabel");
+                        if (lblTr != null)
+                        {
+                            if (lblTr is RectTransform nlRt)
+                            {
+                                nlRt.anchorMin = new Vector2(0f, 0f);
+                                nlRt.anchorMax = new Vector2(0f, 1f);
+                                nlRt.pivot = new Vector2(0f, 0.5f);
+                                nlRt.anchoredPosition = new Vector2(20f, 0f);
+                                nlRt.sizeDelta = new Vector2(178f, 0f);
+                            }
+                            TextMeshProUGUI nlTmp = lblTr.GetComponent<TextMeshProUGUI>();
+                            if (nlTmp != null)
+                            {
+                                nlTmp.fontSize = 13.5f;
+                                if (row.name == "Row_STRENGTH") nlTmp.text = "<b><color=#EF5350>[M] MIGHT</color></b> <size=85%><color=#90A4AE>(STR)</color></size>";
+                                else if (row.name == "Row_PERCEPTION") nlTmp.text = "<b><color=#FFA726>[O] OBSERVATION</color></b> <size=85%><color=#90A4AE>(PER)</color></size>";
+                                else if (row.name == "Row_AGILITY") nlTmp.text = "<b><color=#66BB6A>[R] REFLEX</color></b> <size=85%><color=#90A4AE>(AGI)</color></size>";
+                                else if (row.name == "Row_INTELLIGENCE") nlTmp.text = "<b><color=#42A5F5>[T] TACTICS</color></b> <size=85%><color=#90A4AE>(INT)</color></size>";
+                                else if (row.name == "Row_CHARISMA") nlTmp.text = "<b><color=#AB47BC>[L] LEADERSHIP</color></b> <size=85%><color=#90A4AE>(CHA)</color></size>";
+                            }
+                        }
+
+                        Button minus = row.Find("Btn_Minus")?.GetComponent<Button>();
+                        if (minus != null)
+                        {
+                            if (minus.transform is RectTransform mRt)
+                            {
+                                mRt.anchorMin = new Vector2(0f, 0.5f);
+                                mRt.anchorMax = new Vector2(0f, 0.5f);
+                                mRt.pivot = new Vector2(0f, 0.5f);
+                                mRt.anchoredPosition = new Vector2(204f, 0f);
+                                mRt.sizeDelta = new Vector2(34f, 34f);
+                            }
+                            StyleDThemeUtility.ApplyChipButton(minus, new Color(0.28f, 0.31f, 0.36f, 1f), new Color(0.40f, 0.44f, 0.50f, 1f), 1.8f, StyleDThemeUtility.ColBone);
+                        }
+
+                        Transform valTr = row.Find("ValueDisplay");
+                        if (valTr is RectTransform vdRt)
+                        {
+                            vdRt.anchorMin = new Vector2(0f, 0f);
+                            vdRt.anchorMax = new Vector2(0f, 1f);
+                            vdRt.pivot = new Vector2(0f, 0.5f);
+                            vdRt.anchoredPosition = new Vector2(244f, 0f);
+                            vdRt.sizeDelta = new Vector2(278f, 0f);
+                            TextMeshProUGUI vTmp = valTr.GetComponent<TextMeshProUGUI>();
+                            if (vTmp != null)
+                            {
+                                vTmp.alignment = TextAlignmentOptions.Center;
+                                vTmp.fontSize = 15f;
+                            }
+                        }
+
+                        Button plus = row.Find("Btn_Plus")?.GetComponent<Button>();
+                        if (plus != null)
+                        {
+                            if (plus.transform is RectTransform pRt)
+                            {
+                                pRt.anchorMin = new Vector2(1f, 0.5f);
+                                pRt.anchorMax = new Vector2(1f, 0.5f);
+                                pRt.pivot = new Vector2(1f, 0.5f);
+                                pRt.anchoredPosition = new Vector2(-14f, 0f);
+                                pRt.sizeDelta = new Vector2(34f, 34f);
+                            }
+                            StyleDThemeUtility.ApplyChipButton(plus, new Color(0.28f, 0.31f, 0.36f, 1f), new Color(0.40f, 0.44f, 0.50f, 1f), 1.8f, StyleDThemeUtility.ColBone);
+                        }
+                    }
+                }
+
+                if (studentWarningText != null && studentWarningText.transform is RectTransform wtRt)
+                {
+                    wtRt.anchoredPosition = new Vector2(0f, 26f);
+                    wtRt.sizeDelta = new Vector2(560f, 34f);
+                    studentWarningText.fontSize = 12f;
+                }
+
+                if (studentContinueButton != null)
+                {
+                    if (studentContinueButton.transform is RectTransform cbRt)
+                    {
+                        cbRt.anchoredPosition = new Vector2(0f, 26f);
+                        cbRt.sizeDelta = new Vector2(400f, 44f);
+                    }
+                    StyleDThemeUtility.ApplyChipButton(studentContinueButton, new Color(0.68f, 0.31f, 0.14f, 1f), new Color(0.84f, 0.40f, 0.18f, 1f), 1.45f, new Color(0.96f, 0.94f, 0.89f, 1f));
+                }
+            }
+
+            Transform insp = inner.Find("RightColumn/InspectorPanel");
+            if (insp != null)
+            {
+                if (insp is RectTransform inspRt)
+                {
+                    inspRt.offsetMin = Vector2.zero;
+                    inspRt.offsetMax = Vector2.zero;
+                }
+                StyleDThemeUtility.ApplySliced(insp.GetComponent<Image>(), StyleDThemeUtility.CcModuleTray, 1.35f, Color.white, disableOutline: true);
+
+                Transform div = insp.Find("Divider");
+                if (div != null) div.gameObject.SetActive(false);
+
+                Transform title = insp.Find("InspTitle");
+                if (title is RectTransform tRt)
+                {
+                    tRt.anchoredPosition = new Vector2(0f, -4f);
+                    tRt.sizeDelta = new Vector2(-36f, 24f);
+                }
+                if (title?.GetComponent<TextMeshProUGUI>() is TextMeshProUGUI inspTitleTmp)
+                    inspTitleTmp.fontSize = 15f;
+
+                Transform quote = insp.Find("InspQuote");
+                if (quote is RectTransform qRt)
+                {
+                    qRt.anchoredPosition = new Vector2(0f, -38f);
+                    qRt.sizeDelta = new Vector2(-36f, 20f);
+                }
+                Transform vBanner = insp.Find("VignetteBanner");
+                if (vBanner is RectTransform vbRt)
+                {
+                    vbRt.anchoredPosition = new Vector2(0f, -68f);
+                    vbRt.sizeDelta = new Vector2(-48f, 138f);
+                }
+                Transform desc = insp.Find("InspDesc");
+                if (desc is RectTransform dsRt)
+                {
+                    dsRt.anchoredPosition = new Vector2(0f, -216f);
+                    dsRt.sizeDelta = new Vector2(-48f, 48f);
+                }
+
+                Transform impact = insp.Find("ImpactCard");
+                if (impact != null)
+                {
+                    if (impact is RectTransform imRt)
+                    {
+                        imRt.anchoredPosition = new Vector2(0f, -274f);
+                        imRt.sizeDelta = new Vector2(-48f, 240f);
+                    }
+                    StyleDThemeUtility.ApplySliced(impact.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+                    Transform tLine = impact.Find("TopLine");
+                    if (tLine != null) tLine.gameObject.SetActive(false);
+
+                    Transform inspImpact = impact.Find("InspImpact");
+                    if (inspImpact is RectTransform iiRt)
+                    {
+                        iiRt.offsetMin = new Vector2(18f, 14f);
+                        iiRt.offsetMax = new Vector2(-18f, -14f);
+                    }
+                }
+            }
+        }
+
+        private void ApplyStyleDSummaryDossierTheme()
+        {
+            if (summaryDossierPanel == null) return;
+            ApplyStyleDRootBackdrop();
+
+            Transform frame = summaryDossierPanel.transform.Find("FederalDossierFrame");
+            if (frame == null) return;
+            if (frame is RectTransform frameRt)
+            {
+                frameRt.sizeDelta = new Vector2(1480f, 800f);
+                frameRt.anchoredPosition = Vector2.zero;
+            }
+            StyleDThemeUtility.ApplySliced(frame.GetComponent<Image>(), StyleDThemeUtility.CcConsoleChassis, 2.4f, Color.white, disableOutline: true);
+
+            Transform hdrBar = frame.Find("HeaderBar");
+            if (hdrBar is RectTransform hbRt)
+            {
+                hbRt.offsetMin = new Vector2(34f, -100f);
+                hbRt.offsetMax = new Vector2(-34f, -26f);
+                Image hbImg = hdrBar.GetComponent<Image>();
+                if (hbImg != null) hbImg.color = Color.clear;
+
+                Transform gDiv = hdrBar.Find("GoldDivider");
+                if (gDiv != null && gDiv.GetComponent<Image>() is Image gImg)
+                    gImg.color = new Color(0.55f, 0.38f, 0.18f, 0.72f);
+
+                TextMeshProUGUI titleTmp = hdrBar.Find("TitleBlock/Title")?.GetComponent<TextMeshProUGUI>();
+                if (titleTmp != null) titleTmp.color = StyleDThemeUtility.ColBone;
+                TextMeshProUGUI subTmp = hdrBar.Find("TitleBlock/Subtitle")?.GetComponent<TextMeshProUGUI>();
+                if (subTmp != null) subTmp.color = StyleDThemeUtility.ColAmber;
+                TextMeshProUGUI caseTmp = hdrBar.Find("MetaBlock/CaseId")?.GetComponent<TextMeshProUGUI>();
+                if (caseTmp != null) caseTmp.color = StyleDThemeUtility.ColMuted;
+            }
+
+            Transform cols = frame.Find("ColumnsContainer");
+            if (cols != null)
+            {
+                if (cols is RectTransform colsRt)
+                {
+                    colsRt.offsetMin = new Vector2(34f, 92f);
+                    colsRt.offsetMax = new Vector2(-34f, -110f);
+                }
+
+                string[] colNames = { "Col1_Identity", "Col2_Aptitudes", "Col3_Manifest" };
+                foreach (string cName in colNames)
+                {
+                    Transform col = cols.Find(cName);
+                    if (col == null) continue;
+                    StyleDThemeUtility.ApplySliced(col.GetComponent<Image>(), StyleDThemeUtility.CcDossierCard, 1.35f, Color.white, disableOutline: true);
+
+                    VerticalLayoutGroup colVlg = col.GetComponent<VerticalLayoutGroup>();
+                    if (colVlg != null)
+                    {
+                        colVlg.padding = new RectOffset(18, 18, 5, 16);
+                        colVlg.spacing = 6f;
+                    }
+
+                    Transform secHdr = col.Find("SectionHeader");
+                    if (secHdr != null)
+                    {
+                        if (secHdr is RectTransform shRt)
+                            shRt.sizeDelta = new Vector2(shRt.sizeDelta.x, 22f);
+                        LayoutElement shLe = secHdr.GetComponent<LayoutElement>() ?? secHdr.gameObject.AddComponent<LayoutElement>();
+                        shLe.minHeight = 22f;
+                        shLe.preferredHeight = 22f;
+                        Image shBg = secHdr.GetComponent<Image>();
+                        if (shBg != null) shBg.color = Color.clear;
+                        TextMeshProUGUI shTxt = secHdr.Find("Text")?.GetComponent<TextMeshProUGUI>();
+                        if (shTxt != null)
+                        {
+                            shTxt.text = StripSlashesAndPrefix(shTxt.text);
+                            shTxt.fontSize = 12f;
+                            shTxt.color = StyleDThemeUtility.ColBone;
+                            SundayTypography.ApplyFont(shTxt, FontRole.Display);
+                        }
+                    }
+
+                    Transform adv = col.Find("AdvisoryBox");
+                    if (adv != null)
+                    {
+                        StyleDThemeUtility.ApplySliced(adv.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+                        if (adv is RectTransform abRt)
+                            abRt.sizeDelta = new Vector2(0f, 156f);
+                        LayoutElement abLe = adv.GetComponent<LayoutElement>() ?? adv.gameObject.AddComponent<LayoutElement>();
+                        abLe.minHeight = 156f;
+                        abLe.preferredHeight = 156f;
+                        TextMeshProUGUI abTmp = adv.GetComponentInChildren<TextMeshProUGUI>();
+                        if (abTmp != null)
+                        {
+                            abTmp.fontSize = 11f;
+                            abTmp.lineSpacing = 1.8f;
+                            abTmp.rectTransform.offsetMin = new Vector2(14f, 12f);
+                            abTmp.rectTransform.offsetMax = new Vector2(-14f, -12f);
+                        }
+                    }
+
+                    Transform edict = col.Find("EdictBox");
+                    if (edict != null)
+                    {
+                        StyleDThemeUtility.ApplySliced(edict.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.55f, Color.white, disableOutline: true);
+                        if (edict is RectTransform ebRt)
+                            ebRt.sizeDelta = new Vector2(0f, 144f);
+                        LayoutElement ebLe = edict.GetComponent<LayoutElement>() ?? edict.gameObject.AddComponent<LayoutElement>();
+                        ebLe.minHeight = 144f;
+                        ebLe.preferredHeight = 144f;
+                        TextMeshProUGUI ebTmp = edict.GetComponentInChildren<TextMeshProUGUI>();
+                        if (ebTmp != null)
+                        {
+                            ebTmp.fontSize = 10.5f;
+                            ebTmp.lineSpacing = 1.5f;
+                            ebTmp.rectTransform.offsetMin = new Vector2(14f, 12f);
+                            ebTmp.rectTransform.offsetMax = new Vector2(-14f, -12f);
+                        }
+                    }
+                }
+            }
+
+            Transform footer = frame.Find("FooterBar");
+            if (footer is RectTransform ftRt)
+            {
+                ftRt.offsetMin = new Vector2(34f, 26f);
+                ftRt.offsetMax = new Vector2(-34f, 82f);
+                Image ftImg = footer.GetComponent<Image>();
+                if (ftImg != null) ftImg.color = Color.clear;
+
+                Transform tDiv = footer.Find("TopDivider");
+                if (tDiv != null && tDiv.GetComponent<Image>() is Image tdImg)
+                    tdImg.color = new Color(0.55f, 0.38f, 0.18f, 0.55f);
+
+                Button startOver = footer.Find("Btn_StartOver")?.GetComponent<Button>() ?? restartCreationButton;
+                if (startOver != null)
+                    StyleDThemeUtility.ApplyChipButton(startOver, new Color(0.24f, 0.27f, 0.31f, 1f), new Color(0.56f, 0.22f, 0.18f, 1f), 1.5f, StyleDThemeUtility.ColBone);
+
+                Button confirm = footer.Find("Btn_CONFIRM&COMMENCESURVIVAL>>")?.GetComponent<Button>() ?? beginSurvivalButton;
+                if (confirm != null)
+                    StyleDThemeUtility.ApplyChipButton(confirm, new Color(0.68f, 0.24f, 0.15f, 1f), new Color(0.84f, 0.31f, 0.19f, 1f), 1.45f, new Color(0.96f, 0.94f, 0.89f, 1f));
+            }
+        }
+        #endregion
     }
 }

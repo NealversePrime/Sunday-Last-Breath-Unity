@@ -52,6 +52,9 @@ namespace SundayLastBreath.UI
         [SerializeField] private Color normalHotkeyColor = new Color(0.85f, 0.65f, 0.30f, 0.95f);
         [SerializeField] private Color hoverHotkeyColor = Color.black;
 
+        public static bool StyleDEnabled { get; set; }
+        public static Sprite StyleDButtonSprite { get; set; }
+
         private static readonly Color DefaultBaseBgColor = new Color(0.003f, 0.005f, 0.009f, 0.82f);
         private static readonly Color DisabledBaseBgColor = new Color(0.002f, 0.003f, 0.005f, 0.50f);
         private static readonly Color DefaultHoverBgColor = new Color(0.85f, 0.50f, 0.06f, 0.96f);
@@ -60,6 +63,11 @@ namespace SundayLastBreath.UI
         private static readonly Color DefaultHoverAccentColor = new Color(1f, 0.85f, 0.40f);
         private static readonly Color DefaultNormalHotkeyColor = new Color(0.85f, 0.65f, 0.30f, 0.95f);
         private static readonly Color HoverDarkTextColor = new Color(0f, 0f, 0f, 1f);
+
+        private static readonly Color StyleDBoneText = new Color(0.90f, 0.88f, 0.82f, 1f);
+        private static readonly Color StyleDMutedText = new Color(0.64f, 0.62f, 0.58f, 0.94f);
+        private static readonly Color StyleDHotkeyColor = new Color(0.88f, 0.68f, 0.32f, 1f);
+        private static readonly Color StyleDHoverBg = new Color(0.72f, 0.44f, 0.16f, 1f);
 
         [Header("Animation Settings")]
         [SerializeField] private float slideDistance = 6f;
@@ -73,6 +81,7 @@ namespace SundayLastBreath.UI
         private bool hasManagedChoiceText = false;
         private string rawMainText;
         private string untaggedFallbackText;
+        private Color? _lastExplicitAccent;
 
         public Button ButtonComponent => button;
 
@@ -223,6 +232,123 @@ namespace SundayLastBreath.UI
             return System.Text.RegularExpressions.Regex.Replace(text, @"</?color(?:=[^>]*)?>", string.Empty, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
+        private void ResolveStyleDColors(bool interactable, string text, Color? explicitAccent, out Color ledCol, out Color btnTint)
+        {
+            if (!interactable)
+            {
+                ledCol = new Color(0.30f, 0.32f, 0.35f, 0.45f);
+                btnTint = new Color(0.16f, 0.17f, 0.19f, 0.92f);
+                return;
+            }
+
+            string upper = string.IsNullOrEmpty(text) ? "" : text.ToUpperInvariant();
+            if (upper.Contains("LOCKED"))
+            {
+                ledCol = new Color(0.78f, 0.26f, 0.22f, 0.90f);
+                btnTint = new Color(0.18f, 0.19f, 0.21f, 0.98f);
+            }
+            else if (upper.Contains("SAFE") || upper.Contains("#22C55E") || upper.Contains("#4ADE80") || upper.Contains("#2ECC71"))
+            {
+                ledCol = new Color(0.24f, 0.84f, 0.46f, 1f);
+                btnTint = new Color(0.21f, 0.26f, 0.23f, 1f);
+            }
+            else if (upper.Contains("DANGER") || upper.Contains("ATTACK"))
+            {
+                ledCol = new Color(0.88f, 0.26f, 0.22f, 1f);
+                btnTint = new Color(0.24f, 0.23f, 0.24f, 1f);
+            }
+            else if (upper.Contains("RISK") || upper.Contains("FIGHT") || upper.Contains("FORCE") ||
+                     upper.Contains("#EF4444") || upper.Contains("#F59E0B"))
+            {
+                ledCol = new Color(0.90f, 0.56f, 0.18f, 1f);
+                btnTint = new Color(0.24f, 0.24f, 0.26f, 1f);
+            }
+            else if (explicitAccent.HasValue)
+            {
+                ledCol = explicitAccent.Value;
+                btnTint = new Color(0.23f, 0.25f, 0.28f, 1f);
+            }
+            else
+            {
+                ledCol = new Color(0.84f, 0.58f, 0.20f, 1f);
+                btnTint = new Color(0.23f, 0.25f, 0.28f, 1f);
+            }
+        }
+
+        private bool ApplyStyleDVisuals(bool interactable, string text, Color? explicitAccent, bool hovered)
+        {
+            if (!StyleDEnabled || StyleDButtonSprite == null) return false;
+
+            ResolveStyleDColors(interactable, text, explicitAccent, out Color ledCol, out Color btnTint);
+            baseAccentColor = ledCol;
+            hoverAccentColor = Color.Lerp(ledCol, new Color(1f, 0.92f, 0.65f, 1f), 0.55f);
+            baseBgColor = btnTint;
+            hoverBgColor = StyleDHoverBg;
+            normalHotkeyColor = interactable ? StyleDHotkeyColor : StyleDMutedText;
+            hoverHotkeyColor = HoverDarkTextColor;
+
+            if (background != null)
+            {
+                background.sprite = StyleDButtonSprite;
+                background.type = Image.Type.Sliced;
+                background.pixelsPerUnitMultiplier = 2.8f;
+                background.color = (hovered && interactable) ? hoverBgColor : baseBgColor;
+            }
+            if (outline != null)
+            {
+                outline.enabled = false;
+            }
+            if (accentBar != null)
+            {
+                RectTransform abRt = accentBar.rectTransform;
+                abRt.anchorMin = new Vector2(0f, 0f);
+                abRt.anchorMax = new Vector2(0f, 1f);
+                abRt.pivot = new Vector2(0f, 0.5f);
+                abRt.anchoredPosition = new Vector2(6f, 0f);
+                abRt.sizeDelta = new Vector2(3.5f, -10f);
+                accentBar.color = (hovered && interactable) ? hoverAccentColor : baseAccentColor;
+                accentBar.gameObject.SetActive(true);
+            }
+            Transform gutTr = transform.Find("Gutter");
+            if (gutTr is RectTransform gutRt)
+            {
+                gutRt.anchoredPosition = new Vector2(4f, 0f);
+            }
+            RectTransform tcRt = textContainer != null
+                ? textContainer
+                : (transform.Find("TextContainer") ?? transform.Find("LabelContainer")) as RectTransform;
+            if (tcRt != null)
+            {
+                tcRt.offsetMin = new Vector2(68f, 0f);
+                tcRt.offsetMax = new Vector2(-14f, 0f);
+            }
+            TMP_FontAsset monoFont = SundayTypography.MonoFont;
+            if (hotkeyTmp != null)
+            {
+                if (monoFont != null && hotkeyTmp.font != monoFont) hotkeyTmp.font = monoFont;
+                hotkeyTmp.color = (hovered && interactable) ? hoverHotkeyColor : normalHotkeyColor;
+            }
+            if (mainLabelTmp != null)
+            {
+                if (monoFont != null && mainLabelTmp.font != monoFont) mainLabelTmp.font = monoFont;
+                mainLabelTmp.enableAutoSizing = true;
+                mainLabelTmp.fontSizeMin = 9.5f;
+                mainLabelTmp.fontSizeMax = 11.2f;
+                if (!hovered || !interactable)
+                {
+                    mainLabelTmp.color = interactable ? StyleDBoneText : StyleDMutedText;
+                }
+            }
+            return true;
+        }
+
+        public void RefreshStyleDTheme()
+        {
+            bool interactable = button == null || button.interactable;
+            string source = hasManagedChoiceText ? rawMainText : (mainLabelTmp != null ? mainLabelTmp.text : "");
+            ApplyStyleDVisuals(interactable, source, _lastExplicitAccent, isHovered);
+        }
+
         public void SyncContentAndState(string mainText)
         {
             hasManagedChoiceText = true;
@@ -231,6 +357,26 @@ namespace SundayLastBreath.UI
             ClearSelectableTint();
 
             bool interactable = button == null || button.interactable;
+            if (ApplyStyleDVisuals(interactable, mainText, _lastExplicitAccent, isHovered && interactable))
+            {
+                if (!interactable) isHovered = false;
+                if (hoverChevronTmp != null)
+                {
+                    hoverChevronTmp.color = HoverDarkTextColor;
+                    hoverChevronTmp.gameObject.SetActive(isHovered && interactable);
+                }
+                if (isHovered && interactable && mainLabelTmp != null)
+                {
+                    mainLabelTmp.color = HoverDarkTextColor;
+                    mainLabelTmp.text = StripColorTags(mainText);
+                }
+                else
+                {
+                    RestoreNormalLabelVisuals();
+                }
+                return;
+            }
+
             hoverBgColor = DefaultHoverBgColor;
             hoverHotkeyColor = HoverDarkTextColor;
 
@@ -308,6 +454,7 @@ namespace SundayLastBreath.UI
             hasManagedChoiceText = true;
             rawMainText = mainText;
             untaggedFallbackText = null;
+            _lastExplicitAccent = accent;
             isHovered = false;
             hoverBgColor = DefaultHoverBgColor;
             hoverHotkeyColor = HoverDarkTextColor;
@@ -320,7 +467,9 @@ namespace SundayLastBreath.UI
             }
             if (mainLabelTmp != null)
             {
-                mainLabelTmp.color = Color.white;
+                mainLabelTmp.color = (StyleDEnabled && StyleDButtonSprite != null)
+                    ? (interactable ? StyleDBoneText : StyleDMutedText)
+                    : Color.white;
                 mainLabelTmp.text = mainText;
             }
             if (button != null)
@@ -332,6 +481,11 @@ namespace SundayLastBreath.UI
                 {
                     button.onClick.AddListener(() => onClickAction());
                 }
+            }
+            if (ApplyStyleDVisuals(interactable, mainText, accent, false))
+            {
+                gameObject.SetActive(true);
+                return;
             }
             if (!interactable)
             {
@@ -405,7 +559,10 @@ namespace SundayLastBreath.UI
         {
             if (mainLabelTmp != null)
             {
-                mainLabelTmp.color = Color.white;
+                bool interactable = button == null || button.interactable;
+                mainLabelTmp.color = (StyleDEnabled && StyleDButtonSprite != null)
+                    ? (interactable ? StyleDBoneText : StyleDMutedText)
+                    : Color.white;
                 if (hasManagedChoiceText && rawMainText != null)
                 {
                     mainLabelTmp.text = rawMainText;
@@ -424,14 +581,6 @@ namespace SundayLastBreath.UI
             currentChevronOffset = defaultChevronOffset;
             targetChevronOffset = defaultChevronOffset;
 
-            baseBgColor = DefaultBaseBgColor;
-            hoverBgColor = DefaultHoverBgColor;
-            baseOutlineColor = DefaultBaseOutlineColor;
-            baseAccentColor = DefaultBaseAccentColor;
-            hoverAccentColor = DefaultHoverAccentColor;
-            normalHotkeyColor = DefaultNormalHotkeyColor;
-            hoverHotkeyColor = HoverDarkTextColor;
-
             ClearSelectableTint();
 
             if (hoverChevronTmp != null)
@@ -440,6 +589,25 @@ namespace SundayLastBreath.UI
                 RectTransform rt = hoverChevronTmp.rectTransform;
                 rt.anchoredPosition = new Vector2(defaultChevronOffset, rt.anchoredPosition.y);
             }
+
+            if (StyleDEnabled && StyleDButtonSprite != null)
+            {
+                bool interactable = button == null || button.interactable;
+                string source = hasManagedChoiceText ? rawMainText : (mainLabelTmp != null ? mainLabelTmp.text : "");
+                ApplyStyleDVisuals(interactable, source, _lastExplicitAccent, false);
+                RestoreNormalLabelVisuals();
+                if (shineSweep != null) shineSweep.gameObject.SetActive(false);
+                transform.localScale = Vector3.one;
+                return;
+            }
+
+            baseBgColor = DefaultBaseBgColor;
+            hoverBgColor = DefaultHoverBgColor;
+            baseOutlineColor = DefaultBaseOutlineColor;
+            baseAccentColor = DefaultBaseAccentColor;
+            hoverAccentColor = DefaultHoverAccentColor;
+            normalHotkeyColor = DefaultNormalHotkeyColor;
+            hoverHotkeyColor = HoverDarkTextColor;
 
             if (hotkeyTmp != null)
             {
@@ -506,22 +674,34 @@ namespace SundayLastBreath.UI
             ClearSelectableTint();
 
             isHovered = true;
-            hoverBgColor = DefaultHoverBgColor;
-            hoverHotkeyColor = HoverDarkTextColor;
             targetChevronOffset = defaultChevronOffset + slideDistance;
 
-            if (background != null)
+            if (StyleDEnabled && StyleDButtonSprite != null)
             {
-                background.color = hoverBgColor;
+                string srcText = hasManagedChoiceText ? (rawMainText ?? "") : (mainLabelTmp != null ? mainLabelTmp.text : "");
+                ApplyStyleDVisuals(true, srcText, _lastExplicitAccent, true);
+            }
+            else
+            {
+                hoverBgColor = DefaultHoverBgColor;
+                hoverHotkeyColor = HoverDarkTextColor;
+                if (background != null) background.color = hoverBgColor;
+                if (hotkeyTmp != null) hotkeyTmp.color = HoverDarkTextColor;
+                if (accentBar != null)
+                {
+                    accentBar.color = hoverAccentColor;
+                    accentBar.gameObject.SetActive(true);
+                }
+                if (outline != null)
+                {
+                    outline.effectColor = hoverOutlineColor;
+                    outline.effectDistance = new Vector2(2f, -1f);
+                }
             }
             if (hoverChevronTmp != null)
             {
                 hoverChevronTmp.color = HoverDarkTextColor;
                 hoverChevronTmp.gameObject.SetActive(true);
-            }
-            if (hotkeyTmp != null)
-            {
-                hotkeyTmp.color = HoverDarkTextColor;
             }
             if (mainLabelTmp != null)
             {
@@ -532,16 +712,6 @@ namespace SundayLastBreath.UI
                 }
                 mainLabelTmp.color = HoverDarkTextColor;
                 mainLabelTmp.text = StripColorTags(source);
-            }
-            if (accentBar != null)
-            {
-                accentBar.color = hoverAccentColor;
-                accentBar.gameObject.SetActive(true);
-            }
-            if (outline != null)
-            {
-                outline.effectColor = hoverOutlineColor;
-                outline.effectDistance = new Vector2(2f, -1f);
             }
 
             // High-frequency CRT phosphor tick SFX
@@ -568,19 +738,27 @@ namespace SundayLastBreath.UI
             isHovered = false;
             targetChevronOffset = defaultChevronOffset;
 
-            if (background != null)
-            {
-                background.color = baseBgColor;
-            }
             if (hoverChevronTmp != null)
             {
                 hoverChevronTmp.gameObject.SetActive(false);
+            }
+            RestoreNormalLabelVisuals();
+            if (StyleDEnabled && StyleDButtonSprite != null)
+            {
+                bool interactable = button == null || button.interactable;
+                string source = hasManagedChoiceText ? rawMainText : (mainLabelTmp != null ? mainLabelTmp.text : "");
+                ApplyStyleDVisuals(interactable, source, _lastExplicitAccent, false);
+                return;
+            }
+
+            if (background != null)
+            {
+                background.color = baseBgColor;
             }
             if (hotkeyTmp != null)
             {
                 hotkeyTmp.color = normalHotkeyColor;
             }
-            RestoreNormalLabelVisuals();
             if (accentBar != null)
             {
                 accentBar.gameObject.SetActive(false);

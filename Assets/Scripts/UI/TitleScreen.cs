@@ -146,12 +146,13 @@ namespace SundayLastBreath.UI
 
         private void RefreshLoadSlotCards()
         {
+            bool styleD = StyleDThemeUtility.IsStyleDActive;
             bool anySave = SaveManager.Instance != null && SaveManager.Instance.HasAnySave();
             if (modalTitleText != null)
             {
-                modalTitleText.text = anySave
-                    ? "SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER"
-                    : "SURVIVOR ARCHIVE // ALL SLOTS EMPTY";
+                modalTitleText.text = styleD
+                    ? (anySave ? "ARCHIVE DOSSIER - LOAD SURVIVOR" : "ARCHIVE DOSSIER - ALL SLOTS EMPTY")
+                    : (anySave ? "SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER" : "SURVIVOR ARCHIVE // ALL SLOTS EMPTY");
             }
 
             for (int i = 0; i < SaveManager.TotalSlotCount; i++)
@@ -163,36 +164,66 @@ namespace SundayLastBreath.UI
                 if (s.exists)
                 {
                     string savedTimeBadge = !string.IsNullOrEmpty(s.realSaveTime)
-                        ? $"<color=#64748B>[{s.realSaveTime}]</color>"
+                        ? (styleD ? $"<color=#8C9486>[{s.realSaveTime}]</color>" : $"<color=#64748B>[{s.realSaveTime}]</color>")
                         : "";
 
                     if (slotTitleTexts[slotIdx] != null)
                     {
-                        string titleHex = slotIdx == 0 ? "#38BDF8" : "#F59E0B";
+                        string titleHex = styleD
+                            ? (slotIdx == 0 ? "#E0A43A" : "#D95829")
+                            : (slotIdx == 0 ? "#38BDF8" : "#F59E0B");
+                        string nameHex = styleD ? "#E4DFD1" : "#F8FAFC";
+                        string jobHex = styleD ? "#8C9486" : "#94A3B8";
                         slotTitleTexts[slotIdx].text =
-                            $"<color={titleHex}><b>[{slotTitle}]</b></color>   <color=#F8FAFC><b>{s.characterName.ToUpper()}</b></color> <color=#94A3B8>({s.job})</color>   {savedTimeBadge}";
+                            $"<color={titleHex}><b>[{slotTitle}]</b></color>   <color={nameHex}><b>{s.characterName.ToUpper()}</b></color> <color={jobHex}>({s.job})</color>   {savedTimeBadge}";
+                        slotTitleTexts[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
                     }
 
                     if (slotDetailTexts[slotIdx] != null)
                     {
-                        slotDetailTexts[slotIdx].text =
-                            $"<color=#FBBF24><b>{s.roomDisplayName}</b></color>   |   <color=#E2E8F0>{s.clockDisplay}</color>   |   " +
-                            $"HP: <color=#EF4444><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#10B981><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#A78BFA><b>{s.humanity}%</b></color>";
-                    }
-
-                    if (slotLoadButtons[slotIdx] != null)
-                    {
-                        slotLoadButtons[slotIdx].interactable = true;
-                        Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
-                        if (btnBg != null) btnBg.color = new Color(0.08f, 0.40f, 0.22f, 0.98f);
-                        Outline btnOl = slotLoadButtons[slotIdx].GetComponent<Outline>();
-                        if (btnOl != null) btnOl.effectColor = new Color(0.28f, 0.90f, 0.55f, 0.75f);
+                        string clockText = styleD && !string.IsNullOrEmpty(s.clockDisplay)
+                            ? s.clockDisplay.Replace(" // ", " - ")
+                            : s.clockDisplay;
+                        if (styleD)
+                        {
+                            slotDetailTexts[slotIdx].text =
+                                $"<color=#E0A43A><b>{s.roomDisplayName}</b></color>   |   <color=#E4DFD1>{clockText}</color>   |   " +
+                                $"HP: <color=#D95829><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#6EE7B7><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#B4A7D6><b>{s.humanity}%</b></color>";
+                        }
+                        else
+                        {
+                            slotDetailTexts[slotIdx].text =
+                                $"<color=#FBBF24><b>{s.roomDisplayName}</b></color>   |   <color=#E2E8F0>{clockText}</color>   |   " +
+                                $"HP: <color=#EF4444><b>{s.hp}/{s.hpMax}</b></color>   STM: <color=#10B981><b>{s.stamina}/{s.staminaMax}</b></color>   HUM: <color=#A78BFA><b>{s.humanity}%</b></color>";
+                        }
+                        slotDetailTexts[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
                     }
 
                     if (slotLoadBtnLabels[slotIdx] != null)
                     {
                         slotLoadBtnLabels[slotIdx].text = "<b>> LOAD SLOT</b>";
-                        slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.98f, 0.65f);
+                        slotLoadBtnLabels[slotIdx].color = styleD ? StyleDThemeUtility.ColBone : new Color(0.35f, 0.98f, 0.65f);
+                    }
+
+                    if (slotLoadButtons[slotIdx] != null)
+                    {
+                        slotLoadButtons[slotIdx].interactable = true;
+                        if (styleD)
+                        {
+                            StyleDThemeUtility.ApplyMetalButton(
+                                slotLoadButtons[slotIdx],
+                                StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.55f),
+                                StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.78f),
+                                2.8f,
+                                StyleDThemeUtility.ColBone);
+                        }
+                        else
+                        {
+                            Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
+                            if (btnBg != null) btnBg.color = new Color(0.08f, 0.40f, 0.22f, 0.98f);
+                            Outline btnOl = slotLoadButtons[slotIdx].GetComponent<Outline>();
+                            if (btnOl != null) btnOl.effectColor = new Color(0.28f, 0.90f, 0.55f, 0.75f);
+                        }
                     }
 
                     if (slotDeleteButtons[slotIdx] != null)
@@ -202,9 +233,17 @@ namespace SundayLastBreath.UI
 
                     if (slotCardBgs[slotIdx] != null)
                     {
-                        slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);
+                        if (styleD)
+                        {
+                            StyleDThemeUtility.ApplySliced(slotCardBgs[slotIdx], StyleDThemeUtility.WellRecessed, 3.2f, Color.white);
+                            StyleDThemeUtility.AddLeftAccentBar(slotCardBgs[slotIdx].transform, slotIdx == 0 ? StyleDThemeUtility.ColAmber : StyleDThemeUtility.ColRust, 4f);
+                        }
+                        else
+                        {
+                            slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);
+                        }
                     }
-                    if (slotCardOutlines[slotIdx] != null)
+                    if (!styleD && slotCardOutlines[slotIdx] != null)
                     {
                         slotCardOutlines[slotIdx].effectColor = slotIdx == 0
                             ? new Color(0.22f, 0.74f, 0.97f, 0.65f)
@@ -215,29 +254,45 @@ namespace SundayLastBreath.UI
                 {
                     if (slotTitleTexts[slotIdx] != null)
                     {
-                        slotTitleTexts[slotIdx].text = $"<color=#64748B><b>[{slotTitle}]</b>   -   [ EMPTY ARCHIVE SLOT ]</color>";
+                        string emptyHex = styleD ? "#8C9486" : "#64748B";
+                        slotTitleTexts[slotIdx].text = $"<color={emptyHex}><b>[{slotTitle}]</b>   -   [ EMPTY ARCHIVE SLOT ]</color>";
+                        slotTitleTexts[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
                     }
 
                     if (slotDetailTexts[slotIdx] != null)
                     {
+                        string detHex = styleD ? "#8C9486" : "#475569";
                         slotDetailTexts[slotIdx].text = slotIdx == 0
-                            ? "<color=#475569><i>No QuickSave recorded yet. Press F5 during gameplay to QuickSave.</i></color>"
-                            : "<color=#475569><i>No survivor record stored in this slot. Save via Personal Phone [TAB] in-game.</i></color>";
-                    }
-
-                    if (slotLoadButtons[slotIdx] != null)
-                    {
-                        slotLoadButtons[slotIdx].interactable = false;
-                        Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
-                        if (btnBg != null) btnBg.color = new Color(0.06f, 0.08f, 0.11f, 0.75f);
-                        Outline btnOl = slotLoadButtons[slotIdx].GetComponent<Outline>();
-                        if (btnOl != null) btnOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.35f);
+                            ? $"<color={detHex}><i>No QuickSave recorded yet. Press F5 during gameplay to QuickSave.</i></color>"
+                            : $"<color={detHex}><i>No survivor record stored in this slot. Save via Personal Phone [TAB] in-game.</i></color>";
+                        slotDetailTexts[slotIdx].GetComponent<HorizontalMarqueeText>()?.ResetScroll();
                     }
 
                     if (slotLoadBtnLabels[slotIdx] != null)
                     {
                         slotLoadBtnLabels[slotIdx].text = "EMPTY";
-                        slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.40f, 0.46f);
+                        slotLoadBtnLabels[slotIdx].color = styleD ? StyleDThemeUtility.ColMuted : new Color(0.35f, 0.40f, 0.46f);
+                    }
+
+                    if (slotLoadButtons[slotIdx] != null)
+                    {
+                        slotLoadButtons[slotIdx].interactable = false;
+                        if (styleD)
+                        {
+                            StyleDThemeUtility.ApplyMetalButton(
+                                slotLoadButtons[slotIdx],
+                                StyleDThemeUtility.ColMetalDisabled,
+                                StyleDThemeUtility.ColMetalDisabled,
+                                2.8f,
+                                StyleDThemeUtility.ColMuted);
+                        }
+                        else
+                        {
+                            Image btnBg = slotLoadButtons[slotIdx].GetComponent<Image>();
+                            if (btnBg != null) btnBg.color = new Color(0.06f, 0.08f, 0.11f, 0.75f);
+                            Outline btnOl = slotLoadButtons[slotIdx].GetComponent<Outline>();
+                            if (btnOl != null) btnOl.effectColor = new Color(0.18f, 0.22f, 0.28f, 0.35f);
+                        }
                     }
 
                     if (slotDeleteButtons[slotIdx] != null)
@@ -247,9 +302,17 @@ namespace SundayLastBreath.UI
 
                     if (slotCardBgs[slotIdx] != null)
                     {
-                        slotCardBgs[slotIdx].color = new Color(0.03f, 0.04f, 0.06f, 0.85f);
+                        if (styleD)
+                        {
+                            StyleDThemeUtility.ApplySliced(slotCardBgs[slotIdx], StyleDThemeUtility.WellRecessed, 3.2f, new Color(0.72f, 0.72f, 0.74f, 0.90f));
+                            StyleDThemeUtility.AddLeftAccentBar(slotCardBgs[slotIdx].transform, StyleDThemeUtility.ColHairline, 4f);
+                        }
+                        else
+                        {
+                            slotCardBgs[slotIdx].color = new Color(0.03f, 0.04f, 0.06f, 0.85f);
+                        }
                     }
-                    if (slotCardOutlines[slotIdx] != null)
+                    if (!styleD && slotCardOutlines[slotIdx] != null)
                     {
                         slotCardOutlines[slotIdx].effectColor = new Color(0.16f, 0.20f, 0.26f, 0.45f);
                     }
@@ -325,9 +388,11 @@ namespace SundayLastBreath.UI
             modalRect.offsetMin = Vector2.zero;
             modalRect.offsetMax = Vector2.zero;
 
+            bool styleD = StyleDThemeUtility.IsStyleDActive;
+
             // Fullscreen Dark Backdrop (Blocks Raycasts)
             Image backdrop = loadGameModal.AddComponent<Image>();
-            backdrop.color = new Color(0.015f, 0.02f, 0.03f, 0.92f);
+            backdrop.color = styleD ? StyleDThemeUtility.ColBackdrop : new Color(0.015f, 0.02f, 0.03f, 0.92f);
             backdrop.raycastTarget = true;
 
             // 2. Central Dossier Panel (860 x 570)
@@ -338,11 +403,17 @@ namespace SundayLastBreath.UI
             pRect.anchoredPosition = Vector2.zero;
 
             Image pBg = panel.AddComponent<Image>();
-            pBg.color = new Color(0.04f, 0.06f, 0.09f, 0.98f);
-
             Outline pOutline = panel.AddComponent<Outline>();
             pOutline.effectColor = new Color(0.85f, 0.60f, 0.20f, 0.75f);
             pOutline.effectDistance = new Vector2(2f, -2f);
+            if (styleD)
+            {
+                StyleDThemeUtility.ApplySliced(pBg, StyleDThemeUtility.PanelChassis, 3.2f, Color.white, disableOutline: true);
+            }
+            else
+            {
+                pBg.color = new Color(0.04f, 0.06f, 0.09f, 0.98f);
+            }
 
             // 3. Header Bar
             GameObject headerObj = new GameObject("HeaderBar");
@@ -351,25 +422,35 @@ namespace SundayLastBreath.UI
             hRect.anchorMin = new Vector2(0f, 1f);
             hRect.anchorMax = new Vector2(1f, 1f);
             hRect.pivot = new Vector2(0.5f, 1f);
-            hRect.sizeDelta = new Vector2(0f, 52f);
-            hRect.anchoredPosition = Vector2.zero;
 
             Image hBg = headerObj.AddComponent<Image>();
-            hBg.color = new Color(0.08f, 0.12f, 0.16f, 0.95f);
+            if (styleD)
+            {
+                hRect.offsetMin = new Vector2(18f, -62f);
+                hRect.offsetMax = new Vector2(-18f, -18f);
+                hBg.color = Color.clear;
+                StyleDThemeUtility.AddHeaderDivider(headerObj.transform);
+            }
+            else
+            {
+                hRect.sizeDelta = new Vector2(0f, 52f);
+                hRect.anchoredPosition = Vector2.zero;
+                hBg.color = new Color(0.08f, 0.12f, 0.16f, 0.95f);
+            }
 
             GameObject titleTextObj = new GameObject("TitleText");
             titleTextObj.transform.SetParent(headerObj.transform, false);
             RectTransform ttRect = titleTextObj.AddComponent<RectTransform>();
             ttRect.anchorMin = Vector2.zero;
             ttRect.anchorMax = Vector2.one;
-            ttRect.offsetMin = new Vector2(20f, 0f);
-            ttRect.offsetMax = new Vector2(-20f, 0f);
+            ttRect.offsetMin = new Vector2(styleD ? 8f : 20f, 0f);
+            ttRect.offsetMax = new Vector2(styleD ? -8f : -20f, 0f);
 
             modalTitleText = titleTextObj.AddComponent<TextMeshProUGUI>();
-            modalTitleText.text = "SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER";
-            modalTitleText.fontSize = 16.5f;
+            modalTitleText.text = styleD ? "ARCHIVE DOSSIER - LOAD SURVIVOR" : "SELECT ARCHIVED SURVIVOR SLOT // CLASSIFIED DOSSIER";
+            modalTitleText.fontSize = styleD ? 14f : 16.5f;
             modalTitleText.fontStyle = FontStyles.Bold;
-            modalTitleText.color = new Color(1f, 0.75f, 0.35f, 1f);
+            modalTitleText.color = styleD ? StyleDThemeUtility.ColBone : new Color(1f, 0.75f, 0.35f, 1f);
             modalTitleText.alignment = TextAlignmentOptions.MidlineLeft;
             SundayTypography.ApplyFont(modalTitleText, FontRole.Display);
 
@@ -383,15 +464,24 @@ namespace SundayLastBreath.UI
                 cRect.anchorMin = new Vector2(0.5f, 1f);
                 cRect.anchorMax = new Vector2(0.5f, 1f);
                 cRect.pivot = new Vector2(0.5f, 1f);
-                cRect.anchoredPosition = new Vector2(0f, -60f - (slotIdx * 88f));
-                cRect.sizeDelta = new Vector2(816f, 80f);
+                cRect.anchoredPosition = styleD
+                    ? new Vector2(0f, -72f - (slotIdx * 84f))
+                    : new Vector2(0f, -60f - (slotIdx * 88f));
+                cRect.sizeDelta = styleD ? new Vector2(796f, 76f) : new Vector2(816f, 80f);
 
                 slotCardBgs[slotIdx] = cardObj.AddComponent<Image>();
-                slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);
-
                 slotCardOutlines[slotIdx] = cardObj.AddComponent<Outline>();
                 slotCardOutlines[slotIdx].effectColor = new Color(0.25f, 0.32f, 0.42f, 0.65f);
                 slotCardOutlines[slotIdx].effectDistance = new Vector2(1.5f, -1.5f);
+                if (styleD)
+                {
+                    StyleDThemeUtility.ApplySliced(slotCardBgs[slotIdx], StyleDThemeUtility.WellRecessed, 3.2f, Color.white, disableOutline: true);
+                    StyleDThemeUtility.AddLeftAccentBar(cardObj.transform, slotIdx == 0 ? StyleDThemeUtility.ColAmber : StyleDThemeUtility.ColRust, 4f);
+                }
+                else
+                {
+                    slotCardBgs[slotIdx].color = new Color(0.06f, 0.09f, 0.14f, 0.96f);
+                }
 
                 // Dedicated Text Container with RectMask2D to strictly prevent text overflowing into buttons
                 GameObject textContainer = new GameObject("TextContainer");
@@ -417,8 +507,9 @@ namespace SundayLastBreath.UI
                 slotTitleTexts[slotIdx].color = Color.white;
                 slotTitleTexts[slotIdx].alignment = TextAlignmentOptions.MidlineLeft;
                 slotTitleTexts[slotIdx].textWrappingMode = TextWrappingModes.NoWrap;
-                slotTitleTexts[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
+                slotTitleTexts[slotIdx].overflowMode = TextOverflowModes.Overflow;
                 SundayTypography.ApplyFont(slotTitleTexts[slotIdx], FontRole.Body);
+                topObj.AddComponent<HorizontalMarqueeText>();
 
                 // Bottom Line: Location, Clock, Vitals
                 GameObject botObj = new GameObject("SlotDetails");
@@ -434,8 +525,9 @@ namespace SundayLastBreath.UI
                 slotDetailTexts[slotIdx].color = new Color(0.78f, 0.82f, 0.88f);
                 slotDetailTexts[slotIdx].alignment = TextAlignmentOptions.MidlineLeft;
                 slotDetailTexts[slotIdx].textWrappingMode = TextWrappingModes.NoWrap;
-                slotDetailTexts[slotIdx].overflowMode = TextOverflowModes.Ellipsis;
+                slotDetailTexts[slotIdx].overflowMode = TextOverflowModes.Overflow;
                 SundayTypography.ApplyFont(slotDetailTexts[slotIdx], FontRole.Body);
+                botObj.AddComponent<HorizontalMarqueeText>();
 
                 // Load Slot Button (Right side)
                 GameObject loadBtnObj = new GameObject("LoadButton");
@@ -469,8 +561,17 @@ namespace SundayLastBreath.UI
                 slotLoadBtnLabels[slotIdx].text = "<b>> LOAD SLOT</b>";
                 slotLoadBtnLabels[slotIdx].fontSize = 12.5f;
                 slotLoadBtnLabels[slotIdx].alignment = TextAlignmentOptions.Center;
-                slotLoadBtnLabels[slotIdx].color = new Color(0.35f, 0.98f, 0.65f);
+                slotLoadBtnLabels[slotIdx].color = styleD ? StyleDThemeUtility.ColBone : new Color(0.35f, 0.98f, 0.65f);
                 SundayTypography.ApplyFont(slotLoadBtnLabels[slotIdx], FontRole.Mono);
+                if (styleD)
+                {
+                    StyleDThemeUtility.ApplyMetalButton(
+                        slotLoadButtons[slotIdx],
+                        StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.55f),
+                        StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColSage, 0.78f),
+                        2.8f,
+                        StyleDThemeUtility.ColBone);
+                }
 
                 // Delete Slot Button [DEL]
                 GameObject delBtnObj = new GameObject("DeleteButton");
@@ -504,8 +605,17 @@ namespace SundayLastBreath.UI
                 dbTmp.text = "<b>X</b>";
                 dbTmp.fontSize = 12.5f;
                 dbTmp.alignment = TextAlignmentOptions.Center;
-                dbTmp.color = new Color(0.98f, 0.45f, 0.45f);
+                dbTmp.color = styleD ? StyleDThemeUtility.ColBone : new Color(0.98f, 0.45f, 0.45f);
                 SundayTypography.ApplyFont(dbTmp, FontRole.Mono);
+                if (styleD)
+                {
+                    StyleDThemeUtility.ApplyMetalButton(
+                        slotDeleteButtons[slotIdx],
+                        StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColRust, 0.65f),
+                        StyleDThemeUtility.WithRgbScale(StyleDThemeUtility.ColRust, 0.88f),
+                        2.8f,
+                        StyleDThemeUtility.ColBone);
+                }
             }
 
             // 5. Bottom Return Button
@@ -515,8 +625,8 @@ namespace SundayLastBreath.UI
             cnRect.anchorMin = new Vector2(0.5f, 0f);
             cnRect.anchorMax = new Vector2(0.5f, 0f);
             cnRect.pivot = new Vector2(0.5f, 0f);
-            cnRect.sizeDelta = new Vector2(260f, 42f);
-            cnRect.anchoredPosition = new Vector2(0f, 16f);
+            cnRect.sizeDelta = styleD ? new Vector2(280f, 40f) : new Vector2(260f, 42f);
+            cnRect.anchoredPosition = styleD ? new Vector2(0f, 18f) : new Vector2(0f, 16f);
 
             Image cnBg = cancelObj.AddComponent<Image>();
             cnBg.color = new Color(0.12f, 0.15f, 0.20f, 0.98f);
@@ -542,8 +652,12 @@ namespace SundayLastBreath.UI
             cnTmp.text = "<b>[ < RETURN TO MAIN MENU ]</b>";
             cnTmp.fontSize = 14f;
             cnTmp.alignment = TextAlignmentOptions.Center;
-            cnTmp.color = new Color(0.85f, 0.88f, 0.92f, 1f);
+            cnTmp.color = styleD ? StyleDThemeUtility.ColBone : new Color(0.85f, 0.88f, 0.92f, 1f);
             SundayTypography.ApplyFont(cnTmp, FontRole.Mono);
+            if (styleD)
+            {
+                StyleDThemeUtility.ApplyMetalButton(cancelBtn, StyleDThemeUtility.ColMetalBtn, StyleDThemeUtility.ColMetalHover, 2.8f, StyleDThemeUtility.ColBone);
+            }
 
             loadGameModal.SetActive(false);
         }

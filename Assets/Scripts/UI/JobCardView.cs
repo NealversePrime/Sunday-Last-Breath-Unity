@@ -55,10 +55,24 @@ namespace SundayLastBreath.UI
                 _accentColor = new Color(0.92f, 0.32f, 0.26f, 1f);
             }
 
-            _baseBorderColor = Color.Lerp(new Color(0.16f, 0.22f, 0.30f, 1f), _accentColor, 0.28f);
-            _hoverBorderColor = Color.Lerp(_accentColor, Color.white, 0.20f);
-            _baseBtnColor = new Color(0.08f, 0.11f, 0.16f, 0.98f);
-            _hoverBtnColor = Color.Lerp(new Color(0.12f, 0.16f, 0.22f, 1f), _accentColor, 0.72f);
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                _baseBorderColor = new Color(0.86f, 0.86f, 0.88f, 1f);
+                _hoverBorderColor = Color.white;
+                _baseInnerColor = Color.clear;
+                _hoverInnerColor = Color.clear;
+                _baseBtnColor = new Color(0.24f, 0.27f, 0.31f, 1f);
+                _hoverBtnColor = job.id.Equals("student", StringComparison.OrdinalIgnoreCase)
+                    ? new Color(0.58f, 0.42f, 0.18f, 1f)
+                    : Color.Lerp(new Color(0.24f, 0.27f, 0.31f, 1f), _accentColor, 0.58f);
+            }
+            else
+            {
+                _baseBorderColor = Color.Lerp(new Color(0.16f, 0.22f, 0.30f, 1f), _accentColor, 0.28f);
+                _hoverBorderColor = Color.Lerp(_accentColor, Color.white, 0.20f);
+                _baseBtnColor = new Color(0.08f, 0.11f, 0.16f, 0.98f);
+                _hoverBtnColor = Color.Lerp(new Color(0.12f, 0.16f, 0.22f, 1f), _accentColor, 0.72f);
+            }
 
             BindAndUpgradeVisuals(job);
             ApplyHoverVisuals(false);
@@ -66,21 +80,36 @@ namespace SundayLastBreath.UI
 
         private void BindAndUpgradeVisuals(JobData job)
         {
+            bool isStyleD = StyleDThemeUtility.IsStyleDActive;
             _cardBorder = GetComponent<Image>();
             if (_cardBorder != null)
             {
                 _cardBorder.raycastTarget = true;
+                if (isStyleD)
+                {
+                    StyleDThemeUtility.ApplySliced(_cardBorder, StyleDThemeUtility.CcDossierCard, 1.35f, _baseBorderColor, disableOutline: true);
+                }
             }
 
             _cardOutline = GetComponent<Outline>();
-            if (_cardOutline == null)
+            if (_cardOutline == null && !isStyleD)
             {
                 _cardOutline = gameObject.AddComponent<Outline>();
                 _cardOutline.effectDistance = new Vector2(1.5f, -1.5f);
             }
+            if (_cardOutline != null && isStyleD)
+            {
+                _cardOutline.enabled = false;
+            }
 
             Transform inner = transform.Find("InnerCard");
             if (inner == null) return;
+
+            if (isStyleD && inner is RectTransform inRt)
+            {
+                inRt.offsetMin = new Vector2(12f, 10f);
+                inRt.offsetMax = new Vector2(-12f, -8f);
+            }
 
             _innerBg = inner.GetComponent<Image>();
             if (_innerBg != null)
@@ -91,10 +120,17 @@ namespace SundayLastBreath.UI
             Transform topBarTr = inner.Find("TopBorder");
             if (topBarTr != null)
             {
-                _topBar = topBarTr.GetComponent<Image>();
-                if (_topBar != null) _topBar.color = _accentColor;
-                RectTransform tbRect = topBarTr.GetComponent<RectTransform>();
-                if (tbRect != null) tbRect.sizeDelta = new Vector2(0f, 4f);
+                if (isStyleD)
+                {
+                    topBarTr.gameObject.SetActive(false);
+                }
+                else
+                {
+                    _topBar = topBarTr.GetComponent<Image>();
+                    if (_topBar != null) _topBar.color = _accentColor;
+                    RectTransform tbRect = topBarTr.GetComponent<RectTransform>();
+                    if (tbRect != null) tbRect.sizeDelta = new Vector2(0f, 4f);
+                }
             }
 
             // Banner & Role Archetype Badge
@@ -104,8 +140,8 @@ namespace SundayLastBreath.UI
                 RectTransform bRect = banner.GetComponent<RectTransform>();
                 if (bRect != null)
                 {
-                    bRect.sizeDelta = new Vector2(0f, 162f);
-                    bRect.anchoredPosition = new Vector2(0f, -4f);
+                    bRect.sizeDelta = new Vector2(0f, isStyleD ? 146f : 162f);
+                    bRect.anchoredPosition = new Vector2(0f, isStyleD ? -26f : -4f);
                 }
 
                 Transform jobImgTr = banner.Find("JobImage");
@@ -124,8 +160,19 @@ namespace SundayLastBreath.UI
                 RectTransform tRect = titleTr.GetComponent<RectTransform>();
                 if (tRect != null)
                 {
-                    tRect.sizeDelta = new Vector2(-36f, 30f);
-                    tRect.anchoredPosition = new Vector2(0f, -172f);
+                    if (isStyleD)
+                    {
+                        tRect.anchorMin = new Vector2(0f, 1f);
+                        tRect.anchorMax = new Vector2(1f, 1f);
+                        tRect.pivot = new Vector2(0.5f, 1f);
+                        tRect.offsetMin = new Vector2(18f, -204f);
+                        tRect.offsetMax = new Vector2(-264f, -176f);
+                    }
+                    else
+                    {
+                        tRect.sizeDelta = new Vector2(-36f, 28f);
+                        tRect.anchoredPosition = new Vector2(0f, -172f);
+                    }
                 }
 
                 _titleText = titleTr.GetComponent<TextMeshProUGUI>();
@@ -135,16 +182,17 @@ namespace SundayLastBreath.UI
                         ? "CONSTRUCTION"
                         : job.title;
                     _titleText.text = displayTitle;
-                    _titleText.fontSize = 22f;
+                    _titleText.fontSize = isStyleD ? 18.5f : 22f;
+                    _titleText.overflowMode = isStyleD ? TextOverflowModes.Overflow : TextOverflowModes.Truncate;
                     _titleText.color = _accentColor;
                     SundayTypography.ApplyFont(_titleText, FontRole.Display);
                 }
             }
 
-            // Ensure Core Attribute Pill on the right of the Title row (using 3-letter S.P.A.I.C. tags!)
+            // Ensure Core Attribute Pill on the right of the Title row (using 3-letter M.O.R.T.A.L. tags!)
             EnsureAttributeStrip(inner, job);
 
-            // Description & Quote (Bumped to 13px for crisp readability)
+            // Description & Quote
             Transform descTr = inner.Find("Description");
             if (descTr != null)
             {
@@ -159,35 +207,40 @@ namespace SundayLastBreath.UI
                 if (dTmp != null)
                 {
                     string cleanQuote = (job.quote ?? "").Trim('\"');
-                    dTmp.text = $"<color=#DCE4EC>{job.description}</color>\n<color=#90A4AE><i>\"{cleanQuote}\"</i></color>";
-                    dTmp.fontSize = 13f;
-                    dTmp.lineSpacing = 3f;
+                    dTmp.text = isStyleD
+                        ? $"<color=#E4DFD1>{job.description}</color>\n<color=#9A9488><i>\"{cleanQuote}\"</i></color>"
+                        : $"<color=#DCE4EC>{job.description}</color>\n<color=#90A4AE><i>\"{cleanQuote}\"</i></color>";
+                    dTmp.fontSize = isStyleD ? 11.5f : 13f;
+                    dTmp.lineSpacing = isStyleD ? 1.5f : 3f;
                     dTmp.overflowMode = TextOverflowModes.Truncate;
                     SundayTypography.ApplyFont(dTmp, FontRole.Body);
                 }
             }
 
-            // Stats / Perks Box (Upgraded federal slate styling + 12.5px readable Mono font)
+            // Stats / Perks Box
             Transform statsTr = inner.Find("StatsBox");
             if (statsTr != null)
             {
                 RectTransform stRect = statsTr.GetComponent<RectTransform>();
                 if (stRect != null)
                 {
-                    stRect.sizeDelta = new Vector2(-36f, 62f);
-                    stRect.anchoredPosition = new Vector2(0f, -268f);
+                    stRect.sizeDelta = new Vector2(-36f, isStyleD ? 58f : 62f);
+                    stRect.anchoredPosition = new Vector2(0f, isStyleD ? -264f : -268f);
                 }
 
                 Image stBg = statsTr.GetComponent<Image>();
-                if (stBg != null)
+                if (isStyleD)
                 {
-                    stBg.color = new Color(0.05f, 0.08f, 0.13f, 0.92f);
+                    StyleDThemeUtility.ApplySliced(stBg, StyleDThemeUtility.CcInputTerminal, 1.65f, Color.white, disableOutline: true);
                 }
-
-                Outline stOl = statsTr.GetComponent<Outline>();
-                if (stOl == null) stOl = statsTr.gameObject.AddComponent<Outline>();
-                stOl.effectColor = new Color(_accentColor.r, _accentColor.g, _accentColor.b, 0.25f);
-                stOl.effectDistance = new Vector2(1f, -1f);
+                else
+                {
+                    if (stBg != null) stBg.color = new Color(0.05f, 0.08f, 0.13f, 0.92f);
+                    Outline stOl = statsTr.GetComponent<Outline>();
+                    if (stOl == null) stOl = statsTr.gameObject.AddComponent<Outline>();
+                    stOl.effectColor = new Color(_accentColor.r, _accentColor.g, _accentColor.b, 0.25f);
+                    stOl.effectDistance = new Vector2(1f, -1f);
+                }
 
                 Transform stripeTr = statsTr.Find("LeftStripe");
                 if (stripeTr != null)
@@ -204,9 +257,9 @@ namespace SundayLastBreath.UI
                     TextMeshProUGUI stTmp = sTextTr.GetComponent<TextMeshProUGUI>();
                     if (stTmp != null)
                     {
-                        stTmp.fontSize = 12.5f;
-                        stTmp.lineSpacing = 4f;
-                        stTmp.color = new Color(0.85f, 0.90f, 0.95f);
+                        stTmp.fontSize = isStyleD ? 12f : 12.5f;
+                        stTmp.lineSpacing = 3.5f;
+                        stTmp.color = isStyleD ? StyleDThemeUtility.ColBone : new Color(0.85f, 0.90f, 0.95f);
                         stTmp.text = FormatPerksAndLoadout(job);
                         SundayTypography.ApplyFont(stTmp, FontRole.Mono);
                     }
@@ -220,27 +273,44 @@ namespace SundayLastBreath.UI
                 RectTransform btnRect = btnTr.GetComponent<RectTransform>();
                 if (btnRect != null)
                 {
-                    btnRect.sizeDelta = new Vector2(-36f, 44f);
-                    btnRect.anchoredPosition = new Vector2(0f, 14f);
+                    btnRect.sizeDelta = new Vector2(-36f, isStyleD ? 40f : 44f);
+                    btnRect.anchoredPosition = new Vector2(0f, isStyleD ? 8f : 14f);
                 }
 
                 _btnBg = btnTr.GetComponent<Image>();
-                Outline btnOl = btnTr.GetComponent<Outline>();
-                if (btnOl == null) btnOl = btnTr.gameObject.AddComponent<Outline>();
-                btnOl.effectColor = new Color(_accentColor.r, _accentColor.g, _accentColor.b, 0.45f);
-                btnOl.effectDistance = new Vector2(1f, -1f);
-
-                Button bBtn = btnTr.GetComponent<Button>();
-                if (bBtn != null)
+                if (isStyleD)
                 {
-                    bBtn.onClick.RemoveAllListeners();
-                    bBtn.onClick.AddListener(TriggerSelect);
+                    Button bBtn = btnTr.GetComponent<Button>();
+                    if (bBtn != null)
+                    {
+                        bBtn.onClick.RemoveAllListeners();
+                        bBtn.onClick.AddListener(TriggerSelect);
+                        StyleDThemeUtility.ApplyChipButton(bBtn, _baseBtnColor, _hoverBtnColor, 1.55f);
+                    }
+                    else
+                    {
+                        StyleDThemeUtility.ApplySliced(_btnBg, StyleDThemeUtility.CcChipButton, 1.55f, _baseBtnColor, disableOutline: true);
+                    }
+                }
+                else
+                {
+                    Outline btnOl = btnTr.GetComponent<Outline>();
+                    if (btnOl == null) btnOl = btnTr.gameObject.AddComponent<Outline>();
+                    btnOl.effectColor = new Color(_accentColor.r, _accentColor.g, _accentColor.b, 0.45f);
+                    btnOl.effectDistance = new Vector2(1f, -1f);
+
+                    Button bBtn = btnTr.GetComponent<Button>();
+                    if (bBtn != null)
+                    {
+                        bBtn.onClick.RemoveAllListeners();
+                        bBtn.onClick.AddListener(TriggerSelect);
+                    }
                 }
 
                 _btnText = btnTr.GetComponentInChildren<TextMeshProUGUI>();
                 if (_btnText != null)
                 {
-                    _btnText.fontSize = 14.5f;
+                    _btnText.fontSize = isStyleD ? 13.5f : 14.5f;
                     _btnText.characterSpacing = 2.5f;
                     SundayTypography.ApplyFont(_btnText, FontRole.Display);
                 }
@@ -288,14 +358,17 @@ namespace SundayLastBreath.UI
             }
 
             Image badgeBg = badgeObj.GetComponent<Image>();
-            if (badgeBg != null)
+            if (StyleDThemeUtility.IsStyleDActive)
             {
-                badgeBg.color = new Color(0.04f, 0.06f, 0.10f, 0.92f);
+                StyleDThemeUtility.ApplySliced(badgeBg, StyleDThemeUtility.CcInputTerminal, 1.7f, Color.white, disableOutline: true);
             }
-            Outline badgeOl = badgeObj.GetComponent<Outline>();
-            if (badgeOl != null)
+            else
             {
-                badgeOl.effectColor = new Color(_accentColor.r, _accentColor.g, _accentColor.b, 0.70f);
+                if (badgeBg != null)
+                    badgeBg.color = new Color(0.04f, 0.06f, 0.10f, 0.92f);
+                Outline badgeOl = badgeObj.GetComponent<Outline>();
+                if (badgeOl != null)
+                    badgeOl.effectColor = new Color(_accentColor.r, _accentColor.g, _accentColor.b, 0.70f);
             }
 
             TextMeshProUGUI badgeTmp = badgeObj.GetComponentInChildren<TextMeshProUGUI>();
@@ -351,8 +424,13 @@ namespace SundayLastBreath.UI
                 if (sRect != null)
                 {
                     sRect.sizeDelta = new Vector2(246f, 24f);
-                    sRect.anchoredPosition = new Vector2(-18f, -175f);
+                    sRect.anchoredPosition = new Vector2(-18f, StyleDThemeUtility.IsStyleDActive ? -179f : -175f);
                 }
+            }
+
+            if (StyleDThemeUtility.IsStyleDActive && stripObj != null)
+            {
+                StyleDThemeUtility.ApplySliced(stripObj.GetComponent<Image>(), StyleDThemeUtility.CcInputTerminal, 1.7f, Color.white, disableOutline: true);
             }
 
             TextMeshProUGUI attrTmp = stripObj.GetComponentInChildren<TextMeshProUGUI>();
@@ -403,6 +481,12 @@ namespace SundayLastBreath.UI
                 case "doctor": gear = "First Aid Kit, Antibiotics, Scalpel"; break;
                 case "manager": gear = "Luxury Watch, Golf Club"; break;
                 case "student": gear = "Baseball Bat, Textbook"; break;
+            }
+
+            if (StyleDThemeUtility.IsStyleDActive)
+            {
+                return $"<color=#E0A43A><b>PERKS:</b></color> <color=#E4DFD1>{perks}</color>\n" +
+                       $"<color=#6EE7B7><b>GEAR:</b></color>  <color=#C6C1B4>{gear}</color>";
             }
 
             return $"<color=#FFA726><b>■ PERKS:</b></color> <color=#FFFFFF>{perks}</color>\n" +
@@ -463,7 +547,7 @@ namespace SundayLastBreath.UI
             if (_cardBorder != null)
                 _cardBorder.color = hovered ? _hoverBorderColor : _baseBorderColor;
 
-            if (_cardOutline != null)
+            if (_cardOutline != null && !StyleDThemeUtility.IsStyleDActive)
                 _cardOutline.effectColor = hovered
                     ? new Color(_accentColor.r, _accentColor.g, _accentColor.b, 0.80f)
                     : new Color(0.10f, 0.15f, 0.22f, 0.50f);
@@ -475,10 +559,21 @@ namespace SundayLastBreath.UI
                 _jobImage.color = hovered ? Color.white : new Color(0.86f, 0.88f, 0.92f, 1f);
 
             if (_btnBg != null)
-                _btnBg.color = hovered ? _hoverBtnColor : _baseBtnColor;
+            {
+                Color c = hovered ? _hoverBtnColor : _baseBtnColor;
+                if (StyleDThemeUtility.IsStyleDActive && _btnBg.canvasRenderer != null)
+                {
+                    _btnBg.color = Color.white;
+                    _btnBg.canvasRenderer.SetColor(c);
+                }
+                else
+                {
+                    _btnBg.color = c;
+                }
+            }
 
             if (_btnText != null)
-                _btnText.color = hovered ? Color.white : new Color(0.90f, 0.94f, 0.98f);
+                _btnText.color = hovered ? Color.white : (StyleDThemeUtility.IsStyleDActive ? StyleDThemeUtility.ColBone : new Color(0.90f, 0.94f, 0.98f));
         }
     }
 }
